@@ -160,8 +160,8 @@
 }
 
 .stat-icon {
-  width: 32px;
-  height: 32px;
+  width: 100px;
+  height: 100px;
   object-fit: contain;
   filter: drop-shadow(0 0 4px rgba(95, 179, 232, 0.3));
 }
@@ -172,7 +172,7 @@
 
 .stat-name {
   font-family: var(--font-headings, 'NorseBold', sans-serif);
-  font-size: 11px;
+  font-size: 20px;
   color: #5fb3e8;
   font-weight: bold;
   letter-spacing: 1px;
@@ -180,7 +180,7 @@
 
 .stat-label-code {
   font-family: var(--font-body, 'Segoe UI', sans-serif);
-  font-size: 9px;
+  font-size: 15px;
   color: #c5c8d4;
   opacity: 0.7;
   letter-spacing: 0.5px;
@@ -188,7 +188,7 @@
 
 .stat-value {
   font-family: var(--font-headings, 'NorseBold', sans-serif);
-  font-size: 14px;
+  font-size: 18px;
   color: #d4a574;
   font-weight: bold;
 }
@@ -225,7 +225,7 @@
 
 .character-art {
   width: 420px;
-  height: 580px;
+  height: 450px;
   background-image: url('/Character artwork.png');   /* your current file - keep the name */
   background-size: contain;
   background-repeat: no-repeat;

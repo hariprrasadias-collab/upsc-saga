@@ -1,24 +1,143 @@
-# Logs
-logs
+# ===================================================================
+# General
+# ===================================================================
+
+# Operating System generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files and logs
 *.log
+*.tmp
+*~
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# ===================================================================
+# IDEs and Editors
+# ===================================================================
 
-# Editor directories and files
+# JetBrains IDEs (IntelliJ, PyCharm, WebStorm, etc.)
+.idea/
+
+# Visual Studio Code
 .vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
+# It's often useful to share workspace settings with your team
+# Uncomment the following lines to track specific VSCode files
+# !.vscode/settings.json
+# !.vscode/tasks.json
+# !.vscode/launch.json
+# !.vscode/extensions.json
+
+# Visual Studio
 *.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+*.user
+*.userosscache
+*.sln.docstates
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# =to=================================================================
+# Language & Framework Specific
+# ===================================================================
+
+# Node.js / JavaScript
+node_modules/
+dist/
+build/
+.npm/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+/instance/
+# Python Virtual Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Java / Maven / Gradle
+*.class
+*.jar
+*.war
+*.ear
+target/
+.gradle/
+build/
+# Log files
+*.log
+
+# Ruby / Rails
+.bundle/
+log/
+tmp/
+.byebug_history
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+# Test binary, built with `go test -c`
+*.test
+# Output of `go build`
+/bin
+/pkg
+
+# PHP / Composer
+vendor/
+composer.lock
+
+# ===================================================================
+# Miscellaneous
+# ===================================================================
+
+# Environment variables (contains sensitive data)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Code coverage output
+coverage/
+.nyc_output/
+
+# Compressed files
+*.zip
+*.tar.*
+*.rar
+
