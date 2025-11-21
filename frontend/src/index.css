@@ -1,0 +1,111 @@
+/* /frontend/src/index.css */
+
+/* Import Norse Fonts */
+@font-face {
+  font-family: 'Norse';
+  src: url('/Norse.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'NorseBold';
+  src: url('/Norsebold.otf') format('opentype');
+  font-weight: bold;
+}
+
+/* Global CSS Variables (Color Palette & Fonts) */
+:root {
+  /* Colors - God of War Ragnarok Frosty Theme */
+  --color-primary: #0a0e27; /* Deep dark blue/black */
+  --color-secondary: #1a2847; /* Frosty dark blue */
+  --color-accent-blue: #5fb3e8; /* Icy blue */
+  --color-accent-blue-rgb: 95, 179, 232; /* RGB for rgba usage */
+  --color-accent-blue-hover: #4a9ecf; /* Darker icy blue on hover */
+  --color-accent-orange: #d4a574; /* Gold/bronze for Norse accents */
+  --color-accent-orange-rgb: 212, 165, 116; /* RGB for rgba usage */
+  --color-accent-orange-hover: #c89460; /* Darker gold on hover */
+  --color-accent-green: #2ecc71; /* Green for success/XP bars */
+  --color-accent-yellow: #f1c40f; /* Yellow for XP text */
+  --color-text-primary: #c5c8d4; /* Light frosty text */
+  --color-text-secondary: #8a8f9e; /* Dimmer frosty text */
+  --color-background-dark: #0f1a2e; /* Dark panel background */
+  --color-background-dark-rgb: 15, 26, 46; /* RGB for rgba usage */
+  --color-background-dark-alt: #1a2847; /* Alternate dark background */
+  --color-background-dark-alt-rgb: 26, 40, 71; /* RGB for rgba usage */
+  --color-background-dark-alt-dim: #0a1628; /* Dimmer version for completed tasks */
+  --color-background-alt: #0d1a2e; /* A bit lighter than primary */
+  --color-background-light: #1f2f47; /* Lighter dark background */
+  --color-input-background: #0a0f1f; /* Even darker for inputs */
+  --color-border-primary: #3d4f6b; /* Primary stone border */
+  --color-border-secondary: #2a3a52; /* Secondary border */
+  --color-border-secondary-dim: #1a2638; /* Dimmer secondary border */
+  --color-border-stone: #556b7f; /* Stone-like border */
+  --color-error: #c54c3a; /* Red for error messages */
+  --color-error-rgb: 197, 76, 58; /* RGB for rgba usage */
+
+  /* Fonts */
+  --font-body: 'Roboto', sans-serif; /* General text */
+  --font-headings: 'NorseBold', sans-serif; /* Norse titles and dramatic headings */
+  --font-sidebar: 'Norse', sans-serif; /* For sidebar items, Norse feel */
+}
+
+/* Global Resets */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px; /* Base font size */
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  background-color: var(--color-primary); /* Fallback background */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--color-accent-blue);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--color-accent-blue-hover);
+}
+
+ul {
+  list-style: none;
+}
+
+button {
+  font-family: var(--font-body); /* Ensure buttons use the body font */
+  cursor: pointer;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background-dark);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-accent-blue);
+  border-radius: 5px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-blue-hover);
+}

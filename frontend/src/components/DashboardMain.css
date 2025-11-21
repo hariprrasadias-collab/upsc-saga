@@ -1,0 +1,415 @@
+/* DashboardMain.css - God of War Ragnarok Dashboard Styling */
+
+.dashboard-main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a2f4a 50%, #0a0e27 100%);
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Header */
+.dashboard-header {
+  padding: 20px 30px;
+  background: linear-gradient(180deg, rgba(95, 179, 232, 0.1) 0%, rgba(95, 179, 232, 0) 100%);
+  border-bottom: 2px solid rgba(212, 165, 116, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/Runes.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+.header-title {
+  font-family: var(--font-headings, 'NorseBold', sans-serif);
+  font-size: 32px;
+  color: #d4a574;
+  margin: 0;
+  text-shadow: 0 0 10px rgba(95, 179, 232, 0.3);
+  letter-spacing: 2px;
+  font-weight: bold;
+}
+
+.runes-decoration {
+  width: 80px;
+  height: 30px;
+  background-image: url('/Runes.png');
+  background-size: contain;
+  background-position: right center;
+  background-repeat: no-repeat;
+  opacity: 0.4;
+}
+
+/* Content Grid Layout */
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 20px;
+  padding: 30px;
+  flex: 1;
+  overflow: auto;
+}
+
+/* Left Stats Panel */
+.stats-panel-left {
+  background: linear-gradient(135deg, rgba(26, 47, 74, 0.8) 0%, rgba(10, 14, 39, 0.6) 100%);
+  border: 2px solid rgba(212, 165, 116, 0.2);
+  border-radius: 8px;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: inset 0 0 20px rgba(95, 179, 232, 0.1), 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.stat-level {
+  text-align: center;
+  padding: 35px 0;
+  border-bottom: 2px solid rgba(212, 165, 116, 0.3);
+}
+
+.stat-level h3 {
+  font-family: var(--font-headings, 'NorseBold', sans-serif);
+  font-size: 64px;
+  color: #d4a574;
+  margin: 0;
+  letter-spacing: 2px;
+}
+
+.stat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-row .stat-label {
+  font-family: var(--font-headings, 'NorseBold', sans-serif);
+  font-size: 12px;
+  color: #5fb3e8;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.stat-bar-container {
+  width: 100%;
+}
+
+.stat-bar-bg {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(212, 165, 116, 0.3);
+  height: 20px;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.stat-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #5fb3e8 0%, #a8d5e8 50%, #5fb3e8 100%);
+  transition: width 0.3s ease;
+  box-shadow: 0 0 10px rgba(95, 179, 232, 0.5);
+}
+
+.xp-text {
+  font-family: var(--font-body, 'Segoe UI', sans-serif);
+  font-size: 12px;
+  color: #c5c8d4;
+  text-align: right;
+  letter-spacing: 0.5px;
+}
+
+.stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  background: rgba(95, 179, 232, 0.05);
+  border: 1px solid rgba(212, 165, 116, 0.15);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  background: rgba(95, 179, 232, 0.1);
+  border-color: rgba(212, 165, 116, 0.3);
+  transform: translateX(3px);
+}
+
+.stat-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 4px rgba(95, 179, 232, 0.3));
+}
+
+.stat-info {
+  flex: 1;
+}
+
+.stat-name {
+  font-family: var(--font-headings, 'NorseBold', sans-serif);
+  font-size: 11px;
+  color: #5fb3e8;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.stat-label-code {
+  font-family: var(--font-body, 'Segoe UI', sans-serif);
+  font-size: 9px;
+  color: #c5c8d4;
+  opacity: 0.7;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-family: var(--font-headings, 'NorseBold', sans-serif);
+  font-size: 14px;
+  color: #d4a574;
+  font-weight: bold;
+}
+
+/* Center Panel - Character Display */
+.center-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(26, 47, 74, 0.8) 0%, rgba(10, 14, 39, 0.6) 100%);
+  border: 2px solid rgba(212, 165, 116, 0.2);
+  border-radius: 8px;
+  padding: 25px;
+  box-shadow: inset 0 0 20px rgba(95, 179, 232, 0.1), 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.character-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+  justify-content: center;
+  position: relative;
+  background: rgba(10, 14, 39, 0.9);
+  border: 2px solid rgba(95, 179, 232, 0.3);
+  border-radius: 50%;
+  width: 450px;
+  height: 450px;
+  padding: 20px;
+  overflow: hidden; /* important for clean circle */
+}
+
+.character-art {
+  width: 420px;
+  height: 580px;
+  background-image: url('/Character artwork.png');   /* your current file - keep the name */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+
+  /* THIS IS THE KEY PART - removes checkered pattern forever */
+  -webkit-mask-image: url('/Character artwork.png');
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center bottom;
+  mask-image: url('/Character artwork.png');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center bottom;
+
+  background-color: #5fb3e8; /* glowing edge color - change if you want */
+  animation: float 8s ease-in-out infinite;
+  filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.8));
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%      { transform: translateY(-12px); }
+}
+
+
+.progress-circle-container {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-circle {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  filter: drop-shadow(0 0 10px rgba(95, 179, 232, 0.3));
+}
+
+.circle-bg {
+  fill: none;
+  stroke: rgba(95, 179, 232, 0.1);
+  stroke-width: 3;
+}
+
+.circle-fill {
+  fill: none;
+  stroke: url(#progressGradient);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.5s ease;
+}
+
+.progress-text {
+  font-family: var(--font-headings, 'NorseBold', sans-serif);
+  font-size: 24px;
+  fill: #d4a574;
+  text-anchor: middle;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.character-title {
+  font-family: var(--font-headings, 'NorseBold', sans-serif);
+  font-size: 24px;
+  color: #5fb3e8;
+  margin: 0;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(95, 179, 232, 0.3);
+}
+
+.boons-curses {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  width: 100%;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(212, 165, 116, 0.2);
+}
+
+.boons-section,
+.curses-section {
+  padding: 12px;
+  background: rgba(95, 179, 232, 0.05);
+  border: 1px solid rgba(212, 165, 116, 0.15);
+  border-radius: 4px;
+  text-align: center;
+}
+
+.boons-section h3,
+.curses-section h3 {
+  font-family: var(--font-headings, 'NorseBold', sans-serif);
+  font-size: 12px;
+  color: #5fb3e8;
+  margin: 0 0 4px 0;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+.section-label {
+  font-family: var(--font-body, 'Segoe UI', sans-serif);
+  font-size: 10px;
+  color: #c5c8d4;
+  margin: 0;
+  opacity: 0.7;
+}
+
+/* Right Panel - Will be handled by RitualsPanel component */
+.rituals-panel-container {
+  background: linear-gradient(135deg, rgba(26, 47, 74, 0.8) 0%, rgba(10, 14, 39, 0.6) 100%);
+  border: 2px solid rgba(212, 165, 116, 0.2);
+  border-radius: 8px;
+  padding: 25px;
+  box-shadow: inset 0 0 20px rgba(95, 179, 232, 0.1), 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Scrollbar Styling */
+.dashboard-main::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dashboard-main::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-main::-webkit-scrollbar-thumb {
+  background: rgba(212, 165, 116, 0.4);
+  border-radius: 4px;
+}
+
+.dashboard-main::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 165, 116, 0.6);
+}
+
+/* Responsive Design */
+@media (max-width: 1400px) {
+  .dashboard-content {
+    grid-template-columns: 1fr;
+  }
+
+  .boons-curses {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    padding: 15px 20px;
+  }
+
+  .header-title {
+    font-size: 24px;
+  }
+
+  .dashboard-content {
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .stats-panel-left,
+  .center-panel {
+    padding: 15px;
+  }
+
+  .stat-level h3 {
+    font-size: 24px;
+  }
+
+  .character-art {
+    max-width: 150px;
+    max-height: 200px;
+  }
+
+  .progress-circle-container {
+    width: 140px;
+    height: 140px;
+  }
+
+  .character-title {
+    font-size: 18px;
+  }
+}
