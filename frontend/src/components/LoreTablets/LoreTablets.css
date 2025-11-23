@@ -1,0 +1,191 @@
+/* /frontend/src/components/LoreTablets/LoreTablets.css */
+
+.lore-container {
+    padding: 2rem;
+    height: 100%;
+    overflow-y: auto;
+    background: radial-gradient(circle at top, #1a1f2e 0%, #0a0e17 100%);
+}
+
+.lore-header {
+    font-family: var(--font-headings);
+    font-size: 3rem;
+    color: var(--color-accent-orange);
+    text-align: center;
+    margin-bottom: 2rem;
+    text-shadow: 0 0 15px rgba(212, 165, 116, 0.4);
+}
+
+/* MASONRY GRID */
+.tablets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding-bottom: 50px;
+}
+
+/* ADD NEW BUTTON (Looks like a broken stone) */
+.add-tablet-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px dashed var(--color-border-stone);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.add-tablet-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--color-accent-blue);
+}
+
+.plus-icon {
+    font-size: 3rem;
+    color: var(--color-text-secondary);
+}
+
+/* THE TABLET CARD */
+.tablet-card {
+    background: linear-gradient(145deg, #252b38, #1a1f29);
+    border: 1px solid #3d4f6b;
+    border-bottom: 4px solid #3d4f6b; /* Thick bottom for weight */
+    border-radius: 4px;
+    padding: 1.5rem;
+    min-height: 200px;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+}
+
+.tablet-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    border-color: var(--color-accent-orange);
+}
+
+/* Runes decoration on top of card */
+.tablet-card::before {
+    content: 'ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ'; /* Random runes */
+    position: absolute;
+    top: 5px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.1);
+    letter-spacing: 5px;
+}
+
+.tablet-title {
+    font-family: var(--font-headings);
+    font-size: 1.2rem;
+    color: var(--color-text-primary);
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 5px;
+}
+
+.tablet-preview {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 5; /* Show only 5 lines */
+    -webkit-box-orient: vertical;
+}
+
+/* --- EDITOR MODAL --- */
+.editor-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(5px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.editor-stone {
+    width: 800px;
+    height: 80vh;
+    background: #151a23;
+    border: 2px solid var(--color-accent-orange);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 50px rgba(0,0,0,0.8);
+}
+
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+    background: rgba(0,0,0,0.3);
+    border-bottom: 1px solid var(--color-border-stone);
+}
+
+.title-input {
+    background: transparent;
+    border: none;
+    color: var(--color-accent-orange);
+    font-family: var(--font-headings);
+    font-size: 1.5rem;
+    width: 70%;
+    outline: none;
+}
+
+.content-textarea {
+    flex-grow: 1;
+    background: transparent;
+    border: none;
+    padding: 2rem;
+    color: var(--color-text-primary);
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    resize: none;
+    outline: none;
+}
+
+.editor-footer {
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    background: rgba(0,0,0,0.3);
+    border-top: 1px solid var(--color-border-stone);
+}
+
+.save-btn, .delete-btn {
+    padding: 0.8rem 2rem;
+    font-family: var(--font-headings);
+    cursor: pointer;
+    border: none;
+    text-transform: uppercase;
+}
+
+.save-btn {
+    background: var(--color-accent-green);
+    color: black;
+}
+
+.delete-btn {
+    background: transparent;
+    color: var(--color-error);
+    border: 1px solid var(--color-error);
+}
+
+.delete-btn:hover {
+    background: var(--color-error);
+    color: white;
+}

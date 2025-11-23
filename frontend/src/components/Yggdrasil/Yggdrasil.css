@@ -1,0 +1,351 @@
+/* /frontend/src/components/Yggdrasil/Yggdrasil.css */
+
+.yggdrasil-container {
+    padding: 2rem;
+    height: 100%;
+    overflow: auto;
+    background: radial-gradient(circle at center, #1a2847 0%, #0a0e27 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tree-header {
+    font-family: var(--font-headings);
+    font-size: 3rem;
+    color: var(--color-accent-green);
+    text-shadow: 0 0 20px rgba(46, 204, 113, 0.6);
+    margin-bottom: 3rem;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    flex-shrink: 0;
+}
+
+.tree-wrapper {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 100px;
+    min-width: min-content;
+}
+
+/* --- THE NODES --- */
+.tree-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 10px;
+    position: relative;
+}
+
+.node-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+    position: relative;
+}
+
+.node-content {
+    position: relative;
+    padding: 12px 20px;
+    border: 2px solid;
+    clip-path: polygon(10% 0, 100% 0, 100% 80%, 90% 100%, 0 100%, 0 20%);
+    background: linear-gradient(145deg, #1e2a3a, #0f1620);
+    font-family: var(--font-headings);
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 180px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60px;
+}
+
+.node-content:hover {
+    transform: translateY(-3px);
+}
+
+.node-title {
+    font-size: 0.9rem;
+    line-height: 1.3;
+    word-wrap: break-word;
+}
+
+/* --- EXPAND BUTTON --- */
+.expand-btn {
+    margin-top: -8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--color-accent-blue);
+    background: #0a0e27;
+    color: var(--color-accent-blue);
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    transition: all 0.2s;
+}
+
+.expand-btn:hover {
+    background: var(--color-accent-blue);
+    color: white;
+}
+
+.expand-btn.expanded {
+    background: var(--color-accent-orange);
+    border-color: var(--color-accent-orange);
+    color: #1a0505;
+}
+
+/* --- CYCLE OF REVISIONS (STATUS COLORS) --- */
+
+/* Level 0: Locked (Grey) */
+.status-0 .node-content {
+    border-color: #444;
+    color: #777;
+    background: #111;
+    cursor: pointer; /* Allow click to see requirements */
+}
+
+/* Level 1: Discovered / Unlocked (Blue) */
+.status-1 .node-content {
+    border-color: #3498db; /* River Blue */
+    color: #3498db;
+    box-shadow: 0 0 10px rgba(52, 152, 219, 0.2);
+}
+
+/* Level 2: Read Once (Green) */
+.status-2 .node-content {
+    border-color: #2ecc71; /* Forest Green */
+    color: #2ecc71;
+    box-shadow: 0 0 15px rgba(46, 204, 113, 0.3);
+}
+
+/* Level 3: Revised Once (Purple) */
+.status-3 .node-content {
+    border-color: #9b59b6; /* Mystic Purple */
+    color: #9b59b6;
+    box-shadow: 0 0 20px rgba(155, 89, 182, 0.4);
+}
+
+/* Level 4: Revised Twice (Red) */
+.status-4 .node-content {
+    border-color: #e74c3c; /* War Red */
+    color: #e74c3c;
+    box-shadow: 0 0 25px rgba(231, 76, 60, 0.5);
+}
+
+/* Level 5: Mastered (Gold) */
+.status-5 .node-content {
+    border-color: #f1c40f; /* Godly Gold */
+    color: #1a0505;
+    background: linear-gradient(145deg, #f1c40f, #b08d55);
+    box-shadow: 0 0 30px rgba(241, 196, 15, 0.8);
+    font-weight: bold;
+    transform: scale(1.05);
+}
+
+/* --- BRANCHES --- */
+.children-container {
+    display: flex;
+    flex-direction: row;
+    padding-top: 25px;
+    position: relative;
+    justify-content: center;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.tree-node > .children-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 25px;
+    background: var(--color-border-stone);
+    z-index: 0;
+}
+
+/* --- LEAF GRID --- */
+.children-container.leaf-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.leaf-grid .tree-node {
+    margin: 0;
+}
+
+.leaf-grid::before {
+    height: 15px;
+}
+
+@media (max-width: 1200px) {
+    .children-container.leaf-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* --- TABLET MODAL --- */
+.tablet-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50; /* Low enough to not block sidebar */
+}
+
+.tablet-stone {
+    width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    background: #151f2e;
+    border: 4px solid var(--color-border-stone);
+    padding: 0;
+    box-shadow: 0 0 50px rgba(95, 179, 232, 0.2);
+}
+
+.tablet-header {
+    background: rgba(0,0,0,0.3);
+    padding: 1.5rem;
+    border-bottom: 2px solid var(--color-border-stone);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tablet-header h2 {
+    font-family: var(--font-headings);
+    color: var(--color-accent-orange);
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+.close-btn {
+    background: transparent;
+    border: none;
+    color: var(--color-text-secondary);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.tablet-body {
+    padding: 2rem;
+}
+
+.tablet-desc {
+    color: var(--color-text-primary);
+    margin-bottom: 2rem;
+    font-style: italic;
+}
+
+/* REVISION TRACKER IN MODAL */
+.revision-tracker {
+    margin: 20px 0;
+    background: rgba(0,0,0,0.5);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #555;
+}
+
+.tracker-label {
+    font-size: 0.9rem;
+    color: #aaa;
+    margin-bottom: 15px;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.tracker-dots {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin: 0 10px;
+}
+
+.tracker-dots::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #333;
+    z-index: 0;
+    transform: translateY(-50%);
+}
+
+.dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #222;
+    border: 2px solid #555;
+    z-index: 1;
+    transition: all 0.3s;
+    cursor: help;
+}
+
+.dot.active {
+    transform: scale(1.3);
+    border-color: #fff;
+}
+
+/* Specific colors for active dots */
+.dot.active.l1 { background: #3498db; box-shadow: 0 0 10px #3498db; }
+.dot.active.l2 { background: #2ecc71; box-shadow: 0 0 10px #2ecc71; }
+.dot.active.l3 { background: #9b59b6; box-shadow: 0 0 10px #9b59b6; }
+.dot.active.l4 { background: #e74c3c; box-shadow: 0 0 10px #e74c3c; }
+.dot.active.l5 { background: #f1c40f; box-shadow: 0 0 10px #f1c40f; }
+
+.resources-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 2rem;
+}
+
+.resources-list li {
+    padding: 0.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.mastery-btn {
+    flex: 1;
+    padding: 1rem;
+    background: transparent;
+    border: 2px solid var(--color-accent-green);
+    color: var(--color-accent-green);
+    font-family: var(--font-headings);
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.mastery-btn:hover {
+    background: var(--color-accent-green);
+    color: black;
+}
+
+.mastery-btn.mastered {
+    border-color: var(--color-accent-orange);
+    color: var(--color-accent-orange);
+}

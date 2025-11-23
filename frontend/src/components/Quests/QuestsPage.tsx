@@ -1,11 +1,11 @@
 // /frontend/src/components/Quests/QuestsPage.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import './QuestsPage.css';
-import type { Task, RawTaskFromAPI } from '../../App'; // Re-use Task interface for quests
-import AddQuestForm from './AddQuestForm'; // New component for adding quests
+import type { Task, RawTaskFromAPI } from '../../App'; // Import types from App
+import AddQuestForm from './AddQuestForm';
 
 interface QuestsPageProps {
-  onTaskCompleted: () => Promise<void>; // To refresh dashboard after quest completion
+  onTaskCompleted: () => Promise<void>;
 }
 
 const QuestsPage: React.FC<QuestsPageProps> = ({ onTaskCompleted }) => {
@@ -14,30 +14,36 @@ const QuestsPage: React.FC<QuestsPageProps> = ({ onTaskCompleted }) => {
   const [error, setError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
 
-  // Fetch all tasks (quests and rituals)
+  // --- FIX: Fetch from the specific /api/quests endpoint ---
   const fetchQuests = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:5000/api/tasks');
+      // CRITICAL FIX: Use '/api/quests', NOT '/api/tasks'
+      const response = await fetch('http://localhost:5000/api/quests');
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch tasks');
+        throw new Error('Failed to fetch quests');
       }
+      
       const rawTasks: RawTaskFromAPI[] = await response.json();
-      const allTasks: Task[] = rawTasks.map(task => ({
+      
+      // Map API data to frontend Task interface
+      const allQuests: Task[] = rawTasks.map(task => ({
         id: task.id,
         title: task.title,
-        isCompleted: task.isCompleted === 1,
+        isCompleted: task.isCompleted === 1, // Convert 1/0 to boolean
         xp_reward: task.xp_reward,
         associated_stat: task.associated_stat,
         due_date: task.due_date,
       }));
-      setQuests(allTasks);
+      
+      setQuests(allQuests);
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("An unknown error occurred while fetching tasks.");
+        setError("An unknown error occurred while fetching quests.");
       }
       console.error('Error fetching quests:', err);
     } finally {
@@ -45,6 +51,7 @@ const QuestsPage: React.FC<QuestsPageProps> = ({ onTaskCompleted }) => {
     }
   }, []);
 
+  // Load quests on mount
   useEffect(() => {
     fetchQuests();
   }, [fetchQuests]);
@@ -60,18 +67,19 @@ const QuestsPage: React.FC<QuestsPageProps> = ({ onTaskCompleted }) => {
         throw new Error(errorData.error || 'Failed to complete quest');
       }
 
-      await fetchQuests(); // Refresh the quests list
-      await onTaskCompleted(); // Notify App.tsx to refresh dashboard stats
+      await fetchQuests();   // Refresh list locally
+      await onTaskCompleted(); // Trigger global update (XP, Level, Sidebar)
     } catch (err) {
       console.error('Error completing quest:', err);
       alert('Failed to complete quest. See console for details.');
     }
   };
 
+  // Callback for when the form submits successfully
   const handleQuestAddedOrCancelled = async () => {
-    await fetchQuests(); // Refresh quests list
-    setShowAddForm(false); // Close the form
-    await onTaskCompleted(); // Refresh dashboard data (in case quest creation changes anything, e.g. future daily tasks)
+    await fetchQuests(); // Re-fetch the list to see the new quest immediately
+    setShowAddForm(false);
+    await onTaskCompleted(); // Update dashboard stats just in case
   };
 
   return (

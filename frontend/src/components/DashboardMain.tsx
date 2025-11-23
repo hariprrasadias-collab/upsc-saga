@@ -8,10 +8,13 @@ interface DashboardMainProps {
 }
 
 const DashboardMain: React.FC<DashboardMainProps> = ({
-  stats,
+  stats
 }) => {
 
-  const progressPercent = (stats.current_xp / stats.max_xp) * 100;
+  // Calculate progress percentage safely
+  const progressPercent = stats.max_xp > 0
+    ? (stats.current_xp / stats.max_xp) * 100
+    : 0;
 
   return (
     <div className="dashboard-main">
@@ -86,7 +89,13 @@ const DashboardMain: React.FC<DashboardMainProps> = ({
                   </linearGradient>
                 </defs>
                 <circle cx="100" cy="100" r="90" className="circle-bg"></circle>
-                <circle cx="100" cy="100" r="90" className="circle-fill" style={{ strokeDasharray: `${(progressPercent / 100) * 565} 565` }}></circle>
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="90"
+                  className="circle-fill"
+                  style={{ strokeDasharray: `${(progressPercent / 100) * 565} 565` }}
+                ></circle>
                 <text x="100" y="110" className="progress-text">{Math.round(progressPercent)}%</text>
               </svg>
             </div>

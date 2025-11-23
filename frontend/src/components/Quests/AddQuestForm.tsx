@@ -1,17 +1,20 @@
 // /frontend/src/components/Quests/AddQuestForm.tsx
 import React, { useState } from 'react';
-import './AddQuestForm.css'; // New CSS file for this form
+import './AddQuestForm.css';
 
 interface AddQuestFormProps {
-  onQuestCreated: () => void; // Callback to refresh quests and close form
-  onCancel: () => void; // Callback to close form without creating quest
+  onQuestCreated: () => void;
+  onCancel: () => void;
 }
 
 const AddQuestForm: React.FC<AddQuestFormProps> = ({ onQuestCreated, onCancel }) => {
   const [title, setTitle] = useState('');
-  const [xpReward, setXpReward] = useState<number>(100); // Default XP for quests might be higher
+  
+  // FIX: Use string | number so we can have an empty input without NaN errors
+  const [xpReward, setXpReward] = useState<string | number>(200); 
+  
   const [associatedStat, setAssociatedStat] = useState<string | null>(null);
-  const [dueDate, setDueDate] = useState<string>(''); // Quests can have optional due dates
+  const [dueDate, setDueDate] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -25,24 +28,27 @@ const AddQuestForm: React.FC<AddQuestFormProps> = ({ onQuestCreated, onCancel })
       setSubmitting(false);
       return;
     }
-    if (xpReward <= 0) {
+
+    // Convert to number safely
+    const finalXp = Number(xpReward);
+    if (!finalXp || finalXp <= 0) {
       setError('XP Reward must be a positive number.');
       setSubmitting(false);
       return;
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/quests', { // New endpoint for quests
+      const response = await fetch('http://localhost:5000/api/quests', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           title: title.trim(),
-          xp_reward: xpReward,
+          xp_reward: finalXp,
           associated_stat: associatedStat,
-          due_date: dueDate || null, // Pass null if empty string
-          isCompleted: 0, // New quests are not completed
+          due_date: dueDate || null,
+          isCompleted: 0,
         }),
       });
 
@@ -51,7 +57,7 @@ const AddQuestForm: React.FC<AddQuestFormProps> = ({ onQuestCreated, onCancel })
         throw new Error(errorData.error || 'Failed to create quest');
       }
 
-      onQuestCreated(); // Trigger refresh in parent and close form
+      onQuestCreated();
     } catch (err) {
       console.error('Error creating quest:', err);
       if (err instanceof Error) {
@@ -88,7 +94,8 @@ const AddQuestForm: React.FC<AddQuestFormProps> = ({ onQuestCreated, onCancel })
             type="number"
             id="xp-reward"
             value={xpReward}
-            onChange={(e) => setXpReward(parseInt(e.target.value))}
+            // FIX: Handle empty string to prevent NaN
+            onChange={(e) => setXpReward(e.target.value === '' ? '' : parseInt(e.target.value))}
             min="1"
             required
             disabled={submitting}

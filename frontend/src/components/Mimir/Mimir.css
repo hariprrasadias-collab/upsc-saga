@@ -1,0 +1,167 @@
+/* /frontend/src/components/Mimir/Mimir.css */
+
+/* THE FLOATING HEAD CONTAINER */
+.mimir-head-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 100px;  /* Increased size for the image */
+    height: 100px;
+    background: transparent; /* No background color */
+    border: none; /* No border */
+    cursor: pointer;
+    z-index: 9000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    
+    /* The Floating Animation */
+    animation: floatHead 4s ease-in-out infinite;
+    
+    /* The Magical Blue Glow around the image shape */
+    filter: drop-shadow(0 0 15px rgba(95, 179, 232, 0.6));
+}
+
+.mimir-head-btn:hover {
+    transform: scale(1.1) rotate(-5deg); /* Slight tilt on hover */
+    filter: drop-shadow(0 0 25px rgba(95, 179, 232, 0.9));
+}
+
+/* THE IMAGE ITSELF */
+.mimir-head-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Keeps aspect ratio */
+    pointer-events: none; /* Passes clicks to the button */
+}
+
+/* Remove the old .mimir-eye styles since we have the real eyes now */
+
+@keyframes floatHead {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+
+/* --- CHAT WINDOW STYLES (Unchanged) --- */
+.mimir-chat-window {
+    position: fixed;
+    bottom: 140px; /* Moved up slightly to clear the larger head */
+    right: 30px;
+    width: 350px;
+    height: 500px;
+    background: rgba(10, 14, 23, 0.95);
+    border: 2px solid var(--color-accent-blue);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    z-index: 9000;
+    box-shadow: 0 0 50px rgba(0,0,0,0.8);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    animation: slideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.9); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.mimir-header {
+    background: rgba(95, 179, 232, 0.1);
+    padding: 15px;
+    border-bottom: 1px solid var(--color-accent-blue);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mimir-header h3 {
+    font-family: var(--font-headings);
+    color: var(--color-accent-blue);
+    margin: 0;
+    letter-spacing: 1px;
+}
+
+.clear-chat-btn {
+    background: transparent;
+    border: none;
+    color: var(--color-text-secondary);
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.clear-chat-btn:hover { color: var(--color-error); }
+
+/* Message List */
+.mimir-messages {
+    flex-grow: 1;
+    padding: 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.msg {
+    max-width: 80%;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    animation: popIn 0.2s ease-out;
+}
+
+@keyframes popIn { from{opacity:0; transform:scale(0.9);} to{opacity:1; transform:scale(1);} }
+
+.msg.mimir {
+    align-self: flex-start;
+    background: rgba(95, 179, 232, 0.1);
+    border: 1px solid rgba(95, 179, 232, 0.3);
+    color: var(--color-accent-blue);
+    border-top-left-radius: 0;
+}
+
+.msg.user {
+    align-self: flex-end;
+    background: var(--color-accent-blue);
+    color: #000;
+    border-top-right-radius: 0;
+    font-weight: 500;
+}
+
+/* Input Area */
+.mimir-input-area {
+    padding: 15px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    gap: 10px;
+}
+
+.mimir-input-area input {
+    flex-grow: 1;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid #444;
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    outline: none;
+}
+
+.mimir-input-area input:focus { border-color: var(--color-accent-blue); }
+
+.mimir-send-btn {
+    background: var(--color-accent-blue);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mimir-send-btn:disabled { opacity: 0.5; cursor: wait; }

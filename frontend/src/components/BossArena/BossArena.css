@@ -1,0 +1,203 @@
+/* /frontend/src/components/BossArena/BossArena.css */
+
+.arena-container {
+    padding: 2rem;
+    height: 100%;
+    overflow-y: auto;
+    background: linear-gradient(to bottom, #2c0e0e 0%, #000000 100%); /* Dark Red/Black Theme */
+    color: #f0f0f0;
+}
+
+.arena-header {
+    font-family: var(--font-headings);
+    font-size: 3rem;
+    color: #e74c3c; /* Blood Red */
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    text-shadow: 0 0 20px rgba(231, 76, 60, 0.6);
+    letter-spacing: 5px;
+}
+
+/* BATTLE LIST */
+.battle-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 800px;
+    margin: 0 auto 50px auto;
+}
+
+.battle-card {
+    background: rgba(20, 20, 20, 0.8);
+    border: 2px solid #444;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.battle-card:hover {
+    transform: scale(1.02);
+}
+
+.battle-card.victory {
+    border-color: var(--color-accent-orange);
+    box-shadow: 0 0 15px rgba(212, 165, 116, 0.3);
+}
+
+.battle-card.victory::after {
+    content: 'SLAIN';
+    position: absolute;
+    right: -20px;
+    top: 10px;
+    background: var(--color-accent-orange);
+    color: black;
+    padding: 5px 30px;
+    transform: rotate(45deg);
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+.battle-card.defeat {
+    border-color: #e74c3c;
+    box-shadow: 0 0 15px rgba(231, 76, 60, 0.3);
+}
+
+.battle-card.defeat::after {
+    content: 'DEFEATED';
+    position: absolute;
+    right: -20px;
+    top: 10px;
+    background: #e74c3c;
+    color: white;
+    padding: 5px 30px;
+    transform: rotate(45deg);
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+.boss-info h3 {
+    font-family: var(--font-headings);
+    font-size: 1.5rem;
+    color: #ddd;
+    margin: 0 0 5px 0;
+}
+
+.boss-subject {
+    color: #888;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.score-display {
+    text-align: right;
+}
+
+.score-big {
+    font-size: 2rem;
+    font-weight: bold;
+    font-family: var(--font-headings);
+}
+
+.score-cutoff {
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+/* CHALLENGE BUTTON */
+.challenge-btn {
+    display: block;
+    margin: 0 auto;
+    padding: 1.5rem 4rem;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    font-family: var(--font-headings);
+    font-size: 2rem;
+    cursor: pointer;
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 0 0 20px rgba(231, 76, 60, 0.5);
+}
+
+.challenge-btn:hover {
+    background: #c0392b;
+    transform: scale(1.1);
+    box-shadow: 0 0 40px rgba(231, 76, 60, 0.8);
+}
+
+/* --- MODAL FORM --- */
+.arena-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.arena-modal {
+    background: #1a0505;
+    border: 4px solid #e74c3c;
+    padding: 3rem;
+    width: 500px;
+    text-align: center;
+    box-shadow: 0 0 50px #e74c3c;
+}
+
+.arena-modal h2 {
+    color: #e74c3c;
+    font-family: var(--font-headings);
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+}
+
+.arena-form input, .arena-form select {
+    display: block;
+    width: 100%;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #000;
+    border: 1px solid #555;
+    color: white;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.arena-form input:focus {
+    border-color: #e74c3c;
+    outline: none;
+}
+
+.fight-btn {
+    width: 100%;
+    padding: 1.5rem;
+    background: #e74c3c;
+    color: white;
+    font-family: var(--font-headings);
+    font-size: 1.5rem;
+    border: none;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+.fight-btn:hover {
+    background: #fff;
+    color: #e74c3c;
+}
+
+.cancel-fight {
+    background: transparent;
+    border: none;
+    color: #777;
+    margin-top: 1rem;
+    cursor: pointer;
+}

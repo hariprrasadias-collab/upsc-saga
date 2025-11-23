@@ -2,95 +2,87 @@
 import requests
 import json
 
-# AnkiConnect default URL
 ANKI_CONNECT_URL = 'http://127.0.0.1:8765'
 
-def fetch_due_cards(deck_name="UPSC"):
-    """
-    Connects to local Anki instance via AnkiConnect to get due card count.
-    Returns Total Due (New + Learn + Review).
-    Returns 0 if Anki is not running or deck not found.
-    """
-    # Payload to get detailed stats for a specific deck
-    payload = {
-        "action": "getDeckStats",
-        "params": {"decks": [deck_name]},
-        "version": 6
-    }
-
+def invoke(action, **params):
+    """Generic wrapper to call AnkiConnect."""
+    requestJson = json.dumps({'action': action, 'params': params, 'version': 6})
     try:
-        # Send POST request to AnkiConnect
-        response = requests.post(ANKI_CONNECT_URL, json=payload, timeout=2)
-        response_data = response.json()
-
-        if response_data.get("error"):
-            print(f"AnkiConnect Error: {response_data['error']}")
-            return 0
-
-        # Extract stats for the requested deck
-        # --- THE FIX IS HERE ---
-        # AnkiConnect's getDeckStats returns a dictionary where keys are deck IDs
-        # and values are the stats objects. We need to iterate or find the correct one.
-        # The easiest way is to get the first (and only) deck's stats from the 'result'
-        # as we only requested one deck in params.
-        
-        decks_stats_by_id = response_data.get("result", {})
-        
-        # Check if any stats were returned.
-        if not decks_stats_by_id:
-            print(f"No stats returned for deck '{deck_name}'. It might not exist or be empty.")
-            return 0
-
-        # Since we requested stats for only one deck (by name), we expect only one entry.
-        # However, the key is the deck ID, not the name.
-        # So we just grab the first value in the dictionary.
-        deck_stat = next(iter(decks_stats_by_id.values()), None)
-
-        if not deck_stat:
-            print(f"Stats object not found for deck '{deck_name}' in AnkiConnect response.")
-            return 0
-        # --- END OF FIX ---
-
-        # Calculate total cards due today
-        total_due = (
-            deck_stat.get("new_count", 0) +
-            deck_stat.get("learn_count", 0) +
-            deck_stat.get("review_count", 0)
-        )
-        
-        return total_due
-
-    except requests.exceptions.ConnectionError:
-        print("Could not connect to Anki. Is the app running with AnkiConnect?")
-        return 0
+        response = requests.post(ANKI_CONNECT_URL, data=requestJson).json()
+        if len(response) != 2:
+            raise Exception('response has an unexpected number of fields')
+        if 'error' not in response:
+            raise Exception('response is missing required error field')
+        if 'result' not in response:
+            raise Exception('response is missing required result field')
+        if response['error'] is not None:
+            raise Exception(response['error'])
+        return response['result']
     except Exception as e:
-        print(f"Unexpected error communicating with Anki: {e}")
-        return 0
+        # We print the specific error but don't crash the app
+        # print(f"AnkiConnect Error ({action}): {e}") 
+        return None
+
+def get_due_card_ids(deck_name="UPSC"):
+    """Gets a list of card IDs that are due for review OR new cards ready to learn."""
+    # Modified query: Find cards in deck that are due OR new
+    # 'is:new' catches cards that have never been studied
+    # 'is:due' catches cards that are due for review
+    # 'is:learn' catches cards currently in learning phase
+    query = f'deck:"{deck_name}" (is:new OR is:due OR is:learn)'
+    return invoke('findCards', query=query)
+
+def get_cards_info(card_ids):
+    """Gets details (Question/Answer HTML) for specific card IDs."""
+    return invoke('cardsInfo', cards=card_ids)
+
+def answer_card(card_id, ease):
+    """Submits an answer to Anki (1=Again, 2=Hard, 3=Good, 4=Easy)."""
+    return invoke('answerCards', answers=[{'cardId': card_id, 'ease': ease}])
+
+def fetch_due_count(deck_name="UPSC"):
+    """Gets the total number of due cards for the sidebar."""
+    stats = invoke('getDeckStats', decks=[deck_name])
+    if stats:
+        # Anki returns a dict where keys are deck IDs. We just take the first value.
+        d = list(stats.values())[0]
+        return d['new_count'] + d['learn_count'] + d['review_count']
+    return 0
+
+# --- TEST BLOCK (Runs only when you type 'python anki_client.py') ---
 if __name__ == '__main__':
-    print("--- DEBUGGING ANKI CONNECTION ---")
+    print("\n--- 🔍 TESTING ANKI CONNECTION ---")
     
-    # 1. Ask Anki what decks it actually sees
+    # Test 1: Check connection and Deck Count
     try:
-        debug_payload = {
-            "action": "deckNames",
-            "version": 6
-        }
-        print("Asking Anki for list of deck names...")
-        debug_response = requests.post(ANKI_CONNECT_URL, json=debug_payload, timeout=2)
-        decks_found = debug_response.json().get("result", [])
-        print(f"Anki found these decks: {decks_found}")
-
-        target_deck = "UPSC"
-        if target_deck in decks_found:
-            print(f"\nSuccess! '{target_deck}' is in the list.")
-        else:
-            print(f"\nFAILURE: '{target_deck}' is NOT exactly matching anything in the list above.")
-            print("Please check for exact case sensitivity and trailing spaces in Anki.")
-
+        print("Attempting to contact AnkiConnect...")
+        count = fetch_due_count("UPSC")
+        print(f"✅ SUCCESS: Connected to Anki.")
+        print(f"📊 Cards due in 'UPSC' deck: {count}")
     except Exception as e:
-        print(f"Debug connection failed: {e}")
+        print(f"❌ FAILURE: Could not connect. Is Anki open? Error: {e}")
 
-    print("\n--- RUNNING ORIGINAL TEST ---")
-    # 2. Run the original test function
-    due_count = fetch_due_cards()
-    print(f"Total cards due in 'UPSC' deck: {due_count}")
+    # Test 2: Fetch Specific Card IDs
+    try:
+        ids = get_due_card_ids("UPSC")
+        if ids:
+            print(f"🆔 Found {len(ids)} cards ready to study.")
+            print(f"📝 First 3 Card IDs: {ids[:3]}")
+            
+            # Test 3: Fetch Content for the first card
+            if len(ids) > 0:
+                print("\n--- FETCHING CARD CONTENT ---")
+                info = get_cards_info([ids[0]])
+                if info:
+                    # We use .get() to avoid crashing if fields are missing
+                    q_text = info[0].get('question', 'No Question Found')
+                    a_text = info[0].get('answer', 'No Answer Found')
+                    print(f"❓ Question Sample: {q_text[:100]}...")
+                    print(f"💡 Answer Sample: {a_text[:100]}...")
+        else:
+            print("⚠️ No cards are currently available (or deck 'UPSC' is empty).")
+            
+    except Exception as e:
+        print(f"❌ Error fetching cards: {e}")
+        
+    print("----------------------------------\n")

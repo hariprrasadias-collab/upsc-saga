@@ -1,28 +1,43 @@
 // frontend/src/App.tsx
 import { useState, useEffect, useCallback } from 'react';
-// Remove react-router-dom import if not used or not installed
-import './index.css'; // Global styles and fonts
-import './App.css'; // App-specific styles including background
+import './index.css';
+import './App.css';
+
+// --- COMPONENT IMPORTS ---
 import Sidebar from './components/Sidebar';
 import DashboardMain from './components/DashboardMain';
 import WarMapContainer from './components/WarMap/WarMapContainer';
 import QuestsPage from './components/Quests/QuestsPage';
 import RitualsPanel from './components/RitualsPanel';
+import AshParticles from './components/AshParticles';
+import SpartanRage from './components/SpartanRage/SpartanRage';
+import YggdrasilTree from './components/Yggdrasil/Yggdrasil';
+import LoreTablets from './components/LoreTablets/LoreTablets';
+import BossArena from './components/BossArena/BossArena';
+import Armory from './components/Armory/Armory';
+import MimirChat from './components/Mimir/Mimir';
+import LevelUpModal from './components/LevelUpModal';
+import AnkiDojo from './components/AnkiDojo/AnkiDojo';
+import Seer from './components/Seer/Seer';
+import Ravens from './components/Ravens/Ravens';
 
-// Define Task and RawTaskFromAPI interfaces here for now
+// --- UTILS ---
+import { audioManager } from './util/AudioManager';
+
+// --- TYPES ---
 export interface Task {
   id: number;
   title: string;
   isCompleted: boolean;
   xp_reward: number;
   associated_stat: string | null;
-  due_date: string; // YYYY-MM-DD
+  due_date: string;
 }
 
 export interface RawTaskFromAPI {
   id: number;
   title: string;
-  isCompleted: number; // 0 or 1 from API
+  isCompleted: number;
   xp_reward: number;
   associated_stat: string | null;
   due_date: string;
@@ -34,6 +49,7 @@ export interface UserStats {
   level: number;
   current_xp: number;
   max_xp: number;
+  hacksilver: number;
   strength_stat: number;
   runic_stat: number;
   vitality_stat: number;
@@ -46,22 +62,33 @@ function App() {
   const [ankiDueCount, setAnkiDueCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // Tab state for sidebar navigation (must be before any conditional returns)
+
+  // Navigation State
   const [currentTab, setCurrentTab] = useState('dashboard');
+
+  // Feature States
+  const [isRageMode, setIsRageMode] = useState(false);
+  const [showLevelUp, setShowLevelUp] = useState(false);
 
   const fetchDashboardData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
       const response = await fetch('http://localhost:5000/api/dashboard-data');
-      if (!response.ok) {
-        throw new Error('Failed to fetch dashboard data');
-      }
+      if (!response.ok) throw new Error('Failed to fetch dashboard data');
       const data = await response.json();
 
-      setUserStats(data.stats);
+      // --- LEVEL UP DETECTION LOGIC ---
+      setUserStats((prev) => {
+        const newStats = data.stats;
+        if (prev && newStats.level > prev.level) {
+          audioManager.play('levelup');
+          setShowLevelUp(true);
+        }
+        return newStats;
+      });
 
-      // Convert isCompleted from 0/1 to boolean for frontend consistency
+      // Process Tasks
       const tasksWithBooleanCompletion: Task[] = data.tasks.map((task: RawTaskFromAPI) => ({
         id: task.id,
         title: task.title,
@@ -72,13 +99,9 @@ function App() {
       }));
       setTodayTasks(tasksWithBooleanCompletion);
       setAnkiDueCount(data.anki_due);
+
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unknown error occurred while fetching dashboard data.");
-      }
-      console.error('Error fetching dashboard data:', err);
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setIsLoading(false);
     }
@@ -88,60 +111,59 @@ function App() {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
-  // Handle task completion from Dashboard and QuestsPage
+  // --- AUDIO & VISUAL EFFECTS FOR RAGE MODE ---
+  useEffect(() => {
+    if (isRageMode) {
+      document.body.classList.add('rage-mode');
+      audioManager.startLoop('rage');
+    } else {
+      document.body.classList.remove('rage-mode');
+      audioManager.stopLoop('rage');
+    }
+  }, [isRageMode]);
+
+  // --- TASK COMPLETION HANDLER ---
   const handleTaskCompleted = useCallback(async () => {
-    await fetchDashboardData(); // Re-fetch all dashboard data to update stats and tasks
+    audioManager.play('success');
+    await fetchDashboardData();
   }, [fetchDashboardData]);
 
 
-  if (isLoading) {
-    return (
-      <div className="loading-screen">
-        <p>Loading your adventure...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="error-screen">
-        <p>Error: {error}</p>
-        <p>Please ensure your Flask backend is running (`python app.py` in the backend folder).</p>
-      </div>
-    );
-  }
-
+  if (isLoading && !userStats) return <div className="loading-screen">Loading the Realms...</div>;
+  if (error) return <div className="error-screen">Error: {error}</div>;
 
   return (
     <div className="app-container" style={{
       backgroundImage: `url(/assets/bg_main.jpg)`,
       backgroundSize: 'cover',
       minHeight: '100vh',
+      position: 'relative'
     }}>
+
+      {/* BACKGROUND PARTICLES (Z-Index 0) */}
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
+        <AshParticles isRageMode={isRageMode} />
+      </div>
+
+      {/* SIDEBAR (Left Column) */}
       <Sidebar
         currentTab={currentTab}
         onTabChange={setCurrentTab}
         userStats={userStats}
         ankiDueCount={ankiDueCount}
       />
+
+      {/* MAIN CONTENT AREA (Middle Column - Z-Index 10) */}
       <main className="content" style={{
         backgroundImage: currentTab === 'dashboard' ? `url(/assets/bg_sidebar.png)` : undefined,
         backgroundSize: 'cover',
         minHeight: '100vh',
+        zIndex: 10,
+        position: 'relative'
       }}>
         {currentTab === 'dashboard' && (
           <DashboardMain
-            stats={userStats ?? {
-              id: 0,
-              username: '',
-              level: 1,
-              current_xp: 0,
-              max_xp: 100,
-              strength_stat: 0,
-              runic_stat: 0,
-              vitality_stat: 0,
-              luck_stat: 0,
-            }}
+            stats={userStats!}
           />
         )}
         {currentTab === 'war-map' && (
@@ -150,12 +172,52 @@ function App() {
         {currentTab === 'quests' && (
           <QuestsPage onTaskCompleted={handleTaskCompleted} />
         )}
-        {/* Add more tab content here as needed */}
+        {currentTab === 'codex' && (
+          <YggdrasilTree />
+        )}
+        {currentTab === 'lore-tablets' && (
+          <LoreTablets />
+        )}
+        {currentTab === 'arena' && (
+          <BossArena onBattleComplete={handleTaskCompleted} />
+        )}
+        {currentTab === 'armory' && (
+          <Armory />
+        )}
+        {currentTab === 'dojo' && (
+          <AnkiDojo />
+        )}
+        {currentTab === 'seer' && (
+          <Seer />
+        )}
+        {currentTab === 'ravens' && (
+          <Ravens />
+        )}
       </main>
-      <RitualsPanel
-        tasks={todayTasks}
-        onTaskComplete={handleTaskCompleted}
-      />
+
+      {/* RITUALS PANEL (Right Column) */}
+      <div style={{ zIndex: 15, position: 'relative' }}>
+        <RitualsPanel
+          tasks={todayTasks}
+          onTaskComplete={handleTaskCompleted}
+          // FIX: When clicked, switch tab to War Map
+          onPlanRituals={() => setCurrentTab('war-map')}
+        />
+      </div>
+
+      {/* --- OVERLAYS & FLOATING ELEMENTS --- */}
+
+      <SpartanRage onToggleRage={setIsRageMode} />
+
+      <MimirChat />
+
+      {showLevelUp && userStats && (
+        <LevelUpModal
+          newLevel={userStats.level}
+          onClose={() => setShowLevelUp(false)}
+        />
+      )}
+
     </div>
   );
 }

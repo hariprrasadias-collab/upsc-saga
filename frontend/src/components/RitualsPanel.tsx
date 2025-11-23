@@ -1,15 +1,16 @@
 // /frontend/src/components/RitualsPanel.tsx
 import React from 'react';
 import './RitualsPanel.css';
-// Import Task interface from App.tsx
 import type { Task } from '../App';
 
 interface RitualsPanelProps {
-  tasks: Task[];
+  tasks?: Task[];
   onTaskComplete: (taskId: number) => void;
+  // NEW: Callback to switch tabs
+  onPlanRituals: () => void; 
 }
 
-const RitualsPanel: React.FC<RitualsPanelProps> = ({ tasks, onTaskComplete }) => {
+const RitualsPanel: React.FC<RitualsPanelProps> = ({ tasks = [], onTaskComplete, onPlanRituals }) => {
   return (
     <div className="rituals-panel">
       <div className="rituals-header">
@@ -38,7 +39,13 @@ const RitualsPanel: React.FC<RitualsPanelProps> = ({ tasks, onTaskComplete }) =>
           ))
         )}
       </ul>
-      <button className="add-ritual-btn" style={{ marginTop: 'auto', alignSelf: 'center' }}>
+      
+      {/* FIX: Added onClick handler to switch to War Map */}
+      <button 
+        className="add-ritual-btn" 
+        style={{ marginTop: 'auto', alignSelf: 'center' }}
+        onClick={onPlanRituals}
+      >
         PLAN MORE RITUALS
       </button>
     </div>

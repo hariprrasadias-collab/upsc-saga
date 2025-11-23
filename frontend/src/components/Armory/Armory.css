@@ -1,0 +1,143 @@
+/* /frontend/src/components/Armory/Armory.css */
+
+.armory-container {
+    padding: 2rem;
+    height: 100%;
+    overflow-y: auto;
+    background: linear-gradient(to bottom, #1a1510 0%, #0d0a08 100%); /* Furnace colors */
+    color: #e0e0e0;
+}
+
+.armory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #8B4513; /* SaddleBrown */
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+.armory-title {
+    font-family: var(--font-headings);
+    font-size: 3rem;
+    color: #cd7f32; /* Bronze */
+    text-transform: uppercase;
+    text-shadow: 0 0 15px rgba(205, 127, 50, 0.5);
+}
+
+.wallet-display {
+    background: rgba(0,0,0,0.5);
+    padding: 10px 20px;
+    border: 1px solid #cd7f32;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hacksilver-icon {
+    width: 24px;
+    height: 24px;
+    background: silver;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 5px white;
+}
+
+.wallet-amount {
+    font-size: 1.5rem;
+    font-family: var(--font-headings);
+    color: #fff;
+}
+
+/* SHOP GRID */
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.shop-item {
+    background: #251e18;
+    border: 2px solid #5d4037;
+    border-radius: 8px;
+    padding: 1.5rem;
+    position: relative;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.shop-item:hover {
+    transform: translateY(-5px);
+    border-color: #cd7f32;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.item-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 10px rgba(255,165,0,0.3));
+}
+
+.item-name {
+    font-family: var(--font-headings);
+    font-size: 1.4rem;
+    color: #cd7f32;
+    margin-bottom: 0.5rem;
+}
+
+.item-desc {
+    font-size: 0.9rem;
+    color: #aaa;
+    margin-bottom: 1.5rem;
+    min-height: 40px;
+}
+
+.buy-btn {
+    width: 100%;
+    padding: 1rem;
+    background: #8B4513;
+    color: white;
+    border: none;
+    font-family: var(--font-headings);
+    font-size: 1.1rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: 0.2s;
+}
+
+.buy-btn:hover:not(:disabled) {
+    background: #cd7f32;
+    color: black;
+}
+
+.buy-btn:disabled {
+    background: #333;
+    color: #666;
+    cursor: not-allowed;
+}
+
+.owned-badge {
+    background: #2ecc71;
+    color: black;
+    padding: 1rem;
+    width: 100%;
+    font-weight: bold;
+    font-family: var(--font-headings);
+    letter-spacing: 1px;
+}
+
+/* DWARVEN DECOR */
+.shop-item::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    border: 1px dashed rgba(255,255,255,0.1);
+    pointer-events: none;
+}
