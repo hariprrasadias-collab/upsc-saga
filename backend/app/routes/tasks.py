@@ -19,10 +19,42 @@ def handle_tasks():
 
     elif request.method == 'POST':
         data = request.get_json()
-        conn.execute('INSERT INTO tasks (user_id, title, xp_reward, associated_stat, due_date, isCompleted, is_quest) VALUES (?, ?, ?, ?, ?, 0, 0)',
-                     (user_id, data['title'], data['xp_reward'], data.get('associated_stat'), data['due_date']))
+        
+        start_time = data.get('start_time')
+        end_time = data.get('end_time')
+        
+        conn.execute('INSERT INTO tasks (user_id, title, xp_reward, associated_stat, due_date, start_time, end_time, isCompleted, is_quest) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)',
+                     (user_id, data['title'], data['xp_reward'], data.get('associated_stat'), data['due_date'], start_time, end_time))
         conn.commit()
         new_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
+        
+        # Sync to Google Calendar
+        if start_time and end_time:
+            try:
+                from app.routes.warmap import create_google_calendar_event
+                
+                # Construct description
+                description = f"XP Reward: {data['xp_reward']}\n"
+                if data.get('associated_stat'):
+                    description += f"Associated Stat: {data.get('associated_stat')}\n"
+                
+                # Combine date and time for ISO format if needed, or assume frontend sends full ISO
+                # Frontend sends 'YYYY-MM-DD' for date and 'HH:MM' for time.
+                # We need to construct full ISO strings for Google Calendar
+                
+                date_part = data['due_date']
+                start_iso = f"{date_part}T{start_time}:00"
+                end_iso = f"{date_part}T{end_time}:00"
+                
+                create_google_calendar_event(
+                    title=data['title'],
+                    start_time=start_iso,
+                    end_time=end_iso,
+                    description=description
+                )
+            except Exception as e:
+                print(f"Failed to sync with Google Calendar: {e}")
+                
         return jsonify({"id": new_id}), 201
 
 @bp.route('/<int:task_id>/complete', methods=['POST'])

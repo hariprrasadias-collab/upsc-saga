@@ -7,7 +7,7 @@ interface RitualsPanelProps {
   tasks?: Task[];
   onTaskComplete: (taskId: number) => void;
   // NEW: Callback to switch tabs
-  onPlanRituals: () => void; 
+  onPlanRituals: () => void;
 }
 
 const RitualsPanel: React.FC<RitualsPanelProps> = ({ tasks = [], onTaskComplete, onPlanRituals }) => {
@@ -33,16 +33,16 @@ const RitualsPanel: React.FC<RitualsPanelProps> = ({ tasks = [], onTaskComplete,
               </label>
               <div className="task-info">
                 <span className="task-title">{task.title}</span>
-                <span className="task-xp">+{task.xp_reward} XP</span>
+                {task.xp_reward > 0 && <span className="task-xp">+{task.xp_reward} XP</span>}
               </div>
             </li>
           ))
         )}
       </ul>
-      
+
       {/* FIX: Added onClick handler to switch to War Map */}
-      <button 
-        className="add-ritual-btn" 
+      <button
+        className="add-ritual-btn"
         style={{ marginTop: 'auto', alignSelf: 'center' }}
         onClick={onPlanRituals}
       >

@@ -4,14 +4,16 @@
     padding: 2rem;
     height: 100%;
     overflow-y: auto;
-    background: linear-gradient(to bottom, #2c0e0e 0%, #000000 100%); /* Dark Red/Black Theme */
+    background: linear-gradient(to bottom, #2c0e0e 0%, #000000 100%);
+    /* Dark Red/Black Theme */
     color: #f0f0f0;
 }
 
 .arena-header {
     font-family: var(--font-headings);
     font-size: 3rem;
-    color: #e74c3c; /* Blood Red */
+    color: #e74c3c;
+    /* Blood Red */
     text-align: center;
     text-transform: uppercase;
     margin-bottom: 2rem;
@@ -94,6 +96,18 @@
     letter-spacing: 1px;
 }
 
+.battle-type {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    margin-right: 8px;
+    background: #444;
+    color: #fff;
+    vertical-align: middle;
+}
+
 .score-display {
     text-align: right;
 }
@@ -136,8 +150,11 @@
 /* --- MODAL FORM --- */
 .arena-modal-overlay {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.9);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
     z-index: 200;
     display: flex;
     align-items: center;
@@ -160,7 +177,8 @@
     margin-bottom: 2rem;
 }
 
-.arena-form input, .arena-form select {
+.arena-form input,
+.arena-form select {
     display: block;
     width: 100%;
     margin-bottom: 1.5rem;

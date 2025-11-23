@@ -1,17 +1,19 @@
 // /frontend/src/components/WarMap/AddTaskForm.tsx
 import React, { useState } from 'react';
-import './AddTaskForm.css'; // Make sure this CSS file exists
+import './AddTaskForm.css';
 
 interface AddTaskFormProps {
-  selectedDateStr: string; // The date for which the task is being added
-  onTaskCreated: () => void; // Callback to refresh tasks and close form
-  onCancel: () => void; // Callback to close form without creating task
+  selectedDateStr: string;
+  onTaskCreated: () => void;
+  onCancel: () => void;
 }
 
 const AddTaskForm: React.FC<AddTaskFormProps> = ({ selectedDateStr, onTaskCreated, onCancel }) => {
   const [title, setTitle] = useState('');
-  const [xpReward, setXpReward] = useState<number>(50); // Default XP
+  const [xpReward, setXpReward] = useState<number>(50);
   const [associatedStat, setAssociatedStat] = useState<string | null>(null);
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -30,6 +32,11 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ selectedDateStr, onTaskCreate
       setSubmitting(false);
       return;
     }
+    if (!startTime || !endTime) {
+      setError('Start and End times are required.');
+      setSubmitting(false);
+      return;
+    }
 
     try {
       const response = await fetch('http://localhost:5000/api/tasks', {
@@ -41,8 +48,10 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ selectedDateStr, onTaskCreate
           title: title.trim(),
           xp_reward: xpReward,
           associated_stat: associatedStat,
-          due_date: selectedDateStr, // Use the selected date from WarMap
-          isCompleted: 0, // New tasks are not completed
+          due_date: selectedDateStr,
+          start_time: startTime,
+          end_time: endTime,
+          isCompleted: 0,
         }),
       });
 
@@ -51,7 +60,7 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ selectedDateStr, onTaskCreate
         throw new Error(errorData.error || 'Failed to create ritual');
       }
 
-      onTaskCreated(); // Trigger refresh in parent and close form
+      onTaskCreated();
     } catch (err) {
       console.error('Error creating task:', err);
       if (err instanceof Error) {
@@ -109,6 +118,31 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ selectedDateStr, onTaskCreate
             <option value="vitality_stat">Vitality (GS-III)</option>
             <option value="luck_stat">Luck (GS-IV & Essay)</option>
           </select>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="start-time">Start Time:</label>
+            <input
+              type="time"
+              id="start-time"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+              disabled={submitting}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="end-time">End Time:</label>
+            <input
+              type="time"
+              id="end-time"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+              disabled={submitting}
+              required
+            />
+          </div>
         </div>
 
         <div className="form-actions">

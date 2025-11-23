@@ -1,9 +1,11 @@
 /* /frontend/src/components/WarMap/WarMap.css */
 
 .war-map-container {
-  flex-grow: 1; /* Allow it to take up available space */
+  flex-grow: 1;
+  /* Allow it to take up available space */
   padding: 2rem;
-  overflow-y: auto; /* Allow scrolling within the main content */
+  overflow-y: auto;
+  /* Allow scrolling within the main content */
   /* Removed background-color here as the image needs to show */
   color: var(--color-text-primary);
   /* The background image is likely applied in App.css or a global style */
@@ -13,19 +15,24 @@
 .war-map-header,
 .calendar-section .react-calendar-themed,
 .day-tasks-section {
-  background-color: rgba(var(--color-background-dark-rgb), 0.7); /* Semi-transparent dark background */
-  backdrop-filter: blur(5px); /* Apply a blur effect to content behind it */
+  background-color: rgba(var(--color-background-dark-rgb), 0.7);
+  /* Semi-transparent dark background */
+  backdrop-filter: blur(5px);
+  /* Apply a blur effect to content behind it */
   border: 1px solid var(--color-border-primary);
   border-radius: 10px;
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5); /* Stronger shadow for separation */
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+  /* Stronger shadow for separation */
 }
+
 /* --- END VISIBILITY IMPROVEMENTS --- */
 
 
 .war-map-header {
   text-align: center;
   margin-bottom: 2.5rem;
-  padding: 2.5rem 2rem; /* Adjusted padding */
+  padding: 2.5rem 2rem;
+  /* Adjusted padding */
   margin-left: auto;
   margin-right: auto;
   max-width: 1200px;
@@ -33,31 +40,43 @@
 
 .war-map-header h1 {
   font-family: var(--font-headings);
-  font-size: 3.5rem; /* Made larger */
+  font-size: 3.5rem;
+  /* Made larger */
   color: var(--color-accent-orange);
-  margin-bottom: 0.8rem; /* More space */
-  text-shadow: 0 0 20px rgba(255, 127, 0, 0.6), 0 0 5px rgba(255, 255, 255, 0.2); /* Stronger glow */
-  letter-spacing: 2px; /* More pronounced */
+  margin-bottom: 0.8rem;
+  /* More space */
+  text-shadow: 0 0 20px rgba(255, 127, 0, 0.6), 0 0 5px rgba(255, 255, 255, 0.2);
+  /* Stronger glow */
+  letter-spacing: 2px;
+  /* More pronounced */
 }
 
 .war-map-header p {
-  font-size: 1.2rem; /* Made larger */
-  color: var(--color-text-primary); /* Changed to primary for better contrast */
-  margin-bottom: 2.5rem; /* More space */
-  padding: 0 2rem; /* Increased horizontal padding */
+  font-size: 1.2rem;
+  /* Made larger */
+  color: var(--color-text-primary);
+  /* Changed to primary for better contrast */
+  margin-bottom: 2.5rem;
+  /* More space */
+  padding: 0 2rem;
+  /* Increased horizontal padding */
 }
 
 .create-task-btn {
   background: var(--color-accent-blue);
   color: white;
   border: none;
-  padding: 1.2rem 2.2rem; /* Larger button */
-  border-radius: 10px; /* Slightly more rounded */
+  padding: 1.2rem 2.2rem;
+  /* Larger button */
+  border-radius: 10px;
+  /* Slightly more rounded */
   font-family: var(--font-headings);
-  font-size: 1.2rem; /* Larger text */
+  font-size: 1.2rem;
+  /* Larger text */
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 6px 15px rgba(0, 168, 255, 0.5); /* Stronger shadow */
+  box-shadow: 0 6px 15px rgba(0, 168, 255, 0.5);
+  /* Stronger shadow */
   letter-spacing: 1px;
   text-transform: uppercase;
 }
@@ -65,7 +84,8 @@
 .create-task-btn:hover {
   background: var(--color-accent-blue-hover);
   box-shadow: 0 8px 20px rgba(0, 168, 255, 0.7);
-  transform: translateY(-3px); /* More pronounced lift */
+  transform: translateY(-3px);
+  /* More pronounced lift */
 }
 
 .create-task-btn:active {
@@ -86,46 +106,37 @@
 .calendar-section .react-calendar-themed {
   width: 100%;
   max-width: 450px;
-  padding: 1.5rem; /* Increased padding */
+  padding: 1.5rem;
+  /* Increased padding */
 }
 
 .react-calendar-themed .react-calendar__navigation button {
   color: var(--color-text-primary);
   font-weight: bold;
-  font-size: 1.2em; /* Larger */
+  font-size: 1.2em;
+  /* Larger */
 }
 
 .react-calendar-themed .react-calendar__navigation button:hover:not(:disabled) {
-  background-color: rgba(var(--color-background-dark-alt-rgb), 0.8); /* Slightly more opaque hover */
+  background-color: rgba(var(--color-background-dark-alt-rgb), 0.8);
+  /* Slightly more opaque hover */
 }
 
 .react-calendar-themed .react-calendar__month-view__weekdays__weekday {
   color: var(--color-text-secondary);
-  font-size: 1em; /* Slightly larger */
+  font-size: 1em;
+  /* Slightly larger */
   padding: 0.6em;
 }
 
 .react-calendar-themed .react-calendar__tile {
   color: var(--color-text-primary);
-  padding: 1em 0.5em; /* Increased padding */
-  font-size: 1.05em; /* Slightly larger */
+  padding: 1em 0.5em;
+  /* Increased padding */
+  font-size: 1.05em;
+  /* Slightly larger */
 }
 
-.react-calendar-themed .react-calendar__tile:enabled:hover,
-.react-calendar-themed .react-calendar__tile:enabled:focus {
-  background-color: rgba(var(--color-background-dark-alt-rgb), 0.8);
-  color: var(--color-accent-blue);
-}
-
-.react-calendar-themed .react-calendar__tile--now {
-  background: rgba(var(--color-accent-blue-rgb), 0.2); /* More opaque */
-  color: var(--color-accent-blue);
-}
-
-.react-calendar-themed .react-calendar__tile--active {
-  background: var(--color-accent-orange);
-  color: white;
-}
 
 .react-calendar-themed .react-calendar__tile--active:enabled:hover,
 .react-calendar-themed .react-calendar__tile--active:enabled:focus {
@@ -134,32 +145,38 @@
 }
 
 .react-calendar-themed .react-calendar__tile--hasActive {
-  background: rgba(var(--color-accent-orange-rgb), 0.3); /* More opaque */
+  background: rgba(var(--color-accent-orange-rgb), 0.3);
+  /* More opaque */
   color: var(--color-accent-orange);
 }
 
 
 /* Day Tasks Section */
 .day-tasks-section {
-  padding: 2.5rem; /* Increased padding */
+  padding: 2.5rem;
+  /* Increased padding */
   display: flex;
   flex-direction: column;
 }
 
 .day-tasks-section h2 {
   font-family: var(--font-headings);
-  font-size: 2.5rem; /* Larger */
+  font-size: 2.5rem;
+  /* Larger */
   color: var(--color-accent-blue);
-  margin-bottom: 2rem; /* More space */
+  margin-bottom: 2rem;
+  /* More space */
   text-align: center;
-  text-shadow: 0 0 15px rgba(0, 168, 255, 0.5); /* Stronger glow */
+  text-shadow: 0 0 15px rgba(0, 168, 255, 0.5);
+  /* Stronger glow */
   letter-spacing: 1px;
 }
 
 .loading-message,
 .empty-tasks-message {
   text-align: center;
-  color: var(--color-text-primary); /* Changed to primary for better visibility */
+  color: var(--color-text-primary);
+  /* Changed to primary for better visibility */
   font-style: italic;
   padding: 2rem 0;
   flex-grow: 1;
@@ -172,8 +189,10 @@
 .tasks-list-container {
   flex-grow: 1;
   overflow-y: auto;
-  padding-right: 10px; /* Increased padding for scrollbar */
-  margin-bottom: 2rem; /* More space before the add button */
+  padding-right: 10px;
+  /* Increased padding for scrollbar */
+  margin-bottom: 2rem;
+  /* More space before the add button */
 }
 
 .war-map-task-list {
@@ -186,44 +205,56 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: rgba(var(--color-background-dark-alt-rgb), 0.9); /* Slightly more opaque */
+  background-color: rgba(var(--color-background-dark-alt-rgb), 0.9);
+  /* Slightly more opaque */
   border: 1px solid var(--color-border-secondary);
-  border-radius: 10px; /* Slightly more rounded */
-  padding: 1.2rem 1.8rem; /* Increased padding */
-  margin-bottom: 1rem; /* More space between items */
+  border-radius: 10px;
+  /* Slightly more rounded */
+  padding: 1.2rem 1.8rem;
+  /* Increased padding */
+  margin-bottom: 1rem;
+  /* More space between items */
   transition: all 0.2s ease;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3); /* Stronger shadow */
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  /* Stronger shadow */
 }
 
 .war-map-task-item.completed {
-  opacity: 0.7; /* Slightly less opaque */
-  background-color: rgba(var(--color-background-dark-alt-rgb), 0.6); /* Even dimmer */
+  opacity: 0.7;
+  /* Slightly less opaque */
+  background-color: rgba(var(--color-background-dark-alt-rgb), 0.6);
+  /* Even dimmer */
   border-color: var(--color-border-secondary-dim);
 }
 
 .wm-task-checkbox-wrapper {
   display: flex;
   align-items: center;
-  gap: 15px; /* More space */
+  gap: 15px;
+  /* More space */
   flex-grow: 1;
 }
 
 .wm-task-checkbox-wrapper input[type="checkbox"] {
-  width: 24px; /* Larger checkbox */
+  width: 24px;
+  /* Larger checkbox */
   height: 24px;
   cursor: pointer;
   accent-color: var(--color-accent-orange);
   flex-shrink: 0;
-  border-radius: 4px; /* Slightly rounded checkbox */
+  border-radius: 4px;
+  /* Slightly rounded checkbox */
 }
 
 .wm-task-checkbox-wrapper input[type="checkbox"]:disabled {
   cursor: not-allowed;
-  opacity: 0.5; /* Dimmer disabled checkbox */
+  opacity: 0.5;
+  /* Dimmer disabled checkbox */
 }
 
 .wm-task-title-label {
-  font-size: 1.2rem; /* Larger text */
+  font-size: 1.2rem;
+  /* Larger text */
   font-weight: 500;
   color: var(--color-text-primary);
   cursor: pointer;
@@ -236,11 +267,13 @@
 }
 
 .wm-task-xp {
-  font-size: 1.05rem; /* Larger */
+  font-size: 1.05rem;
+  /* Larger */
   font-weight: bold;
   color: var(--color-accent-yellow);
   flex-shrink: 0;
-  margin-left: 1.5rem; /* More space */
+  margin-left: 1.5rem;
+  /* More space */
 }
 
 /* The 'add-task-button' class is no longer used in this WarMap.css
@@ -252,69 +285,852 @@
 @media (max-width: 992px) {
   .map-content-grid {
     grid-template-columns: 1fr;
-    gap: 2.5rem; /* Slightly more gap */
-  }
-  .react-calendar-themed {
-    max-width: 100%;
-  }
-}
-
-@media (max-width: 768px) {
-  .war-map-container {
-    padding: 1rem;
-  }
-  .war-map-header {
+    gap: 2.5rem;
     padding: 1.5rem 1rem;
   }
+
   .war-map-header h1 {
     font-size: 2.5rem;
   }
+
   .war-map-header p {
     font-size: 1.1rem;
   }
+
   .create-task-btn {
     padding: 1rem 1.5rem;
     font-size: 1.1rem;
   }
+
   .day-tasks-section {
     padding: 1.5rem;
   }
+
   .day-tasks-section h2 {
     font-size: 2rem;
   }
+
   .war-map-task-item {
     padding: 1rem 1.2rem;
   }
+
   .wm-task-title-label {
     font-size: 1.1rem;
   }
+
   .wm-task-xp {
     font-size: 1rem;
   }
 }
 
 @media (max-width: 576px) {
-    .war-map-header h1 {
-        font-size: 2rem;
-    }
-    .war-map-header p {
-        font-size: 0.95rem;
-    }
-    .create-task-btn {
-        font-size: 1rem;
-        padding: 0.8rem 1rem;
-    }
-    .day-tasks-section h2 {
-        font-size: 1.6rem;
-    }
-    .wm-task-checkbox-wrapper input[type="checkbox"] {
-        width: 20px;
-        height: 20px;
-    }
-    .wm-task-title-label {
-        font-size: 1rem;
-    }
-    .wm-task-xp {
-        font-size: 0.9rem;
-    }
+  .war-map-header h1 {
+    font-size: 2rem;
+  }
+
+  .war-map-header p {
+    font-size: 0.95rem;
+  }
+
+  .create-task-btn {
+    font-size: 1rem;
+    padding: 0.8rem 1rem;
+  }
+
+  .day-tasks-section h2 {
+    font-size: 1.6rem;
+  }
+
+  .wm-task-checkbox-wrapper input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+  }
+
+  .wm-task-title-label {
+    font-size: 1rem;
+  }
+
+  .wm-task-xp {
+    font-size: 0.9rem;
+  }
+}
+
+/* Google Calendar Integration */
+.connect-google-btn {
+  background: white;
+  color: #444;
+  border: 1px solid #ddd;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.connect-google-btn:hover {
+  background: #f8f9fa;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.war-map-task-item.google-event {
+  background-color: rgba(66, 133, 244, 0.1);
+  /* Light Google Blue tint */
+  border-color: rgba(66, 133, 244, 0.3);
+}
+
+.google-icon {
+  font-size: 1.2rem;
+}
+
+.google-link {
+  text-decoration: none;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.war-map-task-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: rgba(var(--color-background-dark-alt-rgb), 0.9);
+  /* Slightly more opaque */
+  border: 1px solid var(--color-border-secondary);
+  border-radius: 10px;
+  /* Slightly more rounded */
+  padding: 1.2rem 1.8rem;
+  /* Increased padding */
+  margin-bottom: 1rem;
+  /* More space between items */
+  transition: all 0.2s ease;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  /* Stronger shadow */
+}
+
+.war-map-task-item.completed {
+  opacity: 0.7;
+  /* Slightly less opaque */
+  background-color: rgba(var(--color-background-dark-alt-rgb), 0.6);
+  /* Even dimmer */
+  border-color: var(--color-border-secondary-dim);
+}
+
+.wm-task-checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  /* More space */
+  flex-grow: 1;
+}
+
+.wm-task-checkbox-wrapper input[type="checkbox"] {
+  width: 24px;
+  /* Larger checkbox */
+  height: 24px;
+  cursor: pointer;
+  accent-color: var(--color-accent-orange);
+  flex-shrink: 0;
+  border-radius: 4px;
+  /* Slightly rounded checkbox */
+}
+
+.wm-task-checkbox-wrapper input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  /* Dimmer disabled checkbox */
+}
+
+.wm-task-title-label {
+  font-size: 1.2rem;
+  /* Larger text */
+  font-weight: 500;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.war-map-task-item.completed .wm-task-title-label {
+  color: var(--color-text-secondary);
+  text-decoration: line-through;
+}
+
+.wm-task-xp {
+  font-size: 1.05rem;
+  /* Larger */
+  font-weight: bold;
+  color: var(--color-accent-yellow);
+  flex-shrink: 0;
+  margin-left: 1.5rem;
+  /* More space */
+}
+
+/* The 'add-task-button' class is no longer used in this WarMap.css
+   because the main "create task" button is in WarMapHeader and 
+   the AddTaskForm handles its own buttons. */
+
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .map-content-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding: 1.5rem 1rem;
+  }
+
+  .war-map-header h1 {
+    font-size: 2.5rem;
+  }
+
+  .war-map-header p {
+    font-size: 1.1rem;
+  }
+
+  .create-task-btn {
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+  }
+
+  .day-tasks-section {
+    padding: 1.5rem;
+  }
+
+  .day-tasks-section h2 {
+    font-size: 2rem;
+  }
+
+  .war-map-task-item {
+    padding: 1rem 1.2rem;
+  }
+
+  .wm-task-title-label {
+    font-size: 1.1rem;
+  }
+
+  .wm-task-xp {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .war-map-header h1 {
+    font-size: 2rem;
+  }
+
+  .war-map-header p {
+    font-size: 0.95rem;
+  }
+
+  .create-task-btn {
+    font-size: 1rem;
+    padding: 0.8rem 1rem;
+  }
+
+  .day-tasks-section h2 {
+    font-size: 1.6rem;
+  }
+
+  .wm-task-checkbox-wrapper input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+  }
+
+  .wm-task-title-label {
+    font-size: 1rem;
+  }
+
+  .wm-task-xp {
+    font-size: 0.9rem;
+  }
+}
+
+/* Google Calendar Integration */
+.connect-google-btn {
+  background: white;
+  color: #444;
+  border: 1px solid #ddd;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.connect-google-btn:hover {
+  background: #f8f9fa;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.war-map-task-item.google-event {
+  background-color: rgba(66, 133, 244, 0.1);
+  /* Light Google Blue tint */
+  border-color: rgba(66, 133, 244, 0.3);
+}
+
+.google-icon {
+  font-size: 1.2rem;
+}
+
+.google-link {
+  text-decoration: none;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.google-link:hover {
+  color: #4285f4;
+}
+
+.event-time {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  font-weight: normal;
+}
+
+.google-event-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.google-event-description {
+  margin-left: 0.5rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--color-border-stone);
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.wm-task-checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  /* More space */
+  flex-grow: 1;
+}
+
+.wm-task-checkbox-wrapper input[type="checkbox"] {
+  width: 24px;
+  /* Larger checkbox */
+  height: 24px;
+  cursor: pointer;
+  accent-color: var(--color-accent-orange);
+  flex-shrink: 0;
+  border-radius: 4px;
+  /* Slightly rounded checkbox */
+}
+
+.wm-task-checkbox-wrapper input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  /* Dimmer disabled checkbox */
+}
+
+.wm-task-title-label {
+  font-size: 1.2rem;
+  /* Larger text */
+  font-weight: 500;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.war-map-task-item.completed .wm-task-title-label {
+  color: var(--color-text-secondary);
+  text-decoration: line-through;
+}
+
+.wm-task-xp {
+  font-size: 1.05rem;
+  /* Larger */
+  font-weight: bold;
+  color: var(--color-accent-yellow);
+  flex-shrink: 0;
+  margin-left: 1.5rem;
+  /* More space */
+}
+
+/* The 'add-task-button' class is no longer used in this WarMap.css
+   because the main "create task" button is in WarMapHeader and 
+   the AddTaskForm handles its own buttons. */
+
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .map-content-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding: 1.5rem 1rem;
+  }
+
+  .war-map-header h1 {
+    font-size: 2.5rem;
+  }
+
+  .war-map-header p {
+    font-size: 1.1rem;
+  }
+
+  .create-task-btn {
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+  }
+
+  .day-tasks-section {
+    padding: 1.5rem;
+  }
+
+  .day-tasks-section h2 {
+    font-size: 2rem;
+  }
+
+  .war-map-task-item {
+    padding: 1rem 1.2rem;
+  }
+
+  .wm-task-title-label {
+    font-size: 1.1rem;
+  }
+
+  .wm-task-xp {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .war-map-header h1 {
+    font-size: 2rem;
+  }
+
+  .war-map-header p {
+    font-size: 0.95rem;
+  }
+
+  .create-task-btn {
+    font-size: 1rem;
+    padding: 0.8rem 1rem;
+  }
+
+  .day-tasks-section h2 {
+    font-size: 1.6rem;
+  }
+
+  .wm-task-checkbox-wrapper input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+  }
+
+  .wm-task-title-label {
+    font-size: 1rem;
+  }
+
+  .wm-task-xp {
+    font-size: 0.9rem;
+  }
+}
+
+/* Google Calendar Integration */
+.connect-google-btn {
+  background: white;
+  color: #444;
+  border: 1px solid #ddd;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.connect-google-btn:hover {
+  background: #f8f9fa;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.war-map-task-item.google-event {
+  background-color: rgba(66, 133, 244, 0.1);
+  /* Light Google Blue tint */
+  border-color: rgba(66, 133, 244, 0.3);
+}
+
+.google-icon {
+  font-size: 1.2rem;
+}
+
+.google-link {
+  text-decoration: none;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.google-link:hover {
+  color: #4285f4;
+}
+
+.event-time {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  font-weight: normal;
+}
+
+.google-event-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.google-event-description {
+  margin-left: 0.5rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--color-border-stone);
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.google-event-description .description-line {
+  margin-bottom: 0.25rem;
+}
+
+flex-grow: 1;
+}
+
+.wm-task-checkbox-wrapper input[type="checkbox"] {
+  width: 24px;
+  /* Larger checkbox */
+  height: 24px;
+  cursor: pointer;
+  accent-color: var(--color-accent-orange);
+  flex-shrink: 0;
+  border-radius: 4px;
+  /* Slightly rounded checkbox */
+}
+
+.wm-task-checkbox-wrapper input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  /* Dimmer disabled checkbox */
+}
+
+.wm-task-title-label {
+  font-size: 1.2rem;
+  /* Larger text */
+  font-weight: 500;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.war-map-task-item.completed .wm-task-title-label {
+  color: var(--color-text-secondary);
+  text-decoration: line-through;
+}
+
+.wm-task-xp {
+  font-size: 1.05rem;
+  /* Larger */
+  font-weight: bold;
+  color: var(--color-accent-yellow);
+  flex-shrink: 0;
+  margin-left: 1.5rem;
+  /* More space */
+}
+
+/* The 'add-task-button' class is no longer used in this WarMap.css
+   because the main "create task" button is in WarMapHeader and 
+   the AddTaskForm handles its own buttons. */
+
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .map-content-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding: 1.5rem 1rem;
+  }
+
+  .war-map-header h1 {
+    font-size: 2.5rem;
+  }
+
+  .war-map-header p {
+    font-size: 1.1rem;
+  }
+
+  .create-task-btn {
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+  }
+
+  .day-tasks-section {
+    padding: 1.5rem;
+  }
+
+  .day-tasks-section h2 {
+    font-size: 2rem;
+  }
+
+  .war-map-task-item {
+    padding: 1rem 1.2rem;
+  }
+
+  .wm-task-title-label {
+    font-size: 1.1rem;
+  }
+
+  .wm-task-xp {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .war-map-header h1 {
+    font-size: 2rem;
+  }
+
+  .war-map-header p {
+    font-size: 0.95rem;
+  }
+
+  .create-task-btn {
+    font-size: 1rem;
+    padding: 0.8rem 1rem;
+  }
+
+  .day-tasks-section h2 {
+    font-size: 1.6rem;
+  }
+
+  .wm-task-checkbox-wrapper input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+  }
+
+  .wm-task-title-label {
+    font-size: 1rem;
+  }
+
+  .wm-task-xp {
+    font-size: 0.9rem;
+  }
+}
+
+/* Google Calendar Integration */
+.connect-google-btn {
+  background: white;
+  color: #444;
+  border: 1px solid #ddd;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.connect-google-btn:hover {
+  background: #f8f9fa;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.war-map-task-item.google-event {
+  background-color: rgba(66, 133, 244, 0.1);
+  /* Light Google Blue tint */
+  border-color: rgba(66, 133, 244, 0.3);
+}
+
+.google-icon {
+  font-size: 1.2rem;
+}
+
+.google-link {
+  text-decoration: none;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.google-link:hover {
+  color: #4285f4;
+}
+
+.event-time {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  font-weight: normal;
+}
+
+.google-event-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.google-event-description {
+  margin-left: 0.5rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--color-border-stone);
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.google-event-description .description-line {
+  margin-bottom: 0.25rem;
+}
+
+.google-event-description .description-line:empty {
+  margin-bottom: 0.5rem;
+}
+
+.war-map-task-item.google-event.completed .wm-task-title-label {
+  text-decoration: line-through;
+  color: #95a5a6;
+}
+
+/* Google Calendar Event XP and Actions */
+.event-xp-section {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.xp-editor {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.xp-input {
+  width: 80px;
+  padding: 0.25rem 0.5rem;
+  border: 2px solid #3498db;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ecf0f1;
+  font-size: 0.9rem;
+}
+
+.xp-input:focus {
+  outline: none;
+  border-color: #2ecc71;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.save-xp-btn,
+.cancel-xp-btn {
+  padding: 0.25rem 0.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.save-xp-btn {
+  background: #2ecc71;
+  color: white;
+}
+
+.save-xp-btn:hover {
+  background: #27ae60;
+}
+
+.cancel-xp-btn {
+  background: #e74c3c;
+  color: white;
+}
+
+.cancel-xp-btn:hover {
+  background: #c0392b;
+}
+
+.xp-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.xp-value {
+  color: #f39c12;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.edit-xp-btn {
+  padding: 0.25rem 0.75rem;
+  background: rgba(52, 152, 219, 0.2);
+  border: 1px solid #3498db;
+  border-radius: 4px;
+  color: #3498db;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.edit-xp-btn:hover {
+  background: rgba(52, 152, 219, 0.3);
+  border-color: #2980b9;
+}
+
+.event-actions {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.delete-event-btn {
+  padding: 0.3rem 0.75rem;
+  background: rgba(231, 76, 60, 0.1);
+  border: 1px solid #e74c3c;
+  border-radius: 4px;
+  color: #e74c3c;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.delete-event-btn:hover {
+  background: rgba(231, 76, 60, 0.2);
+  border-color: #c0392b;
+  color: #c0392b;
+}
+
+.google-link {
+  cursor: pointer;
 }

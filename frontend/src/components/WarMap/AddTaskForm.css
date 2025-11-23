@@ -1,24 +1,35 @@
 /* /frontend/src/components/WarMap/AddTaskForm.css */
 
 .add-task-form {
-  background-color: rgba(var(--color-background-dark-rgb), 0.85); /* Slightly more opaque */
-  backdrop-filter: blur(8px); /* Increased blur */
+  background-color: rgba(var(--color-background-dark-rgb), 0.85);
+  /* Slightly more opaque */
+  backdrop-filter: blur(8px);
+  /* Increased blur */
   border: 1px solid var(--color-border-primary);
-  border-radius: 12px; /* Slightly more rounded */
-  padding: 3rem; /* Increased padding */
-  max-width: 550px; /* Slightly wider */
-  margin: 3rem auto; /* Center the form with more margin */
+  border-radius: 12px;
+  /* Slightly more rounded */
+  padding: 3rem;
+  /* Increased padding */
+  max-width: 550px;
+  /* Slightly wider */
+  margin: 3rem auto;
+  /* Center the form with more margin */
   text-align: left;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); /* Stronger shadow */
-  position: relative; /* For potential future z-index needs */
-  z-index: 1000; /* Ensure it's above other content if overlapping */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  /* Stronger shadow */
+  position: relative;
+  /* For potential future z-index needs */
+  z-index: 1000;
+  /* Ensure it's above other content if overlapping */
 }
 
 .add-task-form h3 {
   font-family: var(--font-headings);
-  font-size: 2.2rem; /* Larger title */
+  font-size: 2.2rem;
+  /* Larger title */
   color: var(--color-accent-orange);
-  margin-bottom: 2.5rem; /* More space */
+  margin-bottom: 2.5rem;
+  /* More space */
   text-align: center;
   text-shadow: 0 0 10px rgba(255, 127, 0, 0.4);
   letter-spacing: 0.5px;
@@ -26,103 +37,94 @@
 
 .error-message {
   color: var(--color-error);
-  background-color: rgba(var(--color-error-rgb), 0.15); /* Slightly more opaque error background */
+  background-color: rgba(var(--color-error-rgb), 0.15);
+  /* Slightly more opaque error background */
   border: 1px solid var(--color-error);
-  border-radius: 6px; /* Slightly more rounded */
-  padding: 1rem; /* More padding */
-  margin-bottom: 2rem; /* More space */
+  border-radius: 6px;
+  /* Slightly more rounded */
+  color: var(--color-text-primary);
+  margin-bottom: 0.8rem;
+  /* More space */
+  font-weight: bold;
+  padding: 1rem;
   text-align: center;
-  font-size: 0.95rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.form-row .form-group {
+  flex: 1;
 }
 
 .form-group {
-  margin-bottom: 1.8rem; /* More space between form groups */
+  margin-bottom: 1.8rem;
+  /* More space between form groups */
 }
 
 .form-group label {
   display: block;
   font-family: var(--font-body);
-  font-size: 1.05rem; /* Slightly larger label */
-  color: var(--color-text-primary);
-  margin-bottom: 0.8rem; /* More space */
-  font-weight: bold;
-}
-
-.form-group input[type="text"],
-.form-group input[type="number"],
-.form-group select {
-  width: 100%;
-  padding: 1rem 1.2rem; /* Increased padding */
-  border: 1px solid var(--color-border-stone);
-  border-radius: 8px; /* Slightly more rounded */
-  background-color: var(--color-input-background);
-  color: var(--color-text-primary);
-  font-family: var(--font-body);
-  font-size: 1.05rem; /* Slightly larger font */
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2); /* Stronger inner shadow */
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-
-  /* Custom dropdown arrow for <select> to ensure visibility and consistency */
-  -webkit-appearance: none; /* Remove default browser styling for dropdown arrow */
-  -moz-appearance: none;
-  appearance: none;
-  /* Dark grey arrow SVG for light text on dark background */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23888888'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 1rem center; /* Position the arrow */
-  background-size: 1.2em; /* Size of the arrow */
-  padding-right: 3.5rem; /* Make space for the custom arrow to prevent text overlap */
-  
-  /* --- CRITICAL FIX FOR DROPDOWN VISIBILITY --- */
-  z-index: 1001; /* Ensure the select box itself is above other content */
-  position: relative; /* Needed for z-index to work */
-  /* --- END CRITICAL FIX --- */
-}
-
-/* --- DROPDOWN OPTIONS VISIBILITY FIX (UPDATED WITH !important) --- */
-.form-group select option {
-  background-color: var(--color-input-background) !important; /* Force dark background */
-  color: var(--color-text-primary) !important; /* Force light text */
+  font-size: 1.05rem;
+  /* Slightly larger label */
+  color: var(--color-text-primary) !important;
+  /* Force light text */
   font-family: var(--font-body) !important;
-  padding: 0.5rem 1rem !important; /* Padding for options (might be ignored by some browsers) */
+  padding: 0.5rem 1rem !important;
+  /* Padding for options (might be ignored by some browsers) */
 }
 
 /* Style for focused/hovered option in the dropdown list */
-.form-group select option:checked, /* The currently selected option, even when dropdown is open */
-.form-group select option:focus, /* If an option can be focused (e.g., via keyboard) */
-.form-group select option:hover { /* Mouse hover over an option */
-  background-color: var(--color-accent-blue) !important; /* Use an accent color for highlight */
-  color: white !important; /* Ensure text is white on accent background */
+.form-group select option:checked,
+/* The currently selected option, even when dropdown is open */
+.form-group select option:focus,
+/* If an option can be focused (e.g., via keyboard) */
+.form-group select option:hover {
+  /* Mouse hover over an option */
+  background-color: var(--color-accent-blue) !important;
+  /* Use an accent color for highlight */
+  color: white !important;
+  /* Ensure text is white on accent background */
 }
+
 /* --- END DROPDOWN OPTIONS VISIBILITY FIX --- */
 
 
 .form-group input:focus,
 .form-group select:focus {
   border-color: var(--color-accent-blue);
-  box-shadow: 0 0 0 4px rgba(0, 168, 255, 0.4); /* Stronger focus glow */
+  box-shadow: 0 0 0 4px rgba(0, 168, 255, 0.4);
+  /* Stronger focus glow */
   outline: none;
 }
 
 .form-group input::placeholder {
   color: var(--color-text-secondary);
-  opacity: 0.8; /* Slightly less opaque placeholder */
+  opacity: 0.8;
+  /* Slightly less opaque placeholder */
 }
 
 .form-actions {
   display: flex;
   justify-content: space-between;
-  gap: 1.5rem; /* More space between buttons */
-  margin-top: 2.5rem; /* More margin */
+  gap: 1.5rem;
+  /* More space between buttons */
+  margin-top: 2.5rem;
+  /* More margin */
 }
 
 .form-actions button {
   flex: 1;
-  padding: 1.3rem; /* Larger buttons */
+  padding: 1.3rem;
+  /* Larger buttons */
   border: none;
-  border-radius: 10px; /* More rounded */
+  border-radius: 10px;
+  /* More rounded */
   font-family: var(--font-headings);
-  font-size: 1.15rem; /* Larger font */
+  font-size: 1.15rem;
+  /* Larger font */
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
@@ -132,13 +134,15 @@
 .form-actions button[type="submit"] {
   background: var(--color-accent-orange);
   color: white;
-  box-shadow: 0 6px 20px rgba(255, 127, 0, 0.6); /* Stronger shadow */
+  box-shadow: 0 6px 20px rgba(255, 127, 0, 0.6);
+  /* Stronger shadow */
 }
 
 .form-actions button[type="submit"]:hover:not(:disabled) {
   background: var(--color-accent-orange-hover);
   box-shadow: 0 8px 25px rgba(255, 127, 0, 0.8);
-  transform: translateY(-3px); /* More pronounced lift */
+  transform: translateY(-3px);
+  /* More pronounced lift */
 }
 
 .form-actions button[type="submit"]:active:not(:disabled) {
@@ -146,7 +150,8 @@
   box-shadow: 0 4px 12px rgba(255, 127, 0, 0.6);
 }
 
-.form-actions button[type="button"] { /* Cancel button */
+.form-actions button[type="button"] {
+  /* Cancel button */
   background: var(--color-background-light);
   color: var(--color-text-primary);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
@@ -174,25 +179,38 @@
     margin: 2rem auto;
     max-width: 90%;
   }
+
   .add-task-form h3 {
     font-size: 1.8rem;
   }
+
   .form-group label,
   .form-group input,
   .form-group select {
     font-size: 1rem;
     padding: 0.8rem 1rem;
   }
+
   .form-actions {
-    flex-direction: column; /* Stack buttons vertically */
+    flex-direction: column;
+    /* Stack buttons vertically */
     gap: 1rem;
   }
+
   .form-actions button {
     padding: 1rem;
     font-size: 1rem;
   }
+
   .form-group select {
-    background-position: right 0.7rem center; /* Adjust arrow position */
-    padding-right: 2.5rem; /* Adjust padding for arrow */
+    background-position: right 0.7rem center;
+    /* Adjust arrow position */
+    padding-right: 2.5rem;
+    /* Adjust padding for arrow */
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0;
   }
 }

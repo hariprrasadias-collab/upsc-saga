@@ -7,6 +7,7 @@ import './App.css';
 import Sidebar from './components/Sidebar';
 import DashboardMain from './components/DashboardMain';
 import WarMapContainer from './components/WarMap/WarMapContainer';
+import SyllabusTracker from './components/Syllabus/SyllabusTracker';
 import QuestsPage from './components/Quests/QuestsPage';
 import RitualsPanel from './components/RitualsPanel';
 import AshParticles from './components/AshParticles';
@@ -14,12 +15,17 @@ import SpartanRage from './components/SpartanRage/SpartanRage';
 import YggdrasilTree from './components/Yggdrasil/Yggdrasil';
 import LoreTablets from './components/LoreTablets/LoreTablets';
 import BossArena from './components/BossArena/BossArena';
+import PYQDatabase from './components/PYQ/PYQDatabase';
 import Armory from './components/Armory/Armory';
 import MimirChat from './components/Mimir/Mimir';
 import LevelUpModal from './components/LevelUpModal';
 import AnkiDojo from './components/AnkiDojo/AnkiDojo';
 import Seer from './components/Seer/Seer';
 import Ravens from './components/Ravens/Ravens';
+import AnswerWriting from './components/AnswerWriting/AnswerWriting';
+import MockTests from './components/MockTests/MockTests';
+import FlashcardsManager from './components/Flashcards/FlashcardsManager';
+import AnalyticsDashboard from './components/Analytics/AnalyticsDashboard';
 
 // --- UTILS ---
 import { audioManager } from './util/AudioManager';
@@ -97,7 +103,32 @@ function App() {
         associated_stat: task.associated_stat,
         due_date: task.due_date,
       }));
-      setTodayTasks(tasksWithBooleanCompletion);
+
+      // Fetch today's Google Calendar events
+      const today = new Date().toISOString().split('T')[0];
+      try {
+        const gcalRes = await fetch(`http://localhost:5000/api/warmap/google-events?date=${today}`);
+        if (gcalRes.ok) {
+          const gcalEvents = await gcalRes.json();
+          // Convert Google Calendar events to Task format
+          const gcalTasks: Task[] = gcalEvents.map((event: any, index: number) => ({
+            id: -1000 - index, // Negative IDs to avoid conflicts with DB tasks
+            title: event.title,
+            isCompleted: false,
+            xp_reward: 0, // Google Calendar events don't have XP
+            associated_stat: null,
+            due_date: today,
+          }));
+          // Merge with local tasks
+          setTodayTasks([...tasksWithBooleanCompletion, ...gcalTasks]);
+        } else {
+          setTodayTasks(tasksWithBooleanCompletion);
+        }
+      } catch (err) {
+        console.error("Error fetching Google Calendar events:", err);
+        setTodayTasks(tasksWithBooleanCompletion);
+      }
+
       setAnkiDueCount(data.anki_due);
 
     } catch (err) {
@@ -145,12 +176,10 @@ function App() {
         <AshParticles isRageMode={isRageMode} />
       </div>
 
-      {/* SIDEBAR (Left Column) */}
+      {/* LEFT SIDEBAR */}
       <Sidebar
         currentTab={currentTab}
-        onTabChange={setCurrentTab}
-        userStats={userStats}
-        ankiDueCount={ankiDueCount}
+        setCurrentTab={setCurrentTab}
       />
 
       {/* MAIN CONTENT AREA (Middle Column - Z-Index 10) */}
@@ -169,6 +198,9 @@ function App() {
         {currentTab === 'war-map' && (
           <WarMapContainer onTaskCompleted={handleTaskCompleted} />
         )}
+        {currentTab === 'syllabus' && (
+          <SyllabusTracker onTaskCompleted={handleTaskCompleted} />
+        )}
         {currentTab === 'quests' && (
           <QuestsPage onTaskCompleted={handleTaskCompleted} />
         )}
@@ -177,6 +209,9 @@ function App() {
         )}
         {currentTab === 'lore-tablets' && (
           <LoreTablets />
+        )}
+        {currentTab === 'pyq' && (
+          <PYQDatabase />
         )}
         {currentTab === 'arena' && (
           <BossArena onBattleComplete={handleTaskCompleted} />
@@ -192,6 +227,18 @@ function App() {
         )}
         {currentTab === 'ravens' && (
           <Ravens />
+        )}
+        {currentTab === 'answer-writing' && (
+          <AnswerWriting onTaskCompleted={handleTaskCompleted} />
+        )}
+        {currentTab === 'mock-tests' && (
+          <MockTests onTaskCompleted={handleTaskCompleted} />
+        )}
+        {currentTab === 'flashcards' && (
+          <FlashcardsManager onTaskCompleted={handleTaskCompleted} />
+        )}
+        {currentTab === 'analytics' && (
+          <AnalyticsDashboard />
         )}
       </main>
 

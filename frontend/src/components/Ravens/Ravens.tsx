@@ -15,6 +15,10 @@ interface Article {
     subjects?: string[];
     importance?: number;
     ankiCardId?: number;
+    isBookmarked?: boolean;
+    userNotes?: string;
+    imageUrl?: string;
+    relatedPyqs?: any[];
 }
 
 const Ravens: React.FC = () => {
@@ -23,14 +27,17 @@ const Ravens: React.FC = () => {
     const [processing, setProcessing] = useState(false);
     const [selectedPaper, setSelectedPaper] = useState<string>('');
     const [selectedSubject, setSelectedSubject] = useState<string>('');
+    const [searchQuery, setSearchQuery] = useState<string>('');
+    const [showBookmarked, setShowBookmarked] = useState<boolean>(false);
+    const [editingNotes, setEditingNotes] = useState<number | null>(null);
 
     const papers = ['All Papers', 'GS1', 'GS2', 'GS3', 'GS4'];
-    const subjects = ['All Subjects', 'Polity', 'Economics', 'International Relations',
-        'Environment', 'Science & Tech', 'Internal Security', 'Social Issues'];
+    const subjects = ['All Subjects', 'Polity & Governance', 'Economics', 'International Relations',
+        'Environment & Ecology', 'Science & Technology', 'Internal Security', 'Social Issues'];
 
     useEffect(() => {
         fetchArticles();
-    }, [selectedPaper, selectedSubject]);
+    }, [selectedPaper, selectedSubject, showBookmarked, searchQuery]);
 
     const fetchArticles = async () => {
         setLoading(true);
@@ -38,6 +45,8 @@ const Ravens: React.FC = () => {
             const params = new URLSearchParams();
             if (selectedPaper && selectedPaper !== 'All Papers') params.append('paper', selectedPaper);
             if (selectedSubject && selectedSubject !== 'All Subjects') params.append('subject', selectedSubject);
+            if (showBookmarked) params.append('bookmarked', 'true');
+            if (searchQuery) params.append('search', searchQuery);
 
             const res = await fetch(`http://localhost:5000/api/ravens/saved?${params}`);
             if (res.ok) {
@@ -113,6 +122,29 @@ const Ravens: React.FC = () => {
         }
     };
 
+    const handleBookmark = async (id: number) => {
+        try {
+            await fetch(`http://localhost:5000/api/ravens/${id}/bookmark`, { method: 'POST' });
+            audioManager.play('click');
+            fetchArticles();
+        } catch (err) {
+            console.error("Failed to toggle bookmark:", err);
+        }
+    };
+
+    const handleNotesSave = async (id: number, notes: string) => {
+        try {
+            await fetch(`http://localhost:5000/api/ravens/${id}/notes`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ notes })
+            });
+            setEditingNotes(null);
+        } catch (err) {
+            console.error("Failed to save notes:", err);
+        }
+    };
+
     const paperColors: Record<string, string> = {
         'GS1': '#FF6B6B',
         'GS2': '#4ECDC4',
@@ -133,13 +165,26 @@ const Ravens: React.FC = () => {
                 </button>
             </div>
 
-            <div className="filters-compact">
+            <div className="filters-enhanced">
+                <input
+                    type="text"
+                    placeholder="🔍 Search articles..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="search-input"
+                />
                 <select value={selectedPaper} onChange={(e) => setSelectedPaper(e.target.value)}>
                     {papers.map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
                 <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)}>
                     {subjects.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
+                <button
+                    className={`bookmark-filter ${showBookmarked ? 'active' : ''}`}
+                    onClick={() => setShowBookmarked(!showBookmarked)}
+                >
+                    {showBookmarked ? '⭐ Showing Bookmarked' : '☆ All Articles'}
+                </button>
             </div>
 
             {loading ? (
@@ -152,13 +197,27 @@ const Ravens: React.FC = () => {
                 <div className="articles-grid">
                     {articles.map((article) => (
                         <div key={article.id} className="article-card">
+                            {article.imageUrl && (
+                                <div className="article-image">
+                                    <img src={article.imageUrl} alt={article.title} />
+                                </div>
+                            )}
+
                             <div className="article-header">
                                 <div className="tags">
                                     {article.papers?.map(p => (
                                         <span key={p} className="tag paper-tag" style={{ background: paperColors[p] }}>{p}</span>
                                     ))}
                                 </div>
-                                <span className="date">{article.published}</span>
+                                <div className="header-actions">
+                                    <span className="date">{article.published}</span>
+                                    <button
+                                        className="bookmark-btn"
+                                        onClick={() => article.id && handleBookmark(article.id)}
+                                    >
+                                        {article.isBookmarked ? '⭐' : '☆'}
+                                    </button>
+                                </div>
                             </div>
 
                             {article.subjects && article.subjects.length > 0 && (
@@ -180,6 +239,35 @@ const Ravens: React.FC = () => {
                                     ))}
                                 </ul>
                             )}
+
+                            {article.relatedPyqs && article.relatedPyqs.length > 0 && (
+                                <div className="pyq-section">
+                                    <strong>📚 Related PYQs:</strong>
+                                    {article.relatedPyqs.map((pyq, idx) => (
+                                        <div key={idx} className="pyq-item">
+                                            <span className="pyq-year">{pyq.year}</span> - {pyq.question}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            <div className="notes-section">
+                                {editingNotes === article.id ? (
+                                    <div className="notes-editor">
+                                        <textarea
+                                            defaultValue={article.userNotes || ''}
+                                            placeholder="Add your notes here..."
+                                            onBlur={(e) => article.id && handleNotesSave(article.id, e.target.value)}
+                                            autoFocus
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="notes-display" onClick={() => setEditingNotes(article.id || null)}>
+                                        <span className="notes-label">📝 Notes:</span>
+                                        <span className="notes-text">{article.userNotes || 'Click to add notes...'}</span>
+                                    </div>
+                                )}
+                            </div>
 
                             <div className="actions">
                                 <select

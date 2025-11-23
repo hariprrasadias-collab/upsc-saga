@@ -1,113 +1,112 @@
-// /frontend/src/components/Sidebar.tsx
+// Sidebar with Expandable Groups
 import React, { useState } from 'react';
 import './Sidebar.css';
-import type { UserStats } from '../App';
-// Make sure you created the file frontend/src/utils/AudioManager.ts from the previous step!
-import { audioManager } from '../util/AudioManager';
 
 interface SidebarProps {
   currentTab: string;
-  onTabChange: (tab: string) => void;
-  userStats: UserStats | null;
-  ankiDueCount: number;
+  setCurrentTab: (tab: string) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange, userStats, ankiDueCount }) => {
-  // Initialize state based on the manager
-  const [isMuted, setIsMuted] = useState(audioManager.getMuteStatus());
+const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab }) => {
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
+    planning: true,
+    training: false,
+    knowledge: false,
+    enhancement: false
+  });
 
-  const handleTabClick = (tab: string) => {
-    audioManager.play('click'); // Play sound effect
-    onTabChange(tab);
+  const toggleGroup = (group: string) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [group]: !prev[group]
+    }));
   };
 
-  const toggleSound = () => {
-    const muted = audioManager.toggleMute();
-    setIsMuted(muted);
+  const menuGroups = {
+    planning: {
+      title: '🗺️ Planning',
+      items: [
+        { id: 'war-map', label: 'War Map', icon: '🗓️' },
+        { id: 'syllabus', label: 'Syllabus', icon: '🧭' },
+        { id: 'quests', label: 'Quests', icon: '📜' }
+      ]
+    },
+    training: {
+      title: '💪 Training',
+      items: [
+        { id: 'dojo', label: 'Anki Dojo', icon: '🥋' },
+        { id: 'answer-writing', label: 'Answer Writing', icon: '✍️' },
+        { id: 'mock-tests', label: 'Mock Tests', icon: '📋' },
+        { id: 'arena', label: 'Boss Arena', icon: '⚔️' }
+      ]
+    },
+    knowledge: {
+      title: '📚 Knowledge',
+      items: [
+        { id: 'flashcards', label: 'Flashcards', icon: '🎴' },
+        { id: 'seer', label: 'The Seer', icon: '🔮' },
+        { id: 'ravens', label: 'The Ravens', icon: '🐦' },
+        { id: 'pyq', label: 'The Archives', icon: '🏛️' },
+        { id: 'codex', label: 'Yggdrasil', icon: '🌳' },
+        { id: 'lore-tablets', label: 'Lore Tablets', icon: '📖' }
+      ]
+    },
+    enhancement: {
+      title: '⚡ Enhancement',
+      items: [
+        { id: 'armory', label: 'Armory', icon: '🛡️' }
+      ]
+    }
   };
 
   return (
-    <div className="sidebar-container">
+    <div className="sidebar">
       <div className="sidebar-header">
-        {/* Logo/Title */}
-        <img src="/logo.png" alt="Logo" className="sidebar-logo" style={{display:'none'}} /> 
-        <h1 className="app-title">UPSC SAGA</h1>
-        
-        {/* USER SUMMARY (Level & Money) */}
-        {userStats && (
-            <div className="sidebar-user-summary">
-                <div className="summary-level">LVL {userStats.level}</div>
-                <div className="summary-currency">
-                    <span className="coin-icon"></span> 
-                    {userStats.hacksilver} HS
+        <h2>UPSC SAGA</h2>
+      </div>
+
+      {/* Dashboard - Always visible */}
+      <div
+        className={`menu-item ${currentTab === 'dashboard' ? 'active' : ''}`}
+        onClick={() => setCurrentTab('dashboard')}
+      >
+        <span className="icon">🏠</span>
+        <span className="label">Dashboard</span>
+      </div>
+
+      {/* Analytics - Standalone */}
+      <div
+        className={`menu-item ${currentTab === 'analytics' ? 'active' : ''}`}
+        onClick={() => setCurrentTab('analytics')}
+      >
+        <span className="icon">📊</span>
+        <span className="label">Analytics</span>
+      </div>
+
+      {/* Expandable Groups */}
+      {Object.entries(menuGroups).map(([groupKey, group]) => (
+        <div key={groupKey} className="menu-group">
+          <div className="group-header" onClick={() => toggleGroup(groupKey)}>
+            <span className="group-title">{group.title}</span>
+            <span className="expand-icon">{expandedGroups[groupKey] ? '▼' : '▶'}</span>
+          </div>
+
+          {expandedGroups[groupKey] && (
+            <div className="group-items">
+              {group.items.map(item => (
+                <div
+                  key={item.id}
+                  className={`menu-item sub-item ${currentTab === item.id ? 'active' : ''}`}
+                  onClick={() => setCurrentTab(item.id)}
+                >
+                  <span className="icon">{item.icon}</span>
+                  <span className="label">{item.label}</span>
                 </div>
+              ))}
             </div>
-        )}
-
-        {/* MUTE TOGGLE */}
-        <button 
-            onClick={toggleSound}
-            style={{
-                background: 'transparent',
-                border: '1px solid var(--color-border-primary)',
-                color: 'var(--color-text-secondary)',
-                marginTop: '10px',
-                cursor: 'pointer',
-                padding: '5px 10px',
-                fontSize: '0.8rem',
-                width: '100%',
-                borderRadius: '4px',
-                textTransform: 'uppercase'
-            }}
-        >
-            {isMuted ? "🔇 UNMUTE AUDIO" : "🔊 MUTE AUDIO"}
-        </button>
-      </div>
-
-      {/* NAVIGATION */}
-      <nav className="sidebar-nav">
-        <ul>
-          <li className={currentTab === 'dashboard' ? 'active' : ''}>
-            <button onClick={() => handleTabClick('dashboard')}>Dashboard</button>
-          </li>
-          <li className={currentTab === 'war-map' ? 'active' : ''}>
-            <button onClick={() => handleTabClick('war-map')}>War Map</button>
-          </li>
-          <li className={currentTab === 'quests' ? 'active' : ''}>
-            <button onClick={() => handleTabClick('quests')}>Quests</button>
-          </li>
-          <li className={currentTab === 'codex' ? 'active' : ''}>
-            <button onClick={() => handleTabClick('codex')}>Codex</button>
-          </li>
-          <li className={currentTab === 'lore-tablets' ? 'active' : ''}>
-            <button onClick={() => handleTabClick('lore-tablets')}>Lore Tablets</button>
-          </li>
-          <li className={currentTab === 'arena' ? 'active' : ''}>
-            <button onClick={() => handleTabClick('arena')}>Arena</button>
-          </li>
-          <li className={currentTab === 'armory' ? 'active' : ''}>
-            <button onClick={() => handleTabClick('armory')} style={{color: '#cd7f32'}}>Armory</button>
-          </li>
-          <li className={currentTab === 'seer' ? 'active' : ''}>
-            <button onClick={() => handleTabClick('seer')} style={{color: '#7fdbff'}}>The Seer</button>
-          </li>
-          <li className={currentTab === 'ravens' ? 'active' : ''}>
-            <button onClick={() => handleTabClick('ravens')}>The Ravens</button>
-          </li>
-          {/* In Sidebar.tsx navigation list */}
-          <li className={currentTab === 'dojo' ? 'active' : ''}>
-            <button onClick={() => handleTabClick('dojo')}>The Dojo (Anki)</button>
-          </li>
-        </ul>
-      </nav>
-
-      <div className="sidebar-footer">
-        {ankiDueCount > 0 && (
-            <div className="anki-alert">
-                Anki Cards Due: {ankiDueCount}
-            </div>
-        )}
-      </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 };

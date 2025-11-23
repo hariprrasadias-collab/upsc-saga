@@ -1,0 +1,286 @@
+/* /frontend/src/components/PYQ/PYQDatabase.css */
+
+.pyq-container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    height: 100%;
+    background: #0a0e17;
+    color: #e0e0e0;
+    overflow: hidden;
+}
+
+/* SIDEBAR FILTERS */
+.pyq-sidebar {
+    background: rgba(16, 20, 30, 0.95);
+    border-right: 1px solid #333;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.filter-section {
+    margin-bottom: 25px;
+}
+
+.filter-section h3 {
+    font-family: var(--font-headings);
+    color: #ffd700;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 5px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #aaa;
+    transition: color 0.2s;
+}
+
+.filter-checkbox:hover {
+    color: #fff;
+}
+
+.filter-checkbox input {
+    accent-color: #ffd700;
+}
+
+/* MAIN CONTENT */
+.pyq-main {
+    padding: 20px 40px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.pyq-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.pyq-title {
+    font-family: var(--font-headings);
+    font-size: 2.5rem;
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.search-bar {
+    position: relative;
+    width: 400px;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 12px 20px;
+    padding-left: 45px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #444;
+    border-radius: 25px;
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.search-bar input:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #ffd700;
+    outline: none;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+}
+
+.search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+}
+
+/* QUESTION LIST */
+.question-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.question-card {
+    background: rgba(25, 30, 45, 0.8);
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 20px;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.question-card:hover {
+    border-color: #555;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.q-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.q-tags {
+    display: flex;
+    gap: 10px;
+}
+
+.tag {
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: #222;
+    border: 1px solid #444;
+}
+
+.tag.year {
+    color: #3498db;
+    border-color: #3498db;
+}
+
+.tag.subject {
+    color: #e74c3c;
+    border-color: #e74c3c;
+}
+
+.tag.difficulty {
+    color: #2ecc71;
+    border-color: #2ecc71;
+}
+
+.fav-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #444;
+    transition: transform 0.2s;
+}
+
+.fav-btn.active {
+    color: #e74c3c;
+}
+
+.fav-btn:hover {
+    transform: scale(1.2);
+}
+
+.q-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    white-space: pre-wrap;
+}
+
+.q-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.option {
+    padding: 10px 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid #333;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.option:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.option.correct {
+    background: rgba(46, 204, 113, 0.2);
+    border-color: #2ecc71;
+    color: #2ecc71;
+}
+
+.option.wrong {
+    background: rgba(231, 76, 60, 0.2);
+    border-color: #e74c3c;
+    color: #e74c3c;
+}
+
+.reveal-btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.reveal-btn:hover {
+    background: #2980b9;
+}
+
+.explanation {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(255, 215, 0, 0.1);
+    border-left: 3px solid #ffd700;
+    border-radius: 0 4px 4px 0;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.explanation h4 {
+    color: #ffd700;
+    margin: 0 0 10px 0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ANALYTICS WIDGET */
+.analytics-widget {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.chart-bar {
+    height: 8px;
+    background: #333;
+    border-radius: 4px;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.chart-fill {
+    height: 100%;
+    background: #3498db;
+}

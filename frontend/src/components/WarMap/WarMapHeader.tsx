@@ -8,6 +8,8 @@ interface WarMapHeaderProps {
   onToggleAddForm: () => void; // Toggles the visibility of the AddTaskForm
   selectedDateStr: string; // The currently selected date from WarMapContainer
   onTaskActionComplete: () => void; // Called after task is created or form is cancelled
+  onConnectGoogle?: () => void;
+  isGoogleConnected?: boolean;
 }
 
 const WarMapHeader: React.FC<WarMapHeaderProps> = ({
@@ -15,6 +17,8 @@ const WarMapHeader: React.FC<WarMapHeaderProps> = ({
   onToggleAddForm,
   selectedDateStr,
   onTaskActionComplete,
+  onConnectGoogle,
+  isGoogleConnected,
 }) => {
   return (
     <header className="war-map-header">
@@ -25,6 +29,11 @@ const WarMapHeader: React.FC<WarMapHeaderProps> = ({
           <button className="create-task-btn" onClick={onToggleAddForm}>
             Convene War Council (New Task)
           </button>
+          {onConnectGoogle && !isGoogleConnected && (
+            <button className="connect-google-btn" onClick={onConnectGoogle}>
+              📅 Connect Google Calendar
+            </button>
+          )}
         </>
       ) : (
         <AddTaskForm
