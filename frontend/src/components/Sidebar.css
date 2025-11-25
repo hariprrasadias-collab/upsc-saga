@@ -1,17 +1,19 @@
-/* Sidebar Styles - With Expandable Groups */
+/* Sidebar Styles - Premium Glassmorphism */
 
 .sidebar {
   width: 250px;
   height: 100vh;
-  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+  background: rgba(26, 33, 62, 0.6);
+  backdrop-filter: blur(12px);
+  border-right: 2px solid rgba(255, 215, 0, 0.3);
   color: #ecf0f1;
   display: flex;
   flex-direction: column;
-  border-right: 2px solid rgba(255, 215, 0, 0.3);
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 100;
   position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .sidebar-header {
@@ -27,26 +29,27 @@
   text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
-/* Menu Item - Always visible (Dashboard) */
+/* Menu Item */
 .menu-item {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.9rem 1rem;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s ease;
   border-left: 3px solid transparent;
   user-select: none;
 }
 
 .menu-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-left-color: #3498db;
+  background: rgba(255, 255, 255, 0.15);
+  border-left-color: #ffd700;
+  transform: translateX(5px) scale(1.02);
 }
 
 .menu-item.active {
-  background: rgba(52, 152, 219, 0.2);
-  border-left-color: #3498db;
+  background: rgba(212, 165, 116, 0.2);
+  border-left-color: #ffd700;
   font-weight: 600;
 }
 

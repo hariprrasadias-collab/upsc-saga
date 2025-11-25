@@ -2,6 +2,9 @@
 import React from 'react';
 import './DashboardMain.css';
 import type { UserStats } from '../App';
+import ChallengeCard from './DashboardMain/ChallengeCard';
+import RevisionWidget from './DashboardMain/RevisionWidget';
+import { useAnalytics } from '../contexts/AnalyticsContext';
 
 interface DashboardMainProps {
   stats: UserStats;
@@ -10,10 +13,16 @@ interface DashboardMainProps {
 const DashboardMain: React.FC<DashboardMainProps> = ({
   stats
 }) => {
+  const { analytics } = useAnalytics();
+
+  // Use real-time analytics data if available, otherwise fall back to initial stats
+  const currentLevel = analytics?.level ?? stats.level;
+  const currentXP = analytics?.xp ?? stats.current_xp;
+  const maxXP = analytics?.max_xp ?? stats.max_xp;
 
   // Calculate progress percentage safely
-  const progressPercent = stats.max_xp > 0
-    ? (stats.current_xp / stats.max_xp) * 100
+  const progressPercent = maxXP > 0
+    ? (currentXP / maxXP) * 100
     : 0;
 
   return (
@@ -24,10 +33,16 @@ const DashboardMain: React.FC<DashboardMainProps> = ({
       </div>
 
       <div className="dashboard-content">
-        {/* Left Stats Panel */}
+        {/* Left Column */}
+        <div className="dashboard-column-left">
+          <ChallengeCard />
+          <RevisionWidget />
+        </div>
+
+        {/* Center Stats Panel (Technically Middle Column) */}
         <div className="stats-panel-left">
           <div className="stat-level">
-            <h3>LEVEL {stats.level}</h3>
+            <h3>LEVEL {currentLevel}</h3>
           </div>
           <div className="stat-row">
             <div className="stat-label">PROGRESS</div>
@@ -37,7 +52,7 @@ const DashboardMain: React.FC<DashboardMainProps> = ({
               </div>
             </div>
           </div>
-          <div className="xp-text">XP: {stats.current_xp} / {stats.max_xp}</div>
+          <div className="xp-text">XP: {currentXP} / {maxXP}</div>
 
           <div className="stats-list">
             <div className="stat-item strength">

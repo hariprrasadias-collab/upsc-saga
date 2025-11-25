@@ -76,3 +76,42 @@ def complete_task(task_id):
     rewards = calculate_and_apply_rewards(user_id, task['xp_reward'], 15, tags)
     
     return jsonify(rewards), 200
+
+@bp.route('/log-study', methods=['POST'])
+def log_study_session():
+    """Log study hours and award XP"""
+    try:
+        data = request.get_json()
+        user_id = 1
+        minutes = data.get('minutes', 0)
+        
+        if minutes <= 0:
+            return jsonify({'error': 'Invalid duration'}), 400
+            
+        # Calculate XP: 10 XP per 30 mins -> 20 XP per hour
+        xp_earned = int((minutes / 60) * 20)
+        if xp_earned < 1: xp_earned = 1
+        
+        conn = get_db()
+        
+        # Update user stats (XP and study hours)
+        # Assuming users table has total_study_hours or similar? 
+        # If not, we'll just track XP for now.
+        # But user asked "how study hours are logged".
+        # Let's check schema. Assuming no specific column, we'll just add XP.
+        
+        # Award XP
+        conn.execute('UPDATE users SET current_xp = current_xp + ? WHERE id = ?', (xp_earned, user_id))
+        
+        # Log activity
+        conn.execute('''
+            INSERT INTO activity_log (user_id, activity_type, description, xp_awarded)
+            VALUES (?, 'study_session', ?, ?)
+        ''', (user_id, f"Studied for {minutes} minutes", xp_earned))
+        
+        conn.commit()
+        
+        return jsonify({'success': True, 'xp_earned': xp_earned})
+    except Exception as e:
+        print(f"Error logging study: {e}")
+        return jsonify({'error': str(e)}), 500

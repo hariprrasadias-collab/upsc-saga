@@ -1,0 +1,127 @@
+.revision-widget {
+    background: rgba(22, 27, 34, 0.8);
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 15px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #30363d;
+}
+
+.widget-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: #f0f6fc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.due-count {
+    background: #f85149;
+    color: white;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.due-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.due-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.due-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: #58a6ff;
+}
+
+.due-info {
+    flex: 1;
+}
+
+.due-subject {
+    font-size: 0.7rem;
+    color: #8b949e;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.due-title {
+    font-size: 0.9rem;
+    color: #c9d1d9;
+    font-weight: 500;
+}
+
+.quick-revise-btn {
+    background: #238636;
+    color: white;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-left: 10px;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.2s;
+}
+
+.due-item:hover .quick-revise-btn {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.quick-revise-btn:hover {
+    background: #2ea043;
+    transform: scale(1.1);
+}
+
+.empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #8b949e;
+    padding: 20px;
+}
+
+.empty-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.more-count {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #8b949e;
+    padding-top: 5px;
+}

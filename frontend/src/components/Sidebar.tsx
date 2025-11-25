@@ -12,7 +12,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab }) => {
     planning: true,
     training: false,
     knowledge: false,
-    enhancement: false
+    enhancement: false,
+    admin: false
   });
 
   const toggleGroup = (group: string) => {
@@ -36,13 +37,17 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab }) => {
       items: [
         { id: 'dojo', label: 'Anki Dojo', icon: '🥋' },
         { id: 'answer-writing', label: 'Answer Writing', icon: '✍️' },
+        { id: 'scribe', label: 'The Scribe (AI)', icon: '📜' },
         { id: 'mock-tests', label: 'Mock Tests', icon: '📋' },
-        { id: 'arena', label: 'Boss Arena', icon: '⚔️' }
+        { id: 'arena', label: 'Boss Arena', icon: '⚔️' },
+        { id: 'essay', label: 'Essay Workshop', icon: '✍️' },
+        { id: 'csat', label: 'CSAT Prep', icon: '🧮' }
       ]
     },
     knowledge: {
       title: '📚 Knowledge',
       items: [
+        { id: 'mimir', label: 'Mimir (AI)', icon: '🧙‍♂️' },
         { id: 'flashcards', label: 'Flashcards', icon: '🎴' },
         { id: 'seer', label: 'The Seer', icon: '🔮' },
         { id: 'ravens', label: 'The Ravens', icon: '🐦' },
@@ -55,6 +60,12 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab }) => {
       title: '⚡ Enhancement',
       items: [
         { id: 'armory', label: 'Armory', icon: '🛡️' }
+      ]
+    },
+    admin: {
+      title: '🛡️ Admin',
+      items: [
+        { id: 'admin', label: 'Control Panel', icon: '⚙️' }
       ]
     }
   };
@@ -81,6 +92,15 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab }) => {
       >
         <span className="icon">📊</span>
         <span className="label">Analytics</span>
+      </div>
+
+      {/* Weak Areas - Standalone */}
+      <div
+        className={`menu-item ${currentTab === 'weak-areas' ? 'active' : ''}`}
+        onClick={() => setCurrentTab('weak-areas')}
+      >
+        <span className="icon">🎯</span>
+        <span className="label">Weak Areas</span>
       </div>
 
       {/* Expandable Groups */}

@@ -27,6 +27,7 @@ const PYQDatabase: React.FC = () => {
     const [questions, setQuestions] = useState<Question[]>([]);
     const [analytics, setAnalytics] = useState<Analytics | null>(null);
     const [loading, setLoading] = useState(true);
+    const [startingQuiz, setStartingQuiz] = useState(false);
 
     // Filters
     const [selectedYears, setSelectedYears] = useState<number[]>([]);
@@ -105,6 +106,39 @@ const PYQDatabase: React.FC = () => {
         );
     };
 
+    const startQuiz = async () => {
+        if (questions.length === 0) return;
+
+        setStartingQuiz(true);
+        try {
+            const filters = {
+                year: selectedYears[0],
+                subject: selectedSubjects[0],
+                search: searchQuery,
+                is_favorite: showFavoritesOnly,
+                limit: 25
+            };
+
+            const res = await fetch('http://localhost:5000/api/pyq/start-quiz', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filters, title: 'PYQ Quiz' })
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                window.location.href = `/pyq-quiz/${data.session_id}`;
+            } else {
+                alert(data.error || 'Failed to start quiz');
+            }
+        } catch (err) {
+            console.error("Error starting quiz", err);
+            alert('Failed to start quiz');
+        } finally {
+            setStartingQuiz(false);
+        }
+    };
+
     return (
         <div className="pyq-container">
             {/* SIDEBAR FILTERS */}
@@ -167,6 +201,14 @@ const PYQDatabase: React.FC = () => {
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
+                    <button
+                        className="start-quiz-btn"
+                        onClick={startQuiz}
+                        disabled={startingQuiz || questions.length === 0}
+                        title="Start an interactive quiz with current filters"
+                    >
+                        {startingQuiz ? 'Starting...' : '🎯 Start Quiz'}
+                    </button>
                 </div>
 
                 <div className="question-list">

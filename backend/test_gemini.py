@@ -1,6 +1,6 @@
 # Test Gemini API directly
 import os
-os.environ['GEMINI_API_KEY'] = 'AIzaSyAmr9F5ia-DXkW2GeAqhtorXvCRYoClUpo'
+# os.environ['GEMINI_API_KEY'] = os.getenv('GEMINI_API_KEY')  # Use env variable
 
 from app.services.upsc_summarizer import summarize_for_upsc
 

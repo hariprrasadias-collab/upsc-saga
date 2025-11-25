@@ -2,6 +2,7 @@
 import React from 'react';
 import './RitualsPanel.css';
 import type { Task } from '../App';
+import StudyTimer from './StudyTimer';
 
 interface RitualsPanelProps {
   tasks?: Task[];
@@ -16,6 +17,9 @@ const RitualsPanel: React.FC<RitualsPanelProps> = ({ tasks = [], onTaskComplete,
       <div className="rituals-header">
         <h2>TODAY'S RITUALS</h2>
       </div>
+
+      <StudyTimer />
+
       <ul className="rituals-list">
         {tasks.length === 0 ? (
           <p className="no-tasks-message">No rituals due today. Forge new ones on the War Map!</p>

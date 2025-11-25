@@ -11,6 +11,9 @@ interface Topic {
     status: string;
     notes: string | null;
     last_updated: string;
+    revision_count?: number;
+    next_revision_date?: string;
+    last_revised_at?: string;
 }
 
 interface Analytics {
@@ -89,6 +92,25 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         }
     };
 
+    const handleMarkRevised = async (id: number) => {
+        try {
+            const res = await fetch(`http://localhost:5000/api/syllabus/${id}/revise`, {
+                method: 'POST'
+            });
+            const data = await res.json();
+
+            // Update local state
+            setTopics(prev => prev.map(t => t.id === id ? {
+                ...t,
+                revision_count: data.revision_count,
+                next_revision_date: data.next_revision_date
+            } : t));
+
+        } catch (err) {
+            console.error("Failed to mark revised", err);
+        }
+    };
+
     const openNotes = (topic: Topic) => {
         setCurrentTopicId(topic.id);
         setNotesText(topic.notes || '');
@@ -130,12 +152,6 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         if (!analytics) return 0;
         const total = analytics.totals.find(t => t.paper === paper)?.total || 0;
         if (total === 0) return 0;
-
-        // Count completed or in progress (weighted?)
-        // Simple count: anything not 'Not Started' counts as some progress?
-        // Let's do: Completed = 100%, Revision 2 = 90%, Revision 1 = 75%, Notes Done = 50%, Reading = 25%
-        // Or just simple count of 'Completed' for the bar?
-        // Let's do simple count of 'Completed' for now to be strict.
 
         const completed = analytics.breakdown
             .filter(b => b.paper === paper && b.status === 'Completed')
@@ -217,6 +233,13 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                                                                 >
                                                                     📝
                                                                 </button>
+                                                                <button
+                                                                    className="revise-btn"
+                                                                    onClick={() => handleMarkRevised(topic.id)}
+                                                                    title={`Mark as Revised (Count: ${topic.revision_count || 0})`}
+                                                                >
+                                                                    ↻
+                                                                </button>
                                                                 <select
                                                                     className={`status-select ${topic.status.toLowerCase().replace(' ', '-')}`}
                                                                     value={topic.status}
@@ -227,6 +250,11 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                                                                     ))}
                                                                 </select>
                                                             </div>
+                                                            {topic.next_revision_date && (
+                                                                <div className={`revision-badge ${new Date(topic.next_revision_date) <= new Date() ? 'due' : ''}`}>
+                                                                    Next: {new Date(topic.next_revision_date).toLocaleDateString()}
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     ))}
                                                 </div>

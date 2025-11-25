@@ -1,6 +1,7 @@
 // Mock Tests - Main Container
 import React, { useState, useEffect } from 'react';
 import './MockTests.css';
+import { useAnalytics } from '../../contexts/AnalyticsContext';
 
 interface Test {
     id: number;
@@ -43,6 +44,7 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [results, setResults] = useState<any>(null);
     const [view, setView] = useState<'list' | 'test' | 'results'>('list');
+    const { refreshAnalytics } = useAnalytics();
 
     // Fetch available tests
     useEffect(() => {
@@ -140,6 +142,7 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
             if (onTaskCompleted) {
                 onTaskCompleted();
             }
+            refreshAnalytics(true);
         } catch (err) {
             console.error(err);
             alert('Failed to submit test');

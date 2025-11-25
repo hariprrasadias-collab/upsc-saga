@@ -13,6 +13,7 @@ def get_questions():
     # Filter parameters
     year = request.args.get('year')
     subject = request.args.get('subject')
+    topic = request.args.get('topic')
     difficulty = request.args.get('difficulty')
     search = request.args.get('search')
     is_favorite = request.args.get('is_favorite')
@@ -27,6 +28,10 @@ def get_questions():
     if subject:
         query += " AND subject = ?"
         params.append(subject)
+        
+    if topic:
+        query += " AND topic = ?"
+        params.append(topic)
         
     if difficulty:
         query += " AND difficulty = ?"
@@ -53,10 +58,12 @@ def get_filters():
     
     years = conn.execute("SELECT DISTINCT year FROM pyq_questions ORDER BY year DESC").fetchall()
     subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
+    topics = conn.execute("SELECT DISTINCT topic FROM pyq_questions WHERE topic IS NOT NULL ORDER BY topic").fetchall()
     
     return jsonify({
         'years': [row['year'] for row in years],
-        'subjects': [row['subject'] for row in subjects]
+        'subjects': [row['subject'] for row in subjects],
+        'topics': [row['topic'] for row in topics]
     })
 
 @bp.route('/<int:id>/favorite', methods=['POST'])
@@ -96,7 +103,387 @@ def get_analytics():
         ORDER BY year
     ''').fetchall()
     
+    # Topic distribution (Top 20)
+    topic_counts = conn.execute('''
+        SELECT topic, COUNT(*) as count 
+        FROM pyq_questions 
+        WHERE topic IS NOT NULL
+        GROUP BY topic
+        ORDER BY count DESC
+        LIMIT 20
+    ''').fetchall()
+    
     return jsonify({
         'by_subject': [dict(row) for row in subject_counts],
-        'by_year': [dict(row) for row in year_counts]
+        'by_year': [dict(row) for row in year_counts],
+        'by_topic': [dict(row) for row in topic_counts]
     })
+
+@bp.route('/create-mock', methods=['POST'])
+def create_mock_from_filters():
+    """Create a mock test from filtered PYQ questions"""
+    try:
+        data = request.get_json()
+        filters = data.get('filters', {})
+        
+        conn = get_db()
+        
+        # 1. Fetch filtered questions
+        query = "SELECT * FROM pyq_questions WHERE 1=1"
+        params = []
+        
+        title_parts = []
+        
+        if filters.get('year'):
+            query += " AND year = ?"
+            params.append(filters['year'])
+            title_parts.append(str(filters['year']))
+            
+        if filters.get('subject'):
+            query += " AND subject = ?"
+            params.append(filters['subject'])
+            title_parts.append(filters['subject'])
+            
+        if filters.get('topic'):
+            query += " AND topic = ?"
+            params.append(filters['topic'])
+            title_parts.append(filters['topic'])
+            
+        if filters.get('search'):
+            query += " AND (question_text LIKE ? OR explanation LIKE ?)"
+            search_term = f"%{filters['search']}%"
+            params.append(search_term)
+            params.append(search_term)
+            title_parts.append(f"Search: {filters['search']}")
+            
+        if filters.get('is_favorite'):
+            query += " AND is_favorite = 1"
+            title_parts.append("Favorites")
+            
+        questions = conn.execute(query, params).fetchall()
+        
+        if not questions:
+            return jsonify({'error': 'No questions found matching filters'}), 400
+            
+        # 2. Create Mock Test
+        title = "PYQ Archive: " + " - ".join(title_parts) if title_parts else "PYQ Archive: All Questions"
+        description = f"Generated from Archives with {len(questions)} questions."
+        total_questions = len(questions)
+        duration = total_questions * 2 # 2 mins per question
+        total_marks = total_questions * 2
+        
+        cursor = conn.execute('''
+            INSERT INTO mock_tests (title, description, test_type, subject, total_questions, duration_minutes, total_marks, difficulty)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            title, 
+            description, 
+            'pyq-generated', 
+            filters.get('subject', 'Mixed'), 
+            total_questions, 
+            duration, 
+            total_marks, 
+            'Medium'
+        ))
+        
+        test_id = cursor.lastrowid
+        
+        # 3. Insert Questions into test_questions
+        for idx, q in enumerate(questions):
+            conn.execute('''
+                INSERT INTO test_questions (
+                    test_id, question_number, question_text, 
+                    option_a, option_b, option_c, option_d, 
+                    correct_answer, explanation, subject, topic, difficulty, year
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                test_id, 
+                idx + 1, 
+                q['question_text'],
+                q['option_a'], q['option_b'], q['option_c'], q['option_d'],
+                q['correct_option'], q['explanation'],
+                q['subject'], q['topic'], q['difficulty'], q['year']
+            ))
+            
+        conn.commit()
+        
+        return jsonify({
+            'success': True, 
+            'test_id': test_id, 
+            'message': f'Created mock test "{title}" with {total_questions} questions'
+        })
+        
+    except Exception as e:
+        print(f"Error creating mock test: {e}")
+        return jsonify({'error': str(e)}), 500
+
+# ============ QUIZ MODE ENDPOINTS ============
+
+@bp.route('/start-quiz', methods=['POST'])
+def start_quiz():
+    """Start a new quiz session with filtered questions"""
+    try:
+        data = request.get_json()
+        filters = data.get('filters', {})
+        title = data.get('title', 'PYQ Quiz')
+        
+        conn = get_db()
+        
+        # Build query with filters
+        query = "SELECT * FROM pyq_questions WHERE 1=1"
+        params = []
+        
+        if filters.get('year'):
+            query += " AND year = ?"
+            params.append(filters['year'])
+            
+        if filters.get('subject'):
+            query += " AND subject = ?"
+            params.append(filters['subject'])
+            
+        if filters.get('topic'):
+            query += " AND topic = ?"
+            params.append(filters['topic'])
+            
+        if filters.get('search'):
+            query += " AND (question_text LIKE ? OR explanation LIKE ?)"
+            search_term = f"%{filters['search']}%"
+            params.append(search_term)
+            params.append(search_term)
+            
+        if filters.get('is_favorite'):
+            query += " AND is_favorite = 1"
+        
+        # Randomize question order
+        query += " ORDER BY RANDOM()"
+        
+        # Limit number of questions if specified
+        limit = filters.get('limit', 25)  # Default 25 questions
+        query += f" LIMIT {limit}"
+        
+        questions = conn.execute(query, params).fetchall()
+        
+        if not questions:
+            return jsonify({'error': 'No questions found matching filters'}), 400
+        
+        # Create quiz session
+        import json
+        cursor = conn.execute('''
+            INSERT INTO pyq_quiz_sessions (title, total_questions, filters, status)
+            VALUES (?, ?, ?, ?)
+        ''', (title, len(questions), json.dumps(filters), 'in_progress'))
+        
+        session_id = cursor.lastrowid
+        
+        # Initialize answer records
+        for q in questions:
+            conn.execute('''
+                INSERT INTO pyq_quiz_answers (session_id, question_id)
+                VALUES (?, ?)
+            ''', (session_id, q['id']))
+        
+        conn.commit()
+        
+        return jsonify({
+            'session_id': session_id,
+            'questions': [dict(q) for q in questions],
+            'total_questions': len(questions),
+            'started_at': cursor.lastrowid
+        })
+        
+    except Exception as e:
+        print(f"Error starting quiz: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@bp.route('/quiz/<int:session_id>/answer', methods=['POST'])
+def save_answer(session_id):
+    """Save user's answer for a specific question"""
+    try:
+        data = request.get_json()
+        question_id = data.get('question_id')
+        selected_answer = data.get('selected_answer')
+        time_spent = data.get('time_spent', 0)
+        marked_for_review = data.get('marked_for_review', False)
+        
+        conn = get_db()
+        
+        # Get correct answer
+        question = conn.execute(
+            "SELECT correct_option FROM pyq_questions WHERE id = ?",
+            (question_id,)
+        ).fetchone()
+        
+        if not question:
+            return jsonify({'error': 'Question not found'}), 404
+        
+        is_correct = (selected_answer == question['correct_option']) if selected_answer else False
+        
+        # Update answer record
+        conn.execute('''
+            UPDATE pyq_quiz_answers 
+            SET selected_answer = ?, is_correct = ?, time_spent = ?, marked_for_review = ?
+            WHERE session_id = ? AND question_id = ?
+        ''', (selected_answer, is_correct, time_spent, marked_for_review, session_id, question_id))
+        
+        conn.commit()
+        
+        return jsonify({'success': True})
+        
+    except Exception as e:
+        print(f"Error saving answer: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@bp.route('/quiz/<int:session_id>/submit', methods=['POST'])
+def submit_quiz(session_id):
+    """Submit quiz and calculate score"""
+    try:
+        conn = get_db()
+        
+        # Get all answers for this session
+        answers = conn.execute('''
+            SELECT * FROM pyq_quiz_answers WHERE session_id = ?
+        ''', (session_id,)).fetchall()
+        
+        total_questions = len(answers)
+        correct_count = sum(1 for a in answers if a['is_correct'])
+        incorrect_count = total_questions - correct_count
+        score = (correct_count / total_questions * 100) if total_questions > 0 else 0
+        
+        # Calculate total time spent
+        total_time = sum(a['time_spent'] or 0 for a in answers)
+        
+        # Update session
+        from datetime import datetime
+        conn.execute('''
+            UPDATE pyq_quiz_sessions 
+            SET submitted_at = ?, duration_seconds = ?, score = ?, 
+                correct_count = ?, incorrect_count = ?, status = ?
+            WHERE id = ?
+        ''', (datetime.now(), total_time, score, correct_count, incorrect_count, 'completed', session_id))
+        
+        conn.commit()
+        
+        # Get detailed results
+        results = conn.execute('''
+            SELECT qa.*, q.question_text, q.option_a, q.option_b, q.option_c, q.option_d,
+                   q.correct_option, q.explanation, q.subject, q.topic, q.year
+            FROM pyq_quiz_answers qa
+            JOIN pyq_questions q ON qa.question_id = q.id
+            WHERE qa.session_id = ?
+            ORDER BY qa.id
+        ''', (session_id,)).fetchall()
+        
+        return jsonify({
+            'score': score,
+            'total_questions': total_questions,
+            'correct_count': correct_count,
+            'incorrect_count': incorrect_count,
+            'duration_seconds': total_time,
+            'results': [dict(r) for r in results]
+        })
+        
+    except Exception as e:
+        print(f"Error submitting quiz: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@bp.route('/quiz/<int:session_id>', methods=['GET'])
+def get_quiz_session(session_id):
+    """Get quiz session details with answers"""
+    try:
+        conn = get_db()
+        
+        session = conn.execute(
+            "SELECT * FROM pyq_quiz_sessions WHERE id = ?",
+            (session_id,)
+        ).fetchone()
+        
+        if not session:
+            return jsonify({'error': 'Session not found'}), 404
+        
+        answers = conn.execute('''
+            SELECT qa.*, q.question_text, q.option_a, q.option_b, q.option_c, q.option_d,
+                   q.correct_option, q.explanation, q.subject, q.topic, q.year, q.difficulty
+            FROM pyq_quiz_answers qa
+            JOIN pyq_questions q ON qa.question_id = q.id
+            WHERE qa.session_id = ?
+            ORDER BY qa.id
+        ''', (session_id,)).fetchall()
+        
+        return jsonify({
+            'session': dict(session),
+            'questions': [dict(a) for a in answers]
+        })
+        
+    except Exception as e:
+        print(f"Error fetching quiz session: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@bp.route('/quiz-history', methods=['GET'])
+def get_quiz_history():
+    """Get all quiz sessions for user"""
+    try:
+        conn = get_db()
+        
+        sessions = conn.execute('''
+            SELECT * FROM pyq_quiz_sessions 
+            WHERE user_id = 1
+            ORDER BY started_at DESC
+        ''').fetchall()
+        
+        return jsonify([dict(s) for s in sessions])
+        
+    except Exception as e:
+        print(f"Error fetching quiz history: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@bp.route('/quiz-stats', methods=['GET'])
+def get_quiz_stats():
+    """Get overall quiz performance statistics"""
+    try:
+        conn = get_db()
+        
+        # Overall stats
+        overall = conn.execute('''
+            SELECT 
+                COUNT(*) as total_quizzes,
+                AVG(score) as avg_score,
+                MAX(score) as best_score,
+                SUM(total_questions) as total_questions_attempted
+            FROM pyq_quiz_sessions
+            WHERE user_id = 1 AND status = 'completed'
+        ''').fetchone()
+        
+        # Subject-wise accuracy
+        subject_stats = conn.execute('''
+            SELECT 
+                q.subject,
+                COUNT(*) as attempted,
+                SUM(CASE WHEN qa.is_correct THEN 1 ELSE 0 END) as correct,
+                ROUND(AVG(CASE WHEN qa.is_correct THEN 100.0 ELSE 0.0 END), 2) as accuracy
+            FROM pyq_quiz_answers qa
+            JOIN pyq_questions q ON qa.question_id = q.id
+            JOIN pyq_quiz_sessions qs ON qa.session_id = qs.id
+            WHERE qs.user_id = 1 AND qs.status = 'completed' AND qa.selected_answer IS NOT NULL
+            GROUP BY q.subject
+            ORDER BY accuracy DESC
+        ''').fetchall()
+        
+        # Recent improvement trend (last 10 quizzes)
+        trend = conn.execute('''
+            SELECT score, started_at
+            FROM pyq_quiz_sessions
+            WHERE user_id = 1 AND status = 'completed'
+            ORDER BY started_at DESC
+            LIMIT 10
+        ''').fetchall()
+        
+        return jsonify({
+            'overall': dict(overall) if overall else {},
+            'subject_wise': [dict(s) for s in subject_stats],
+            'recent_trend': [dict(t) for t in trend]
+        })
+        
+    except Exception as e:
+        print(f"Error fetching quiz stats: {e}")
+        return jsonify({'error': str(e)}), 500
+

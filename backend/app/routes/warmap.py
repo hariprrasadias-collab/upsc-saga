@@ -198,17 +198,34 @@ def complete_google_event(event_id):
                 body=event
             ).execute()
         
-        # Also update metadata in local DB
+        # Get XP metadata and award XP
         conn = get_db()
         user_id = 1  # Get from session in production
+        
+        metadata = conn.execute('''
+            SELECT xp_reward FROM calendar_event_metadata 
+            WHERE event_id = ? AND user_id = ?
+        ''', (event_id, user_id)).fetchone()
+        
+        xp_reward = metadata['xp_reward'] if metadata else 0
+        
+        # Award XP if it exists
+        if xp_reward > 0:
+            conn.execute('''
+                UPDATE users
+                SET current_xp = current_xp + ?
+                WHERE id = ?
+            ''', (xp_reward, user_id))
+        
+        # Update metadata to mark as completed
         conn.execute('''
             INSERT OR REPLACE INTO calendar_event_metadata 
-            (event_id, user_id, is_completed)
-            VALUES (?, ?, 1)
-        ''', (event_id, user_id))
+            (event_id, user_id, xp_reward, is_completed)
+            VALUES (?, ?, ?, 1)
+        ''', (event_id, user_id, xp_reward))
         conn.commit()
         
-        return jsonify({'success': True})
+        return jsonify({'success': True, 'xp_awarded': xp_reward})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

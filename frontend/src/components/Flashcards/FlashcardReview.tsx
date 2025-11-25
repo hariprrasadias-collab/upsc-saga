@@ -1,6 +1,7 @@
 // FlashcardReview - Interactive review interface with flip animation
 import React, { useState, useEffect } from 'react';
 import './Flashcards.css';
+import { useAnalytics } from '../../contexts/AnalyticsContext';
 
 interface Card {
     id: number;
@@ -22,6 +23,7 @@ const FlashcardReview: React.FC<FlashcardReviewProps> = ({ deckId, onFinish }) =
     const [loading, setLoading] = useState(true);
     const [sessionStart, setSessionStart] = useState(Date.now());
     const [cardsReviewed, setCardsReviewed] = useState(0);
+    const { refreshAnalytics } = useAnalytics();
 
     useEffect(() => {
         fetchDueCards();
@@ -82,6 +84,7 @@ const FlashcardReview: React.FC<FlashcardReviewProps> = ({ deckId, onFinish }) =
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ cards_reviewed: cardsReviewed + 1 })
             });
+            refreshAnalytics(true);
         }
         onFinish();
     };

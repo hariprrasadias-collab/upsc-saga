@@ -1,0 +1,135 @@
+// Daily Challenge Card Component
+import React, { useState, useEffect } from 'react';
+import './ChallengeCard.css';
+
+interface Challenge {
+    id: number;
+    title: string;
+    description: string;
+    type: string;
+    target_value: number;
+    xp_reward: number;
+    completed: boolean;
+    progress: number;
+}
+
+const ChallengeCard: React.FC = () => {
+    const [challenge, setChallenge] = useState<Challenge | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [streak, setStreak] = useState(0);
+
+    useEffect(() => {
+        fetchChallenge();
+        fetchStreak();
+    }, []);
+
+    const fetchChallenge = async () => {
+        try {
+            const res = await fetch('http://localhost:5000/api/challenges/daily');
+            if (res.ok) {
+                const data = await res.json();
+                setChallenge(data);
+            }
+        } catch (err) {
+            console.error('Error fetching challenge:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchStreak = async () => {
+        try {
+            const res = await fetch('http://localhost:5000/api/challenges/streak');
+            if (res.ok) {
+                const data = await res.json();
+                setStreak(data.current_streak || 0);
+            }
+        } catch (err) {
+            console.error('Error fetching streak:', err);
+        }
+    };
+
+    const handleComplete = async () => {
+        if (!challenge || challenge.completed) return;
+
+        try {
+            const res = await fetch('http://localhost:5000/api/challenges/complete', {
+                method: 'POST'
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                alert(`Challenge completed! +${data.xp_awarded} XP`);
+                fetchChallenge();
+                fetchStreak();
+
+                // Refresh page stats
+                window.location.reload();
+            }
+        } catch (err) {
+            console.error('Error completing challenge:', err);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="challenge-card loading">
+                <p>Loading today's challenge...</p>
+            </div>
+        );
+    }
+
+    if (!challenge) {
+        return (
+            <div className="challenge-card error">
+                <p>No challenge available today</p>
+            </div>
+        );
+    }
+
+    const progress = challenge.completed ? 100 : (challenge.progress / challenge.target_value) * 100;
+
+    return (
+        <div className={`challenge-card ${challenge.completed ? 'completed' : ''}`}>
+            <div className="challenge-header">
+                <h3>🎯 Daily Challenge</h3>
+                <div className="streak-badge">
+                    🔥 {streak} day{streak !== 1 ? 's' : ''}
+                </div>
+            </div>
+
+            <div className="challenge-body">
+                <h4>{challenge.title}</h4>
+                <p>{challenge.description}</p>
+
+                <div className="challenge-progress">
+                    <div className="progress-bar">
+                        <div
+                            className="progress-fill"
+                            style={{ width: `${progress}%` }}
+                        ></div>
+                    </div>
+                    <span className="progress-text">
+                        {challenge.progress} / {challenge.target_value}
+                    </span>
+                </div>
+
+                <div className="challenge-footer">
+                    <span className="reward">+{challenge.xp_reward} XP</span>
+                    {challenge.completed ? (
+                        <div className="completed-badge">✅ Completed</div>
+                    ) : (
+                        <button
+                            className="complete-btn"
+                            onClick={handleComplete}
+                        >
+                            Mark Complete
+                        </button>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default ChallengeCard;

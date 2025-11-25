@@ -222,29 +222,40 @@ def get_answer_writing_analytics():
     try:
         user_id = 1
         conn = get_db()
+        
         # Retrieve scores with date and subject
-        scores = conn.execute('''
-            SELECT ans.overall_score, DATE(ans.submitted_at) as date, aq.subject
-            FROM answer_submissions ans
-            JOIN answer_questions aq ON ans.question_id = aq.id
-            WHERE ans.user_id = ?
-            ORDER BY ans.submitted_at ASC
-        ''', (user_id,)).fetchall()
-        score_data = [dict(s) for s in scores]
-        # Improvement rate based on overall scores
-        improvement = calculate_improvement_rate([s['overall_score'] for s in scores])
+        try:
+            scores = conn.execute('''
+                SELECT ans.overall_score, DATE(ans.submitted_at) as date, aq.subject
+                FROM answer_submissions ans
+                JOIN answer_questions aq ON ans.question_id = aq.id
+                WHERE ans.user_id = ?
+                ORDER BY ans.submitted_at ASC
+            ''', (user_id,)).fetchall()
+            score_data = [dict(s) for s in scores]
+            # Improvement rate based on overall scores
+            improvement = calculate_improvement_rate([s['overall_score'] for s in scores])
+        except:
+            score_data = []
+            improvement = 0
+            
         # Average score per subject
-        subject_avg = conn.execute('''
-            SELECT aq.subject, AVG(ans.overall_score) as avg_score, COUNT(*) as count
-            FROM answer_submissions ans
-            JOIN answer_questions aq ON ans.question_id = aq.id
-            WHERE ans.user_id = ?
-            GROUP BY aq.subject
-        ''', (user_id,)).fetchall()
+        try:
+            subject_avg = conn.execute('''
+                SELECT aq.subject, AVG(ans.overall_score) as avg_score, COUNT(*) as count
+                FROM answer_submissions ans
+                JOIN answer_questions aq ON ans.question_id = aq.id
+                WHERE ans.user_id = ?
+                GROUP BY aq.subject
+            ''', (user_id,)).fetchall()
+            subject_avg_data = [dict(s) for s in subject_avg]
+        except:
+            subject_avg_data = []
+            
         return jsonify({
             'scores': score_data,
             'improvement_rate': improvement,
-            'subject_averages': [dict(s) for s in subject_avg]
+            'subject_averages': subject_avg_data
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500

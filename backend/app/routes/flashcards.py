@@ -129,6 +129,10 @@ def create_flashcard():
     """Create a new flashcard"""
     try:
         data = request.get_json()
+        
+        if 'deck_id' not in data:
+            return jsonify({'error': 'deck_id is required'}), 400
+            
         conn = get_db()
         
         cursor = conn.execute('''
@@ -147,11 +151,15 @@ def create_flashcard():
         card_id = cursor.lastrowid
         conn.commit()
         
-        # Award 2 XP for creating a card
-        award_xp(1, 2, 0)
+        # Award 2 XP for creating a card (handle failure gracefully)
+        try:
+            award_xp(1, 2, 0)
+        except Exception as xp_error:
+            print(f"Failed to award XP for flashcard creation: {xp_error}")
         
         return jsonify({'id': card_id, 'message': 'Card created'}), 201
     except Exception as e:
+        print(f"Error creating flashcard: {e}")
         return jsonify({'error': str(e)}), 500
 
 

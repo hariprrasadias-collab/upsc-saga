@@ -6,9 +6,12 @@ import {
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 
+import { useAnalytics } from '../../contexts/AnalyticsContext';
+
 const AnalyticsDashboard: React.FC = () => {
+    const { analytics: overview, loading: contextLoading } = useAnalytics();
     const [timeframe, setTimeframe] = useState<'7d' | '30d' | 'all'>('30d');
-    const [overview, setOverview] = useState<any>(null);
+    // const [overview, setOverview] = useState<any>(null); // Removed local state
     const [subjectData, setSubjectData] = useState<any[]>([]);
     const [mockTrends, setMockTrends] = useState<any>(null);
     const [weakAreas, setWeakAreas] = useState<any[]>([]);
@@ -22,20 +25,17 @@ const AnalyticsDashboard: React.FC = () => {
         try {
             setLoading(true);
 
-            // Fetch all analytics data in parallel
-            const [overviewRes, subjectRes, mockRes, weakRes] = await Promise.all([
-                fetch(`http://localhost:5000/api/analytics/overview?timeframe=${timeframe}`),
+            // Fetch remaining analytics data in parallel
+            const [subjectRes, mockRes, weakRes] = await Promise.all([
                 fetch('http://localhost:5000/api/analytics/subject-wise'),
                 fetch('http://localhost:5000/api/analytics/mock-tests'),
                 fetch('http://localhost:5000/api/analytics/weak-areas?limit=5')
             ]);
 
-            const overviewData = await overviewRes.json();
             const subjectData = await subjectRes.json();
             const mockData = await mockRes.json();
             const weakData = await weakRes.json();
 
-            setOverview(overviewData);
             setSubjectData(subjectData);
             setMockTrends(mockData);
             setWeakAreas(weakData);
@@ -46,7 +46,7 @@ const AnalyticsDashboard: React.FC = () => {
         }
     };
 
-    if (loading) return <div className="analytics-loading">Loading analytics...</div>;
+    if (loading && !overview) return <div className="analytics-loading">Loading analytics...</div>;
 
     return (
         <div className="analytics-dashboard">

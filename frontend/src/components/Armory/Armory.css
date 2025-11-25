@@ -4,7 +4,7 @@
     padding: 2rem;
     height: 100%;
     overflow-y: auto;
-    background: linear-gradient(to bottom, #1a1510 0%, #0d0a08 100%); /* Furnace colors */
+    background: linear-gradient(to bottom, #1a1510 0%, #0d0a08 100%);
     color: #e0e0e0;
 }
 
@@ -12,7 +12,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid #8B4513; /* SaddleBrown */
+    border-bottom: 2px solid #8B4513;
     padding-bottom: 1rem;
     margin-bottom: 2rem;
 }
@@ -20,13 +20,13 @@
 .armory-title {
     font-family: var(--font-headings);
     font-size: 3rem;
-    color: #cd7f32; /* Bronze */
+    color: #cd7f32;
     text-transform: uppercase;
     text-shadow: 0 0 15px rgba(205, 127, 50, 0.5);
 }
 
 .wallet-display {
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.5);
     padding: 10px 20px;
     border: 1px solid #cd7f32;
     border-radius: 8px;
@@ -50,18 +50,220 @@
     color: #fff;
 }
 
-/* SHOP GRID */
-.shop-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 30px;
+/* TAB NAVIGATION */
+.armory-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #8B4513;
 }
 
-.shop-item {
-    background: #251e18;
-    border: 2px solid #5d4037;
-    border-radius: 8px;
+.tab-btn {
+    padding: 1rem 2rem;
+    background: transparent;
+    border: none;
+    color: #aaa;
+    font-family: var(--font-headings);
+    font-size: 1.1rem;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+}
+
+.tab-btn:hover {
+    color: #cd7f32;
+}
+
+.tab-btn.active {
+    color: #cd7f32;
+    border-bottom-color: #cd7f32;
+}
+
+/* BADGES TAB */
+.badges-container {
+    padding: 1rem 0;
+}
+
+.badge-stats {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
     padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid #8B4513;
+    border-radius: 8px;
+    font-size: 1.1rem;
+}
+
+.badge-stats span {
+    color: #cd7f32;
+    font-weight: bold;
+}
+
+.badge-category {
+    margin-bottom: 3rem;
+}
+
+.category-title {
+    font-family: var(--font-headings);
+    font-size: 1.8rem;
+    color: #cd7f32;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+
+.badge-card.locked .badge-icon::after {
+    content: '🔒';
+    position: absolute;
+    bottom: -10px;
+    right: -10px;
+    font-size: 1.5rem;
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.8));
+}
+
+.badge-card.unlocked {
+    border-color: #cd7f32;
+    box-shadow: 0 0 20px rgba(205, 127, 50, 0.3);
+}
+
+.badge-card.unlocked::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg,
+            transparent,
+            rgba(255, 255, 255, 0.1),
+            transparent);
+    animation: shine 3s infinite;
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%) rotate(45deg);
+    }
+
+    100% {
+        transform: translateX(100%) rotate(45deg);
+    }
+}
+
+.badge-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 10px rgba(255, 165, 0, 0.5));
+    position: relative;
+}
+
+.badge-info {
+    width: 100%;
+    z-index: 1;
+}
+
+.badge-name {
+    font-family: var(--font-headings);
+    font-size: 1.3rem;
+    color: #cd7f32;
+    margin-bottom: 0.5rem;
+}
+
+.badge-desc {
+    font-size: 0.9rem;
+    color: #bbb;
+    margin-bottom: 1rem;
+    min-height: 40px;
+    line-height: 1.4;
+}
+
+.badge-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+    width: 100%;
+}
+
+.badge-rarity {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    padding: 0.3rem 0.8rem;
+    border-radius: 12px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.rarity-common .badge-rarity {
+    background: #6c757d;
+    color: white;
+}
+
+.rarity-rare .badge-rarity {
+    background: #3b82f6;
+    color: white;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+}
+
+.rarity-epic .badge-rarity {
+    background: #9333ea;
+    color: white;
+    box-shadow: 0 0 10px rgba(147, 51, 234, 0.4);
+}
+
+.rarity-legendary .badge-rarity {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: black;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.badge-reward {
+    color: #4ade80;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.badge-progress {
+    margin-top: 1rem;
+    width: 100%;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+    border: 1px solid #333;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4ade80, #22c55e);
+    transition: width 0.5s ease;
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+}
+
+.progress-text {
+    font-size: 0.8rem;
     position: relative;
     transition: all 0.3s;
     display: flex;
@@ -73,13 +275,13 @@
 .shop-item:hover {
     transform: translateY(-5px);
     border-color: #cd7f32;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .item-icon {
     font-size: 4rem;
     margin-bottom: 1rem;
-    filter: drop-shadow(0 0 10px rgba(255,165,0,0.3));
+    filter: drop-shadow(0 0 10px rgba(255, 165, 0, 0.3));
 }
 
 .item-name {
@@ -107,11 +309,13 @@
     cursor: pointer;
     text-transform: uppercase;
     transition: 0.2s;
+    border-radius: 4px;
 }
 
 .buy-btn:hover:not(:disabled) {
     background: #cd7f32;
     color: black;
+    box-shadow: 0 0 15px rgba(205, 127, 50, 0.5);
 }
 
 .buy-btn:disabled {
@@ -128,9 +332,9 @@
     font-weight: bold;
     font-family: var(--font-headings);
     letter-spacing: 1px;
+    border-radius: 4px;
 }
 
-/* DWARVEN DECOR */
 .shop-item::before {
     content: '';
     position: absolute;
@@ -138,6 +342,69 @@
     left: 5px;
     right: 5px;
     bottom: 5px;
-    border: 1px dashed rgba(255,255,255,0.1);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
     pointer-events: none;
+}
+
+/* INVENTORY TAB */
+.inventory-container {
+    padding: 1rem;
+}
+
+.inventory-container h2 {
+    color: #cd7f32;
+    font-family: var(--font-headings);
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.inventory-item {
+    background: #251e18;
+    border: 2px solid #5d4037;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.inventory-item:hover {
+    transform: translateY(-3px);
+    border-color: #cd7f32;
+}
+
+.inventory-item .item-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+.inventory-item h3 {
+    color: #cd7f32;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    font-family: var(--font-headings);
+}
+
+.inventory-item p {
+    font-size: 0.85rem;
+    color: #aaa;
+}
+
+.empty-inventory {
+    text-align: center;
+    padding: 3rem;
+    color: #aaa;
+    font-size: 1.1rem;
+}
+
+.loading {
+    text-align: center;
+    padding: 3rem;
+    font-size: 1.5rem;
+    color: #cd7f32;
 }

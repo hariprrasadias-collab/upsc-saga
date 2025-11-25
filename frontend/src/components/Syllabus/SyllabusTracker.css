@@ -275,6 +275,201 @@
     background: #238636;
     color: white;
     border: none;
+    overflow: hidden;
+}
+
+.paper-header {
+    background: #21262d;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #30363d;
+}
+
+.paper-header:hover {
+    background: #30363d;
+}
+
+.paper-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #58a6ff;
+}
+
+.subject-list {
+    background: #0d1117;
+}
+
+.subject-item {
+    border-bottom: 1px solid #21262d;
+}
+
+.subject-header {
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    font-weight: bold;
+    color: #c9d1d9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.subject-header:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.topic-list {
+    padding: 0 1.5rem 1rem 1.5rem;
+    background: #0d1117;
+}
+
+.topic-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid #21262d;
+    gap: 15px;
+}
+
+.topic-item:last-child {
+    border-bottom: none;
+}
+
+.topic-content {
+    flex: 1;
+}
+
+.topic-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.topic-meta {
+    font-size: 0.8rem;
+    color: #8b949e;
+    margin-top: 4px;
+}
+
+.topic-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 200px;
+    justify-content: flex-end;
+}
+
+.status-select {
+    background: #21262d;
+    color: #c9d1d9;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.status-select.not-started {
+    border-color: #f85149;
+    color: #f85149;
+}
+
+.status-select.reading {
+    border-color: #d29922;
+    color: #d29922;
+}
+
+.status-select.notes-done {
+    border-color: #238636;
+    color: #238636;
+}
+
+.status-select.revision-1 {
+    border-color: #a371f7;
+    color: #a371f7;
+}
+
+.status-select.revision-2 {
+    border-color: #db6d28;
+    color: #db6d28;
+}
+
+.status-select.completed {
+    border-color: #58a6ff;
+    color: #58a6ff;
+    background: rgba(88, 166, 255, 0.1);
+}
+
+.notes-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.notes-btn:hover,
+.notes-btn.has-notes {
+    opacity: 1;
+}
+
+/* NOTES MODAL */
+.notes-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.notes-modal {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    width: 600px;
+    max-width: 90%;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.notes-modal h3 {
+    margin-top: 0;
+    color: #58a6ff;
+    border-bottom: 1px solid #30363d;
+    padding-bottom: 10px;
+}
+
+.notes-textarea {
+    width: 100%;
+    height: 300px;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    color: #c9d1d9;
+    padding: 10px;
+    font-family: monospace;
+    resize: vertical;
+    margin-bottom: 15px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.save-btn {
+    background: #238636;
+    color: white;
+    border: none;
     padding: 8px 16px;
     border-radius: 4px;
     cursor: pointer;
@@ -287,4 +482,58 @@
     padding: 8px 16px;
     border-radius: 4px;
     cursor: pointer;
+}
+
+/* Revision Features */
+.revise-btn {
+    background: none;
+    border: 1px solid #30363d;
+    color: #8b949e;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1.2rem;
+}
+
+.revise-btn:hover {
+    background: #1f6feb;
+    color: white;
+    border-color: #1f6feb;
+    transform: rotate(180deg);
+}
+
+.revision-badge {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    background: #21262d;
+    color: #8b949e;
+    border: 1px solid #30363d;
+    white-space: nowrap;
+}
+
+.revision-badge.due {
+    background: rgba(248, 81, 73, 0.1);
+    color: #f85149;
+    border-color: #f85149;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }

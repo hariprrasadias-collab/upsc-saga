@@ -172,6 +172,9 @@ const WarMapContainer: React.FC<WarMapContainerProps> = ({ onTaskCompleted }) =>
     } catch (err) {
       console.error('Failed to sync completion:', err);
     }
+
+    // Sync with main app (Rituals Panel)
+    await onTaskCompleted();
   };
 
   const handleDeleteEvent = async (eventId: string) => {

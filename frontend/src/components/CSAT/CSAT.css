@@ -1,0 +1,243 @@
+.csat-container {
+    padding: 2rem;
+    color: #e2e8f0;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.csat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 1rem;
+}
+
+.header-content h1 {
+    font-size: 2rem;
+    margin: 0;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.header-content p {
+    color: #94a3b8;
+    margin: 0.5rem 0 0;
+}
+
+.csat-tabs {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Practice Mode Styles */
+.practice-mode {
+    animation: fadeIn 0.5s ease;
+}
+
+.filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    background: #1e293b;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #334155;
+}
+
+.filters select {
+    background: #0f172a;
+    border: 1px solid #334155;
+    color: #e2e8f0;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    min-width: 200px;
+}
+
+.start-btn {
+    background: #f59e0b;
+    color: #0f172a;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.start-btn:disabled {
+    background: #475569;
+    cursor: not-allowed;
+}
+
+.question-card {
+    background: #1e293b;
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid #334155;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.q-number {
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.difficulty {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.difficulty.easy {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.difficulty.medium {
+    background: #fef9c3;
+    color: #854d0e;
+}
+
+.difficulty.hard {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.question-text {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.option-btn {
+    background: #0f172a;
+    border: 1px solid #334155;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+}
+
+.option-btn:hover:not(:disabled) {
+    border-color: #f59e0b;
+}
+
+.option-btn.correct {
+    background: #065f46;
+    border-color: #059669;
+}
+
+.option-btn.wrong {
+    background: #7f1d1d;
+    border-color: #dc2626;
+}
+
+.explanation-box {
+    background: #0f172a;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #f59e0b;
+    animation: slideDown 0.3s ease;
+}
+
+.explanation-box h3 {
+    color: #f59e0b;
+    margin: 0 0 0.5rem 0;
+}
+
+.next-btn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+/* Formula Sheet Styles */
+.formula-sheet {
+    display: grid;
+    gap: 2rem;
+    animation: fadeIn 0.5s ease;
+}
+
+.formula-category h2 {
+    color: #f59e0b;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.formula-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.formula-card {
+    background: #1e293b;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    overflow: hidden;
+}
+
+.formula-header {
+    padding: 1rem;
+    background: #0f172a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.formula-header h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.formula-content {
+    padding: 1rem;
+    background: #1e293b;
+}
+
+.formula-content ul {
+    padding-left: 1.5rem;
+    margin: 0;
+}
+
+.formula-content li {
+    margin-bottom: 0.5rem;
+    color: #cbd5e1;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

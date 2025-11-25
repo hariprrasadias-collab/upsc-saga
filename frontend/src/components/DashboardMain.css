@@ -10,6 +10,27 @@
   overflow: hidden;
 }
 
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 20px;
+  padding: 20px 30px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.dashboard-column-left {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.stats-panel-left {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 /* Header */
 .dashboard-header {
   padding: 20px 30px;
@@ -51,37 +72,6 @@
   width: 80px;
   height: 30px;
   background-image: url('/Runes.png');
-  background-size: contain;
-  background-position: right center;
-  background-repeat: no-repeat;
-  opacity: 0.4;
-}
-
-/* Content Grid Layout */
-.dashboard-content {
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
-  gap: 20px;
-  padding: 30px;
-  flex: 1;
-  overflow: auto;
-}
-
-/* Left Stats Panel */
-.stats-panel-left {
-  background: linear-gradient(135deg, rgba(26, 47, 74, 0.8) 0%, rgba(10, 14, 39, 0.6) 100%);
-  border: 2px solid rgba(212, 165, 116, 0.2);
-  border-radius: 8px;
-  padding: 25px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  box-shadow: inset 0 0 20px rgba(95, 179, 232, 0.1), 0 8px 20px rgba(0, 0, 0, 0.5);
-}
-
-.stat-level {
-  text-align: center;
-  padding: 35px 0;
   border-bottom: 2px solid rgba(212, 165, 116, 0.3);
 }
 
@@ -220,37 +210,35 @@
   width: 450px;
   height: 450px;
   padding: 20px;
-  overflow: hidden; /* important for clean circle */
+  overflow: hidden;
 }
 
 .character-art {
-  width: 420px;
-  height: 450px;
-  background-image: url('/Character artwork.png');   /* your current file - keep the name */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/Character artwork.png');
   background-size: contain;
   background-repeat: no-repeat;
-  background-position: center bottom;
-
-  /* THIS IS THE KEY PART - removes checkered pattern forever */
-  -webkit-mask-image: url('/Character artwork.png');
-  -webkit-mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-position: center bottom;
-  mask-image: url('/Character artwork.png');
-  mask-size: contain;
-  mask-repeat: no-repeat;
-  mask-position: center bottom;
-
-  background-color: #5fb3e8; /* glowing edge color - change if you want */
+  background-position: center center;
+  z-index: 0;
   animation: float 8s ease-in-out infinite;
   filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.8));
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50%      { transform: translateY(-12px); }
-}
 
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
+}
 
 .progress-circle-container {
   position: relative;
@@ -259,12 +247,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 2;
+  margin-top: auto;
+  margin-bottom: 10px;
 }
 
 .progress-circle {
   width: 100%;
   height: 100%;
-  transform: rotate(-90deg);
   filter: drop-shadow(0 0 10px rgba(95, 179, 232, 0.3));
 }
 
@@ -280,6 +270,8 @@
   stroke-width: 3;
   stroke-linecap: round;
   transition: stroke-dasharray 0.5s ease;
+  transform: rotate(-90deg);
+  transform-origin: center;
 }
 
 .progress-text {
@@ -299,6 +291,8 @@
   letter-spacing: 2px;
   text-transform: uppercase;
   text-shadow: 0 0 10px rgba(95, 179, 232, 0.3);
+  z-index: 2;
+  margin-bottom: 20px;
 }
 
 .boons-curses {

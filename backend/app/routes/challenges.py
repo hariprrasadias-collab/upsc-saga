@@ -1,0 +1,102 @@
+from flask import Blueprint, jsonify, request
+from app.services.challenge_service import challenge_service
+
+challenges_bp = Blueprint('challenges', __name__)
+
+@challenges_bp.route('/api/challenges/daily', methods=['GET'])
+def get_daily_challenge():
+    """
+    Get today's assigned challenge for the user.
+    """
+    try:
+        user_id = 1  # TODO: Get from session
+        challenge = challenge_service.get_daily_challenge(user_id)
+        
+        if not challenge:
+            return jsonify({'error': 'No challenge available'}), 404
+        
+        return jsonify(challenge)
+    except Exception as e:
+        print(f"Error fetching daily challenge: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+@challenges_bp.route('/api/challenges/complete', methods=['POST'])
+def complete_challenge():
+    """
+    Mark today's challenge as complete.
+    """
+    try:
+        user_id = 1  # TODO: Get from session
+        result = challenge_service.complete_challenge(user_id)
+        
+        return jsonify(result)
+    except Exception as e:
+        print(f"Error completing challenge: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+@challenges_bp.route('/api/challenges/streak', methods=['GET'])
+def get_streak():
+    """
+    Get user's current streak information.
+    """
+    try:
+        user_id = 1  # TODO: Get from session
+        streak = challenge_service.get_streak(user_id)
+        
+        if not streak:
+            return jsonify({
+                'current_streak': 0,
+                'longest_streak': 0,
+                'last_activity_date': None
+            })
+        
+        return jsonify(streak)
+    except Exception as e:
+        print(f"Error fetching streak: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+@challenges_bp.route('/api/challenges/history', methods=['GET'])
+def get_history():
+    """
+    Get user's challenge completion history (last 30 days).
+    """
+    try:
+        user_id = 1  # TODO: Get from session
+        days = request.args.get('days', 30, type=int)
+        
+        history = challenge_service.get_challenge_history(user_id, days)
+        return jsonify(history)
+    except Exception as e:
+        print(f"Error fetching challenge history: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+@challenges_bp.route('/api/challenges/progress', methods=['POST'])
+def update_progress():
+    """
+    Update progress for today's challenge.
+    """
+    try:
+        user_id = 1  # TODO: Get from session
+        data = request.get_json()
+        progress = data.get('progress', 0)
+        
+        success = challenge_service.update_challenge_progress(user_id, progress)
+        
+        if success:
+            return jsonify({'success': True, 'message': 'Progress updated'})
+        else:
+            return jsonify({'success': False, 'message': 'No active challenge'}), 404
+            
+    except Exception as e:
+        print(f"Error updating progress: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500

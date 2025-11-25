@@ -1,0 +1,355 @@
+.essay-workshop-container {
+    padding: 2rem;
+    color: #e2e8f0;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.essay-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 1rem;
+}
+
+.header-content h1 {
+    font-size: 2rem;
+    margin: 0;
+    background: linear-gradient(135deg, #60a5fa 0%, #a855f7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.header-content p {
+    color: #94a3b8;
+    margin: 0.5rem 0 0;
+}
+
+.essay-tabs {
+    display: flex;
+    gap: 1rem;
+}
+
+.tab-btn {
+    background: transparent;
+    border: 1px solid #475569;
+    color: #94a3b8;
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tab-btn.active {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
+}
+
+/* Editor Styles */
+.essay-editor {
+    background: #1e293b;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.editor-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+}
+
+.topic-selector {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.topic-selector select {
+    flex: 1;
+    background: #0f172a;
+    border: 1px solid #334155;
+    color: #e2e8f0;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.custom-topic-input {
+    flex: 1;
+    background: #0f172a;
+    border: 1px solid #334155;
+    color: #e2e8f0;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.timer-control {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: #0f172a;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #334155;
+}
+
+.timer-display {
+    font-family: monospace;
+    font-size: 1.5rem;
+    color: #4ade80;
+}
+
+.timer-display.warning {
+    color: #f87171;
+}
+
+.timer-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+}
+
+.timer-btn.start {
+    background: #22c55e;
+    color: #0f172a;
+}
+
+.timer-btn.stop {
+    background: #ef4444;
+    color: white;
+}
+
+.editor-area textarea {
+    width: 100%;
+    height: 60vh;
+    background: #0f172a;
+    border: 1px solid #334155;
+    color: #e2e8f0;
+    padding: 1.5rem;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    resize: none;
+    font-family: 'Georgia', serif;
+}
+
+.editor-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.word-count {
+    color: #94a3b8;
+}
+
+.submit-btn {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.submit-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Evaluation Styles */
+.essay-evaluation {
+    animation: fadeIn 0.5s ease;
+}
+
+.evaluation-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.back-btn {
+    background: transparent;
+    border: 1px solid #475569;
+    color: #94a3b8;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.score-card {
+    background: #1e293b;
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid #334155;
+}
+
+.score-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 8px solid #4caf50;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #0f172a;
+}
+
+.score-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+.score-max {
+    font-size: 0.9rem;
+    color: #94a3b8;
+}
+
+.topic-info h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+}
+
+.overall-feedback {
+    color: #cbd5e1;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.feedback-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.feedback-section {
+    background: #1e293b;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #334155;
+}
+
+.feedback-section.strengths h3 {
+    color: #4ade80;
+}
+
+.feedback-section.weaknesses h3 {
+    color: #f87171;
+}
+
+.feedback-section ul {
+    padding-left: 1.5rem;
+    margin: 0;
+}
+
+.feedback-section li {
+    margin-bottom: 0.5rem;
+    color: #e2e8f0;
+}
+
+.suggestions-section {
+    background: #1e293b;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #334155;
+    margin-bottom: 2rem;
+}
+
+.suggestions-section h3 {
+    color: #fbbf24;
+}
+
+.model-structure {
+    background: #0f172a;
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid #334155;
+}
+
+.structure-item {
+    margin-bottom: 1.5rem;
+}
+
+.structure-item h4 {
+    color: #94a3b8;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+}
+
+/* History Styles */
+.history-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.history-card {
+    background: #1e293b;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.history-card:hover {
+    transform: translateY(-2px);
+    border-color: #3b82f6;
+}
+
+.history-card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #94a3b8;
+}
+
+.history-score {
+    font-weight: bold;
+    color: #4ade80;
+}
+
+.history-card h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #e2e8f0;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,13 +1,18 @@
 // frontend/src/App.tsx
 import { useState, useEffect, useCallback } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import './index.css';
 import './App.css';
+import './animations.css';
+import { AnalyticsProvider } from './contexts/AnalyticsContext';
 
 // --- COMPONENT IMPORTS ---
 import Sidebar from './components/Sidebar';
 import DashboardMain from './components/DashboardMain';
 import WarMapContainer from './components/WarMap/WarMapContainer';
 import SyllabusTracker from './components/Syllabus/SyllabusTracker';
+import WeakAreasDashboard from './components/WeakAreas/WeakAreasDashboard';
+import AdminDashboard from './components/Admin/AdminDashboard';
 import QuestsPage from './components/Quests/QuestsPage';
 import RitualsPanel from './components/RitualsPanel';
 import AshParticles from './components/AshParticles';
@@ -16,16 +21,22 @@ import YggdrasilTree from './components/Yggdrasil/Yggdrasil';
 import LoreTablets from './components/LoreTablets/LoreTablets';
 import BossArena from './components/BossArena/BossArena';
 import PYQDatabase from './components/PYQ/PYQDatabase';
+import QuizSession from './components/PYQ/QuizSession';
+import QuizResults from './components/PYQ/QuizResults';
 import Armory from './components/Armory/Armory';
-import MimirChat from './components/Mimir/Mimir';
+
 import LevelUpModal from './components/LevelUpModal';
 import AnkiDojo from './components/AnkiDojo/AnkiDojo';
 import Seer from './components/Seer/Seer';
 import Ravens from './components/Ravens/Ravens';
 import AnswerWriting from './components/AnswerWriting/AnswerWriting';
 import MockTests from './components/MockTests/MockTests';
+import EssayWorkshop from './components/Essay/EssayWorkshop';
+import CSATModule from './components/CSAT/CSATModule';
+import MimirChat from './components/Mimir/MimirChat';
 import FlashcardsManager from './components/Flashcards/FlashcardsManager';
 import AnalyticsDashboard from './components/Analytics/AnalyticsDashboard';
+import AnswerWorkbench from './components/Scribe/AnswerWorkbench';
 
 // --- UTILS ---
 import { audioManager } from './util/AudioManager';
@@ -110,15 +121,35 @@ function App() {
         const gcalRes = await fetch(`http://localhost:5000/api/warmap/google-events?date=${today}`);
         if (gcalRes.ok) {
           const gcalEvents = await gcalRes.json();
-          // Convert Google Calendar events to Task format
-          const gcalTasks: Task[] = gcalEvents.map((event: any, index: number) => ({
-            id: -1000 - index, // Negative IDs to avoid conflicts with DB tasks
-            title: event.title,
-            isCompleted: false,
-            xp_reward: 0, // Google Calendar events don't have XP
-            associated_stat: null,
-            due_date: today,
-          }));
+
+          // Fetch metadata for each event to get XP and completion status
+          const gcalTasksPromises = gcalEvents.map(async (event: any, index: number) => {
+            try {
+              const metaRes = await fetch(`http://localhost:5000/api/warmap/google-events/${event.id}/metadata`);
+              const metadata = metaRes.ok ? await metaRes.json() : { xp_reward: 0, is_completed: false };
+
+              return {
+                id: -1000 - index, // Negative IDs to avoid conflicts with DB tasks
+                title: event.title,
+                isCompleted: metadata.is_completed || false,
+                xp_reward: metadata.xp_reward || 0,
+                associated_stat: metadata.associated_stat || null,
+                due_date: today,
+              };
+            } catch (err) {
+              console.error(`Error fetching metadata for event ${event.id}:`, err);
+              return {
+                id: -1000 - index,
+                title: event.title,
+                isCompleted: false,
+                xp_reward: 0,
+                associated_stat: null,
+                due_date: today,
+              };
+            }
+          });
+
+          const gcalTasks: Task[] = await Promise.all(gcalTasksPromises);
           // Merge with local tasks
           setTodayTasks([...tasksWithBooleanCompletion, ...gcalTasks]);
         } else {
@@ -164,108 +195,131 @@ function App() {
   if (error) return <div className="error-screen">Error: {error}</div>;
 
   return (
-    <div className="app-container" style={{
-      backgroundImage: `url(/assets/bg_main.jpg)`,
-      backgroundSize: 'cover',
-      minHeight: '100vh',
-      position: 'relative'
-    }}>
-
-      {/* BACKGROUND PARTICLES (Z-Index 0) */}
-      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
-        <AshParticles isRageMode={isRageMode} />
-      </div>
-
-      {/* LEFT SIDEBAR */}
-      <Sidebar
-        currentTab={currentTab}
-        setCurrentTab={setCurrentTab}
-      />
-
-      {/* MAIN CONTENT AREA (Middle Column - Z-Index 10) */}
-      <main className="content" style={{
-        backgroundImage: currentTab === 'dashboard' ? `url(/assets/bg_sidebar.png)` : undefined,
+    <AnalyticsProvider>
+      <div className="app-container" style={{
+        backgroundImage: `url(/assets/bg_main.jpg)`,
         backgroundSize: 'cover',
         minHeight: '100vh',
-        zIndex: 10,
         position: 'relative'
       }}>
-        {currentTab === 'dashboard' && (
-          <DashboardMain
-            stats={userStats!}
+
+        {/* BACKGROUND PARTICLES (Z-Index 0) */}
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
+          <AshParticles isRageMode={isRageMode} />
+        </div>
+
+        {/* LEFT SIDEBAR */}
+        <Sidebar
+          currentTab={currentTab}
+          setCurrentTab={setCurrentTab}
+        />
+
+        {/* MAIN CONTENT AREA (Middle Column - Z-Index 10) */}
+        <main className="content" style={{
+          backgroundImage: currentTab === 'dashboard' ? `url(/assets/bg_sidebar.png)` : undefined,
+          backgroundSize: 'cover',
+          minHeight: '100vh',
+          zIndex: 10,
+          position: 'relative'
+        }}>
+          {currentTab === 'dashboard' && (
+            <DashboardMain
+              stats={userStats!}
+            />
+          )}
+          {currentTab === 'war-map' && (
+            <WarMapContainer onTaskCompleted={handleTaskCompleted} />
+          )}
+          {currentTab === 'syllabus' && (
+            <SyllabusTracker onTaskCompleted={handleTaskCompleted} />
+          )}
+          {currentTab === 'quests' && (
+            <QuestsPage />
+          )}
+          {currentTab === 'codex' && (
+            <YggdrasilTree />
+          )}
+          {currentTab === 'lore' && (
+            <LoreTablets />
+          )}
+          {currentTab === 'pyq-archives' && (
+            <PYQDatabase />
+          )}
+          {currentTab === 'boss' && (
+            <BossArena onBattleComplete={handleTaskCompleted} />
+          )}
+          {currentTab === 'armory' && (
+            <Armory />
+          )}
+          {currentTab === 'dojo' && (
+            <AnkiDojo />
+          )}
+          {currentTab === 'seer' && (
+            <Seer />
+          )}
+          {currentTab === 'ravens' && (
+            <Ravens />
+          )}
+          {currentTab === 'answer-writing' && (
+            <AnswerWriting onTaskCompleted={handleTaskCompleted} />
+          )}
+          {currentTab === 'mock-tests' && (
+            <MockTests onTaskCompleted={handleTaskCompleted} />
+          )}
+          {currentTab === 'essay' && (
+            <EssayWorkshop onTaskCompleted={handleTaskCompleted} />
+          )}
+          {currentTab === 'csat' && <CSATModule />}
+          {currentTab === 'mimir' && <MimirChat />}
+          {currentTab === 'flashcards' && (
+            <FlashcardsManager onTaskCompleted={handleTaskCompleted} />
+          )}
+          {currentTab === 'analytics' && (
+            <AnalyticsDashboard />
+          )}
+          {currentTab === 'weak-areas' && (
+            <WeakAreasDashboard />
+          )}
+          {currentTab === 'admin' && (
+            <AdminDashboard />
+          )}
+          {currentTab === 'scribe' && (
+            <AnswerWorkbench />
+          )}
+
+          {/* Quiz Mode Routes */}
+          <Routes>
+            <Route path="/pyq-quiz/:sessionId" element={<QuizSession />} />
+            <Route path="/pyq-quiz-results/:sessionId" element={<QuizResults />} />
+          </Routes>
+        </main>
+
+        {/* RITUALS PANEL (Right Column) */}
+        <div style={{ zIndex: 15, position: 'relative' }}>
+          <RitualsPanel
+            tasks={todayTasks}
+            onTaskComplete={handleTaskCompleted}
+            // FIX: When clicked, switch tab to War Map
+            onPlanRituals={() => setCurrentTab('war-map')}
+          />
+        </div>
+
+        {/* --- OVERLAYS & FLOATING ELEMENTS --- */}
+
+        <SpartanRage onToggleRage={setIsRageMode} />
+
+        {/* Floating Mimir - Always visible */}
+        <MimirChat mode="floating" />
+
+        {showLevelUp && userStats && (
+          <LevelUpModal
+            newLevel={userStats.level}
+            onClose={() => setShowLevelUp(false)}
           />
         )}
-        {currentTab === 'war-map' && (
-          <WarMapContainer onTaskCompleted={handleTaskCompleted} />
-        )}
-        {currentTab === 'syllabus' && (
-          <SyllabusTracker onTaskCompleted={handleTaskCompleted} />
-        )}
-        {currentTab === 'quests' && (
-          <QuestsPage onTaskCompleted={handleTaskCompleted} />
-        )}
-        {currentTab === 'codex' && (
-          <YggdrasilTree />
-        )}
-        {currentTab === 'lore-tablets' && (
-          <LoreTablets />
-        )}
-        {currentTab === 'pyq' && (
-          <PYQDatabase />
-        )}
-        {currentTab === 'arena' && (
-          <BossArena onBattleComplete={handleTaskCompleted} />
-        )}
-        {currentTab === 'armory' && (
-          <Armory />
-        )}
-        {currentTab === 'dojo' && (
-          <AnkiDojo />
-        )}
-        {currentTab === 'seer' && (
-          <Seer />
-        )}
-        {currentTab === 'ravens' && (
-          <Ravens />
-        )}
-        {currentTab === 'answer-writing' && (
-          <AnswerWriting onTaskCompleted={handleTaskCompleted} />
-        )}
-        {currentTab === 'mock-tests' && (
-          <MockTests onTaskCompleted={handleTaskCompleted} />
-        )}
-        {currentTab === 'flashcards' && (
-          <FlashcardsManager onTaskCompleted={handleTaskCompleted} />
-        )}
-        {currentTab === 'analytics' && (
-          <AnalyticsDashboard />
-        )}
-      </main>
 
-      {/* RITUALS PANEL (Right Column) */}
-      <div style={{ zIndex: 15, position: 'relative' }}>
-        <RitualsPanel
-          tasks={todayTasks}
-          onTaskComplete={handleTaskCompleted}
-          // FIX: When clicked, switch tab to War Map
-          onPlanRituals={() => setCurrentTab('war-map')}
-        />
       </div>
-
-      {/* --- OVERLAYS & FLOATING ELEMENTS --- */}
-
-      <SpartanRage onToggleRage={setIsRageMode} />
-
-      <MimirChat />
-
-      {showLevelUp && userStats && (
-        <LevelUpModal
-          newLevel={userStats.level}
-          onClose={() => setShowLevelUp(false)}
-        />
-      )}
-
-    </div>
+    </AnalyticsProvider>
   );
 }
 

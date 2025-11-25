@@ -1,0 +1,854 @@
+year,subject,topic,question_number,question_text,option_a,option_b,option_c,option_d,correct_option,explanation,difficulty
+2024,Geography,Climatology & Atmospheric Science,1,"Consider the following statements
+Statement-I: The atmosphere is heated more by incoming solar radiation than by terrestrial radiation.
+Statement-II: Carbon dioxide and other greenhouse gases in the atmosphere are good absorbers of long wave radiation.
+Which one of the following is correct in respect of the above statements?",Both Statements are correct and II explains I,Both correct but II does not explain I,"Statement-I correct, II incorrect","Statement-I incorrect, II correct",D,,Medium
+2024,Geography,Climatology & Atmospheric Science,2,"Consider the following statements regarding isothermal maps in the month of January:
+1. The isotherms deviate to the north over the ocean and to the south over the continent.
+2. The presence of cold ocean currents, Gulf Stream and North Atlantic Drift make the North Atlantic Ocean colder.
+Which one of the following is correct?",1 only,2 only,Both 1 and 2,Neither 1 nor 2,A,,Medium
+2024,Geography,Geomorphology & Volcanology,3,"Consider the following:
+1. Pyroclastic debris
+2. Ash and dust
+3. Nitrogen compounds
+4. Sulphur compounds
+How many of the above are products of volcanic eruptions?",Only one,Only two,Only three,All four,D,,Medium
+2024,Geography,Geomorphology & Weathering,4,"Consider the following statements:
+Statement-I: Rainfall is one of the reasons for weathering of rocks.
+Statement-II: Rain water contains carbon dioxide in solution.
+Statement-III: Rain water contains atmospheric oxygen.
+Which one of the following is correct?",Both II and III correct and both explain I,"Both II and III correct, only one explains I",Only one of II and III correct and explains I,Neither II nor III correct,A,,Medium
+2024,Geography,World Geography - Agriculture,5,Which of the following countries are well known as the two largest cocoa producers in the world?,Algeria and Morocco,Botswana and Namibia,Côte d'Ivoire and Ghana,Madagascar and Mozambique,C,,Medium
+2024,Geography,Physical Geography - Rivers,6,"With reference to the Himalayan rivers joining the Ganga downstream of Prayagraj from West to East, which one of the following sequences is correct?",Ghaghara - Gomati - Gandak - Kosi,Gomati - Ghaghara - Gandak - Kosi,Ghaghara - Gomati - Kosi - Gandak,Gomati - Ghaghara - Kosi - Gandak,B,,Medium
+2024,Geography,Physical Geography - Weather,7,Consider the following statements about atmospheric conditions.,A,B,C,D,A,,Medium
+2024,Geography,Physical Geography - Waterfalls & Rivers,8,"Consider the following information about waterfalls, regions and rivers.",Only one,Only two,All three,None,B,,Medium
+2024,Geography,Physical Geography - Mountain Systems,9,"Consider the following information about mountain ranges, regions and types.",Only one,Only two,Only three,All four,A,,Medium
+2024,Geography,Physical Geography - Geopolitics,10,How many countries have a border with the North Sea?,Only one,Only two,Only three,All four,B,,Medium
+2024,Geography,Infrastructure & Development,11,Consider the following airports and Greenfield projects.,1 only,2 only,Both 1 and 2,Neither 1 nor 2,A,,Medium
+2024,Geography,Climatology & Atmospheric Science,12,"With reference to water vapour, which of the following statements are correct?",1 only,2 only,Both 1 and 2,Neither 1 nor 2,A,,Medium
+2024,Geography,Climatology - Climate Classification,13,"Consider the following description of climate characteristics.
+Annual and daily range of temperatures is low. Precipitation occurs throughout the year. Precipitation varies between 50 cm - 250 cm.
+What is this type of climate?",Equatorial climate,China type climate,Humid subtropical climate,Marine West coast climate,D,,Medium
+2024,Geography,Climatology - Coriolis Force,14,"With reference to Coriolis force, which of the following statements are correct?",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",C,,Medium
+2024,Geography,Climatology - Astronomy,15,"On June 21 every year, which of the following latitudes experiences sunlight of more than 12 hours?",1 only,2 only,3 and 4,2 and 4,D,,Medium
+2024,Geography,Physical Geography - Tropical Regions,16,One of the following regions has the world's largest tropical peatland. Which one of the following denotes that region?,Amazon Basin,Congo Basin,Kikori Basin,Rio de la Plata Basin,B,,Medium
+2024,Environment,Pollution & Contamination,17,"With reference to perfluoroalkyl and polyfluoroalkyl substances (PFAS), consider the following statements.",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",D,,Medium
+2024,Environment,Biodiversity & Ecology,18,"Consider the following organisms: Carabid beetles, Centipedes, Flies, Termites, Wasps. Parasitoid species are found in how many of the above?",Only two,Only three,Only four,All five,B,,Medium
+2024,Environment,Botany & Plant Science,19,"Consider the following plants: Groundnut, Horse-gram, Soybean. How many of the above belong to the pea family?",Only one,Only two,All three,None,C,,Medium
+2024,Environment,Zoology & Wildlife,20,"Consider the following statements:
+Statement-I: The Indian Flying Fox is placed under the vermin category in the Wild Life Protection Act, 1972.
+Statement-II: The Indian Flying Fox feeds on the blood of other animals.
+Which one is correct?",Both Statements are correct and II explains I,Both correct but II does not explain I,"Statement-I correct, II incorrect","Statement-I incorrect, II correct",X,,Medium
+2024,Environment,Wildlife & Conservation,21,"The organisms Cicada, Froghopper and Pond skater are",Birds,Fish,Insects,Reptiles,C,,Medium
+2024,Environment,Environmental Science,22,"Consider the following statements:
+Statement-I: Many chewing gums found in the market are considered a source of environmental pollution.
+Statement-II: Many chewing gums contain plastic as gum base.
+Which one is correct?",Both Statements are correct and II explains I,Both correct but II does not explain I,"Statement-I correct, II incorrect","Statement-I incorrect, II correct",A,,Medium
+2024,Environment,Biodiversity & Ecology,23,Consider the following pairs of countries and animals found in their natural habitat.,Only one,Only two,All three,None,D,,Medium
+2024,Environment,International Organizations,24,Consider the following statements regarding World Toilet Organization.,2 only,3 only,1 and 2,2 and 3,A,,Medium
+2024,Environment,Zoology & Wildlife Behavior,25,Consider the following statements about animal behavior and characteristics.,1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",A,,Medium
+2024,Environment,Agricultural Innovation,26,Which one of the following is the correct description of 100 Million Farmers?,Platform for food and water systems,Network for organic animal husbandry,Digital platform for fertilizer trading,Platform for Farmer Product Organisations,A,,Medium
+2024,Environment,Renewable Energy,27,"How many of the following are considered Distributed Energy Resources: Battery storage, Biomass generators, Fuel cells, Rooftop solar photovoltaic units?",Only one,Only two,Only three,All four,D,,Medium
+2024,Environment,Environmental Biology,28,Which one of the following shows a unique relationship with an insect that has coevolved with it?,Fig,Mahua,Sandalwood,Silk cotton,A,,Medium
+2024,Environment,Biodiversity & Ecology,29,"Consider the following: Butterflies, Fish, Frogs. How many have poisonous species among them?",Only one,Only two,All three,None,C,,Medium
+2024,Environment,Botany - Native Plants,30,"Consider the following trees: Cashew, Papaya, Red sanders. How many are actually native to India?",Only one,Only two,All three,None,A,,Medium
+2024,Science & Technology,Space Technology - Radioisotopes,31,"With reference to radioisotope thermoelectric generators (RTGs), consider the following statements.",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",B,,Medium
+2024,Science & Technology,Astronomy - Stellar Evolution,32,"Consider the following statements:
+Statement-I: Giant stars live much longer than dwarf stars.
+Statement-II: Giant stars have greater rate of nuclear reactions than dwarf stars.
+Which one is correct?",Both Statements are correct and II explains I,Both correct but II does not explain I,"Statement-I correct, II incorrect","Statement-I incorrect, II correct",A,,Medium
+2024,Science & Technology,Human Physiology,33,Which one of the following is synthesised in human body that dilates blood vessels and increases blood flow?,Nitric oxide,Nitrous oxide,Nitrogen dioxide,Nitrogen pentoxide,D,,Medium
+2024,Science & Technology,Technology - Radars,34,"Consider the following activities. In how many can radars be used: Monitoring of precipitation at airports, Tracking the migration of animals, Identification of narcotics on passengers?",Only one,Only two,All three,None,B,,Medium
+2024,Science & Technology,Defence Technology,35,"Consider the following aircraft: Rafael, MiG-29, Tejas MK-1. How many are considered fifth generation fighter aircraft?",Only one,Only two,All three,None,D,,Medium
+2024,Science & Technology,Materials Science,36,In which of the following are hydrogels used?,1 only,1 and 2 only,2 and 3 only,"1, 2 and 3",A,,Medium
+2024,Science & Technology,Alternative Energy,37,Which one of the following is the exhaust pipe emission from Fuel Cell Electric Vehicles powered by hydrogen?,Hydrogen peroxide,Hydronium,Oxygen,Water vapour,D,,Medium
+2024,Science & Technology,Energy Storage,38,"Recently, the term pumped-storage hydropower is discussed in the context of which one of the following?",Irrigation of terraced crop fields,Lift irrigation of cereal crops,Long duration energy storage,Rainwater harvesting system,C,,Medium
+2024,Science & Technology,Biotechnology,39,Membrane Bioreactors are often discussed in the context of,Assisted reproductive technologies,Drug delivery nanotechnologies,Vaccine production technologies,Wastewater treatment technologies,D,,Medium
+2024,Science & Technology,Financial Instruments - Money Market,40,"With reference to the Indian economy, Collateral Borrowing and Lending Obligations are the instruments of",Bond market,Forex market,Money market,Stock market,C,,Medium
+2024,Economy,Demographics,41,The total fertility rate in an economy is defined as,Number of children born per 1000 people,Number of children born to couple in lifetime,Birth rate minus death rate,Average live births by end of child-bearing age,D,,Medium
+2024,Economy,Banking & Financial Regulation,42,"Consider the following statements about India's financial system.
+1. Non-Banking Financial Companies can access the Liquidity Adjustment Facility window of the RBI.
+2. Foreign Institutional Investors can hold Government Securities.
+3. Stock Exchanges can offer separate trading platforms for debts.",1 and 2 only,3 only,"1, 2 and 3",2 and 3 only,C,,Medium
+2024,Economy,Capital Markets,43,"In India, which of the following can trade in Corporate Bonds and Government Securities?",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",D,,Medium
+2024,Economy,Financial Instruments,44,"Consider the following: Exchange-Traded Funds (ETF), Motor vehicles, Currency swap. Which are considered financial instruments?",1 only,2 and 3 only,"1, 2 and 3","1, 3 and 4",D,,Medium
+2024,Economy,Sectoral Classification,45,Consider the following pairs of economic activities and sectors.,Only one,Only two,Only three,All four,B,,Medium
+2024,Economy,Sustainable Energy - Aviation Fuel,46,"Consider the following materials: Agricultural residues, Corn grain, Wastewater treatment sludge, Wood mill waste. Which can be used as feedstock for Sustainable Aviation Fuel?",1 and 2 only,3 and 4 only,"1, 2, 3 and 4",1 and 3 only,C,,Medium
+2024,Economy,Capital Formation,47,Consider the following pairs of items and their classification as capital.,Only one,Only two,Only three,All four,B,,Medium
+2024,Economy,Technology & Digital Economy,48,Which one of the following words/phrases is most appropriately used to denote an interoperable network of 3D virtual worlds?,Big data analytics,Cryptography,Metaverse,Virtual matrix,C,,Medium
+2024,Economy,Banking Regulation,49,With reference to the rules imposed by RBI for foreign banks in India.,1 only,2 only,Both 1 and 2,Neither 1 nor 2,D,,Medium
+2024,Economy,Corporate Social Responsibility,50,Consider the following statements about Corporate Social Responsibility (CSR) rules in India.,1 only,2 only,Both 1 and 2,Neither 1 nor 2,A,,Medium
+2024,Polity,International Finance,51,"Consider the following statements:
+Statement-I: If USA were to default on its debt, holders of US Treasury Bonds will not be able to exercise their claims.
+Statement-II: USA Government debt is not backed by any hard assets.
+Which one is correct?",Both Statements are correct and II explains I,Both correct but II does not explain I,"Statement-I correct, II incorrect","Statement-I incorrect, II correct",C,,Medium
+2024,Polity,Banking & Lending,52,"Consider the following statements:
+Statement-I: Syndicated lending spreads the risk of borrower default across multiple lenders.
+Statement-II: The syndicated loan cannot be a credit line.
+Which one is correct?",Both Statements are correct and II explains I,Both correct but II does not explain I,"Statement-I correct, II incorrect","Statement-I incorrect, II correct",X,,Medium
+2024,Polity,Monetary Policy - Digital Rupee,53,Consider the following statements about digital rupee.,1 and 2 only,1 and 3 only,2 and 4 only,"1, 2 and 4",D,,Medium
+2024,History,Ancient India - Buddhism,54,"With reference to ancient India, Gautama Buddha was generally known by which epithets?",1 only,2 and 3 only,"1, 2 and 3",None of the above,B,,Medium
+2024,History,Ancient India - Archaeology,55,Consider the following information about Archaeological Sites.,1 and 2,2 and 3,3 and 4,1 and 4,C,,Medium
+2024,History,Medieval India - Portuguese,56,Who of the following rulers of medieval India gave permission to Portuguese to build a fort at Bhatkal?,Krishnadevaraya,Narasimha Saluva,Muhammad Shah III,Yusuf Adil Shah,A,,Medium
+2024,History,Medieval India - Colonial Revenue,57,"With reference to revenue collection by Cornwallis, consider the following statements.",1 only,2 only,Both 1 and 2,Neither 1 nor 2,X,,Medium
+2024,History,Ancient India - Literature,58,"Consider the following statements:
+1. There are no parables in Upanishads.
+2. Upanishads were composed earlier than the Puranas.
+Which is correct?",1 only,2 only,Both 1 and 2,Neither 1 nor 2,B,,Medium
+2024,Polity,International Relations,59,Consider the following statements about India's international memberships.,1 only,2 only,Both 1 and 2,Neither 1 nor 2,A,,Medium
+2024,Culture,UNESCO Intangible Heritage,60,Which one of the following was the latest inclusion in the Intangible Cultural Heritage List of UNESCO?,Chhau dance,Durga puja,Garba dance,Kumbh mela,C,,Medium
+2024,Polity,Constitutional History,61,Who was the Provisional President of the Constituent Assembly before Dr. Rajendra Prasad took over?,C. Rajagopalachari,Dr. B.R. Ambedkar,T.T. Krishnamachari,Dr. Sachchidananda Sinha,D,,Medium
+2024,Polity,Constitutional History - Government of India Act 1935,62,"With reference to the Government of India Act, 1935, consider the following statements.",1 only,2 only,Both 1 and 2,Neither 1 nor 2,A,,Medium
+2024,Culture,Classical Literature,63,Which one of the following is a work attributed to playwright Bhasa?,Kavyalankara,Natyashastra,Madhyama-vyayoga,Mahabhashya,C,,Medium
+2024,History,Medieval India - Buddhism,64,"Sanghabhuti, an Indian Buddhist monk, was the author of a commentary on which text?",Prajnaparamita Sutra,Visuddhimagga,Sarvastivada Vinaya,Lalitavistara,C,,Medium
+2024,Culture,World Heritage Sites,65,Consider the following properties included in the World Heritage List by UNESCO.,"1, 2 and 4","1, 3 and 5",2 and 4 only,3 and 5 only,B,,Medium
+2024,Polity,Constitutional Amendment,66,"As per Article 368 of the Constitution of India, the Parliament may amend provisions by way of",1 and 2,2 and 3,1 and 3,"1, 2 and 3",D,,Medium
+2024,Polity,Population & Demographics,67,Consider the following countries frequently mentioned for low birth rates or ageing population.,Only one,Only two,Only three,All four,A,,Medium
+2024,Polity,Parliamentary Procedures - Money Bills,68,Which of the following statements are correct in respect of Money Bills in Parliament?,1 and 2 only,2 and 3 only,"1, 2 and 3","1, 3 and 4",C,,Medium
+2024,Polity,Defence Forces - Ranks,69,Which of the following is correctly matched with equivalent rank in defence services?,1 and 4,1 and 3,"2, 3 and 4",3 only,D,,Medium
+2024,Polity,Regional Administration - NEC,70,The North Eastern Council (NEC) was established under which Act?,"1, 2 and 3","1, 3 and 4","1, 2 and 4","2, 3 and 4",A,,Medium
+2024,Polity,Elections - Delimitation,71,How many Delimitation Commissions have been constituted by the Government of India till December 2023?,One,Two,Three,Four,D,,Medium
+2024,Polity,Constitutional Amendment - Regional Languages,72,"The Constitution 71st Amendment Act, 1992 includes which languages in the Eighth Schedule?","1, 2 and 3","1, 2 and 4","1, 3 and 4","2, 3 and 4",A,,Medium
+2024,Polity,Political Parties & Leadership,73,Consider the following pairs of political parties and leaders.,Only one,Only two,Only three,All four,B,,Medium
+2024,Polity,Constitutional Structure,74,Which of the following statements are correct about the Constitution of India?,1 and 2,2 and 3,1 and 3,"1, 2 and 3",D,,Medium
+2024,Polity,Constitutional Division of Powers,75,Which one of the following statements is correct about India's constitutional distribution of powers?,Inter-State trade is State subject,Inter-State migration is State subject,Inter-State quarantine is Union subject,Corporation tax is State subject,C,,Medium
+2024,Polity,Fundamental Rights - Privacy,76,Under which of the following Articles of the Constitution has the Supreme Court placed the Right to Privacy?,Article 15,Article 16,Article 19,Article 21,A,,Medium
+2024,Polity,Defence Forces - CDS,77,What are the duties of the Chief of Defence Staff (CDS)?,"1, 2 and 3",1 and 2 only,2 and 3 only,1 and 3 only,D,,Medium
+2024,Polity,Military Operations,78,Operations undertaken by the Army towards upliftment of local population is called,Operation Sankalp,Operation Maitri,Operation Sadbhavana,Operation Madad,C,,Medium
+2024,Polity,International Borders,79,The longest border between any two countries in the world is between,Canada and USA,Chile and Argentina,China and India,Kazakhstan and Russia,A,,Medium
+2024,Polity,Parliamentary Institutions,80,Which of the following statements about the Ethics Committee in the Lok Sabha are correct?,1 and 2,2 and 3,1 and 3,"1, 2 and 3",C,,Medium
+2024,Polity,Constitutional Amendment - Women Reservation,81,Consider the following about Nari Shakti Vandan Adhiniyam.,"1, 2 and 3",1 and 2 only,2 and 3 only,1 and 3 only,C,,Medium
+2024,Polity,Military Operations & Exercises,82,Which of the following statements about Exercise Mitra Shakti-2023 are correct?,"1, 2 and 3","1, 2 and 4","1, 3 and 4","2, 3 and 4",D,,Medium
+2024,Polity,Constitutional Writs,83,A Writ of Prohibition is an order issued by,A government officer prohibiting action,Parliament to pass law,Lower court prohibiting proceedings,Government prohibiting unconstitutional policy,A,,Medium
+2024,Polity,Scheduled Tribes - Constitutional Status,84,Consider the following statements about Scheduled Tribes.,1 only,2 only,Both 1 and 2,Neither 1 nor 2,B,,Medium
+2024,Polity,Parliamentary Budget Procedure,85,"With reference to Union Budget, consider the following statements.",1 only,2 only,Both 1 and 2,Neither 1 nor 2,C,,Medium
+2024,International Relations,Current Affairs - Authors,86,"Who is the author of the books ""The India Way"" and ""Why Bharat Matters""?",Bhupender Yadav,Nalin Mehta,Shashi Tharoor,Subrahmanyam Jaishankar,D,,Medium
+2024,International Relations,Geopolitics,87,Consider the following pairs of countries and reasons for being in news.,Only one pair,Only two pairs,All three pairs,None of the pairs,B,,Medium
+2024,Geography,International Waterways,88,"Consider the following statements:
+Statement-I: Sumed pipeline is a strategic route for Persian Gulf oil and natural gas.
+Statement-II: Sumed pipeline connects the Red Sea with the Mediterranean Sea.
+Which one is correct?",Both Statements are correct and II explains I,Both correct but II does not explain I,"Statement-I correct, II incorrect","Statement-I incorrect, II correct",A,,Medium
+2024,Geography,Physical Geography - Red Sea,89,Consider the following statements about the Red Sea.,1 only,2 only,Both 1 and 2,Neither 1 nor 2,C,,Medium
+2024,Environment,Air Pollution & Industrial Emissions,90,"According to the EPA, which one is the largest source of sulphur dioxide emissions?",Locomotives using fossil fuels,Ships using fossil fuels,Extraction of metals from ores,Power plants using fossil fuels,D,,Medium
+2024,International Relations,Regional Security - Sahel,91,"Consider the following statements:
+Statement-I: There is instability in the Sahel region.
+Statement-II: There have been military coups in several Sahel countries recently.
+Which one is correct?",Both Statements are correct and II explains I,Both correct but II does not explain I,"Statement-I correct, II incorrect","Statement-I incorrect, II correct",A,,Medium
+2024,International Relations,Trade & Commerce,92,"Consider the following statements:
+Statement-I: India does not import apples from USA.
+Statement-II: India's law prohibits import of GM food.
+Which one is correct?",1 only,2 only,Both 1 and 2,Neither 1 nor 2,D,,Medium
+2024,Polity,Parliamentary Institutions - Speaker,93,Consider the following statements about the Speaker of Lok Sabha.,1 only,1 and 2,2 and 3,"1, 2 and 3",A,,Medium
+2024,Polity,Parliamentary Procedures,94,Consider the following statements about bills in Indian Parliament.,1 only,1 and 2,2 and 3,3 only,B,,Medium
+2024,Polity,Parliamentary Procedures - Prorogation,95,Consider the following statements about prorogation and dissolution in Parliament.,1 only,1 and 2,2 and 3,3 only,C,,Medium
+2024,International Relations,Climate Action - EU,96,"Consider the following statements:
+Statement-I: The European Parliament approved The Net-Zero Industry Act.
+Statement-II: The EU intends to achieve carbon neutrality by 2040.
+Which one is correct?",Both Statements are correct and II explains I,Both correct but II does not explain I,"Statement-I correct, II incorrect","Statement-I incorrect, II correct",B,,Medium
+2024,International Relations,Geopolitics - Venezuela,97,"Consider the following statements:
+Statement-I: Venezuela has achieved rapid recovery from its economic crisis.
+Statement-II: Venezuela has the world's largest oil reserves.
+Which one is correct?",Both Statements are correct and II explains I,Both correct but II does not explain I,"Statement-I correct, II incorrect","Statement-I incorrect, II correct",D,,Medium
+2024,Polity,Land Administration - Digital Records,98,Consider the following about the Digital India Land Records Modernisation Programme.,1 and 2,2 and 3,1 and 3,"1, 2 and 3",D,,Medium
+2024,Polity,Social Welfare - Maternal Health,99,Consider the following about Pradhan Mantri Surakshit Matritva Abhiyan.,1 only,2 only,Both 1 and 2,Neither 1 nor 2,B,,Medium
+2024,Polity,Social Welfare - Pension Scheme,100,Consider the following about Pradhan Mantri Shram Yogi Maan-dhan (PM-SYM) Yojana.,"1, 3 and 4",2 and 3,2 only,"1, 2 and 4",B,,Medium
+2023,Geography,Rivers & Lakes,1,"Consider the following statements about Indian rivers and lakes:
+1. Jhelum River passes through Wular Lake.
+2. Krishna River directly feeds Kolleru Lake.
+3. Meandering of Gandak River formed Kanwar Lake.
+How many statements are correct?",Only one,Only two,All three,None,A,,Medium
+2023,Geography,Ports & Maritime,2,"Consider the following pairs of ports:
+1. Kamarajar Port - First major port in India registered as a company
+2. Mundra Port - Largest privately owned port in India
+3. Visakhapatnam - Largest container port in India
+How many pairs are correctly matched?",Only one pair,Only two pairs,All three pairs,None of the pairs,B,,Medium
+2023,Geography,Botany - Trees,3,"Consider the following trees:
+1. Jackfruit (Artocarpus heterophyllus)
+2. Mahua (Madhuca indica)
+3. Teak (Tectona grandis)
+How many are deciduous trees?",Only one,Only two,All three,None,B,,Medium
+2023,Geography,Agriculture - Productivity,4,"Consider the following statements about India and China agriculture:
+1. India has more arable area than China.
+2. Proportion of irrigated area is more in India than China.
+3. Average productivity per hectare is higher in India than China.
+How many statements are correct?",Only one,Only two,All three,None,A,,Medium
+2023,Geography,Coastal Features - Marshland,5,Which is the best example of repeated falls in sea level giving rise to extensive marshland?,Bhitarkanika Mangroves,Marakkanam Salt Pans,Naupada Swamp,Rann of Kutch,D,,Medium
+2023,Geography,Mineral Resources,6,Ilmenite and rutile are rich sources of which one of the following?,Aluminium,Copper,Iron,Titanium,D,,Medium
+2023,Geography,Global Resources - Cobalt,7,About three-fourths of world's cobalt is produced by which country?,Argentina,Botswana,Democratic Republic of Congo,Kazakhstan,C,,Medium
+2023,Geography,Congo Basin,8,Which one of the following is a part of the Congo Basin?,Cameroon,Nigeria,South Sudan,Uganda,A,,Medium
+2023,Geography,Mountain Ranges & Ghats,9,"Consider statements about Indian mountain ranges:
+1. Amarkantak Hills are at confluence of Vindhya and Sahyadri Ranges.
+2. Biligirirangan Hills constitute easternmost part of Satpura Range.
+3. Seshachalam Hills constitute southernmost part of Western Ghats.
+How many are correct?",Only one,Only two,All three,None,D,,Medium
+2023,Geography,Connectivity Projects,10,"Consider statements about India's connectivity projects:
+1. East-West Corridor connects Dibrugarh and Surat.
+2. Trilateral Highway connects Moreh in Manipur and Chiang Mai in Thailand via Myanmar.
+3. Bangladesh-China-India-Myanmar Corridor connects Varanasi and Kunming.
+How many are correct?",Only one,Only two,All three,None,D,,Medium
+2023,Environment,Energy - Uranium,11,"Consider statements about uranium and India:
+Statement-I: India depends on coal for most electricity production despite uranium deposits.
+Statement-II: Uranium enriched to 60% is required for electricity production.
+Which is correct?","Both correct, II explains I","Both correct, II does not explain I","I correct, II incorrect","I incorrect, II correct",C,,Medium
+2023,Environment,Wildlife - Marsupials,12,"Consider statements about marsupials:
+Statement-I: Marsupials are not naturally found in India.
+Statement-II: Marsupials can thrive only in montane grasslands with no predators.
+Which is correct?","Both correct, II explains I","Both correct, II does not explain I","I correct, II incorrect","I incorrect, II correct",C,,Medium
+2023,Environment,Invasive Species Database,13,Invasive Species Specialist Group that develops Global Invasive Species Database belongs to which organization?,IUCN,UNEP,UN WCED,WWF,A,,Medium
+2023,Environment,Nocturnal Animals,14,"Which fauna are generally nocturnal or active after sunset?
+1. Lion-tailed Macaque
+2. Malabar Civet
+3. Sambar Deer
+How many?",Only one,Only two,All three,None,A,,Medium
+2023,Environment,Insect Communication,15,Which organisms perform waggle dance to indicate direction and distance to food source?,Butterflies,Dragonflies,Honeybees,Wasps,C,,Medium
+2023,Environment,Mushroom Properties,16,"How many statements about mushrooms are correct?
+1. Some have medicinal properties.
+2. Some have psychoactive properties.
+3. Some have insecticidal properties.
+4. Some have bioluminescent properties.",Only one,Only two,Only three,All four,D,,Medium
+2023,Environment,Squirrel Behavior,17,"How many statements about Indian squirrels are correct?
+1. They build nests by making burrows.
+2. They store food materials in ground.
+3. They are omnivorous.",Only one,Only two,All three,None,B,,Medium
+2023,Science & Technology,Extremophile Microorganisms,18,"How many microorganisms can grow in extreme conditions?
+1. Temperature above boiling point of water.
+2. Temperature below freezing point.
+3. Highly acidic environment (pH below 3).",Only one,Only two,All three,None,C,,Medium
+2023,Environment,Tool-Making Animals,19,Which animal makes a tool with a stick to scrape insects?,Fishing cat,Orangutan,Otter,Sloth bear,B,,Medium
+2023,Science & Technology,Hydrofluorocarbons,20,"In making of how many are hydrofluorocarbons used?
+1. Aerosols
+2. Foam agents
+3. Fire retardants
+4. Lubricants",Only one,Only two,Only three,All four,C,,Medium
+2023,Economy,Infrastructure Investment Trusts,21,"Consider statements about Infrastructure Investment Trusts (InvITs):
+Statement-I: Interest income is exempted from tax, dividend is taxable.
+Statement-II: InvITs are recognized as borrowers under SARFAESI Act 2002.
+Which is correct?","Both correct, II explains I","Both correct, II does not explain I","I correct, II incorrect","I incorrect, II correct",D,,Medium
+2023,Economy,Monetary Policy - Interest Rates,22,"Consider statements about Central Banks:
+Statement-I: Many Central Banks carried out interest rate hikes post-pandemic.
+Statement-II: Central Banks assume ability to counteract rising prices via monetary policy.
+Which is correct?","Both correct, II explains I","Both correct, II does not explain I","I correct, II incorrect","I incorrect, II correct",A,,Medium
+2023,Economy,Carbon Markets,23,"Consider statements about carbon markets:
+Statement-I: Carbon markets are one of the most widespread tools against climate change.
+Statement-II: Carbon markets transfer resources from private sector to State.
+Which is correct?","Both correct, II explains I","Both correct, II does not explain I","I correct, II incorrect","I incorrect, II correct",B,,Medium
+2023,Economy,RBI - Sterilization Operations,24,Which RBI activity is considered sterilization?,Open Market Operations,Settlement oversight,Government debt management,NBFI regulation,A,,Medium
+2023,Economy,Capital Markets Classification,25,"How many of the following are included in capital markets?
+1. Government Bond Market
+2. Call Money Market
+3. Treasury Bill Market
+4. Stock Market",Only one,Only two,Only three,All four,B,,Medium
+2023,Economy,Agricultural Systems - Farmer Models,26,Which best describes Small Farmer Large Field concept?,Resettlement of displaced people,Marginal farmers form groups,Contract farming with corporate,Company extends loans and inputs,B,,Medium
+2023,Economy,Agricultural Commodities - Niger Seeds,27,"How many statements about Niger seeds are correct?
+1. Government provides MSP for Niger seeds.
+2. Niger is cultivated as Kharif crop.
+3. Tribal people use Niger seed oil for cooking.",Only one,Only two,All three,None,C,,Medium
+2023,Economy,Intangible Investments,28,"How many are considered intangible investments?
+1. Brand recognition
+2. Inventory
+3. Intellectual property
+4. Mailing list of clients",Only one,Only two,Only three,All four,C,,Medium
+2023,Economy,Finance Commission - Tax Devolution,29,"For horizontal tax devolution, Fifteenth Finance Commission used how many criteria besides population, area and income distance?",Only two,Only three,Only four,All five,B,,Medium
+2023,Economy,Infrastructure Investment Initiatives,30,"UNOPS S3i initiative focuses on how many infrastructure sectors?
+1. Affordable housing
+2. Mass rapid transport
+3. Health care
+4. Renewable energy",Only one,Only two,Only three,All four,C,,Medium
+2023,Polity,Constitutional Law - Due Process,31,What does Due Process of Law mean essentially?,Principle of natural justice,Procedure established by law,Fair application of law,Equality before law,A,,Medium
+2023,Polity,Prison Administration,32,"Consider statements about Indian prisons:
+Statement-I: Prisons managed by State Governments with own rules.
+Statement-II: Prisons governed by Prisons Act 1894 kept under Provincial Governments.
+Which is correct?","Both correct, II explains I","Both correct, II does not explain I","I correct, II incorrect","I incorrect, II correct",A,,Medium
+2023,Polity,Constitution Purpose,33,Which statement best reflects the chief purpose of Constitution?,Determines objective for laws,Enables creation of political offices,Defines and limits powers,Secures social justice,C,,Medium
+2023,Polity,Constitutional Amendments,34,Which Constitutional Amendment was believed to overcome judicial interpretations of Fundamental Rights?,1st Amendment,42nd Amendment,44th Amendment,86th Amendment,X,,Medium
+2023,Polity,Constitutional Bodies,35,"How many of the following are constitutional bodies?
+1. National Commission for Backward Classes
+2. National Human Rights Commission
+3. National Law Commission
+4. National Consumer Disputes Redressal Commission",Only one,Only two,Only three,All four,A,,Medium
+2023,Polity,Presidential Election,36,"How many statements about Presidential elections are correct?
+1. If declared void, all acts before date of decision become invalid.
+2. Election can be postponed if Legislative Assemblies dissolved.
+3. Constitution prescribes time limits for Presidential assent.",Only one,Only two,All three,None,D,,Medium
+2023,Polity,Bills - Finance & Money Bills,37,"How many statements about Finance Bill and Money Bill are correct?
+1. Rajya Sabha can amend Finance Bill.
+2. Rajya Sabha cannot amend Money Bill, only recommend.
+3. Joint sitting required for disagreement on Finance Bill.",Only one,Only two,All three,None,B,,Medium
+2023,Polity,Community Reserves - Wildlife,38,"Once area notified as Community Reserve, how many statements are correct?
+1. Chief Wildlife Warden becomes governing authority.
+2. Hunting is not allowed.
+3. People allowed to collect non-timber forest produce.
+4. People allowed traditional agricultural practices.",Only one,Only two,Only three,All four,B,,Medium
+2023,Polity,Scheduled Areas Administration,39,"How many statements about Scheduled Areas are correct?
+1. Notification happens through Presidential Order.
+2. Highest unit is District, lowest is village cluster.
+3. Chief Ministers submit annual reports to Union Home Ministry.",Only one,Only two,All three,None,B,,Medium
+2023,Polity,Reservation Policies & SC/ST,40,"Consider statements about reservation policies:
+Statement-I: Supreme Court held reservation policies limited by Article 335.
+Statement-II: Article 335 defines efficiency of administration.
+Which is correct?","Both correct, II explains I","Both correct, II does not explain I","I correct, II incorrect","I incorrect, II correct",C,,Medium
+2023,History,Ancient India - Buddhist Centers,41,"In which region was Dhanyakataka, a prominent Buddhist centre under Mahasanghikas, located?",Andhra,Gandhara,Kalinga,Magadha,A,,Medium
+2023,History,Ancient India - Stupas,42,"How many statements about Stupas are correct?
+1. Stupa concept is Buddhist in origin.
+2. Stupa was repository of relics.
+3. Stupa was votive and commemorative structure in Buddhist tradition.",Only one,Only two,All three,None,B,,Medium
+2023,History,Ancient South India - Ports,43,"Korkai, Poompuhar and Muchiri were well known as:",Capital cities,Ports,Centres of iron-and-steel making,Shrines of Jain Tirthankaras,B,,Medium
+2023,History,Sangam Literature - Practices,44,Which practice of Vattakirutal is mentioned in Sangam poems?,Kings employing women bodyguards,Learned persons in royal courts,Girls keeping watch over fields,King ritual suicide after defeat,D,,Medium
+2023,History,Medieval Dynasties,45,"How many dynasties established kingdoms in early eighth century AD?
+1. Hoysala
+2. Gahadavala
+3. Kakatiya
+4. Yadava",Only one,Only two,Only three,None,D,,Medium
+2023,History,Ancient Literature - Authors,46,"How many literary work-author pairs are correctly matched?
+1. Devichandragupta - Bilhana
+2. Hammira-Mahakavya - Nayachandra Suri
+3. Milinda-panha - Nagarjuna
+4. Nitivakyamrita - Somadeva Suri",Only one,Only two,Only three,All four,B,,Medium
+2023,Culture,Religious Philosophy - Jainism,47,"Souls not only as property of animals and plants, but also rocks and water - which religious sect of ancient India?",Buddhism,Jainism,Shaivism,Vaishnavism,B,,Medium
+2023,History,Medieval India - Vijayanagara,48,Which Vijayanagara ruler constructed a dam across Tungabhadra River?,Devaraya I,Mallikarjuna,Vira Vijaya,Virupaksha,A,,Medium
+2023,History,Medieval India - Gujarat,49,Which medieval Gujarat ruler surrendered Diu to Portuguese?,Ahmad Shah,Mahmud Begarha,Bahadur Shah,Muhammad Shah,C,,Medium
+2023,History,Colonial India - Governance,50,By which Act was Governor General of Bengal designated as Governor General of India?,Regulating Act,Pitt's India Act,Charter Act 1793,Charter Act 1833,D,,Medium
+2023,Social Welfare,Maternal Health - Janani Suraksha,51,"How many statements about Janani Suraksha Yojana are correct?
+1. Safe motherhood intervention of State Health Departments.
+2. Objective to reduce maternal and neonatal mortality among poor.
+3. Aims to promote institutional delivery.
+4. Provides public health facilities to sick infants up to one year.",Only one,Only two,Only three,All four,B,,Medium
+2023,Social Welfare,Anemia Eradication Programs,52,"How many statements about Anaemia Mukt Bharat Strategy are correct?
+1. Provides prophylactic calcium supplementation.
+2. Runs campaign for delayed cord clamping.
+3. Provides periodic deworming.
+4. Addresses non-nutritional causes of anaemia.",Only one,Only two,Only three,All four,C,,Medium
+2023,Science & Technology,Material Science - Carbon Fibers,53,"Which statements about carbon fibres are correct?
+1. Used in automobiles and aircrafts.
+2. Once used cannot be recycled.",1 only,2 only,Both 1 and 2,Neither 1 nor 2,A,,Medium
+2023,Science & Technology,Accelerometer Technology,54,"In how many actions is accelerometer function required?
+1. Car crash detection for airbags.
+2. Laptop free fall detection.
+3. Smartphone tilt detection for display rotation.",Only one,Only two,All three,None,C,,Medium
+2023,Science & Technology,Aquaculture - Biofilters,55,"How many statements about biofilters in Recirculating Aquaculture System are correct?
+1. Provide waste treatment by removing uneaten fish feed.
+2. Convert ammonia to nitrate.
+3. Increase phosphorus as nutrient for fish.",Only one,Only two,All three,None,B,,Medium
+2023,Science & Technology,Space Objects - Astronomy,56,"How many space object-description pairs are correctly matched?
+1. Cepheids - Giant clouds of dust and gas.
+2. Nebulae - Stars that brighten and dim periodically.
+3. Pulsars - Neutron stars from collapsed massive stars.",Only one,Only two,All three,None,A,,Medium
+2023,Science & Technology,Missile Systems & Defense,57,"Which statements about missiles are correct?
+1. Ballistic are jet-propelled at subsonic speeds throughout.
+2. Agni-V is medium-range supersonic cruise missile.",1 only,2 only,Both 1 and 2,Neither 1 nor 2,D,,Medium
+2023,Science & Technology,Missile Technology,58,"Which statements about missiles are correct?
+1. Ballistic are jet-propelled at subsonic speeds.
+2. Agni-V is medium-range cruise missile, BrahMos is ballistic.",1 only,2 only,Both 1 and 2,Neither 1 nor 2,D,,Medium
+2023,Environment,Mercury Pollution,59,"How many statements about mercury pollution are correct?
+1. Gold mining is a source.
+2. Coal thermal plants cause mercury pollution.
+3. No known safe level of exposure.",Only one,Only two,All three,None,B,,Medium
+2023,Environment,Green Hydrogen,60,"How many statements about green hydrogen are correct?
+1. Can be used directly as fuel for combustion.
+2. Can be blended with natural gas.
+3. Can be used in fuel cells for vehicles.",Only one,Only two,All three,None,C,,Medium
+2023,Geography,European Borders - Ukraine,61,"How many countries share land border with Ukraine?
+1. Bulgaria
+2. Czech Republic
+3. Hungary
+4. Latvia
+5. Lithuania
+6. Romania",Only two,Only three,Only four,Only five,A,,Medium
+2023,Geography,Atmospheric Physics,62,Which statement about Earth's atmosphere is correct?,About 10 times insolation at equator vs poles,Infrared rays roughly 2/3 of insolation,Infrared waves absorbed by water vapour in lower atmosphere,Infrared waves part of visible spectrum,C,,Medium
+2023,Geography,Tropical Rainforest Soil,63,"Consider statements about tropical rainforest soil:
+Statement-I: Soil is rich in nutrients.
+Statement-II: High temperature and moisture cause organic matter to decompose quickly.
+Which is correct?","Both correct, II explains I","Both correct, II does not explain I","I correct, II incorrect","I incorrect, II correct",D,,Medium
+2023,Geography,Temperature & Ocean-Land Contrast,64,"Consider statements about temperature contrast:
+Statement-I: Temperature contrast between continents and oceans greater in summer than winter.
+Statement-II: Specific heat of water more than land surface.
+Which is correct?","Both correct, II explains I","Both correct, II does not explain I","I correct, II incorrect","I incorrect, II correct",D,,Medium
+2023,Science & Technology,Seismology - P & S Waves,65,"Which statements about seismology are correct?
+1. In seismograph, P waves recorded earlier than S waves.
+2. P waves: particles vibrate to-fro in direction of propagation.
+S waves: particles vibrate perpendicular to propagation.",1 only,2 only,Both 1 and 2,Neither 1 nor 2,C,,Medium
+2023,Environment,Coal-Based Power Plants,66,"How many statements about coal-based thermal plants in India are correct?
+1. None use seawater.
+2. None set up in water-stressed district.
+3. None privately owned.",Only one,Only two,All three,None,D,,Medium
+2023,Environment,Fish & Wildlife Habitat,67,Which one of the following about fish farming practices is correct?,Option A,Option B,Option C,Option D,A,,Medium
+2023,Environment,Carbon Capture & Sequestration,68,"How many activities are often considered for carbon capture and sequestration?
+1. Spreading basalt rock on farmlands.
+2. Increasing ocean alkalinity.
+3. Capturing CO2 and pumping into abandoned mines.",Only one,Only two,All three,None,C,,Medium
+2023,Science & Technology,Aerial Metagenomics,69,Aerial metagenomics best refers to which situation?,Collecting DNA from air,Understanding avian genetic makeup,Using drones to collect samples,Aerial genetic study,A,,Medium
+2023,Science & Technology,Microsatellite DNA,70,Microsatellite DNA is used in which case?,Evolutionary relationships,Stem cell transformation,Clonal plant propagation,Drug efficacy assessment,A,,Medium
+2023,Economy,MSME - Enterprise Classification,71,"Which statements about MSMED Act 2006 are correct?
+1. Medium enterprises have investments between 15-25 crore.
+2. All bank loans to MSME qualify under priority sector.",1 only,2 only,Both 1 and 2,Neither 1 nor 2,B,,Medium
+2023,Economy,Digital Currencies - CBDC,72,Which statements about Central Bank digital currencies are correct?,Option A,Option B,Option C,Option D,C,,Medium
+2023,Social Welfare,Self-Help Groups,73,"How many statements about Self-Help Groups are correct?
+1. Originally initiated by State Bank of India.
+2. All members take responsibility for individual loans.
+3. Regional Rural Banks support SHGs.",Only one,Only two,All three,None,D,,Medium
+2023,Economy,Health Care Systems,74,Which statements about India's health care are correct?,Option A,Option B,Option C,Option D,B,,Medium
+2023,Social Welfare,Public Health Delivery,75,"Consider statements about public sector health:
+Statement-I: Largely focuses on curative care with limited preventive care.
+Statement-II: Under decentralized approach, States responsible for health services.
+Which is correct?","Both correct, II explains I","Both correct, II does not explain I","I correct, II incorrect","I incorrect, II correct",B,,Medium
+2023,Environment,Water Resources - Groundwater,76,"Consider statements about India's water extraction:
+Statement-I: Extracts more than quarter of world's groundwater annually.
+Statement-II: Needs to extract to satisfy drinking water needs of 18% population.
+Which is correct?","Both correct, II explains I","Both correct, II does not explain I","I correct, II incorrect","I incorrect, II correct",C,,Medium
+2023,Environment,Underground Storage - Coal Reserves,77,Which statement about fisheries practices is correct?,Statement A,Statement B,Statement C,Statement D,B,,Medium
+2023,Geography,Famine & Civil Conflict Regions,78,Which country suffers from decades of civil strife and famine?,Angola,Costa Rica,Ecuador,Somalia,D,,Medium
+2023,Environment,Biodiversity Management Committees,79,Which statements about Biodiversity Management Committees are correct?,1 only,2 only,Both 1 and 2,Neither 1 nor 2,C,,Medium
+2023,Polity,Presidential Election - Electoral College,80,"How many statements about Presidential elections in India are correct?
+1. Nominated members eligible for Electoral College.
+2. Higher assembly seats = higher MLA vote value.
+3. MP vote value > Kerala MLA value.
+4. Puducherry MLA value > Arunachal Pradesh.",1 only,2 only,Both 1 and 2,Neither 1 nor 2,A,,Medium
+2023,History,Archaeological Research - Historians,81,"Alexander Rea, A.H. Longhurst, Robert Sewell, James Burgess, Walter Elliot were associated with:",Archaeological excavations,English Press establishment,Church construction,Railway construction,A,,Medium
+2023,History,Archaeological Sites - Cave Shrines,82,"How many archaeological site pairs are correctly matched?
+1. Besnagar - Shaivite cave shrine.
+2. Bhaja - Buddhist cave shrine.
+3. Sittanavasal - Jain cave shrine.",Only one,Only two,All three,None,B,,Medium
+2023,History,National Handloom Day - Swadeshi,83,"Consider statements about National Handloom Day:
+Statement-I: 7th August declared as National Handloom Day.
+Statement-II: Swadeshi Movement launched on same day in 1905.
+Which is correct?","Both correct, II explains I","Both correct, II does not explain I","I correct, II incorrect","I incorrect, II correct",A,,Medium
+2023,Culture,National Flag - Flag Code 2002,84,"Consider statements about National Flag under Flag Code 2002:
+Statement-I: Standard size 600mm x 400mm.
+Statement-II: Ratio of length to width is 3:2.
+Which is correct?","Both correct, II explains I","Both correct, II does not explain I","I correct, II incorrect","I incorrect, II correct",D,,Medium
+2023,Culture,Constitution Day,85,"Consider statements about Constitution Day:
+Statement-I: Celebrated on 26th November for constitutional values.
+Statement-II: On 26th Nov 1949, Drafting Committee set up under Ambedkar.
+Which is correct?","Both correct, II explains I","Both correct, II does not explain I","I correct, II incorrect","I incorrect, II correct",C,,Medium
+2023,Geography,Global Trade - Gold Exports,86,"Consider statements about Switzerland:
+Statement-I: One of leading exporters of gold by value.
+Statement-II: Has second largest gold reserves in world.
+Which is correct?","Both correct, II explains I","Both correct, II does not explain I","I correct, II incorrect","I incorrect, II correct",C,,Medium
+2023,International Relations,USA-EU Relations,87,"Consider statements about USA-EU relations:
+Statement-I: USA and EU launched Trade and Technology Council.
+Statement-II: They claim trying to bring tech progress under their control.
+Which is correct?","Both correct, II explains I","Both correct, II does not explain I","I correct, II incorrect","I incorrect, II correct",C,,Medium
+2023,Economy,Global Export & PLI Scheme,88,"Consider statements about India's trade:
+Statement-I: Accounts for 3.2% of global export of goods.
+Statement-II: Many companies used Production-linked Incentive scheme.
+Which is correct?","Both correct, II explains I","Both correct, II does not explain I","I correct, II incorrect","I incorrect, II correct",D,,Medium
+2023,International Relations,EU Stability & Growth Pact,89,"How many statements about EU's Stability and Growth Pact are correct?
+1. Limits budgetary deficit of EU countries.
+2. Makes countries share infrastructure facilities.
+3. Enables countries to share technologies.",Only one,Only two,All three,None,A,,Medium
+2023,International Relations,Global Migration Compact,90,"How many statements about Global Compact for Migration are correct?
+1. All UN countries adopted GCM.
+2. Commitments are binding on UN members.
+3. GCM addresses internal migration.",Only one,Only two,All three,None,D,,Medium
+2023,Polity,Home Guards - Internal Security,91,"How many statements about Home Guards are correct?
+1. Raised under Home Guards Act.
+2. Role to serve as auxiliary to police.
+3. Border Wing raised in some States.",Only one,Only two,All three,None,B,,Medium
+2023,Polity,Official Secrets Act - Uniforms,92,"How many action-act pairs are correctly matched?
+1. Unauthorized police/military uniforms - Official Secrets Act 1923.
+2. Misleading police officer - Indian Evidence Act 1872.
+3. Celebratory gunfire - Arms Amendment Act 2019.",Only one,Only two,All three,None,B,,Medium
+2023,International Relations,Regional Conflicts,93,"How many region-conflict pairs are correctly matched?
+1. North Kivu/Ituri - War between Armenia/Azerbaijan.
+2. Nagorno-Karabakh - Mozambique Insurgency.
+3. Kherson/Zaporizhzhia - Israel-Lebanon Dispute.",Only one,Only two,All three,None,D,,Medium
+2023,International Relations,Israel-Arab Relations,94,"Consider statements about Israel's diplomacy:
+Statement-I: Established diplomatic relations with Arab States.
+Statement-II: Arab Peace Initiative mediated by Saudi Arabia signed with Israel.
+Which is correct?","Both correct, II explains I","Both correct, II does not explain I","I correct, II incorrect","I incorrect, II correct",C,,Medium
+2023,Sports & Awards,Sports Awards - Khel Ratna,95,"How many sports award-achievement pairs are correctly matched?
+1. Major Dhyan Chand Khel Ratna - Spectacular performance.
+2. Arjuna Award - Lifetime achievement.
+3. Dronacharya Award - Eminent coaches.
+4. Rashtriya Khel Protsahan Puraskar - Post-retirement contribution.",Only one,Only two,Only three,All four,B,,Medium
+2023,Culture,Chess Olympiad 2022,96,"How many statements about 44th Chess Olympiad 2022 are correct?
+1. First Chess Olympiad in India.
+2. Mascot named Thambi.
+3. Open section trophy - Vera Menchik Cup.
+4. Women section trophy - Hamilton-Russell Cup.",Only one,Only two,Only three,All four,B,,Medium
+2023,Geography,Global Conflicts & Regions,97,How many conflicting region pairs are correctly matched?,Only one,Only two,All three,None,D,,Medium
+2023,Geography,Africa - Civil Instability,98,"Chad, Guinea, Mali, Sudan attracted international attention for which common reason?",Rare earth deposits,Chinese military bases,Sahara southward expansion,Successful coups,D,,Medium
+2023,Environment,Green Hydrogen - Industry,99,"Green hydrogen expected to decarbonize how many industries?
+1. Fertilizer plants
+2. Oil refineries
+3. Steel plants",Only one,Only two,All three,None,C,,Medium
+2023,International Relations,G-20 Framework,100,"Which statements about G-20 are correct?
+1. Established as platform for Finance Ministers and Central Bank Governors.
+2. Digital public infrastructure is India's G-20 priority.",1 only,2 only,Both 1 and 2,Neither 1 nor 2,C,,Medium
+2022,Economy,International Finance - IMF,1,Rapid Financing Instrument and Rapid Credit Facility are related to the provisions of lending by which one of the following?,Asian Development Bank,International Monetary Fund,United Nations Environment Programme Finance Initiative,World Bank,B,,Medium
+2022,Economy,Banking & Exchange Rates,2,"With reference to the Indian economy, consider the following statements:
+1. If the inflation is too high, Reserve Bank of India (RBI) is likely to buy government securities.
+2. If the rupee is rapidly depreciating, RBI is likely to sell dollars in the market.
+3. If interest rates in the USA or European Union were to fall, that is likely to induce RBI to buy dollars.
+Which of the statements given above are correct?",1 and 2 only,1 and 3 only,2 and 3 only,"1, 2 and 3",C,,Medium
+2022,Economy,Exchange Rate - NEER & REER,3,"With reference to the exchange rates, consider the following statements:
+1. An increase in Nominal Effective Exchange Rate (NEER) indicates the appreciation of rupee.
+2. An increase in the Real Effective Exchange Rate (REER) indicates an improvement in trade competitiveness.
+3. An increasing trend in domestic inflation relative to inflation in other countries is likely to cause an increasing divergence between NEER and REER.
+Which of the above statements are correct?",1 and 2 only,1 and 3 only,2 and 3 only,"1, 2 and 3",B,,Medium
+2022,Economy,International Framework - G20,4,"With reference to the G20 Common Framework, consider the following statements:
+1. It is an initiative endorsed by the G20 together with the Paris Club.
+2. It is an initiative to support Low Income Countries with unsustainable debt.
+Which of the statements given above is/are correct?",1 only,2 only,Both 1 and 2,Neither 1 nor 2,C,,Medium
+2022,Economy,Inflation-Indexed Bonds,5,"With reference to the Indian economy, what are the advantages of Inflation-Indexed Bonds (IIBs)?
+1. Government can reduce the coupon rates on its borrowing by way of IIBs.
+2. IIBs provide protection to the investors from uncertainty regarding inflation.
+3. The interest received as well as capital gains on IIBs are not taxable.",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",A,,Medium
+2022,Economy,Real Sector Classification,6,"Which of the following activities constitute real sector in the economy?
+1. Farmers harvesting their crops
+2. Textile mills converting raw cotton into fabrics
+3. A commercial bank lending money to a trading company
+4. A corporate body issuing Rupee Denominated Bonds overseas",1 and 2 only,"2, 3 and 4 only","1, 3 and 4 only","1, 2, 3 and 4",D,,Medium
+2022,Economy,E-Commerce Regulations,7,"With reference to foreign-owned e-commerce firms operating in India, which of the following statements is/are correct?
+1. They can sell their own goods in addition to offering their platforms as market-places.
+2. The degree to which they can own big sellers on their platforms is limited.",1 only,2 only,Both 1 and 2,Neither 1 nor 2,A,,Medium
+2022,Economy,Indirect Transfers & Taxation,8,"Which one of the following situations best reflects ""Indirect Transfers"" often talked about in media recently with reference to India?",An Indian company investing in a foreign enterprise and paying taxes to the foreign country on the profits arising out of its investment,A foreign company investing in India and paying taxes to the country of its base on the profits arising out of its investment,An Indian company purchases tangible assets in a foreign country and sells such assets after their value increases and transfers the proceeds to India,A foreign company transfers shares and such shares derive their substantial value from assets located in India,D,,Medium
+2022,Economy,Government Expenditure,9,"With reference to the expenditure made by an organisation or a company, which of the following statements is/are correct?
+1. Acquiring new technology is capital expenditure.
+2. Debt financing is considered capital expenditure, while equity financing is considered revenue expenditure.",1 only,2 only,Both 1 and 2,Neither 1 nor 2,A,,Medium
+2022,Economy,Household Savings & Debt,10,"With reference to the Indian economy, consider the following statements:
+1. A share of the household financial savings goes towards borrowings.
+2. Government-dated securities at market-related rates in auctions form a large component of internal debt.",1 only,2 only,Both 1 and 2,Neither 1 nor 2,C,,Medium
+2022,Polity,Constitutional Amendment Bills,11,"Consider the following statements:
+1. A bill amending the Constitution requires a prior recommendation of the President of India.
+2. When a Constitution Amendment Bill is presented to the President of India, it is obligatory for the President of India to give his/her assent.
+3. A Constitution Amendment Bill must be passed by both the Lok Sabha and the Rajya Sabha by a special majority and there is no provision for joint sitting.",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",B,,Medium
+2022,Polity,Lok Sabha Exclusive Powers,12,"Which of the following is/are the exclusive powers of Lok Sabha?
+1. To ratify the declaration of Emergency
+2. To pass a motion of no-confidence against the Council of Ministers
+3. To impeach the President of India",1 and 2 only,2 only,1 and 3 only,3 only,B,,Medium
+2022,Polity,Union Government Ministers,13,"Consider the following statements:
+1. The Constitution of India classifies the ministers into four ranks viz. Cabinet Minister, Minister of State with Independent Charge, Minister of State and Deputy Minister.
+2. The total number of ministers in the Union Government, including the Prime Minister, shall not exceed 15 percent of the total number of members in the Lok Sabha.",1 only,2 only,Both 1 and 2,Neither 1 nor 2,B,,Medium
+2022,Polity,Anti-Defection Laws,14,"With reference to anti-defection law in India, consider the following statements:
+1. The law specifies that a nominated legislator cannot join any political party within six months of being appointed to the House.
+2. The law does not provide any time-frame within which the presiding officer has to decide a defection case.",1 only,2 only,Both 1 and 2,Neither 1 nor 2,B,,Medium
+2022,Polity,Lok Sabha Exclusive Powers,15,"Consider the following statements about Contempt of Court in India:
+1. Pursuant to the report of H.N. Sanyal Committee, the Contempt of Courts Act, 1971 was passed.
+2. The Constitution of India empowers the Supreme Court and the High Courts to punish for contempt of themselves.
+3. The Constitution of India defines Civil Contempt and Criminal Contempt.
+4. In India, the Parliament is vested with the powers to make laws on Contempt of Court.",1 and 2 only,"1, 2 and 4",3 and 4 only,3 only,B,,Medium
+2022,Polity,Anti-Defection Procedures,16,"Consider the following statements:
+1. Government law officers and legal firms are recognised as advocates, but corporate lawyers and patent attorneys are excluded from recognition as advocates.
+2. Bar Councils have the power to lay down the rules relating to legal education and recognition of law colleges.",1 only,2 only,Both 1 and 2,Neither 1 nor 2,B,,Medium
+2022,Polity,Attorney General & Solicitor General,17,"Consider the following statements:
+1. Attorney General of India and Solicitor General of India are the only officers of the Government who are allowed to participate in the meetings of the Parliament of India.
+2. According to the Constitution of India, the Attorney General of India submits his resignation when the Government which appointed him resigns.",1 only,2 only,Both 1 and 2,Neither 1 nor 2,D,,Medium
+2022,Polity,Constitutional Writs - Mandamus,18,"With reference to the writs issued by the Courts in India, consider the following statements:
+1. Mandamus will not lie against a private organisation unless it is entrusted with a public duty.
+2. Mandamus will not lie against a Company even though it may be a Government Company.
+3. Any public minded person can be a petitioner to move the Court to obtain the writ of Quo Warranto.",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",D,,Medium
+2022,Polity,Ayushman Bharat Digital Mission,19,"With reference to Ayushman Bharat Digital Mission, consider the following statements:
+1. Private and public hospitals must adopt it.
+2. As it aims to achieve universal health coverage, every citizen of India should be part of it ultimately.
+3. It has seamless portability across the country.",1 and 2 only,1 and 3 only,3 only,"1, 2 and 3",B,,Medium
+2022,Polity,Deputy Speaker of Lok Sabha,20,"With reference to Deputy Speaker of Lok Sabha, consider the following statements:
+1. As per the Rules of Procedure and Conduct of Business in Lok Sabha, the election of Deputy Speaker shall be held on such date as the Speaker may fix.
+2. There is a mandatory provision that the election of a candidate as Deputy Speaker of Lok Sabha shall be from either the principal opposition party or the ruling party.
+3. The Deputy Speaker has the same power as of the Speaker when presiding over the sitting of the House and no appeal lies against his rulings.
+4. The well established parliamentary practice regarding the appointment of Deputy Speaker is that the motion is moved by the Speaker and duly seconded by the Prime Minister.",1 and 3 only,2 and 3 only,"1, 2 and 3",2 and 4 only,A,,Medium
+2022,Environment,Agricultural Anthropogenic Sources,21,"Among the following crops, which one is the most important anthropogenic source of both methane and nitrous oxide?",Cotton,Rice,Sugarcane,Wheat,B,,Medium
+2022,Environment,System of Rice Intensification,22,"System of Rice Intensification of cultivation, in which alternate wetting and drying of rice fields is practised, results in:
+1. Reduced seed requirement
+2. Reduced methane production
+3. Reduced electricity consumption",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",D,,Medium
+2022,Geography,African Lakes - Faguibine,23,Which one of the following lakes of West Africa has become dry and turned into a desert?,Lake Victoria,Lake Faguibine,Lake Oguta,Lake Volta,B,,Medium
+2022,Geography,Gandikota Canyon - Pennar River,24,Gandikota canyon of South India was created by which one of the following rivers?,Cauvery,Manjira,Pennar,Tungabhadra,C,,Medium
+2022,Geography,Mountain Peaks of Himalayas,25,"Consider the following pairs:
+Peak - Mountains
+1. Namcha Barwa - Garhwal Himalaya
+2. Nanda Devi - Kumaon Himalaya
+3. Nokrek - Sikkim Himalaya
+Which of the pairs given above is/are correctly matched?",1 and 2,2 only,1 and 3,3 only,B,,Medium
+2022,Geography,Levant Region,26,The term Levant often heard in the news roughly corresponds to which of the following regions?,Region along the eastern Mediterranean shores,Region along North African shores stretching from Egypt to Morocco,Region along Persian Gulf and Horn of Africa,The entire coastal areas of Mediterranean Sea,A,,Medium
+2022,Geography,Central Asia - Borders with Afghanistan,27,"Consider the following countries:
+1. Azerbaijan
+2. Kyrgyzstan
+3. Tajikistan
+4. Turkmenistan
+5. Uzbekistan
+Which of the above have borders with Afghanistan?","1, 2 and 5 only","1, 2, 3 and 4 only","3, 4 and 5 only","1, 2, 3, 4 and 5",C,,Medium
+2022,Science & Technology,Digital Platforms - Government,28,"With reference to India, consider the following statements:
+1. Aarogya Setu
+2. COWIN
+3. DigiLocker
+4. DIKSHA
+Which of the above are built on top of open-source digital platforms?","1, 2 and 3 only","1, 2 and 4 only",3 and 4 only,"1, 2, 3 and 4",B,,Medium
+2022,Geography,Summer Solstice - Longest Day,29,"In the northern hemisphere, the longest day of the year normally occurs in the",First half of the month of June,Second half of the month of June,First half of the month of July,Second half of the month of July,B,,Medium
+2022,Geography,Wetlands & Lakes of India,30,"Consider the following pairs:
+Wetland/Lake - Location
+1. Hokera Wetland - Punjab
+2. Renuka Wetland - Himachal Pradesh
+3. Rudrasagar Lake - Tripura
+4. Sasthamkotta Lake - Tamil Nadu
+How many pairs given above are correctly matched?",Only one pair,Only two pairs,Only three pairs,All four pairs,B,,Medium
+2022,Science & Technology,Rare Earth Elements - Monazite,31,"Consider the following statements:
+1. Monazite is a source of rare earths.
+2. Monazite contains thorium.
+3. Monazite occurs naturally in the entire Indian coastal sands in India.
+4. In India, Government bodies only can process or export monazite.
+Which of the statements given above are correct?","1, 2 and 3 only","1, 2 and 4 only",3 and 4 only,"1, 2, 3 and 4",D,,Medium
+2022,Science & Technology,Web 3.0 Technology,32,"With reference to Web 3.0, consider the following statements:
+1. Web 3.0 technology enables people to control their own data.
+2. In Web 3.0 world, there can be blockchain based social networks.
+3. Web 3.0 is operated by users collectively rather than a corporation.
+Which of the statements given above are correct?",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",D,,Medium
+2022,Science & Technology,Software as a Service,33,"With reference to Software as a Service (SaaS), consider the following statements:
+1. SaaS buyers can customise the user interface and can change data fields.
+2. SaaS users can access their data through their mobile devices.
+3. Outlook, Hotmail and Yahoo! Mail are forms of SaaS.
+Which of the statements given above are correct?",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",D,,Medium
+2022,Science & Technology,Fractional Orbital Bombardment System,34,Which one of the following statements best reflects the idea behind the Fractional Orbital Bombardment System often talked about in media?,A hypersonic missile is launched into space to counter the asteroid approaching the Earth and explode it in space.,A spacecraft lands on another planet after making several orbital motions.,A missile is put into a stable orbit around the Earth and deorbits over a target on the Earth.,A spacecraft moves along a comet with the same speed and places a probe on its surface.,C,,Medium
+2022,Science & Technology,Quantum Computing,35,Which one of the following is the context in which the term qubit is mentioned?,Cloud Services,Quantum Computing,Visible Light Communication Technologies,Wireless Communication Technologies,B,,Medium
+2022,Science & Technology,Short-Range Devices & Technologies,36,"Consider the following communication technologies:
+1. Closed-circuit Television
+2. Radio Frequency Identification
+3. Wireless Local Area Network
+Which of the above are considered Short-Range devices/technologies?",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",D,,Medium
+2022,Science & Technology,Biofilms & Antibiotic Resistance,37,"Consider the following statements:
+1. Biofilms can form on medical implants within human tissues.
+2. Biofilms can form on food and food processing surfaces.
+3. Biofilms can exhibit antibiotic resistance.
+Which of the statements given above are correct?",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",D,,Medium
+2022,Science & Technology,Probiotics & Gut Health,38,"Consider the following statements in respect of probiotics:
+1. Probiotics are made of both bacteria and yeast.
+2. The organisms in probiotics are found in foods we ingest but they do not naturally occur in our gut.
+3. Probiotics help in the digestion of milk sugars.
+Which of the statements given above is/are correct?",1 only,2 only,1 and 3,2 and 3,C,,Medium
+2022,Science & Technology,COVID-19 Vaccines,39,"In the context of vaccines manufactured to prevent COVID-19 pandemic, consider the following statements:
+1. The Serum Institute of India produced COVID-19 vaccine named Covishield using mRNA platform.
+2. Sputnik V vaccine is manufactured using vector based platform.
+3. COVAXIN is an inactivated pathogen based vaccine.
+Which of the statements given above are correct?",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",B,,Medium
+2022,Science & Technology,Solar Storm Effects,40,"If a major solar storm/solar flare reaches the Earth, which of the following are the possible effects on the Earth?
+1. GPS and navigation systems could fail.
+2. Tsunamis could occur at equatorial regions.
+3. Power grids could be damaged.
+4. Intense auroras could occur over much of the Earth.
+5. Forest fires could take place over much of the planet.
+6. Orbits of the satellites could be disturbed.
+7. Shortwave radio communication of the aircraft flying over polar regions could be interrupted.","1, 2, 4 and 5 only","2, 3, 5, 6 and 7 only","1, 3, 4, 6 and 7 only","1, 2, 3, 4, 5, 6 and 7",C,,Medium
+2022,Environment,Climate Action Tracker,41,Climate Action Tracker which monitors the emission reduction pledges of different countries is a,Database created by coalition of research organisations,Wing of International Panel of Climate Change,Committee under United Nations Framework Convention on Climate Change,Agency promoted and financed by United Nations Environment Programme and World Bank,A,,Medium
+2022,Environment,Climate Group & EP100 Initiative,42,"Consider the following statements:
+1. The Climate Group is an international non-profit organization that drives climate action by building large networks and runs them.
+2. The International Energy Agency in partnership with the Climate Group launched a global initiative EP100.
+3. EP100 brings together leading companies committed to driving innovation in energy efficiency and increasing competitiveness while delivering on emission reduction goals.
+4. Some Indian companies are members of EP100.
+5. The International Energy Agency is the Secretariat to the Under2 Coalition.
+Which of the statements given above are correct?","1, 2, 4 and 5","1, 3 and 4 only","2, 3 and 5 only","1, 2, 3, 4 and 5",B,,Medium
+2022,Environment,Rainforest Functions - Wetlands,43,"If rainforests and tropical forests are the lungs of the Earth, then surely wetlands function as its kidneys. Which one of the following functions of wetlands best reflects the above statement?","The water cycle in wetlands involves surface runoff, subsoil percolation and evaporation.","Algae form the nutrient base upon which fish, crustaceans, molluscs, birds, reptiles and mammals thrive.",Wetlands play vital role in maintaining sedimentation balance and soil stabilization.,Aquatic plants absorb heavy metals and excess nutrients.,D,,Medium
+2022,Environment,WHO Air Quality Guidelines,44,"In the context of WHO Air Quality Guidelines, consider the following statements:
+1. The 24-hour mean of PM2.5 should not exceed 15 μgm and annual mean of PM2.5 should not exceed 5 μgm.
+2. In a year, the highest levels of ozone pollution occur during the periods of inclement weather.
+3. PM10 can penetrate the lung barrier and enter the bloodstream.
+4. Excessive ozone in the air can trigger asthma.","1, 3 and 4",1 and 4 only,"2, 3 and 4",1 and 2 only,B,,Medium
+2022,Environment,Gucchi - Himalayan Fungus,45,"With reference to Gucchi sometimes mentioned in the news, consider the following statements:
+1. It is a fungus.
+2. It grows in some Himalayan forest areas.
+3. It is commercially cultivated in the Himalayan foothills of north-eastern India.
+Which of the statements given above is/are correct?",1 only,3 only,1 and 2,2 and 3,C,,Medium
+2022,Environment,Polyethylene Terephthalate,46,"With reference to polyethylene terephthalate, the use of which is so widespread in our daily lives, consider the following statements:
+1. Its fibres can be blended with wool and cotton fibres to reinforce their properties.
+2. Containers made of it can be used to store any alcoholic beverage.
+3. Bottles made of it can be recycled into other products.
+4. Articles made of it can be easily disposed of by incineration without causing greenhouse gas emissions.",1 and 3,2 and 4,1 and 4,2 and 3,A,,Medium
+2022,Environment,Bird Identification,47,Which of the following is not a bird?,Golden Mahseer,Indian Nightjar,Spoonbill,White Ibis,A,,Medium
+2022,Environment,Nitrogen-Fixing Plants,48,"Which of the following are nitrogen-fixing plants?
+1. Alfalfa
+2. Amaranth
+3. Chickpea
+4. Clover
+5. Purslane (Kulfa)
+6. Spinach","1, 3 and 4 only","1, 3, 5 and 6 only","2, 4, 5 and 6 only","1, 2, 4, 5 and 6",A,,Medium
+2022,Environment,Biorock Technology - Coral Restoration,49,Biorock technology is talked about in which one of the following situations?,Restoration of damaged coral reefs,Development of building materials using plant residues,Identification of areas for exploration/extraction of shale gas,Providing salt licks for wild animals in forests/protected areas,A,,Medium
+2022,Environment,Miyawaki Method - Urban Forests,50,The Miyawaki method is well known for the,Promotion of commercial farming in arid and semi-arid areas,Development of gardens using genetically modified flora,Creation of mini forests in urban areas,Harvesting wind energy on coastal areas and on sea surfaces,C,,Medium
+2022,History,Government of India Act 1919,51,"In the Government of India Act 1919, the functions of Provincial Government were divided into Reserved and Transferred subjects. Which of the following were treated as Reserved subjects?
+1. Administration of Justice
+2. Local Self-Government
+3. Land Revenue
+4. Police","1, 2 and 3","2, 3 and 4","1, 3 and 4","1, 2 and 4",C,,Medium
+2022,History,Medieval Currency - Fanam,52,"In medieval India, the term Fanam referred to",Clothing,Coins,Ornaments,Weapons,B,,Medium
+2022,History,Freedom Fighters - Ghadar Party,53,"Consider the following freedom fighters:
+1. Barindra Kumar Ghosh
+2. Jogesh Chandra Chatterjee
+3. Rash Behari Bose
+Who of the above was/were actively associated with the Ghadar Party?",1 and 2,2 only,1 and 3,3 only,D,,Medium
+2022,History,Cripps Mission Proposals,54,"With reference to the proposals of Cripps Mission, consider the following statements:
+1. The Constituent Assembly would have members nominated by the Provincial Assemblies as well as the Princely States.
+2. Any Province, which is not prepared to accept the new Constitution would have the right to sign a separate agreement with Britain regarding its future status.
+Which of the statements given above is/are correct?",1 only,2 only,Both 1 and 2,Neither 1 nor 2,B,,Medium
+2022,History,Jaina vs Buddhist Texts,55,"With reference to Indian history, consider the following texts:
+1. Nettipakarana
+2. Parishishtaparvan
+3. Avadanashataka
+4. Trishashtilakshana Mahapurana
+Which of the above are Jaina texts?","1, 2 and 3",2 and 4 only,1 and 3,"2, 3 and 4",B,,Medium
+2022,History,Historical Persons & Scholars,56,"With reference to Indian history, consider the following pairs:
+Historical person - Known as
+1. Aryadeva - Jaina scholar
+2. Dignaga - Buddhist scholar
+3. Nathamuni - Vaishnava scholar
+How many pairs given above are correctly matched?",None of the pairs,Only one pair,Only two pairs,All three pairs,C,,Medium
+2022,History,Mongol Invasions of India,57,"With reference to Indian history, consider the following statements:
+1. The first Mongol invasion of India happened during the reign of Jalal-ud-din Khalji.
+2. During the reign of Ala-ud-din Khalji, one Mongol assault marched up to Delhi and besieged the city.
+3. Muhammad-bin-Tughlaq temporarily lost portions of north-west of his kingdom to Mongols.
+Which of the statements given above is/are correct?",1 and 2,2 only,1 and 3,3 only,B,,Medium
+2022,History,Kautilya Arthashastra - Slavery,58,"According to Kautilyas Arthashastra, which of the following are correct?
+1. A person could be a slave as a result of a judicial punishment.
+2. If a female slave bore her master a son, she was legally free.
+3. If a son born to a female slave was fathered by her master, the son was entitled to the legal status of the masters son.",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",D,,Medium
+2022,History,Medieval India - Dutch & Portuguese,59,"With reference to Indian history, consider the following statements:
+1. The Dutch established their factories/warehouses on the east coast on lands granted to them by Gajapati rulers.
+2. Alfonso de Albuquerque captured Goa from the Bijapur Sultanate.
+3. The English East India Company established a factory at Madras on a plot of land leased from a representative of the Vijayanagara empire.",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",B,,Medium
+2022,History,Kautilya Arthashastra - Legal Status,60,"According to Kautilyas Arthashastra, which of the following are correct?
+1. A person could be a slave as a result of a judicial punishment.
+2. If a female slave bore her master a son, she was legally free.
+3. If a son born to a female slave was fathered by her master, the son was entitled to the legal status of the masters son.",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",B,,Medium
+2022,Economy,US Monetary Policy & Capital Flight,61,"Consider the following statements:
+1. Tight monetary policy of US Federal Reserve could lead to capital flight.
+2. Capital flight may increase the interest cost of firms with existing External Commercial Borrowings (ECBs).
+3. Devaluation of domestic currency decreases the currency risk associated with ECBs.
+Which of the statements given above are correct?",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",X,,Medium
+2022,Economy,Tea Producing States,62,"Consider the following States:
+1. Andhra Pradesh
+2. Kerala
+3. Himachal Pradesh
+4. Tripura
+How many of the above are generally known as tea-producing States?",Only one State,Only two States,Only three States,All four States,D,,Medium
+2022,Economy,Credit Rating Agencies,63,"Consider the following statements:
+1. In India, credit rating agencies are regulated by Reserve Bank of India.
+2. The rating agency popularly known as ICRA is a public limited company.
+3. Brickwork Ratings is an Indian credit rating agency.
+Which of the statements given above are correct?",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",B,,Medium
+2022,Economy,Banks Board Bureau,64,"With reference to the Banks Board Bureau (BBB), which of the following statements are correct?
+1. The Governor of RBI is the Chairman of BBB.
+2. BBB recommends for the selection of heads for Public Sector Banks.
+3. BBB helps the Public Sector Banks in developing strategies and capital raising plans.",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",B,,Medium
+2022,Economy,Convertible Bonds,65,"With reference to Convertible Bonds, consider the following statements:
+1. As there is an option to exchange the bond for equity, Convertible Bonds pay a lower rate of interest.
+2. The option to convert to equity affords the bondholder a degree of indexation to rising consumer prices.",1 only,2 only,Both 1 and 2,Neither 1 nor 2,C,,Medium
+2022,International Relations,"International Memberships - AIIB, SCO",66,"Consider the following:
+1. Asian Infrastructure Investment Bank
+2. Missile Technology Control Regime
+3. Shanghai Cooperation Organisation
+India is a member of which of the above?",1 and 2 only,3 only,2 and 3 only,"1, 2 and 3",D,,Medium
+2022,International Relations,Vietnam Economy & Politics,67,"Consider the following statements:
+1. Vietnam has been one of the fastest growing economies in the world in the recent years.
+2. Vietnam is led by a multi-party political system.
+3. Vietnams economic growth is linked to its integration with global supply chains and focus on exports.
+4. For a long time Vietnams low labour costs and stable exchange rates have attracted global manufacturers.
+5. Vietnam has the most productive e-service sector in the Indo-Pacific region.
+Which of the statements given above are correct?",2 and 4,3 and 5,"1, 3 and 4",1 and 2,C,,Medium
+2022,Economy,Price Stability - RBI,68,"In India, which one of the following is responsible for maintaining price stability by controlling inflation?",Department of Consumer Affairs,Expenditure Management Commission,Financial Stability and Development Council,Reserve Bank of India,D,,Medium
+2022,Economy,Non-Fungible Tokens,69,"With reference to Non-Fungible Tokens (NFTs), consider the following statements:
+1. They enable the digital representation of physical assets.
+2. They are unique cryptographic tokens that exist on a blockchain.
+3. They can be traded or exchanged at equivalency and therefore can be used as a medium of commercial transactions.",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",A,,Medium
+2022,Geography,Indian Reservoirs & States,70,"Consider the following pairs:
+Reservoirs - States
+1. Ghataprabha - Telangana
+2. Gandhi Sagar - Madhya Pradesh
+3. Indira Sagar - Andhra Pradesh
+4. Maithon - Chhattisgarh
+How many pairs given above are not correctly matched?",Only one pair,Only two pairs,Only three pairs,All four pairs,C,,Medium
+2022,Economy,Industrial Disputes Compilation,71,"In India, which one of the following compiles information on industrial disputes, closures, retrenchments and lay-offs in factories employing workers?",Central Statistics Office,Department for Promotion of Industry and Internal Trade,Labour Bureau,National Technical Manpower Information System,C,,Medium
+2022,Economy,Coal Controllers Organization,72,"In India, what is the role of the Coal Controllers Organization (CCO)?
+1. CCO is the major source of Coal Statistics in Government of India.
+2. It monitors progress of development of Captive Coal/Lignite blocks.
+3. It hears any objection to the Governments notification relating to acquisition of coal-bearing areas.
+4. It ensures that coal mining companies deliver the coal to end users in the prescribed time.","1, 2 and 3",3 and 4 only,1 and 2 only,"1, 2 and 4",A,,Medium
+2022,Polity,Fifth Schedule - Scheduled Areas,73,"If a particular area is brought under the Fifth Schedule of the Constitution of India, which one of the following statements best reflects the consequence of it?",This would prevent the transfer of land of tribal people to non-tribal people.,This would create a local self-governing body in that area.,This would convert that area into a Union Territory.,The State having such areas would be declared a Special Category State.,A,,Medium
+2022,Social Welfare,Sanitation & Urban Welfare,74,"Consider the following statements:
+1. The India Sanitation Coalition is a platform to promote sustainable sanitation and is funded by the Government of India and the World Health Organization.
+2. The National Institute of Urban Affairs is an apex body of the Ministry of Housing and Urban Affairs in Government of India and provides innovative solutions to address the challenges of Urban India.",1 only,2 only,Both 1 and 2,Neither 1 nor 2,D,,Medium
+2022,Polity,Environment Protection Act Bodies,75,"Which one of the following has been constituted under the Environment Protection Act, 1986?",Central Water Commission,Central Ground Water Board,Central Ground Water Authority,National Water Development Agency,C,,Medium
+2022,International Relations,UN Credentials Committee,76,"With reference to the United Nations Credentials Committee, consider the following statements:
+1. It is a committee set up by the UN Security Council and works under its supervision.
+2. It traditionally meets in March, June and September every year.
+3. It assesses the credentials of all UN members before submitting a report to the General Assembly for approval.",3 only,1 and 3,2 and 3,1 and 2,A,,Medium
+2022,Geography,Polar Code,77,Which one of the following statements best describes the Polar Code?,It is the international code of safety for ships operating in polar waters.,It is the agreement of the countries around the North Pole regarding the demarcation of their territories in the polar region.,It is a set of norms to be followed by the countries whose scientists undertake research studies in the North Pole and South Pole.,It is a trade and security agreement of the member countries of the Arctic Council.,A,,Medium
+2022,International Relations,UN General Assembly Observer Status,78,"With reference to the United Nations General Assembly, consider the following statements:
+1. The UN General Assembly can grant observer status to the non-member States.
+2. Inter-governmental organisations can seek observer status in the UN General Assembly.
+3. Permanent Observers in the UN General Assembly can maintain missions at the UN headquarters.",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",D,,Medium
+2022,Economy,Tea Board of India,79,"With reference to the Tea Board in India, consider the following statements:
+1. The Tea Board is a statutory body.
+2. It is a regulatory body attached to the Ministry of Agriculture and Farmers Welfare.
+3. The Tea Boards Head Office is situated in Bengaluru.
+4. The Board has overseas offices at Dubai and Moscow.",1 and 3,2 and 4,3 and 4,1 and 4,D,,Medium
+2022,Environment,Greenwashing Definition,80,Which one of the following best describes the term greenwashing?,Conveying a false impression that a companys products are eco-friendly and environmentally sound,Non-inclusion of ecological environmental costs in the Annual Financial Statements of a country,Ignoring the disastrous ecological consequences while undertaking infrastructure development,Making mandatory provisions for environmental costs in a government project/programme,A,,Medium
+2022,Geography,Ashokas Rock Edicts,81,"Consider the following statements:
+1. High clouds primarily reflect solar radiation and cool the surface of the Earth.
+2. Low clouds have a high absorption of infrared radiation emanating from the Earths surface and thus cause warming effect.",1 only,2 only,Both 1 and 2,Neither 1 nor 2,D,,Medium
+2022,Geography,Refugee Settlements,82,"Consider the following statements:
+1. Bidibidi is a large refugee settlement in north-western Kenya.
+2. Some people who fled from South Sudan civil war live in Bidibidi.
+3. Some people who fled from civil war in Somalia live in Dadaab refugee complex in Kenya.",1 and 2,2 only,2 and 3,3 only,C,,Medium
+2022,Geography,Turkic States Members,83,"Consider the following countries:
+1. Armenia
+2. Azerbaijan
+3. Croatia
+4. Romania
+5. Uzbekistan
+Which of the above are members of the Organization of Turkic States?","1, 2 and 4",1 and 3,2 and 5,"3, 4 and 5",C,,Medium
+2022,Geography,Solar Parks & Renewable Energy,84,"Consider the following statements:
+1. Gujarat has the largest solar park in India.
+2. Kerala has a fully solar powered International Airport.
+3. Goa has the largest floating solar photovoltaic project in India.",1 and 2,2 only,2 and 3,3 only,B,,Medium
+2022,International Relations,UN Convention on Law of Sea,85,"With reference to the United Nations Convention on the Law of Sea, consider the following statements:
+1. A coastal state has the right to establish the breadth of its territorial sea up to a limit not exceeding 12 nautical miles, measured from baseline determined in accordance with the convention.
+2. Ships of all states, whether coastal or land-locked, enjoy the right of innocent passage through the territorial sea.
+3. The Exclusive Economic Zone shall not extend beyond 200 nautical miles from the baseline from which the breadth of the territorial sea is measured.",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",D,,Medium
+2022,Geography,Senkaku Islands Dispute,86,"Which one of the following statements best reflects the issue with Senkaku Islands, sometimes mentioned in the news?",It is generally believed that they are artificial islands made by a country around South China Sea.,China and Japan engage in maritime disputes over these islands in East China Sea.,A permanent American military base has been set up there to help Taiwan to increase its defence capabilities.,"Though International Court of Justice declared them as no mans land, some South-East Asian countries claim them.",B,,Medium
+2022,International Relations,Countries in News - Military Coup,87,"Consider the following pairs:
+Country - Important reason for being in the news recently
+1. Chad - Setting up of permanent military base by China
+2. Guinea - Suspension of Constitution and Government by military
+3. Lebanon - Severe and prolonged economic depression
+4. Tunisia - Suspension of Parliament by President",Only one pair,Only two pairs,Only three pairs,All four pairs,C,,Medium
+2022,Geography,Regions in the World,88,"Consider the following pairs:
+Region often mentioned in the news - Country
+1. Anatolia - Turkey
+2. Amhara - Ethiopia
+3. Cabo Delgado - Spain
+4. Catalonia - Italy",Only one pair,Only two pairs,Only three pairs,All four pairs,B,,Medium
+2022,International Relations,Civil Wars & Conflicts,89,"Consider the following statements:
+1. Wild animals are the sole property of the government.
+2. When a wild animal is declared protected, such animal is entitled for equal protection whether it is found in protected areas or outside.",1 and 2,2 only,1 and 3,3 only,B,,Medium
+2022,Environment,Ants as Fungi Cultivators,90,Certain species of which one of the following organisms are well known as cultivators of fungi?,Ant,Cockroach,Crab,Spider,A,,Medium
+2022,History,Ashokas Rock Edicts Sites,91,"Consider the following pairs:
+Site of Ashokas major rock edicts - Location in the State of
+1. Dhauli - Odisha
+2. Erragudi - Andhra Pradesh
+3. Jaugada - Madhya Pradesh
+4. Kalsi - Karnataka",Only one pair,Only two pairs,Only three pairs,All four pairs,B,,Medium
+2022,History,Medieval Dynasty Kings,92,"Consider the following pairs:
+King - Dynasty
+1. Nannuka - Chandela
+2. Jayashakti - Paramara
+3. Nagabhata II - Gurjara-Pratihara
+4. Bhoja - Rashtrakuta",Only one pair,Only two pairs,Only three pairs,All four pairs,B,,Medium
+2022,History,Sangam Literature Characteristics,93,Which one of the following statements about Sangam literature in ancient South India is correct?,Sangam poems are devoid of any reference to material culture.,The social classification of Varna was known to Sangam poets.,Sangam poems have no reference to warrior ethic.,Sangam literature refers to magical forces as irrational.,B,,Medium
+2022,Culture,Yogavasishtha Translation - Mughal,94,Yogavsistha was translated into Persian by Nizamuddin Panipati during the reign of,Akbar,Humayun,Shahjahan,Aurangzeb,A,,Medium
+2022,Culture,Ramanuja Teachings & Philosophy,95,The worlds second tallest statue in sitting pose of Ramanuja was inaugurated by the Prime Minister of India at Hyderabad recently. Which one of the following statements correctly represents the teachings of Ramanuja?,The best means of salvation was devotion.,"Vedas are eternal, self-existent and wholly authoritative.",Logical arguments were essential means for the highest bliss.,Salvation was to be obtained through meditation.,A,,Medium
+2022,Culture,Somnath Temple - Jyotirlinga,96,"The Prime Minister recently inaugurated the new Circuit House near Somnath Temple at Veraval. Which of the following statements are correct regarding Somnath Temple?
+1. Somnath Temple is one of the Jyotirlinga shrines.
+2. A description of Somnath Temple was given by Al-Biruni.
+3. Pran Pratishtha of Somnath Temple (installation of the present day temple) was done by President S. Radhakrishnan.",1 and 2 only,2 and 3 only,1 and 3 only,"1, 2 and 3",A,,Medium
+2022,Science & Technology,Immunology - B & T Cells,97,Which one of the following statements best describes the role of B cells and T cells in the human body?,They protect the body from environmental allergens.,They alleviate the bodys pain and inflammation.,They act as immunosuppressants in the body.,They protect the body from the diseases caused by pathogens.,D,,Medium
+2022,Science & Technology,Nanoparticles,98,"Consider the following statements:
+1. Other than those made by humans, nanoparticles do not exist in nature.
+2. Nanoparticles of some metallic oxides are used in the manufacture of some cosmetics.
+3. Nanoparticles of some commercial products which enter the environment are unsafe for humans.",1 only,3 only,1 and 2,2 and 3,D,,Medium
+2022,Science & Technology,DNA Barcoding,99,"Consider the following statements:
+1. DNA Barcoding can be a tool to assess the age of a plant or animal.
+2. DNA Barcoding can be used to distinguish among species that look alike.
+3. DNA Barcoding can be used to identify undesirable animal or plant materials in processed foods.",1 only,3 only,1 and 2,2 and 3,D,,Medium
+2022,Environment,Acid Rain Causes,100,"Consider the following:
+1. Carbon monoxide
+2. Nitrogen oxide
+3. Ozone
+4. Sulphur dioxide
+Excess of which of the above in the environment is/are causes of acid rain?","1, 2 and 3",2 and 4 only,4 only,"1, 3 and 4",B,,Medium

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import './AnswerWriting.css';
 import { audioManager } from '../../util/AudioManager';
+import { useAnalytics } from '../../contexts/AnalyticsContext';
 
 interface Prompt {
     id: number;
@@ -40,6 +41,11 @@ const AnswerWriting: React.FC<AnswerWritingProps> = ({ onTaskCompleted }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
     const [showEvaluation, setShowEvaluation] = useState(false);
+    const [showHistory, setShowHistory] = useState(false);
+    const [history, setHistory] = useState<any[]>([]);
+    const [loadingHistory, setLoadingHistory] = useState(false);
+
+    const { refreshAnalytics } = useAnalytics();
 
     // Fetch daily prompt on mount
     useEffect(() => {
@@ -73,6 +79,29 @@ const AnswerWriting: React.FC<AnswerWritingProps> = ({ onTaskCompleted }) => {
         } catch (err) {
             console.error('Error fetching prompt:', err);
         }
+    };
+
+    const fetchHistory = async () => {
+        setLoadingHistory(true);
+        try {
+            const res = await fetch('http://localhost:5000/api/answer-writing/my-answers');
+            if (res.ok) {
+                const data = await res.json();
+                setHistory(data);
+            }
+        } catch (err) {
+            console.error('Error fetching history:', err);
+        } finally {
+            setLoadingHistory(false);
+        }
+    };
+
+    const toggleHistory = () => {
+        if (!showHistory && history.length === 0) {
+            fetchHistory();
+        }
+        setShowHistory(!showHistory);
+        audioManager.play('click');
     };
 
     const startTimer = () => {
@@ -124,6 +153,9 @@ const AnswerWriting: React.FC<AnswerWritingProps> = ({ onTaskCompleted }) => {
                 if (onTaskCompleted) {
                     onTaskCompleted();
                 }
+
+                // Refresh analytics context
+                refreshAnalytics(true);
             } else {
                 alert('Failed to submit answer');
             }
@@ -167,11 +199,50 @@ const AnswerWriting: React.FC<AnswerWritingProps> = ({ onTaskCompleted }) => {
 
     return (
         <div className="answer-writing-container">
-            {!showEvaluation ? (
+            {showHistory ? (
+                <div className="history-container">
+                    <div className="history-header">
+                        <h1>📜 Submission History</h1>
+                        <button onClick={toggleHistory} className="back-btn">← Back to Practice</button>
+                    </div>
+
+                    {loadingHistory ? (
+                        <div className="loading">Loading history...</div>
+                    ) : history.length === 0 ? (
+                        <div className="empty-state">
+                            <h2>No submissions yet</h2>
+                            <p>Practice answering questions to build your submission history!</p>
+                            <button onClick={toggleHistory} className="start-practice-btn">
+                                ✏️ Start Practicing
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="history-list">
+                            {history.map((item) => (
+                                <div key={item.id} className="history-item">
+                                    <div className="history-item-header">
+                                        <span className="history-subject">{item.subject}</span>
+                                        <span className="history-score">{item.overall_score?.toFixed(1) || 'N/A'}/10</span>
+                                    </div>
+                                    <p className="history-question">{item.question}</p>
+                                    <div className="history-meta">
+                                        <span>📝 {item.word_count} words</span>
+                                        <span>⏱️ {Math.floor(item.time_taken / 60)}:{(item.time_taken % 60).toString().padStart(2, '0')}</span>
+                                        <span>📅 {new Date(item.submitted_at).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            ) : !showEvaluation ? (
                 <>
                     {/* Header */}
                     <div className="aw-header">
                         <h1>✍️ Answer Writing Practice</h1>
+                        <button onClick={toggleHistory} className="history-btn">
+                            {showHistory ? '✏️ Back to Practice' : '📜 View History'}
+                        </button>
                         <div className="aw-meta">
                             <span className="subject-badge">{currentPrompt.subject}</span>
                             <span className="difficulty-badge difficulty-{currentPrompt.difficulty.toLowerCase()}">
