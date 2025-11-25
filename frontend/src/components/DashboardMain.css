@@ -359,7 +359,12 @@
   background: rgba(212, 165, 116, 0.6);
 }
 
-/* Responsive Design */
+.pomodoro-above-head {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
 @media (max-width: 1400px) {
   .dashboard-content {
     grid-template-columns: 1fr;

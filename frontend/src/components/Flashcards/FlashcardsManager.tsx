@@ -1,4 +1,3 @@
-// Flashcards - Main Container Component
 import React, { useState } from 'react';
 import './Flashcards.css';
 import DeckManager from './DeckManager';

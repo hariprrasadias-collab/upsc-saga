@@ -14,7 +14,7 @@ def create_app():
         dashboard, tasks, quests, battles, shop, codex, lore, mimir, 
         seer, ravens, anki, warmap, answer_writing, mock_tests, pyq, 
         syllabus, flashcards, analytics, essay, csat, badges, challenges, 
-        shop_new, weak_areas, admin
+        shop_new, weak_areas, admin, predictive, pomodoro, timebox
     )
     
     # Register blueprints
@@ -43,8 +43,14 @@ def create_app():
     app.register_blueprint(shop_new.shop_bp_new)
     app.register_blueprint(weak_areas.weak_areas_bp)
     app.register_blueprint(admin.admin_bp)
+    app.register_blueprint(predictive.predictive_bp)
+    app.register_blueprint(pomodoro.pomodoro_bp)
+    app.register_blueprint(timebox.timebox_bp)
 
     from app.routes.scribe import scribe_bp
-    app.register_blueprint(scribe_bp)
+    app.register_blueprint(scribe_bp, url_prefix='/api/scribe')
+
+    from app.routes.arena import arena_bp
+    app.register_blueprint(arena_bp, url_prefix='/api/arena')
 
     return app

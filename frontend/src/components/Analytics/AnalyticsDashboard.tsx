@@ -1,6 +1,7 @@
 // Analytics Dashboard - Phase 2 Feature #2
 import React, { useState, useEffect } from 'react';
 import './Analytics.css';
+import './BurnoutAlert.css';
 import {
     LineChart, Line, BarChart, Bar, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
@@ -17,6 +18,10 @@ const AnalyticsDashboard: React.FC = () => {
     const [weakAreas, setWeakAreas] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
+    // Predictive Analytics State
+    const [predictiveData, setPredictiveData] = useState<any>(null);
+    const [showBurnoutAlert, setShowBurnoutAlert] = useState(false);
+
     useEffect(() => {
         fetchAnalytics();
     }, [timeframe]);
@@ -26,19 +31,28 @@ const AnalyticsDashboard: React.FC = () => {
             setLoading(true);
 
             // Fetch remaining analytics data in parallel
-            const [subjectRes, mockRes, weakRes] = await Promise.all([
+            const [subjectRes, mockRes, weakRes, predictiveRes] = await Promise.all([
                 fetch('http://localhost:5000/api/analytics/subject-wise'),
                 fetch('http://localhost:5000/api/analytics/mock-tests'),
-                fetch('http://localhost:5000/api/analytics/weak-areas?limit=5')
+                fetch('http://localhost:5000/api/analytics/weak-areas?limit=5'),
+                fetch('http://localhost:5000/api/analytics/predictive/all')
             ]);
 
             const subjectData = await subjectRes.json();
             const mockData = await mockRes.json();
             const weakData = await weakRes.json();
+            const predictiveAnalytics = await predictiveRes.json();
 
             setSubjectData(subjectData);
             setMockTrends(mockData);
             setWeakAreas(weakData);
+            setPredictiveData(predictiveAnalytics);
+
+            // Show burnout alert if high risk
+            if (predictiveAnalytics?.burnout_detection?.burnout_risk === 'high') {
+                setShowBurnoutAlert(true);
+            }
+
             setLoading(false);
         } catch (err) {
             console.error('Failed to fetch analytics:', err);
@@ -109,6 +123,130 @@ const AnalyticsDashboard: React.FC = () => {
                     </div>
                 </div>
             )}
+
+
+            {/* Burnout Alert */}
+            {showBurnoutAlert && predictiveData?.burnout_detection && (
+                <div className="burnout-alert">
+                    <div className="alert-icon">⚠️</div>
+                    <div className="alert-content">
+                        <h3 className="alert-title">{predictiveData.burnout_detection.message}</h3>
+                        <div className="alert-recommendations">
+                            <strong>Recommendations:</strong>
+                            <ul>
+                                {predictiveData.burnout_detection.recommendations?.map((rec: string, i: number) => (
+                                    <li key={i}>{rec}</li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div className="alert-stats">
+                            <span>Avg Study Hours: {predictiveData.burnout_detection.avg_study_hours}h/day</span>
+                        </div>
+                    </div>
+                    <button className="alert-dismiss" onClick={() => setShowBurnoutAlert(false)} aria-label="Dismiss alert">
+                        ×
+                    </button>
+                </div>
+            )}
+
+
+            {/* Predictive Analytics Section */}
+            {predictiveData && (
+                <div className="predictive-analytics-section">
+                    <h2 className="section-title">🧠 Predictive Insights</h2>
+
+                    <div className="predictive-grid">
+                        {/* Exam Readiness Score */}
+                        <div className="predictive-card readiness-card">
+                            <h3>📊 Exam Readiness</h3>
+                            <div className="readiness-gauge">
+                                <svg width="200" height="200" viewBox="0 0 200 200">
+                                    <circle
+                                        cx="100"
+                                        cy="100"
+                                        r="80"
+                                        fill="none"
+                                        stroke="#333"
+                                        strokeWidth="15"
+                                    />
+                                    <circle
+                                        cx="100"
+                                        cy="100"
+                                        r="80"
+                                        fill="none"
+                                        stroke="#d4a574"
+                                        strokeWidth="15"
+                                        strokeDasharray={`${(predictiveData.exam_readiness?.overall_score || 0) * 5.03} 503`}
+                                        strokeLinecap="round"
+                                        transform="rotate(-90 100 100)"
+                                    />
+                                    <text x="100" y="100" textAnchor="middle" dy=".3em" fontSize="40" fill="#d4a574">
+                                        {predictiveData.exam_readiness?.overall_score || 0}%
+                                    </text>
+                                </svg>
+                            </div>
+                            <div className="readiness-breakdown">
+                                {predictiveData.exam_readiness?.breakdown && Object.entries(predictiveData.exam_readiness.breakdown).map(([key, value]: [string, any]) => (
+                                    <div key={key} className="breakdown-item">
+                                        <span>{key.replace('_', ' ')}</span>
+                                        <span className="breakdown-bar">
+                                            <div style={{ width: `${value * 4}%`, background: '#d4a574' }}></div>
+                                        </span>
+                                        <span>{value.toFixed(1)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Success Probability */}
+                        <div className="predictive-card probability-card">
+                            <h3>🎯 Success Probability</h3>
+                            <div className="probability-meter">
+                                <div className="probability-value">
+                                    {predictiveData.success_probability?.probability || 0}%
+                                </div>
+                                <div className="probability-bar">
+                                    <div
+                                        className="probability-fill"
+                                        style={{ width: `${predictiveData.success_probability?.probability || 0}%` }}
+                                    ></div>
+                                </div>
+                                <div className="probability-info">
+                                    <span className={`confidence confidence-${predictiveData.success_probability?.confidence}`}>
+                                        {predictiveData.success_probability?.confidence} confidence
+                                    </span>
+                                    <span className={`trend trend-${predictiveData.success_probability?.trend}`}>
+                                        {predictiveData.success_probability?.trend}
+                                    </span>
+                                </div>
+                                <p className="probability-message">{predictiveData.success_probability?.message}</p>
+                            </div>
+                        </div>
+
+                        {/* Optimal Study Time */}
+                        <div className="predictive-card study-time-card">
+                            <h3>⏰ Optimal Study Time</h3>
+                            {predictiveData.optimal_study_time?.peak_hours ? (
+                                <>
+                                    <div className="study-time-recommendation">
+                                        {predictiveData.optimal_study_time.recommendation}
+                                    </div>
+                                    <div className="peak-hours">
+                                        {predictiveData.optimal_study_time.formatted_times?.map((time: string, i: number) => (
+                                            <div key={i} className="peak-hour-badge">{time}</div>
+                                        ))}
+                                    </div>
+                                    <p className="study-time-suggestion">{predictiveData.optimal_study_time.suggestion}</p>
+                                </>
+                            ) : (
+                                <p className="no-data">{predictiveData.optimal_study_time?.message || 'Not enough data'}</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Subject-Wise Performance */}
 
             {/* Charts Grid */}
             <div className="charts-grid">

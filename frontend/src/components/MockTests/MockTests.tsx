@@ -44,6 +44,7 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [results, setResults] = useState<any>(null);
     const [view, setView] = useState<'list' | 'test' | 'results'>('list');
+    const [examMode, setExamMode] = useState(false); // NEW: Strict 3-hour mode
     const { refreshAnalytics } = useAnalytics();
 
     // Fetch available tests

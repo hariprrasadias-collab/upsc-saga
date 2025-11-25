@@ -1,0 +1,115 @@
+/* Enhanced Streak Display */
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.header-left h1 {
+    margin: 0;
+    color: #ecf0f1;
+}
+
+.header-left p {
+    margin: 0.25rem 0 0 0;
+    color: #95a5a6;
+}
+
+@keyframes milestoneGlow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 20px rgba(243, 156, 18, 0.5);
+    }
+
+    50% {
+        box-shadow: 0 0 40px rgba(243, 156, 18, 0.8);
+    }
+}
+
+.streak-icon {
+    font-size: 2.5rem;
+    animation: flicker 2s ease-in-out infinite;
+}
+
+@keyframes flicker {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
+}
+
+.streak-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.streak-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #e74c3c;
+    line-height: 1;
+}
+
+.streak-label {
+    color: #95a5a6;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+.milestone-badge {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.5);
+    animation: slideInBadge 0.5s ease-out;
+    white-space: nowrap;
+}
+
+@keyframes slideInBadge {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .streak-display {
+        padding: 0.75rem 1.25rem;
+    }
+
+    .streak-icon {
+        font-size: 2rem;
+    }
+
+    .streak-number {
+        font-size: 1.5rem;
+    }
+}

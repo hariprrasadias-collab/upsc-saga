@@ -1,6 +1,7 @@
 // FlashcardStats - Analytics dashboard for review performance
 import React, { useState, useEffect } from 'react';
 import './Flashcards.css';
+import RevisionCurve from './RevisionCurve';
 
 interface Analytics {
     total_cards: number;
@@ -112,6 +113,9 @@ const FlashcardStats: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Revision Curve */}
+            <RevisionCurve />
 
             {/* Tips */}
             <div className="stats-tips">

@@ -1,221 +1,377 @@
-/* /frontend/src/components/BossArena/BossArena.css */
+/* BossArena.css - Boss Arena Styles */
 
 .arena-container {
-    padding: 2rem;
-    height: 100%;
-    overflow-y: auto;
-    background: linear-gradient(to bottom, #2c0e0e 0%, #000000 100%);
-    /* Dark Red/Black Theme */
-    color: #f0f0f0;
+    padding: 30px;
+    background: linear-gradient(135deg, #1a0b2e 0%, #2d1b4e 100%);
+    min-height: 100vh;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', sans-serif;
 }
 
 .arena-header {
-    font-family: var(--font-headings);
-    font-size: 3rem;
-    color: #e74c3c;
-    /* Blood Red */
     text-align: center;
-    text-transform: uppercase;
-    margin-bottom: 2rem;
-    text-shadow: 0 0 20px rgba(231, 76, 60, 0.6);
-    letter-spacing: 5px;
+    margin-bottom: 40px;
 }
 
-/* BATTLE LIST */
-.battle-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    max-width: 800px;
-    margin: 0 auto 50px auto;
+.arena-title {
+    font-family: var(--font-headings, 'NorseBold', sans-serif);
+    font-size: 48px;
+    color: #ff4081;
+    text-shadow: 0 0 20px rgba(255, 64, 129, 0.5);
+    margin: 0;
+    letter-spacing: 4px;
 }
 
-.battle-card {
-    background: rgba(20, 20, 20, 0.8);
-    border: 2px solid #444;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: transform 0.2s;
-    position: relative;
+.arena-subtitle {
+    color: #b39ddb;
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+.boss-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.boss-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
     overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
 }
 
-.battle-card:hover {
-    transform: scale(1.02);
+.boss-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-.battle-card.victory {
-    border-color: var(--color-accent-orange);
-    box-shadow: 0 0 15px rgba(212, 165, 116, 0.3);
+.boss-card.hard {
+    border-color: #f44336;
 }
 
-.battle-card.victory::after {
-    content: 'SLAIN';
-    position: absolute;
-    right: -20px;
-    top: 10px;
-    background: var(--color-accent-orange);
-    color: black;
-    padding: 5px 30px;
-    transform: rotate(45deg);
-    font-weight: bold;
-    font-size: 0.8rem;
+.boss-card.medium {
+    border-color: #ff9800;
 }
 
-.battle-card.defeat {
-    border-color: #e74c3c;
-    box-shadow: 0 0 15px rgba(231, 76, 60, 0.3);
+.boss-card.easy {
+    border-color: #4caf50;
 }
 
-.battle-card.defeat::after {
-    content: 'DEFEATED';
-    position: absolute;
-    right: -20px;
-    top: 10px;
-    background: #e74c3c;
-    color: white;
-    padding: 5px 30px;
-    transform: rotate(45deg);
-    font-weight: bold;
-    font-size: 0.8rem;
-}
-
-.boss-info h3 {
-    font-family: var(--font-headings);
-    font-size: 1.5rem;
-    color: #ddd;
-    margin: 0 0 5px 0;
-}
-
-.boss-subject {
-    color: #888;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.battle-type {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    font-weight: bold;
-    margin-right: 8px;
-    background: #444;
-    color: #fff;
-    vertical-align: middle;
-}
-
-.score-display {
-    text-align: right;
-}
-
-.score-big {
-    font-size: 2rem;
-    font-weight: bold;
-    font-family: var(--font-headings);
-}
-
-.score-cutoff {
-    font-size: 0.9rem;
-    color: #aaa;
-}
-
-/* CHALLENGE BUTTON */
-.challenge-btn {
-    display: block;
-    margin: 0 auto;
-    padding: 1.5rem 4rem;
-    background: #e74c3c;
-    color: white;
-    border: none;
-    font-family: var(--font-headings);
-    font-size: 2rem;
-    cursor: pointer;
-    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
-    transition: all 0.3s;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    box-shadow: 0 0 20px rgba(231, 76, 60, 0.5);
-}
-
-.challenge-btn:hover {
-    background: #c0392b;
-    transform: scale(1.1);
-    box-shadow: 0 0 40px rgba(231, 76, 60, 0.8);
-}
-
-/* --- MODAL FORM --- */
-.arena-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.9);
-    z-index: 200;
+.boss-image-container {
+    height: 150px;
+    background: rgba(0, 0, 0, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.arena-modal {
-    background: #1a0505;
-    border: 4px solid #e74c3c;
-    padding: 3rem;
-    width: 500px;
-    text-align: center;
-    box-shadow: 0 0 50px #e74c3c;
+.boss-avatar-placeholder {
+    font-size: 64px;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.2);
 }
 
-.arena-modal h2 {
-    color: #e74c3c;
-    font-family: var(--font-headings);
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
+.boss-info {
+    padding: 20px;
 }
 
-.arena-form input,
-.arena-form select {
-    display: block;
+.boss-name {
+    margin: 0 0 10px 0;
+    font-size: 24px;
+    color: #fff;
+}
+
+.boss-meta {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.boss-subject {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.boss-difficulty {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.boss-difficulty.hard {
+    color: #f44336;
+    background: rgba(244, 67, 54, 0.1);
+}
+
+.boss-difficulty.medium {
+    color: #ff9800;
+    background: rgba(255, 152, 0, 0.1);
+}
+
+.boss-difficulty.easy {
+    color: #4caf50;
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.boss-desc {
+    color: #b39ddb;
+    font-size: 14px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.boss-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat .label {
+    font-size: 10px;
+    color: #8892b0;
+    text-transform: uppercase;
+}
+
+.stat .value {
+    font-size: 18px;
+    font-weight: bold;
+    color: #e0e0e0;
+}
+
+.challenge-btn {
     width: 100%;
-    margin-bottom: 1.5rem;
-    padding: 1rem;
-    background: #000;
-    border: 1px solid #555;
+    padding: 12px;
+    background: linear-gradient(90deg, #ff4081, #f50057);
+    border: none;
+    border-radius: 6px;
     color: white;
-    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.challenge-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 15px rgba(255, 64, 129, 0.4);
+}
+
+/* Battle Interface */
+.battle-interface {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: #1a0b2e;
+    color: white;
+    overflow: hidden;
+}
+
+.battle-hud {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.health-bar-container {
+    width: 300px;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 5px 0;
+}
+
+.health-bar-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.health-bar-fill.player {
+    background: #4caf50;
+    box-shadow: 0 0 10px #4caf50;
+}
+
+.health-bar-fill.boss {
+    background: #f44336;
+    box-shadow: 0 0 10px #f44336;
+}
+
+.health-label {
+    font-weight: bold;
+    font-size: 18px;
+    text-transform: uppercase;
+}
+
+.hp-text {
+    font-size: 12px;
+    text-align: right;
+    color: #b39ddb;
+}
+
+.vs-badge {
+    font-size: 32px;
+    font-weight: bold;
+    color: #ffca28;
+    font-family: var(--font-headings, 'NorseBold', sans-serif);
+}
+
+.battle-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: radial-gradient(circle at center, #2d1b4e 0%, #1a0b2e 70%);
+}
+
+.boss-sprite {
+    transition: transform 0.1s;
+}
+
+.boss-avatar-large {
+    font-size: 150px;
+    color: rgba(255, 255, 255, 0.1);
+    text-shadow: 0 0 50px rgba(244, 67, 54, 0.3);
+}
+
+.battle-controls {
+    padding: 30px;
+    background: rgba(0, 0, 0, 0.4);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.question-display h3 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 30px;
+    color: #e0e0e0;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.option-btn {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #e0e0e0;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+}
+
+.option-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #ff4081;
+    transform: translateY(-2px);
+}
+
+/* Animations */
+.shake {
+    animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+@keyframes shake {
+
+    10%,
+    90% {
+        transform: translate3d(-1px, 0, 0);
+    }
+
+    20%,
+    80% {
+        transform: translate3d(2px, 0, 0);
+    }
+
+    30%,
+    50%,
+    70% {
+        transform: translate3d(-4px, 0, 0);
+    }
+
+    40%,
+    60% {
+        transform: translate3d(4px, 0, 0);
+    }
+}
+
+.damage-flash {
+    animation: flash 0.2s;
+}
+
+@keyframes flash {
+
+    0%,
+    100% {
+        filter: brightness(1);
+    }
+
+    50% {
+        filter: brightness(3) sepia(1) hue-rotate(-50deg) saturate(5);
+    }
+}
+
+.battle-result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+}
+
+.battle-result.victory h1 {
+    color: #4caf50;
+    font-size: 64px;
+}
+
+.battle-result.defeat h1 {
+    color: #f44336;
+    font-size: 64px;
+}
+
+.battle-stats {
+    font-size: 24px;
+    margin: 20px 0;
     text-align: center;
 }
 
-.arena-form input:focus {
-    border-color: #e74c3c;
-    outline: none;
-}
-
-.fight-btn {
-    width: 100%;
-    padding: 1.5rem;
-    background: #e74c3c;
-    color: white;
-    font-family: var(--font-headings);
-    font-size: 1.5rem;
+.return-btn {
+    margin-top: 30px;
+    padding: 15px 40px;
+    font-size: 18px;
+    background: white;
+    color: black;
     border: none;
+    border-radius: 30px;
     cursor: pointer;
-    margin-top: 1rem;
-}
-
-.fight-btn:hover {
-    background: #fff;
-    color: #e74c3c;
-}
-
-.cancel-fight {
-    background: transparent;
-    border: none;
-    color: #777;
-    margin-top: 1rem;
-    cursor: pointer;
+    font-weight: bold;
 }

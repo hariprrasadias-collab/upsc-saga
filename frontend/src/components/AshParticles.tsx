@@ -28,7 +28,7 @@ const AshParticles: React.FC<AshParticlesProps> = ({ isRageMode }) => {
         size: `${Math.random() * 3 + 2}px`,
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     setParticles(newParticles);
   }, []);
 

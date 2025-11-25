@@ -1,6 +1,6 @@
-// /frontend/src/components/DashboardMain.tsx
 import React from 'react';
 import './DashboardMain.css';
+import PomodoroTimer from './PomodoroTimer/PomodoroTimer';
 import type { UserStats } from '../App';
 import ChallengeCard from './DashboardMain/ChallengeCard';
 import RevisionWidget from './DashboardMain/RevisionWidget';
@@ -10,50 +10,38 @@ interface DashboardMainProps {
   stats: UserStats;
 }
 
-const DashboardMain: React.FC<DashboardMainProps> = ({
-  stats
-}) => {
+const DashboardMain: React.FC<DashboardMainProps> = ({ stats }) => {
   const { analytics } = useAnalytics();
 
-  // Use real-time analytics data if available, otherwise fall back to initial stats
   const currentLevel = analytics?.level ?? stats.level;
   const currentXP = analytics?.xp ?? stats.current_xp;
   const maxXP = analytics?.max_xp ?? stats.max_xp;
-
-  // Calculate progress percentage safely
-  const progressPercent = maxXP > 0
-    ? (currentXP / maxXP) * 100
-    : 0;
+  const progressPercent = maxXP > 0 ? (currentXP / maxXP) * 100 : 0;
 
   return (
     <div className="dashboard-main">
       <div className="dashboard-header">
         <h1 className="header-title">CHARACTER</h1>
-        <div className="runes-decoration"></div>
+        <div className="runes-decoration" />
       </div>
 
       <div className="dashboard-content">
-        {/* Left Column */}
         <div className="dashboard-column-left">
           <ChallengeCard />
           <RevisionWidget />
         </div>
 
-        {/* Center Stats Panel (Technically Middle Column) */}
         <div className="stats-panel-left">
-          <div className="stat-level">
-            <h3>LEVEL {currentLevel}</h3>
-          </div>
+          <div className="stat-level"><h3>LEVEL {currentLevel}</h3></div>
           <div className="stat-row">
             <div className="stat-label">PROGRESS</div>
             <div className="stat-bar-container">
               <div className="stat-bar-bg">
-                <div className="stat-bar-fill" style={{ width: `${progressPercent}%` }}></div>
+                <div className="stat-bar-fill" style={{ width: `${progressPercent}%` }} />
               </div>
             </div>
           </div>
           <div className="xp-text">XP: {currentXP} / {maxXP}</div>
-
           <div className="stats-list">
             <div className="stat-item strength">
               <img src="/stat_strength.png" alt="Strength" className="stat-icon" />
@@ -90,10 +78,11 @@ const DashboardMain: React.FC<DashboardMainProps> = ({
           </div>
         </div>
 
-        {/* Center Panel - Character & Circular Progress */}
         <div className="center-panel">
+          {/* Pomodoro timer positioned above character head */}
+          <div className="pomodoro-above-head"><PomodoroTimer /></div>
           <div className="character-section">
-            <div className="character-art"></div>
+            <div className="character-art" />
             <div className="progress-circle-container">
               <svg className="progress-circle" viewBox="0 0 200 200">
                 <defs>
@@ -103,20 +92,14 @@ const DashboardMain: React.FC<DashboardMainProps> = ({
                     <stop offset="100%" stopColor="#5fb3e8" />
                   </linearGradient>
                 </defs>
-                <circle cx="100" cy="100" r="90" className="circle-bg"></circle>
-                <circle
-                  cx="100"
-                  cy="100"
-                  r="90"
-                  className="circle-fill"
-                  style={{ strokeDasharray: `${(progressPercent / 100) * 565} 565` }}
-                ></circle>
+                <circle cx="100" cy="100" r="90" className="circle-bg" />
+                <circle cx="100" cy="100" r="90" className="circle-fill"
+                  style={{ strokeDasharray: `${(progressPercent / 100) * 565} 565` }} />
                 <text x="100" y="110" className="progress-text">{Math.round(progressPercent)}%</text>
               </svg>
             </div>
             <h2 className="character-title">UPSC ASPIRANT</h2>
           </div>
-
           <div className="boons-curses">
             <div className="boons-section">
               <h3>ACTIVE BOONS</h3>

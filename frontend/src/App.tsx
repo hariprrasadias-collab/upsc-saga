@@ -19,7 +19,6 @@ import AshParticles from './components/AshParticles';
 import SpartanRage from './components/SpartanRage/SpartanRage';
 import YggdrasilTree from './components/Yggdrasil/Yggdrasil';
 import LoreTablets from './components/LoreTablets/LoreTablets';
-import BossArena from './components/BossArena/BossArena';
 import PYQDatabase from './components/PYQ/PYQDatabase';
 import QuizSession from './components/PYQ/QuizSession';
 import QuizResults from './components/PYQ/QuizResults';
@@ -37,6 +36,9 @@ import MimirChat from './components/Mimir/MimirChat';
 import FlashcardsManager from './components/Flashcards/FlashcardsManager';
 import AnalyticsDashboard from './components/Analytics/AnalyticsDashboard';
 import AnswerWorkbench from './components/Scribe/AnswerWorkbench';
+import BossArena from './components/BossArena/BossArena';
+import PomodoroTimer from './components/PomodoroTimer/PomodoroTimer';
+import TimeBoxing from './components/TimeBoxing/TimeBoxing';
 
 // --- UTILS ---
 import { audioManager } from './util/AudioManager';
@@ -76,7 +78,7 @@ export interface UserStats {
 function App() {
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [todayTasks, setTodayTasks] = useState<Task[]>([]);
-  const [ankiDueCount, setAnkiDueCount] = useState<number>(0);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -160,7 +162,6 @@ function App() {
         setTodayTasks(tasksWithBooleanCompletion);
       }
 
-      setAnkiDueCount(data.anki_due);
 
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -234,7 +235,7 @@ function App() {
             <SyllabusTracker onTaskCompleted={handleTaskCompleted} />
           )}
           {currentTab === 'quests' && (
-            <QuestsPage />
+            <QuestsPage onTaskCompleted={handleTaskCompleted} />
           )}
           {currentTab === 'codex' && (
             <YggdrasilTree />
@@ -244,9 +245,6 @@ function App() {
           )}
           {currentTab === 'pyq-archives' && (
             <PYQDatabase />
-          )}
-          {currentTab === 'boss' && (
-            <BossArena onBattleComplete={handleTaskCompleted} />
           )}
           {currentTab === 'armory' && (
             <Armory />
@@ -286,11 +284,19 @@ function App() {
           {currentTab === 'scribe' && (
             <AnswerWorkbench />
           )}
+          {currentTab === 'arena' && (
+            <BossArena onBattleComplete={handleTaskCompleted} />
+          )}
 
           {/* Quiz Mode Routes */}
           <Routes>
+            <Route path="/" element={null} />
             <Route path="/pyq-quiz/:sessionId" element={<QuizSession />} />
             <Route path="/pyq-quiz-results/:sessionId" element={<QuizResults />} />
+            <Route path="/analytics" element={<AnalyticsDashboard />} />
+            <Route path="/workbench" element={<AnswerWorkbench />} />
+            <Route path="/boss-arena" element={<BossArena onBattleComplete={handleTaskCompleted} />} />
+            <Route path="/timebox" element={<TimeBoxing />} />
           </Routes>
         </main>
 
@@ -310,6 +316,9 @@ function App() {
 
         {/* Floating Mimir - Always visible */}
         <MimirChat mode="floating" />
+
+        {/* Pomodoro Timer - Global productivity tool */}
+        <PomodoroTimer onSessionComplete={handleTaskCompleted} />
 
         {showLevelUp && userStats && (
           <LevelUpModal

@@ -26,7 +26,7 @@ const SpartanRage: React.FC<SpartanRageProps> = ({ onToggleRage }) => {
         if (!isActive) return;
 
         if (timeLeft === 0) {
-            // eslint-disable-next-line react-hooks/exhaustive-deps
+             
             setIsActive(false);
             onToggleRage(false);
         }

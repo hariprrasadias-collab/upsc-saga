@@ -1,0 +1,92 @@
+/* Burnout Alert Banner */
+
+.burnout-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.15) 0%, rgba(192, 57, 43, 0.1) 100%);
+    border: 2px solid #e74c3c;
+    border-left: 6px solid #e74c3c;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    animation: slideDown 0.3s ease-out;
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.alert-content {
+    flex: 1;
+}
+
+.alert-title {
+    color: #e74c3c;
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin: 0 0 1rem 0;
+}
+
+.alert-recommendations {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.alert-recommendations strong {
+    color: #ecf0f1;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.alert-recommendations ul {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: #ecf0f1;
+}
+
+.alert-recommendations li {
+    margin: 0.5rem 0;
+    line-height: 1.5;
+}
+
+.alert-stats {
+    color: #95a5a6;
+    font-size: 0.9rem;
+}
+
+.alert-dismiss {
+    background: none;
+    border: none;
+    color: #e74c3c;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    border-radius: 50%;
+}
+
+.alert-dismiss:hover {
+    background: rgba(231, 76, 60, 0.2);
+    transform: rotate(90deg);
+}

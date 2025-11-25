@@ -1,0 +1,146 @@
+/* Knowledge Graph Styles */
+
+.knowledge-graph {
+    background: rgba(22, 27, 34, 0.9);
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
+.graph-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.graph-header h2 {
+    color: #d4a574;
+    margin: 0;
+    font-size: 1.5rem;
+    font-family: 'NorseBold', serif;
+}
+
+.subject-filter {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.subject-filter button {
+    padding: 0.4rem 1rem;
+    background: #2c3e50;
+    border: 1px solid #34495e;
+    color: #ecf0f1;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+}
+
+.subject-filter button:hover {
+    background: #34495e;
+    border-color: #d4a574;
+}
+
+.subject-filter button.active {
+    background: #d4a574;
+    border-color: #d4a574;
+    color: #161b22;
+    font-weight: bold;
+}
+
+.graph-legend {
+
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background: rgba(30, 41, 59, 0.5);
+    border-radius: 6px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #7d8590;
+    font-size: 0.85rem;
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid #d4a574;
+}
+
+.graph-svg {
+    flex: 1;
+    background: #0d1117;
+    border-radius: 8px;
+    border: 1px solid #21262d;
+}
+
+.graph-node {
+    cursor: grab;
+    transition: opacity 0.2s;
+}
+
+.graph-node:hover {
+    opacity: 0.8;
+    stroke-width: 3px !important;
+}
+
+.graph-node:active {
+    cursor: grabbing;
+}
+
+.graph-edge {
+    opacity: 0.6;
+}
+
+.graph-label {
+    font-family: 'NorseBold', sans-serif;
+    user-select: none;
+}
+
+.graph-loading {
+    text-align: center;
+    padding: 3rem;
+    color: #7d8590;
+    font-size: 1.1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .knowledge-graph {
+        height: 500px;
+    }
+
+    .graph-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .subject-filter {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .knowledge-graph {
+        height: 400px;
+    }
+
+    .graph-legend {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
