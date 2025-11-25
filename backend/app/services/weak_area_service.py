@@ -111,21 +111,11 @@ class WeakAreaAnalyzer:
         
         questions = conn.execute(f'''
             SELECT id, question_text, subject, topic
-            FROM mock_questions
+            FROM questions_master
             WHERE topic IN ({placeholders})
             ORDER BY RANDOM()
             LIMIT ?
         ''', (*topic_list, num_questions)).fetchall()
-        
-        # Fallback to test_questions if no mock_questions found
-        if not questions:
-            questions = conn.execute(f'''
-                SELECT id, question_text, subject, topic
-                FROM test_questions
-                WHERE topic IN ({placeholders})
-                ORDER BY RANDOM()
-                LIMIT ?
-            ''', (*topic_list, num_questions)).fetchall()
         
         if not questions:
             return None
@@ -174,7 +164,7 @@ class WeakAreaAnalyzer:
         
         # Get question details to update weak area analysis
         question = conn.execute('''
-            SELECT subject, topic FROM mock_questions WHERE id = ?
+            SELECT subject, topic FROM questions_master WHERE id = ?
         ''', (question_id,)).fetchone()
         
         # Get user_id from practice set

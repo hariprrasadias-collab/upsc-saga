@@ -1,5 +1,6 @@
 // Sidebar with Expandable Groups
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -16,11 +17,18 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab }) => {
     admin: false
   });
 
+  const navigate = useNavigate();
+
   const toggleGroup = (group: string) => {
     setExpandedGroups(prev => ({
       ...prev,
       [group]: !prev[group]
     }));
+  };
+
+  const handleTabChange = (tabId: string) => {
+    setCurrentTab(tabId);
+    navigate('/');
   };
 
   const menuGroups = {
@@ -79,7 +87,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab }) => {
       {/* Dashboard - Always visible */}
       <div
         className={`menu-item ${currentTab === 'dashboard' ? 'active' : ''}`}
-        onClick={() => setCurrentTab('dashboard')}
+        onClick={() => handleTabChange('dashboard')}
       >
         <span className="icon">🏠</span>
         <span className="label">Dashboard</span>
@@ -88,7 +96,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab }) => {
       {/* Analytics - Standalone */}
       <div
         className={`menu-item ${currentTab === 'analytics' ? 'active' : ''}`}
-        onClick={() => setCurrentTab('analytics')}
+        onClick={() => handleTabChange('analytics')}
       >
         <span className="icon">📊</span>
         <span className="label">Analytics</span>
@@ -97,7 +105,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab }) => {
       {/* Weak Areas - Standalone */}
       <div
         className={`menu-item ${currentTab === 'weak-areas' ? 'active' : ''}`}
-        onClick={() => setCurrentTab('weak-areas')}
+        onClick={() => handleTabChange('weak-areas')}
       >
         <span className="icon">🎯</span>
         <span className="label">Weak Areas</span>
@@ -117,7 +125,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab }) => {
                 <div
                   key={item.id}
                   className={`menu-item sub-item ${currentTab === item.id ? 'active' : ''}`}
-                  onClick={() => setCurrentTab(item.id)}
+                  onClick={() => handleTabChange(item.id)}
                 >
                   <span className="icon">{item.icon}</span>
                   <span className="label">{item.label}</span>

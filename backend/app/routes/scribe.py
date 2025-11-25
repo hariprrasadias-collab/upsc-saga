@@ -12,30 +12,35 @@ def evaluate_answer():
         user_id = 1  # TODO: Get from session
         question_text = data.get('question')
         answer_text = data.get('answer')
-        question_id = data.get('question_id')  # Optional
-
+        
         if not question_text or not answer_text:
             return jsonify({'error': 'Question and Answer are required'}), 400
 
         # Call AI Service
         evaluation_json_str = mimir_service.evaluate_answer(question_text, answer_text)
         
-        # Parse JSON
+        # Parse JSON (Handle Markdown formatting)
         try:
-            evaluation_data = json.loads(evaluation_json_str)
+            clean_json_str = evaluation_json_str
+            if "```json" in clean_json_str:
+                clean_json_str = clean_json_str.split("```json")[1].split("```")[0].strip()
+            elif "```" in clean_json_str:
+                clean_json_str = clean_json_str.split("```")[1].split("```")[0].strip()
+                
+            evaluation_data = json.loads(clean_json_str)
             score = evaluation_data.get('score', 0)
-        except json.JSONDecodeError:
+        except Exception as e:
             # Fallback if AI returns bad JSON
-            print(f"Failed to parse AI response: {evaluation_json_str}")
+            print(f"Failed to parse AI response: {evaluation_json_str} Error: {e}")
             return jsonify({'error': 'Failed to generate valid evaluation', 'raw_response': evaluation_json_str}), 500
 
         # Save to Database
         conn = get_db()
         cursor = conn.cursor()
         cursor.execute('''
-            INSERT INTO answer_evaluations (user_id, question_id, question_text, answer_text, score, feedback_json)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', (user_id, question_id, question_text, answer_text, score, evaluation_json_str))
+            INSERT INTO scribe_evaluations (user_id, question_text, answer_text, score, feedback_json)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (user_id, question_text, answer_text, score, json.dumps(evaluation_data)))
         conn.commit()
         
         new_id = cursor.lastrowid
@@ -57,7 +62,7 @@ def get_history():
         conn = get_db()
         rows = conn.execute('''
             SELECT id, question_text, score, created_at 
-            FROM answer_evaluations
+            FROM scribe_evaluations
             WHERE user_id = ?
             ORDER BY created_at DESC
         ''', (user_id,)).fetchall()

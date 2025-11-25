@@ -1,0 +1,59 @@
+/* Pomodoro Timer in Header */
+.pomodoro-header-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+/* Minimized timer in header - compact display */
+.pomodoro-header-center .pomodoro-minimized {
+    position: static;
+    bottom: auto;
+    right: auto;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.pomodoro-header-center .pomodoro-minimized .pomodoro-icon {
+    font-size: 1.2rem;
+}
+
+.pomodoro-header-center .pomodoro-minimized .pomodoro-time {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Maximized timer - appears as centered modal overlay */
+.pomodoro-header-center .pomodoro-widget {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 400px;
+    padding: 2rem;
+    z-index: 9999;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Overlay backdrop when timer is maximized */
+.pomodoro-header-center .pomodoro-widget::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: -1;
+    backdrop-filter: blur(4px);
+}

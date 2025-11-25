@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import './DashboardMain.css';
 import PomodoroTimer from './PomodoroTimer/PomodoroTimer';
 import type { UserStats } from '../App';
@@ -22,7 +22,6 @@ const DashboardMain: React.FC<DashboardMainProps> = ({ stats }) => {
     <div className="dashboard-main">
       <div className="dashboard-header">
         <h1 className="header-title">CHARACTER</h1>
-        <div className="pomodoro-header-center"><PomodoroTimer /></div>
         <div className="runes-decoration" />
       </div>
 
@@ -80,6 +79,8 @@ const DashboardMain: React.FC<DashboardMainProps> = ({ stats }) => {
         </div>
 
         <div className="center-panel">
+          {/* Pomodoro timer positioned above character head */}
+          <div className="pomodoro-above-head"><PomodoroTimer /></div>
           <div className="character-section">
             <div className="character-art" />
             <div className="progress-circle-container">

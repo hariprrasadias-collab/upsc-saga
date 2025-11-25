@@ -11,17 +11,17 @@ def migrate():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
-    print("Creating essay_submissions table...")
+    print("Creating scribe_evaluations table...")
     try:
         cursor.execute('''
-            CREATE TABLE IF NOT EXISTS essay_submissions (
+            CREATE TABLE IF NOT EXISTS scribe_evaluations (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
-                topic TEXT NOT NULL,
-                content TEXT NOT NULL,
-                evaluation_json TEXT,
+                question_text TEXT NOT NULL,
+                answer_text TEXT NOT NULL,
                 score REAL,
-                submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                feedback_json TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
         print("Table created successfully.")

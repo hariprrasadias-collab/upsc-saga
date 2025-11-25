@@ -1,6 +1,7 @@
 // /frontend/src/components/BossArena/BossArena.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import './BossArena.css';
+import BattleInterface from './BattleInterface';
 
 interface Battle {
     id: string;
@@ -11,7 +12,7 @@ interface Battle {
     my_score: number;
     is_victory: boolean;
     date_fought: string;
-    type: 'Mock Test' | 'Answer Writing';
+    type: 'Mock Test' | 'Answer Writing' | 'Boss Fight';
 }
 
 // Props to notify App to refresh XP stats
@@ -23,6 +24,7 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
     const [battles, setBattles] = useState<Battle[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [activeBattleBoss, setActiveBattleBoss] = useState<{ id: number, name: string, hp: number } | null>(null);
 
     // Form State
     const [bossName, setBossName] = useState('');
@@ -80,11 +82,44 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
         }
     };
 
+    const startBossBattle = (bossId: number, bossName: string, hp: number) => {
+        setActiveBattleBoss({ id: bossId, boss_name: bossName, total_hp: hp, image_url: '' } as any);
+    };
+
+    const handleBattleEnd = () => {
+        setActiveBattleBoss(null);
+        fetchBattles();
+        onBattleComplete();
+    };
+
+    if (activeBattleBoss) {
+        return <BattleInterface boss={activeBattleBoss as any} onBattleEnd={handleBattleEnd} />;
+    }
+
     return (
         <div className="arena-container">
             <h1 className="arena-header">The Proving Grounds</h1>
 
+            <div className="arena-bosses-grid">
+                <div className="boss-card-entry" onClick={() => startBossBattle(1, "Vision Test 1", 5)}>
+                    <h3>Vision Test 1</h3>
+                    <p>HP: 5 | Reward: 100 XP</p>
+                    <button className="fight-btn-small">FIGHT</button>
+                </div>
+                <div className="boss-card-entry" onClick={() => startBossBattle(2, "Mains Answer Writing", 8)}>
+                    <h3>Mains Answer Writing</h3>
+                    <p>HP: 8 | Reward: 200 XP</p>
+                    <button className="fight-btn-small">FIGHT</button>
+                </div>
+                <div className="boss-card-entry" onClick={() => startBossBattle(3, "CSAT Demon", 10)}>
+                    <h3>CSAT Demon</h3>
+                    <p>HP: 10 | Reward: 500 XP</p>
+                    <button className="fight-btn-small">FIGHT</button>
+                </div>
+            </div>
+
             <div className="battle-list">
+                <h2>Battle History</h2>
                 {loading ? (
                     <div style={{ textAlign: 'center' }}>Summoning opponents...</div>
                 ) : battles.length === 0 ? (
@@ -110,14 +145,14 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
             </div>
 
             <button className="challenge-btn" onClick={() => setShowModal(true)}>
-                CHALLENGE A BOSS (Manual Entry)
+                LOG MANUAL BATTLE
             </button>
 
             {/* BATTLE MODAL */}
             {showModal && (
                 <div className="arena-modal-overlay">
                     <div className="arena-modal">
-                        <h2>ENTER THE ARENA</h2>
+                        <h2>LOG PAST BATTLE</h2>
                         <form className="arena-form" onSubmit={handleFight}>
                             <input
                                 type="text"
@@ -161,8 +196,8 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
                                 required
                             />
 
-                            <button type="submit" className="fight-btn">STRIKE!</button>
-                            <button type="button" className="cancel-fight" onClick={() => setShowModal(false)}>Flee</button>
+                            <button type="submit" className="fight-btn">RECORD</button>
+                            <button type="button" className="cancel-fight" onClick={() => setShowModal(false)}>Cancel</button>
                         </form>
                     </div>
                 </div>

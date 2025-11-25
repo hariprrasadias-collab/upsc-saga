@@ -25,8 +25,10 @@ const Ravens: React.FC = () => {
     const [articles, setArticles] = useState<Article[]>([]);
     const [loading, setLoading] = useState(false);
     const [processing, setProcessing] = useState(false);
+    const [processingStatus, setProcessingStatus] = useState<string>('');
     const [selectedPaper, setSelectedPaper] = useState<string>('');
     const [selectedSubject, setSelectedSubject] = useState<string>('');
+    const [selectedSource, setSelectedSource] = useState<string>('All Sources');
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [showBookmarked, setShowBookmarked] = useState<boolean>(false);
     const [editingNotes, setEditingNotes] = useState<number | null>(null);
@@ -37,7 +39,7 @@ const Ravens: React.FC = () => {
 
     useEffect(() => {
         fetchArticles();
-    }, [selectedPaper, selectedSubject, showBookmarked, searchQuery]);
+    }, [selectedPaper, selectedSubject, selectedSource, showBookmarked, searchQuery]);
 
     const fetchArticles = async () => {
         setLoading(true);
@@ -45,6 +47,7 @@ const Ravens: React.FC = () => {
             const params = new URLSearchParams();
             if (selectedPaper && selectedPaper !== 'All Papers') params.append('paper', selectedPaper);
             if (selectedSubject && selectedSubject !== 'All Subjects') params.append('subject', selectedSubject);
+            if (selectedSource && selectedSource !== 'All Sources') params.append('source', selectedSource);
             if (showBookmarked) params.append('bookmarked', 'true');
             if (searchQuery) params.append('search', searchQuery);
 
@@ -62,6 +65,7 @@ const Ravens: React.FC = () => {
 
     const fetchAndProcessLatest = async () => {
         setProcessing(true);
+        setProcessingStatus('Scouting for news...');
         audioManager.play('click');
 
         try {
@@ -72,11 +76,11 @@ const Ravens: React.FC = () => {
             const huginNews = await huginRes.json();
             const allNews = [...muninNews, ...huginNews];
 
-            console.log(`Processing ${allNews.length} articles with Gemini AI...`);
+            setProcessingStatus(`Found ${allNews.length} articles. Processing...`);
 
             for (let i = 0; i < allNews.length; i++) {
                 const article = allNews[i];
-                console.log(`Processing ${i + 1}/${allNews.length}: ${article.title}`);
+                setProcessingStatus(`Processing ${i + 1}/${allNews.length}: ${article.title.substring(0, 30)}...`);
 
                 await fetch('http://localhost:5000/api/ravens/process', {
                     method: 'POST',
@@ -87,14 +91,16 @@ const Ravens: React.FC = () => {
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
 
-            console.log('All articles processed and saved!');
+            setProcessingStatus('All articles processed!');
             audioManager.play('success');
             await fetchArticles();
         } catch (err) {
             console.error("Failed to fetch and process:", err);
+            setProcessingStatus('Error processing articles.');
             audioManager.play('click');
         } finally {
             setProcessing(false);
+            setProcessingStatus('');
         }
     };
 
@@ -179,6 +185,18 @@ const Ravens: React.FC = () => {
                 <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)}>
                     {subjects.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
+                <select
+                    value={selectedSource}
+                    onChange={(e) => setSelectedSource(e.target.value)}
+                    className="source-select"
+                >
+                    <option value="All Sources">All Sources</option>
+                    <option value="The Hindu">The Hindu</option>
+                    <option value="Indian Express">Indian Express</option>
+                    <option value="PIB">PIB</option>
+                    <option value="LiveMint">LiveMint</option>
+                    <option value="Project Syndicate">Project Syndicate</option>
+                </select>
                 <button
                     className={`bookmark-filter ${showBookmarked ? 'active' : ''}`}
                     onClick={() => setShowBookmarked(!showBookmarked)}
@@ -186,6 +204,13 @@ const Ravens: React.FC = () => {
                     {showBookmarked ? '⭐ Showing Bookmarked' : '☆ All Articles'}
                 </button>
             </div>
+
+            {processing && (
+                <div className="processing-indicator">
+                    <div className="spinner"></div>
+                    <p>{processingStatus}</p>
+                </div>
+            )}
 
             {loading ? (
                 <div className="loading">Loading articles...</div>

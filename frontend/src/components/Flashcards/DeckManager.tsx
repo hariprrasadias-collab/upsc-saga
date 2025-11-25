@@ -60,6 +60,7 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onStartReview }) => {
     };
 
     const [showAddCard, setShowAddCard] = useState<number | null>(null);
+    const [viewDeckId, setViewDeckId] = useState<number | null>(null);
     const [cardFront, setCardFront] = useState('');
     const [cardBack, setCardBack] = useState('');
     const [showCsvImport, setShowCsvImport] = useState<number | null>(null);
@@ -224,6 +225,18 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onStartReview }) => {
                             <span className="subject-badge" style={{ backgroundColor: deck.color }}>
                                 {deck.subject}
                             </span>
+                            <button
+                                className="delete-deck-btn"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (window.confirm('Delete this deck and all its cards?')) {
+                                        fetch(`http://localhost:5000/api/flashcards/decks/${deck.id}`, { method: 'DELETE' })
+                                            .then(() => fetchDecks());
+                                    }
+                                }}
+                            >
+                                🗑️
+                            </button>
                         </div>
                         <p className="deck-description">{deck.description || 'No description'}</p>
                         <div className="deck-stats">
@@ -248,9 +261,95 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onStartReview }) => {
                             >
                                 📥 Import CSV
                             </button>
+                            <button
+                                onClick={() => setViewDeckId(deck.id)}
+                                className="view-cards-btn"
+                            >
+                                👁️ View
+                            </button>
                         </div>
                     </div>
                 ))}
+            </div>
+
+            {viewDeckId && (
+                <DeckCardList
+                    deckId={viewDeckId}
+                    onClose={() => setViewDeckId(null)}
+                    onUpdate={() => fetchDecks()}
+                />
+            )}
+        </div>
+    );
+};
+
+interface DeckCardListProps {
+    deckId: number;
+    onClose: () => void;
+    onUpdate: () => void;
+}
+
+const DeckCardList: React.FC<DeckCardListProps> = ({ deckId, onClose, onUpdate }) => {
+    const [cards, setCards] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetch(`http://localhost:5000/api/flashcards/decks/${deckId}`)
+            .then(res => res.json())
+            .then(data => {
+                setCards(data.cards);
+                setLoading(false);
+            })
+            .catch(err => console.error(err));
+    }, [deckId]);
+
+    const handleDeleteCard = async (cardId: number) => {
+        if (!window.confirm('Delete this card?')) return;
+        try {
+            await fetch(`http://localhost:5000/api/flashcards/${cardId}`, { method: 'DELETE' });
+            setCards(prev => prev.filter(c => c.id !== cardId));
+            onUpdate();
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    return (
+        <div className="modal-overlay">
+            <div className="modal-content card-list-modal" style={{ maxWidth: '800px', width: '90%' }}>
+                <div className="modal-header">
+                    <h3>Deck Cards</h3>
+                    <button onClick={onClose} className="close-btn">×</button>
+                </div>
+                <div className="cards-list-container" style={{ maxHeight: '60vh', overflowY: 'auto', marginTop: '1rem' }}>
+                    {loading ? <div>Loading cards...</div> : cards.length === 0 ? <div>No cards in this deck.</div> : (
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '1px solid #444' }}>
+                                    <th style={{ padding: '10px', textAlign: 'left' }}>Front</th>
+                                    <th style={{ padding: '10px', textAlign: 'left' }}>Back</th>
+                                    <th style={{ padding: '10px' }}>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {cards.map(card => (
+                                    <tr key={card.id} style={{ borderBottom: '1px solid #333' }}>
+                                        <td style={{ padding: '10px' }}>{card.front}</td>
+                                        <td style={{ padding: '10px' }}>{card.back}</td>
+                                        <td style={{ padding: '10px', textAlign: 'center' }}>
+                                            <button
+                                                onClick={() => handleDeleteCard(card.id)}
+                                                style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                                            >
+                                                🗑️
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
             </div>
         </div>
     );

@@ -1,10 +1,11 @@
 // frontend/src/App.tsx
 import { useState, useEffect, useCallback } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import './index.css';
 import './App.css';
 import './animations.css';
 import { AnalyticsProvider } from './contexts/AnalyticsContext';
+import { PomodoroProvider } from './contexts/PomodoroContext';
 
 // --- COMPONENT IMPORTS ---
 import Sidebar from './components/Sidebar';
@@ -78,6 +79,7 @@ export interface UserStats {
 function App() {
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [todayTasks, setTodayTasks] = useState<Task[]>([]);
+  const location = useLocation();
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -197,137 +199,146 @@ function App() {
 
   return (
     <AnalyticsProvider>
-      <div className="app-container" style={{
-        backgroundImage: `url(/assets/bg_main.jpg)`,
-        backgroundSize: 'cover',
-        minHeight: '100vh',
-        position: 'relative'
-      }}>
-
-        {/* BACKGROUND PARTICLES (Z-Index 0) */}
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
-          <AshParticles isRageMode={isRageMode} />
-        </div>
-
-        {/* LEFT SIDEBAR */}
-        <Sidebar
-          currentTab={currentTab}
-          setCurrentTab={setCurrentTab}
-        />
-
-        {/* MAIN CONTENT AREA (Middle Column - Z-Index 10) */}
-        <main className="content" style={{
-          backgroundImage: currentTab === 'dashboard' ? `url(/assets/bg_sidebar.png)` : undefined,
+      <PomodoroProvider onSessionComplete={handleTaskCompleted}>
+        <div className="app-container" style={{
+          backgroundImage: `url(/assets/bg_main.jpg)`,
           backgroundSize: 'cover',
           minHeight: '100vh',
-          zIndex: 10,
           position: 'relative'
         }}>
-          {currentTab === 'dashboard' && (
-            <DashboardMain
-              stats={userStats!}
+
+          {/* BACKGROUND PARTICLES (Z-Index 0) */}
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
+            <AshParticles isRageMode={isRageMode} />
+          </div>
+
+          {/* LEFT SIDEBAR */}
+          <Sidebar
+            currentTab={currentTab}
+            setCurrentTab={setCurrentTab}
+          />
+
+          {/* MAIN CONTENT AREA (Middle Column - Z-Index 10) */}
+          <main className="content" style={{
+            backgroundImage: currentTab === 'dashboard' ? `url(/assets/bg_sidebar.png)` : undefined,
+            backgroundSize: 'cover',
+            minHeight: '100vh',
+            zIndex: 10,
+            position: 'relative'
+          }}>
+            {/* Only render Tab Content if we are on the root path */}
+            {location.pathname === '/' && (
+              <>
+                {currentTab === 'dashboard' && (
+                  <DashboardMain
+                    stats={userStats!}
+                  />
+                )}
+                {currentTab === 'war-map' && (
+                  <WarMapContainer onTaskCompleted={handleTaskCompleted} />
+                )}
+                {currentTab === 'syllabus' && (
+                  <SyllabusTracker onTaskCompleted={handleTaskCompleted} />
+                )}
+                {currentTab === 'quests' && (
+                  <QuestsPage onTaskCompleted={handleTaskCompleted} />
+                )}
+                {currentTab === 'codex' && (
+                  <YggdrasilTree />
+                )}
+                {currentTab === 'lore' && (
+                  <LoreTablets />
+                )}
+                {currentTab === 'pyq' && (
+                  <PYQDatabase />
+                )}
+                {currentTab === 'armory' && (
+                  <Armory />
+                )}
+                {currentTab === 'dojo' && (
+                  <AnkiDojo />
+                )}
+                {currentTab === 'seer' && (
+                  <Seer />
+                )}
+                {currentTab === 'ravens' && (
+                  <Ravens />
+                )}
+                {currentTab === 'answer-writing' && (
+                  <AnswerWriting onTaskCompleted={handleTaskCompleted} />
+                )}
+                {currentTab === 'mock-tests' && (
+                  <MockTests onTaskCompleted={handleTaskCompleted} />
+                )}
+                {currentTab === 'essay' && (
+                  <EssayWorkshop onTaskCompleted={handleTaskCompleted} />
+                )}
+                {currentTab === 'csat' && <CSATModule />}
+                {currentTab === 'mimir' && <MimirChat />}
+                {currentTab === 'flashcards' && (
+                  <FlashcardsManager onTaskCompleted={handleTaskCompleted} />
+                )}
+                {currentTab === 'analytics' && (
+                  <AnalyticsDashboard />
+                )}
+                {currentTab === 'weak-areas' && (
+                  <WeakAreasDashboard />
+                )}
+                {currentTab === 'admin' && (
+                  <AdminDashboard />
+                )}
+                {currentTab === 'scribe' && (
+                  <AnswerWorkbench />
+                )}
+                {currentTab === 'arena' && (
+                  <BossArena onBattleComplete={handleTaskCompleted} />
+                )}
+              </>
+            )}
+
+            {/* Quiz Mode Routes */}
+            <Routes>
+              <Route path="/" element={null} />
+              <Route path="/pyq-quiz/:sessionId" element={<QuizSession />} />
+              <Route path="/pyq-quiz-results/:sessionId" element={<QuizResults />} />
+              <Route path="/analytics" element={<AnalyticsDashboard />} />
+              <Route path="/workbench" element={<AnswerWorkbench />} />
+              <Route path="/boss-arena" element={<BossArena onBattleComplete={handleTaskCompleted} />} />
+              <Route path="/timebox" element={<TimeBoxing />} />
+            </Routes>
+          </main>
+
+          {/* RITUALS PANEL (Right Column) */}
+          <div style={{ zIndex: 15, position: 'relative' }}>
+            <RitualsPanel
+              tasks={todayTasks}
+              onTaskComplete={handleTaskCompleted}
+              // FIX: When clicked, switch tab to War Map
+              onPlanRituals={() => setCurrentTab('war-map')}
+            />
+          </div>
+
+          {/* --- OVERLAYS & FLOATING ELEMENTS --- */}
+
+          <SpartanRage onToggleRage={setIsRageMode} />
+
+          {/* Floating Mimir - Always visible */}
+          <MimirChat mode="floating" />
+
+          {/* Pomodoro Timer - Global productivity tool (Hidden on Dashboard to avoid duplication) */}
+          {currentTab !== 'dashboard' && (
+            <PomodoroTimer />
+          )}
+
+          {showLevelUp && userStats && (
+            <LevelUpModal
+              newLevel={userStats.level}
+              onClose={() => setShowLevelUp(false)}
             />
           )}
-          {currentTab === 'war-map' && (
-            <WarMapContainer onTaskCompleted={handleTaskCompleted} />
-          )}
-          {currentTab === 'syllabus' && (
-            <SyllabusTracker onTaskCompleted={handleTaskCompleted} />
-          )}
-          {currentTab === 'quests' && (
-            <QuestsPage onTaskCompleted={handleTaskCompleted} />
-          )}
-          {currentTab === 'codex' && (
-            <YggdrasilTree />
-          )}
-          {currentTab === 'lore' && (
-            <LoreTablets />
-          )}
-          {currentTab === 'pyq-archives' && (
-            <PYQDatabase />
-          )}
-          {currentTab === 'armory' && (
-            <Armory />
-          )}
-          {currentTab === 'dojo' && (
-            <AnkiDojo />
-          )}
-          {currentTab === 'seer' && (
-            <Seer />
-          )}
-          {currentTab === 'ravens' && (
-            <Ravens />
-          )}
-          {currentTab === 'answer-writing' && (
-            <AnswerWriting onTaskCompleted={handleTaskCompleted} />
-          )}
-          {currentTab === 'mock-tests' && (
-            <MockTests onTaskCompleted={handleTaskCompleted} />
-          )}
-          {currentTab === 'essay' && (
-            <EssayWorkshop onTaskCompleted={handleTaskCompleted} />
-          )}
-          {currentTab === 'csat' && <CSATModule />}
-          {currentTab === 'mimir' && <MimirChat />}
-          {currentTab === 'flashcards' && (
-            <FlashcardsManager onTaskCompleted={handleTaskCompleted} />
-          )}
-          {currentTab === 'analytics' && (
-            <AnalyticsDashboard />
-          )}
-          {currentTab === 'weak-areas' && (
-            <WeakAreasDashboard />
-          )}
-          {currentTab === 'admin' && (
-            <AdminDashboard />
-          )}
-          {currentTab === 'scribe' && (
-            <AnswerWorkbench />
-          )}
-          {currentTab === 'arena' && (
-            <BossArena onBattleComplete={handleTaskCompleted} />
-          )}
 
-          {/* Quiz Mode Routes */}
-          <Routes>
-            <Route path="/" element={null} />
-            <Route path="/pyq-quiz/:sessionId" element={<QuizSession />} />
-            <Route path="/pyq-quiz-results/:sessionId" element={<QuizResults />} />
-            <Route path="/analytics" element={<AnalyticsDashboard />} />
-            <Route path="/workbench" element={<AnswerWorkbench />} />
-            <Route path="/boss-arena" element={<BossArena onBattleComplete={handleTaskCompleted} />} />
-            <Route path="/timebox" element={<TimeBoxing />} />
-          </Routes>
-        </main>
-
-        {/* RITUALS PANEL (Right Column) */}
-        <div style={{ zIndex: 15, position: 'relative' }}>
-          <RitualsPanel
-            tasks={todayTasks}
-            onTaskComplete={handleTaskCompleted}
-            // FIX: When clicked, switch tab to War Map
-            onPlanRituals={() => setCurrentTab('war-map')}
-          />
         </div>
-
-        {/* --- OVERLAYS & FLOATING ELEMENTS --- */}
-
-        <SpartanRage onToggleRage={setIsRageMode} />
-
-        {/* Floating Mimir - Always visible */}
-        <MimirChat mode="floating" />
-
-        {/* Pomodoro Timer - Global productivity tool */}
-        <PomodoroTimer onSessionComplete={handleTaskCompleted} />
-
-        {showLevelUp && userStats && (
-          <LevelUpModal
-            newLevel={userStats.level}
-            onClose={() => setShowLevelUp(false)}
-          />
-        )}
-
-      </div>
+      </PomodoroProvider>
     </AnalyticsProvider>
   );
 }

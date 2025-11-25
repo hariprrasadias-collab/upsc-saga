@@ -32,6 +32,12 @@ def init_current_affairs_table():
     ''')
     conn.commit()
 
+def article_exists(link):
+    """Check if article with link already exists"""
+    conn = get_db()
+    cursor = conn.execute('SELECT id FROM current_affairs WHERE original_link = ?', (link,))
+    return cursor.fetchone() is not None
+
 def save_article(article_data):
     """Save a new article to database"""
     conn = get_db()

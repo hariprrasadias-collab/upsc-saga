@@ -49,7 +49,8 @@ def calculate_exam_readiness():
     
     # 4. Consistency (0-20 points): Study streak days
     c.execute("SELECT current_streak FROM user_stats WHERE user_id = 1")
-    streak = c.fetchone()['current_streak'] or 0
+    row = c.fetchone()
+    streak = row['current_streak'] if row else 0
     consistency_score = min((streak / 30.0) * 20, 20)
     
     conn.close()

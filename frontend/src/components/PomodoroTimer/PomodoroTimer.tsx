@@ -1,104 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './PomodoroTimer.css';
-
-type TimerMode = 'work' | 'shortBreak' | 'longBreak';
+import { usePomodoro } from '../../contexts/PomodoroContext';
 
 interface PomodoroTimerProps {
     onSessionComplete?: () => void;
+    className?: string; // Allow custom positioning classes
 }
 
-const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ onSessionComplete }) => {
-    const [mode, setMode] = useState<TimerMode>('work');
-    const [timeLeft, setTimeLeft] = useState(25 * 60); // 25 minutes
-    const [isRunning, setIsRunning] = useState(false);
-    const [sessionsCompleted, setSessionsCompleted] = useState(0);
-    const [isMinimized, setIsMinimized] = useState(false);
+const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ onSessionComplete, className }) => {
+    const {
+        mode,
+        timeLeft,
+        isRunning,
+        sessionsCompleted,
+        toggleTimer,
+        resetTimer,
+        switchMode,
+        setTimeLeft
+    } = usePomodoro();
 
-    const DURATIONS = {
-        work: 25 * 60,
-        shortBreak: 5 * 60,
-        longBreak: 15 * 60
-    };
-
-    useEffect(() => {
-        let interval: number | null = null;
-
-        if (isRunning && timeLeft > 0) {
-            interval = window.setInterval(() => {
-                setTimeLeft(prev => prev - 1);
-            }, 1000);
-        } else if (timeLeft === 0) {
-            handleTimerComplete();
-        }
-
-        return () => {
-            if (interval) clearInterval(interval);
-        };
-    }, [isRunning, timeLeft]);
-
-    const handleTimerComplete = async () => {
-        setIsRunning(false);
-
-        if (mode === 'work') {
-            const newSessions = sessionsCompleted + 1;
-            setSessionsCompleted(newSessions);
-
-            // Award XP for completed Pomodoro
-            try {
-                await fetch('http://localhost:5000/api/pomodoro/complete', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        duration: DURATIONS.work,
-                        timestamp: new Date().toISOString()
-                    })
-                });
-
-                if (onSessionComplete) onSessionComplete();
-            } catch (err) {
-                console.error('Failed to log Pomodoro:', err);
-            }
-
-            // Switch to break (long break every 4 sessions)
-            if (newSessions % 4 === 0) {
-                setMode('longBreak');
-                setTimeLeft(DURATIONS.longBreak);
-            } else {
-                setMode('shortBreak');
-                setTimeLeft(DURATIONS.shortBreak);
-            }
-        } else {
-            // Back to work after break
-            setMode('work');
-            setTimeLeft(DURATIONS.work);
-        }
-
-        // Notification
-        if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification('Pomodoro Timer', {
-                body: mode === 'work' ? 'Work session complete! Take a break.' : 'Break over! Back to work.',
-                icon: '/pomodoro-icon.png'
-            });
-        }
-    };
-
-    const toggleTimer = () => {
-        if (!isRunning && 'Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission();
-        }
-        setIsRunning(!isRunning);
-    };
-
-    const resetTimer = () => {
-        setIsRunning(false);
-        setTimeLeft(DURATIONS[mode]);
-    };
-
-    const switchMode = (newMode: TimerMode) => {
-        setMode(newMode);
-        setTimeLeft(DURATIONS[newMode]);
-        setIsRunning(false);
-    };
+    const [isMinimized, setIsMinimized] = useState(true);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editMinutes, setEditMinutes] = useState('25');
 
     const formatTime = (seconds: number): string => {
         const mins = Math.floor(seconds / 60);
@@ -107,12 +30,30 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ onSessionComplete }) => {
     };
 
     const getProgress = (): number => {
-        return ((DURATIONS[mode] - timeLeft) / DURATIONS[mode]) * 100;
+        // Approximate total duration based on mode for progress bar
+        // This might be inaccurate if custom time is set, but sufficient for visual
+        let total = 25 * 60;
+        if (mode === 'shortBreak') total = 5 * 60;
+        if (mode === 'longBreak') total = 15 * 60;
+
+        // If timeLeft is greater than default, use timeLeft as total
+        if (timeLeft > total) total = timeLeft;
+        if (total === 0) return 0;
+
+        return ((total - timeLeft) / total) * 100;
+    };
+
+    const handleEditSave = () => {
+        const mins = parseInt(editMinutes);
+        if (!isNaN(mins) && mins > 0) {
+            setTimeLeft(mins * 60);
+            setIsEditing(false);
+        }
     };
 
     if (isMinimized) {
         return (
-            <div className="pomodoro-minimized" onClick={() => setIsMinimized(false)}>
+            <div className={`pomodoro-minimized ${className || ''}`} onClick={() => setIsMinimized(false)}>
                 <span className="pomodoro-icon">🍅</span>
                 <span className="pomodoro-time">{formatTime(timeLeft)}</span>
             </div>
@@ -120,7 +61,7 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ onSessionComplete }) => {
     }
 
     return (
-        <div className="pomodoro-widget">
+        <div className={`pomodoro-widget ${className || ''}`}>
             <div className="pomodoro-header">
                 <h3>🍅 Pomodoro</h3>
                 <div className="pomodoro-controls">
@@ -139,13 +80,13 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ onSessionComplete }) => {
                     className={`mode-btn ${mode === 'shortBreak' ? 'active' : ''}`}
                     onClick={() => switchMode('shortBreak')}
                 >
-                    Short Break
+                    Short
                 </button>
                 <button
                     className={`mode-btn ${mode === 'longBreak' ? 'active' : ''}`}
                     onClick={() => switchMode('longBreak')}
                 >
-                    Long Break
+                    Long
                 </button>
             </div>
 
@@ -172,9 +113,41 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ onSessionComplete }) => {
                         strokeLinecap="round"
                     />
                 </svg>
-                <div className="timer-text">
-                    {formatTime(timeLeft)}
-                </div>
+
+                {isEditing ? (
+                    <div className="timer-edit-overlay">
+                        <input
+                            type="number"
+                            value={editMinutes}
+                            onChange={(e) => setEditMinutes(e.target.value)}
+                            className="timer-edit-input"
+                            min="1"
+                            max="120"
+                        />
+                        <div className="timer-edit-actions">
+                            <button onClick={handleEditSave} className="save-btn">✓</button>
+                            <button onClick={() => setIsEditing(false)} className="cancel-btn">✕</button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="timer-text-container">
+                        <div className="timer-text">
+                            {formatTime(timeLeft)}
+                        </div>
+                        {!isRunning && (
+                            <button
+                                className="edit-time-btn"
+                                onClick={() => {
+                                    setEditMinutes(Math.floor(timeLeft / 60).toString());
+                                    setIsEditing(true);
+                                }}
+                                title="Edit Timer"
+                            >
+                                ✎
+                            </button>
+                        )}
+                    </div>
+                )}
             </div>
 
             <div className="pomodoro-actions">
@@ -191,11 +164,11 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ onSessionComplete }) => {
 
             <div className="pomodoro-stats">
                 <div className="stat-item">
-                    <span className="stat-label">Sessions Today:</span>
+                    <span className="stat-label">Sessions:</span>
                     <span className="stat-value">{sessionsCompleted}</span>
                 </div>
                 <div className="stat-item">
-                    <span className="stat-label">XP Earned:</span>
+                    <span className="stat-label">XP:</span>
                     <span className="stat-value">+{sessionsCompleted * 50}</span>
                 </div>
             </div>

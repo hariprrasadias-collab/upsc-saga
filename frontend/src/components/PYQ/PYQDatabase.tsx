@@ -1,5 +1,6 @@
 // /frontend/src/components/PYQ/PYQDatabase.tsx
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './PYQDatabase.css';
 
 interface Question {
@@ -24,6 +25,7 @@ interface Analytics {
 }
 
 const PYQDatabase: React.FC = () => {
+    const navigate = useNavigate();
     const [questions, setQuestions] = useState<Question[]>([]);
     const [analytics, setAnalytics] = useState<Analytics | null>(null);
     const [loading, setLoading] = useState(true);
@@ -127,7 +129,7 @@ const PYQDatabase: React.FC = () => {
 
             const data = await res.json();
             if (res.ok) {
-                window.location.href = `/pyq-quiz/${data.session_id}`;
+                navigate(`/pyq-quiz/${data.session_id}`);
             } else {
                 alert(data.error || 'Failed to start quiz');
             }

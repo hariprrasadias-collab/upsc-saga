@@ -9,7 +9,8 @@ from app.db_models.current_affairs import (
     update_article_importance,
     toggle_bookmark,
     update_user_notes,
-    link_anki_card
+    link_anki_card,
+    article_exists
 )
 from app.services.upsc_summarizer import (
     summarize_for_upsc,
@@ -30,11 +31,13 @@ def call_the_ravens():
     feeds = {
         'munin': [
             'https://www.thehindu.com/news/national/feeder/default.rss',
-            'https://pib.gov.in/RSS/RssFeed.aspx?ModId=2'
+            'https://pib.gov.in/RSS/RssFeed.aspx?ModId=2',
+            'https://indianexpress.com/section/india/feed/'
         ],
         'hugin': [
             'https://www.thehindu.com/opinion/editorial/feeder/default.rss',
-            'https://www.project-syndicate.org/rss'
+            'https://www.project-syndicate.org/rss',
+            'https://www.livemint.com/rss/opinion'
         ]
     }
     
@@ -47,12 +50,16 @@ def call_the_ravens():
             for entry in feed.entries[:10]:
                 summary = entry.get('summary', '')[:200] + "..."
                 
+                # Check if already saved
+                is_saved = article_exists(entry.link)
+                
                 news_items.append({
                     "title": entry.title,
                     "link": entry.link,
                     "published": entry.get('published', 'Today'),
                     "source": feed.feed.get('title', 'Unknown Source'),
-                    "summary": summary
+                    "summary": summary,
+                    "isSaved": is_saved
                 })
         except Exception as e:
             print(f"Raven failed to fly to {url}: {e}")
@@ -70,6 +77,10 @@ def process_article():
     published = data.get('published')
     content = data.get('summary', '')
     
+    # Check for duplicates before processing
+    if article_exists(link):
+        return jsonify({'success': True, 'message': 'Article already exists', 'skipped': True})
+
     try:
         # Get AI summary and tags
         ai_result = summarize_for_upsc(title, content, link)
