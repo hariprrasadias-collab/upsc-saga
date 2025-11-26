@@ -50,6 +50,12 @@ def calculate_and_apply_rewards(user_id, base_xp, base_hs, tags=[]):
     level = user['level']
     max_xp = user['max_xp']
     
+    # Stats
+    strength = user['strength_stat']
+    intellect = user['runic_stat'] # Mapping runic to intellect for clarity if needed, or keeping as runic
+    vitality = user['vitality_stat']
+    luck = user['luck_stat']
+    
     leveled_up = False
     while current_xp >= max_xp:
         level += 1
@@ -57,12 +63,19 @@ def calculate_and_apply_rewards(user_id, base_xp, base_hs, tags=[]):
         max_xp = round(max_xp * 1.2) # XP curve gets harder
         leveled_up = True
         
+        # Increase Stats on Level Up
+        strength += 1
+        intellect += 1
+        vitality += 1
+        luck += 1
+        
     # 6. Save to DB
     cursor.execute('''
         UPDATE users 
-        SET current_xp = ?, level = ?, max_xp = ?, hacksilver = ? 
+        SET current_xp = ?, level = ?, max_xp = ?, hacksilver = ?,
+            strength_stat = ?, runic_stat = ?, vitality_stat = ?, luck_stat = ?
         WHERE id = ?
-    ''', (current_xp, level, max_xp, current_hs, user_id))
+    ''', (current_xp, level, max_xp, current_hs, strength, intellect, vitality, luck, user_id))
     
     conn.commit()
     

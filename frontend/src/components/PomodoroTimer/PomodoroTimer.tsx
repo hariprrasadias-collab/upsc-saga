@@ -91,25 +91,25 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ onSessionComplete, classN
             </div>
 
             <div className="pomodoro-timer-display">
-                <svg className="progress-ring" width="200" height="200">
+                <svg className="progress-ring" width="320" height="320">
                     <circle
-                        cx="100"
-                        cy="100"
-                        r="85"
+                        cx="160"
+                        cy="160"
+                        r="145"
                         fill="none"
                         stroke="#2c3e50"
-                        strokeWidth="8"
+                        strokeWidth="12"
                     />
                     <circle
-                        cx="100"
-                        cy="100"
-                        r="85"
+                        cx="160"
+                        cy="160"
+                        r="145"
                         fill="none"
                         stroke={mode === 'work' ? '#e74c3c' : '#2ecc71'}
-                        strokeWidth="8"
-                        strokeDasharray={`${2 * Math.PI * 85}`}
-                        strokeDashoffset={`${2 * Math.PI * 85 * (1 - getProgress() / 100)}`}
-                        transform="rotate(-90 100 100)"
+                        strokeWidth="12"
+                        strokeDasharray={`${2 * Math.PI * 145}`}
+                        strokeDashoffset={`${2 * Math.PI * 145 * (1 - getProgress() / 100)}`}
+                        transform="rotate(-90 160 160)"
                         strokeLinecap="round"
                     />
                 </svg>

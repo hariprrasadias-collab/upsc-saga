@@ -119,30 +119,53 @@ def identify_weak_areas(conn, user_id, limit=10):
     
     for topic in syllabus_weak:
         weak_areas.append({
-            'topic': f"{topic['subject']}: {topic['name']}",
+            'subject': topic['subject'],
+            'topic': f"{topic['name']}",
             'weakness_score': 80 if topic['status'] == 'Not Started' else 50,
             'source': 'Syllabus',
             'action': 'Start reading' if topic['status'] == 'Not Started' else 'Complete reading'
         })
     
-    # Check mock test subjects with low scores
+    # Check mock test subjects with low scores (get bottom performing ones)
     low_scores = conn.execute('''
         SELECT mt.subject, AVG(mta.score) as avg_score, COUNT(*) as attempts
         FROM mock_test_attempts mta
         JOIN mock_tests mt ON mta.test_id = mt.id
         WHERE mta.user_id = ?
         GROUP BY mt.subject
-        HAVING avg_score < 50
         ORDER BY avg_score ASC
         LIMIT ?
     ''', (user_id, limit)).fetchall()
     
     for subj in low_scores:
+        # Calculate trend for this subject
+        subject_scores = conn.execute('''
+            SELECT mta.score
+            FROM mock_test_attempts mta
+            JOIN mock_tests mt ON mta.test_id = mt.id
+            WHERE mta.user_id = ? AND mt.subject = ?
+            ORDER BY mta.submitted_at ASC
+        ''', (user_id, subj['subject'])).fetchall()
+        
+        scores_list = [s['score'] for s in subject_scores]
+        trend_val = calculate_improvement_rate(scores_list)
+        trend_direction = 'improving' if trend_val > 0 else 'declining' if trend_val < 0 else 'stable'
+        
+        # Get last 5 scores for sparkline
+        recent_scores = scores_list[-5:] if scores_list else []
+        last_attempt = subject_scores[-1]['submitted_at'] if subject_scores else None
+        
         weak_areas.append({
+            'subject': subj['subject'],
             'topic': f"{subj['subject']} (Mock Tests)",
             'weakness_score': max(0, 100 - subj['avg_score']),
             'source': 'Mock Tests',
-            'action': f"Practice more {subj['subject']} questions"
+            'action': f"Practice {subj['subject']} questions",
+            'trend': trend_direction,
+            'trend_value': abs(trend_val),
+            'impact': 'High' if subj['avg_score'] < 40 else 'Medium',
+            'recent_scores': recent_scores,
+            'last_attempt': last_attempt
         })
     
     # Sort by weakness score and limit

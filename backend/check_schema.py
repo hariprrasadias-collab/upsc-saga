@@ -1,19 +1,27 @@
 import sqlite3
 
-DB_PATH = 'd:/upsc-second-brain/backend/upsc_saga.db'
-
-def check_schema():
-    conn = sqlite3.connect(DB_PATH)
+def check_tables():
+    conn = sqlite3.connect('upsc_saga.db')
     cursor = conn.cursor()
-    
-    cursor.execute("PRAGMA table_info(questions_master)")
-    columns = cursor.fetchall()
-    
-    print("Columns in questions_master:")
-    for col in columns:
-        print(f"- {col[1]} ({col[2]})")
-            
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tables = cursor.fetchall()
+    print("Tables:")
+    for table in tables:
+        print(table[0])
+        
+    # Check mock_tests schema
+    print("\nmock_tests columns:")
+    cursor.execute("PRAGMA table_info(mock_tests)")
+    for col in cursor.fetchall():
+        print(col)
+
+    # Check syllabus_topics schema
+    print("\nsyllabus_topics columns:")
+    cursor.execute("PRAGMA table_info(syllabus_topics)")
+    for col in cursor.fetchall():
+        print(col)
+        
     conn.close()
 
 if __name__ == "__main__":
-    check_schema()
+    check_tables()

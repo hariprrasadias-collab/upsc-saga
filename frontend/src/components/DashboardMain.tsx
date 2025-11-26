@@ -22,7 +22,6 @@ const DashboardMain: React.FC<DashboardMainProps> = ({ stats }) => {
     <div className="dashboard-main">
       <div className="dashboard-header">
         <h1 className="header-title">CHARACTER</h1>
-        <div className="pomodoro-header-center"><PomodoroTimer /></div>
         <div className="runes-decoration" />
       </div>
 

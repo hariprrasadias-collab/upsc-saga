@@ -35,9 +35,13 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab }) => {
     planning: {
       title: '🗺️ Planning',
       items: [
+        { id: 'study-plan', label: 'Study Plan', icon: '📅' },
         { id: 'war-map', label: 'War Map', icon: '🗓️' },
         { id: 'syllabus', label: 'Syllabus', icon: '🧭' },
-        { id: 'quests', label: 'Quests', icon: '📜' }
+        { id: 'quests', label: 'Quests', icon: '📜' },
+        { id: 'revision-cards', label: 'Revision Cards', icon: '⚡' },
+        { id: 'mnemonics', label: 'Mnemonics', icon: '🧠' },
+        { id: 'mindmap', label: 'Mind Map', icon: '🕸️' }
       ]
     },
     training: {
@@ -60,6 +64,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab }) => {
         { id: 'seer', label: 'The Seer', icon: '🔮' },
         { id: 'ravens', label: 'The Ravens', icon: '🐦' },
         { id: 'pyq', label: 'The Archives', icon: '🏛️' },
+        { id: 'heatmap', label: 'PYQ Heatmap', icon: '📊' },
+        { id: 'model-answers', label: 'Model Answers', icon: '📝' },
         { id: 'codex', label: 'Yggdrasil', icon: '🌳' },
         { id: 'lore-tablets', label: 'Lore Tablets', icon: '📖' }
       ]
@@ -80,11 +86,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab }) => {
 
   return (
     <div className="sidebar">
-      <div className="sidebar-header">
-        <h2>UPSC SAGA</h2>
-      </div>
-
-      {/* Dashboard - Always visible */}
+      {/* Dashboard - Always Top */}
       <div
         className={`menu-item ${currentTab === 'dashboard' ? 'active' : ''}`}
         onClick={() => handleTabChange('dashboard')}

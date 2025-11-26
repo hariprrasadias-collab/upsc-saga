@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import './AnswerWriting.css';
 import { audioManager } from '../../util/AudioManager';
 import { useAnalytics } from '../../contexts/AnalyticsContext';
+import TemplateSelector from './TemplateSelector';
 
 interface Prompt {
     id: number;
@@ -167,6 +168,12 @@ const AnswerWriting: React.FC<AnswerWritingProps> = ({ onTaskCompleted }) => {
         }
     };
 
+    const handleTemplateSelect = (template: any) => {
+        // Insert template example into the editor
+        setAnswerText(template.example);
+        audioManager.play('success');
+    };
+
     const handleNewAttempt = () => {
         setAnswerText('');
         setWordCount(0);
@@ -281,6 +288,9 @@ const AnswerWriting: React.FC<AnswerWritingProps> = ({ onTaskCompleted }) => {
                             </span>
                         </div>
                     </div>
+
+                    {/* Template Selector */}
+                    <TemplateSelector onSelectTemplate={handleTemplateSelect} />
 
                     {/* Answer Editor */}
                     <div className="answer-editor">

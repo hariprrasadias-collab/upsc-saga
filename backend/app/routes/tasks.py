@@ -92,22 +92,19 @@ def log_study_session():
         xp_earned = int((minutes / 60) * 20)
         if xp_earned < 1: xp_earned = 1
         
+        # Use Game Engine to apply rewards (handles level up, stats, etc.)
+        rewards = calculate_and_apply_rewards(user_id, xp_earned, 0, ['study', 'focus'])
+        
         conn = get_db()
-        
-        # Update user stats (XP and study hours)
-        # Assuming users table has total_study_hours or similar? 
-        # If not, we'll just track XP for now.
-        # But user asked "how study hours are logged".
-        # Let's check schema. Assuming no specific column, we'll just add XP.
-        
-        # Award XP
-        conn.execute('UPDATE users SET current_xp = current_xp + ? WHERE id = ?', (xp_earned, user_id))
-        
         # Log activity
         conn.execute('''
             INSERT INTO activity_log (user_id, activity_type, description, xp_awarded)
             VALUES (?, 'study_session', ?, ?)
         ''', (user_id, f"Studied for {minutes} minutes", xp_earned))
+        
+        conn.commit()
+        
+        return jsonify({'success': True, 'xp_earned': xp_earned, 'rewards': rewards})
         
         conn.commit()
         

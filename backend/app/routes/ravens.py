@@ -195,15 +195,20 @@ def add_to_anki(article_id):
         return jsonify({'success': False, 'error': 'Article not found'}), 404
     
     try:
+        from app.services.upsc_summarizer import generate_flashcard_content
+        
+        # Generate Q&A
+        flashcard = generate_flashcard_content(article['title'], article['upscSummary'])
+        
         # Create Anki note
         note = {
             'deckName': 'Current Affairs',
             'modelName': 'Basic',
             'fields': {
-                'Front': f"{article['title']}\n\nTags: {', '.join(article['papers'])} | {', '.join(article['subjects'])}",
-                'Back': f"{article['upscSummary']}\n\n**Key Points:**\n" + '\n'.join(f"• {point}" for point in article['keyPoints'])
+                'Front': flashcard['question'],
+                'Back': f"{flashcard['answer']}\n\n**Source:** {article['source']}"
             },
-            'tags': article['subjects'] + article['papers']
+            'tags': article['subjects'] + article['papers'] + ['upsc_raven']
         }
         
         # Add note to Anki
@@ -214,7 +219,7 @@ def add_to_anki(article_id):
             link_anki_card(article_id, result)
             return jsonify({'success': True, 'ankiCardId': result})
         else:
-            return jsonify({'success': False, 'error': 'Failed to create Anki card'}), 500
+            return jsonify({'success': False, 'error': 'Failed to create Anki card. Is Anki running?'}), 500
             
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500

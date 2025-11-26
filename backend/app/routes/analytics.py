@@ -325,3 +325,39 @@ def get_progress_trend():
         return jsonify(trend_data)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# ==================== PERFORMANCE SCATTER ====================
+
+@analytics.route('/api/analytics/performance-scatter', methods=['GET'])
+def get_performance_scatter():
+    """Get speed vs accuracy data for scatter plot"""
+    try:
+        user_id = 1
+        conn = get_db()
+        
+        # Group by time spent (bucketed by 10 seconds)
+        # SQLite integer division automatically floors
+        data = conn.execute('''
+            SELECT 
+                (time_spent / 10) * 10 as time_bucket,
+                AVG(is_correct) * 100 as accuracy,
+                COUNT(*) as count
+            FROM pyq_quiz_answers
+            WHERE time_spent > 0 AND time_spent < 300  -- Filter outliers (> 5 mins)
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        ''').fetchall()
+        
+        scatter_data = [
+            {
+                'time_per_question': row['time_bucket'],
+                'accuracy': round(row['accuracy'], 1),
+                'count': row['count']
+            }
+            for row in data
+        ]
+        
+        return jsonify(scatter_data)
+    except Exception as e:
+        print(f"Performance scatter error: {e}")
+        return jsonify([]), 200

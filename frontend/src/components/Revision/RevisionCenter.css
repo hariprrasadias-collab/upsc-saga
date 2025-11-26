@@ -1,0 +1,165 @@
+.revision-center {
+    padding: 2rem;
+    max_width: 800px;
+    margin: 0 auto;
+    color: var(--text-primary);
+}
+
+.revision-header {
+    display: flex;
+    justify_content: space-between;
+    align_items: center;
+    margin-bottom: 2rem;
+}
+
+.due-count {
+    background: var(--accent-primary);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+.card-container {
+    perspective: 1000px;
+    margin-bottom: 2rem;
+}
+
+.revision-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card-type {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    opacity: 0.7;
+    letter-spacing: 1px;
+}
+
+.card-back {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+    width: 100%;
+    animation: fadeIn 0.3s ease;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    min-height: 80px;
+}
+
+.show-answer-btn {
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    padding: 1rem 3rem;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.show-answer-btn:hover {
+    transform: scale(1.05);
+}
+
+.rating-buttons {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+}
+
+.rate-btn {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s, filter 0.2s;
+    font-weight: bold;
+}
+
+.rate-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+.rate-btn.again {
+    background: #ef4444;
+    color: white;
+}
+
+.rate-btn.hard {
+    background: #f59e0b;
+    color: white;
+}
+
+.rate-btn.good {
+    background: #3b82f6;
+    color: white;
+}
+
+.rate-btn.easy {
+    background: #10b981;
+    color: white;
+}
+
+.interval-preview {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    margin-top: 0.3rem;
+    font-weight: normal;
+}
+
+.revision-center.empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    text-align: center;
+}
+
+.empty-content h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.refresh-btn {
+    margin-top: 2rem;
+    padding: 0.8rem 2rem;
+    background: transparent;
+    border: 1px solid var(--accent-primary);
+    color: var(--accent-primary);
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

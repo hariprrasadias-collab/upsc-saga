@@ -2,6 +2,7 @@
 from flask import Blueprint, jsonify, request
 from app.db import get_db
 import json
+import time as import_time
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -27,7 +28,8 @@ def get_admin_stats():
         users_count = conn.execute('SELECT COUNT(*) FROM users').fetchone()[0]
         
         # Count articles (Ravens)
-        articles_count = conn.execute('SELECT COUNT(*) FROM ravens_knowledge').fetchone()[0]
+        # Count articles (Ravens)
+        articles_count = conn.execute('SELECT COUNT(*) FROM current_affairs').fetchone()[0]
         
         # Recent activity (mock tests taken)
         recent_tests = conn.execute('''
@@ -197,11 +199,11 @@ def get_articles():
         offset = (page - 1) * per_page
         
         conn = get_db()
-        query = 'SELECT * FROM ravens_knowledge WHERE 1=1'
+        query = 'SELECT * FROM current_affairs WHERE 1=1'
         params = []
         
         if search:
-            query += ' AND (title LIKE ? OR content LIKE ? OR tags LIKE ?)'
+            query += ' AND (title LIKE ? OR upsc_summary LIKE ? OR subjects LIKE ?)'
             params.append(f'%{search}%')
             params.append(f'%{search}%')
             params.append(f'%{search}%')
@@ -211,13 +213,22 @@ def get_articles():
         total = conn.execute(count_query, params).fetchone()[0]
         
         # Get data
-        query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?'
+        query += ' ORDER BY fetch_date DESC LIMIT ? OFFSET ?'
         params.extend([per_page, offset])
         
         articles = conn.execute(query, params).fetchall()
         
+        articles_list = []
+        for a in articles:
+            d = dict(a)
+            # Map DB columns to frontend expected fields
+            d['tags'] = d.get('subjects', '')
+            d['category'] = d.get('papers', '')
+            # Clean up JSON strings for display if needed, but raw string is fine for now
+            articles_list.append(d)
+
         return jsonify({
-            'articles': [dict(a) for a in articles],
+            'articles': articles_list,
             'total': total,
             'page': page,
             'pages': (total + per_page - 1) // per_page
@@ -239,15 +250,28 @@ def add_article():
             return jsonify({'error': 'Title and content are required'}), 400
             
         conn = get_db()
+        # Map 'content' to 'upsc_summary' and 'original_summary'
+        # Map 'tags' to 'subjects'
+        # Map 'category' to 'papers'
+        
+        import json
+        subjects = json.dumps([data.get('tags', '')]) if data.get('tags') else '[]'
+        papers = json.dumps([data.get('category', 'General')])
+        
         cursor = conn.execute('''
-            INSERT INTO ravens_knowledge (title, content, tags, source, category)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO current_affairs (
+                title, upsc_summary, original_summary, subjects, source, papers, 
+                published_date, original_link
+            )
+            VALUES (?, ?, ?, ?, ?, ?, DATE('now'), ?)
         ''', (
             data['title'],
             data['content'],
-            data.get('tags', ''),
+            data['content'], # Use content for both summaries for manual entry
+            subjects,
             data.get('source', 'Manual'),
-            data.get('category', 'General')
+            papers,
+            'manual-entry-' + str(int(import_time.time())) # Dummy link
         ))
         
         conn.commit()
@@ -268,18 +292,31 @@ def update_article(id):
         
         fields = []
         params = []
-        allowed = ['title', 'content', 'tags', 'source', 'category']
         
-        for field in allowed:
-            if field in data:
-                fields.append(f'{field} = ?')
-                params.append(data[field])
-                
+        if 'title' in data:
+            fields.append('title = ?')
+            params.append(data['title'])
+            
+        if 'content' in data:
+            fields.append('upsc_summary = ?')
+            fields.append('original_summary = ?')
+            params.append(data['content'])
+            params.append(data['content'])
+            
+        if 'tags' in data:
+            import json
+            fields.append('subjects = ?')
+            params.append(json.dumps([data['tags']]))
+            
+        if 'source' in data:
+            fields.append('source = ?')
+            params.append(data['source'])
+            
         if not fields:
             return jsonify({'error': 'No fields to update'}), 400
             
         params.append(id)
-        query = f'UPDATE ravens_knowledge SET {", ".join(fields)} WHERE id = ?'
+        query = f'UPDATE current_affairs SET {", ".join(fields)} WHERE id = ?'
         
         conn.execute(query, params)
         conn.commit()
@@ -297,7 +334,7 @@ def delete_article(id):
             return jsonify({'error': 'Unauthorized'}), 403
             
         conn = get_db()
-        conn.execute('DELETE FROM ravens_knowledge WHERE id = ?', (id,))
+        conn.execute('DELETE FROM current_affairs WHERE id = ?', (id,))
         conn.commit()
         
         return jsonify({'success': True})

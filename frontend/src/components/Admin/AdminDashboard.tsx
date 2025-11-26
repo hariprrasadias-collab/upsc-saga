@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './AdminDashboard.css';
 import { useToast } from '../Toast';
 import ArticleEditor from './ArticleEditor';
+import QuestionEditor from './QuestionEditor';
 
 interface Question {
     id: number;
@@ -35,6 +36,7 @@ const AdminDashboard: React.FC = () => {
     const [questions, setQuestions] = useState<Question[]>([]);
     const [articles, setArticles] = useState<Article[]>([]);
     const [showArticleEditor, setShowArticleEditor] = useState(false);
+    const [showQuestionEditor, setShowQuestionEditor] = useState(false);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const { addToast } = useToast();
@@ -187,7 +189,7 @@ const AdminDashboard: React.FC = () => {
                     <div className="questions-panel animate-slide-in-up">
                         <div className="panel-header">
                             <h1>Question Bank</h1>
-                            <button className="add-btn">+ Add Question</button>
+                            <button className="add-btn" onClick={() => setShowQuestionEditor(true)}>+ Add Question</button>
                         </div>
 
                         <div className="questions-table-container">
@@ -321,6 +323,16 @@ const AdminDashboard: React.FC = () => {
                 <ArticleEditor
                     onClose={() => setShowArticleEditor(false)}
                     onSave={handleArticleSaved}
+                />
+            )}
+            {showQuestionEditor && (
+                <QuestionEditor
+                    onClose={() => setShowQuestionEditor(false)}
+                    onSave={() => {
+                        fetchQuestions(page);
+                        fetchStats();
+                        setShowQuestionEditor(false);
+                    }}
                 />
             )}
         </div>

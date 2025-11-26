@@ -1,7 +1,13 @@
-// frontend/src/components/Ravens/Ravens.tsx
 import React, { useState, useEffect } from 'react';
 import './Ravens.css';
 import { audioManager } from '../../util/AudioManager';
+import { useToast } from '../Toast';
+import IssueMappingViewer from '../IssueMapping/IssueMappingViewer';
+
+type RelatedPyq = {
+    year: string;
+    question: string;
+};
 
 interface Article {
     id?: number;
@@ -18,7 +24,7 @@ interface Article {
     isBookmarked?: boolean;
     userNotes?: string;
     imageUrl?: string;
-    relatedPyqs?: any[];
+    relatedPyqs?: RelatedPyq[];
 }
 
 const Ravens: React.FC = () => {
@@ -32,6 +38,8 @@ const Ravens: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [showBookmarked, setShowBookmarked] = useState<boolean>(false);
     const [editingNotes, setEditingNotes] = useState<number | null>(null);
+    const [mappingArticleId, setMappingArticleId] = useState<number | null>(null);
+    const { addToast } = useToast();
 
     const papers = ['All Papers', 'GS1', 'GS2', 'GS3', 'GS4'];
     const subjects = ['All Subjects', 'Polity & Governance', 'Economics', 'International Relations',
@@ -58,6 +66,7 @@ const Ravens: React.FC = () => {
             }
         } catch (err) {
             console.error("Error fetching articles:", err);
+            addToast('Failed to fetch articles', 'error');
         } finally {
             setLoading(false);
         }
@@ -98,9 +107,35 @@ const Ravens: React.FC = () => {
             console.error("Failed to fetch and process:", err);
             setProcessingStatus('Error processing articles.');
             audioManager.play('click');
+            addToast('Error processing articles', 'error');
         } finally {
             setProcessing(false);
             setProcessingStatus('');
+        }
+    };
+
+    const handleAddToLore = async (article: Article) => {
+        try {
+            const content = `Source: ${article.source}\nPublished: ${article.published}\nLink: ${article.link}\n\nSummary:\n${article.upscSummary}\n\nKey Points:\n${article.keyPoints?.map(p => `- ${p}`).join('\n')}`;
+
+            const res = await fetch('http://localhost:5000/api/lore', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: article.title,
+                    content: content
+                })
+            });
+
+            if (res.ok) {
+                addToast('Added to Lore Tablet', 'success');
+                audioManager.play('success');
+            } else {
+                addToast('Failed to add to Lore', 'error');
+            }
+        } catch (err) {
+            console.error("Failed to add to Lore:", err);
+            addToast('Error adding to Lore', 'error');
         }
     };
 
@@ -108,9 +143,11 @@ const Ravens: React.FC = () => {
         try {
             await fetch(`http://localhost:5000/api/ravens/${id}/to-anki`, { method: 'POST' });
             audioManager.play('success');
+            addToast('Added to Anki', 'success');
             fetchArticles();
         } catch (err) {
             console.error("Failed to add to Anki:", err);
+            addToast('Failed to add to Anki', 'error');
         }
     };
 
@@ -146,8 +183,10 @@ const Ravens: React.FC = () => {
                 body: JSON.stringify({ notes })
             });
             setEditingNotes(null);
+            addToast('Notes saved', 'success');
         } catch (err) {
             console.error("Failed to save notes:", err);
+            addToast('Failed to save notes', 'error');
         }
     };
 
@@ -303,6 +342,23 @@ const Ravens: React.FC = () => {
                                     <option value={2}>⭐⭐ Medium</option>
                                     <option value={3}>⭐⭐⭐ High</option>
                                 </select>
+                                {article.id && (
+                                    <button
+                                        className="mapping-btn"
+                                        onClick={() => setMappingArticleId(prev => prev === article.id ? null : (article.id ?? null))}
+                                    >
+                                        {mappingArticleId === article.id ? 'Hide Mapping' : 'Show Mapping'}
+                                    </button>
+                                )}
+
+                                <button
+                                    className="action-btn lore-btn"
+                                    onClick={() => handleAddToLore(article)}
+                                    title="Save to Lore Tablet"
+                                >
+                                    📜 Add to Lore
+                                </button>
+
                                 {article.ankiCardId ? (
                                     <button disabled>✅ In Anki</button>
                                 ) : (
@@ -314,6 +370,9 @@ const Ravens: React.FC = () => {
                         </div>
                     ))}
                 </div>
+            )}
+            {mappingArticleId && (
+                <IssueMappingViewer articleId={mappingArticleId} />
             )}
         </div>
     );

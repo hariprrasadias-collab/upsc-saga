@@ -325,32 +325,6 @@
 }
 
 .actions button {
-    background: #667eea;
-    color: white;
-    border: none;
-}
-
-.actions button:hover:not(:disabled) {
-    background: #5568d3;
-}
-
-.actions button:disabled {
-    background: #2ecc71;
-    cursor: not-allowed;
-}
-
-/* Loading & Empty */
-.loading,
-.empty {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: #999;
-}
-
-@media (max-width: 768px) {
-    .articles-grid {
-        grid-template-columns: 1fr;
-    }
 
     .filters-enhanced {
         flex-direction: column;

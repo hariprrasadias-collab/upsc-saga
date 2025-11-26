@@ -1,3 +1,4 @@
+from app import cgi_fix
 from flask import Flask
 from flask_cors import CORS
 
@@ -14,7 +15,9 @@ def create_app():
         dashboard, tasks, quests, battles, shop, codex, lore, mimir, 
         seer, ravens, anki, warmap, answer_writing, mock_tests, pyq, 
         syllabus, flashcards, analytics, essay, csat, badges, challenges, 
-        shop_new, weak_areas, admin, predictive, pomodoro, timebox
+        shop_new, weak_areas, admin, predictive, pomodoro, timebox, planner, 
+        templates, revision, heatmap, model_answers, issue_mapping, scheduler,
+        mindmap
     )
     
     # Register blueprints
@@ -41,11 +44,19 @@ def create_app():
     app.register_blueprint(badges.badges_bp)
     app.register_blueprint(challenges.challenges_bp)
     app.register_blueprint(shop_new.shop_bp_new)
-    app.register_blueprint(weak_areas.weak_areas_bp)
+    app.register_blueprint(weak_areas.bp)
     app.register_blueprint(admin.admin_bp)
     app.register_blueprint(predictive.predictive_bp)
     app.register_blueprint(pomodoro.pomodoro_bp)
     app.register_blueprint(timebox.timebox_bp)
+    app.register_blueprint(planner.bp)
+    app.register_blueprint(scheduler.bp)
+    app.register_blueprint(templates.bp)
+    app.register_blueprint(revision.bp)
+    app.register_blueprint(heatmap.bp)
+    app.register_blueprint(model_answers.bp)
+    app.register_blueprint(issue_mapping.bp)
+    app.register_blueprint(mindmap.bp)
 
     from app.routes.scribe import scribe_bp
     app.register_blueprint(scribe_bp, url_prefix='/api/scribe')

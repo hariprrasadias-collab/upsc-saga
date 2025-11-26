@@ -3,19 +3,28 @@ import React, { useState, useEffect } from 'react';
 import './Analytics.css';
 import './BurnoutAlert.css';
 import {
-    LineChart, Line, BarChart, Bar, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+    LineChart, Line, BarChart, Bar,
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 
 import { useAnalytics } from '../../contexts/AnalyticsContext';
+import OracleDashboard from './OracleDashboard';
+import SubjectRadar from './SubjectRadar';
+import PerformanceScatter from './PerformanceScatter';
+import FocusAreasPanel from './FocusAreasPanel';
 
-const AnalyticsDashboard: React.FC = () => {
+interface AnalyticsDashboardProps {
+    onNavigate?: (tab: string) => void;
+}
+
+const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ onNavigate }) => {
     const { analytics: overview, loading: contextLoading } = useAnalytics();
+    // ... existing state ...
     const [timeframe, setTimeframe] = useState<'7d' | '30d' | 'all'>('30d');
-    // const [overview, setOverview] = useState<any>(null); // Removed local state
     const [subjectData, setSubjectData] = useState<any[]>([]);
     const [mockTrends, setMockTrends] = useState<any>(null);
     const [weakAreas, setWeakAreas] = useState<any[]>([]);
+    const [performanceData, setPerformanceData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     // Predictive Analytics State
@@ -31,22 +40,25 @@ const AnalyticsDashboard: React.FC = () => {
             setLoading(true);
 
             // Fetch remaining analytics data in parallel
-            const [subjectRes, mockRes, weakRes, predictiveRes] = await Promise.all([
+            const [subjectRes, mockRes, weakRes, predictiveRes, perfRes] = await Promise.all([
                 fetch('http://localhost:5000/api/analytics/subject-wise'),
                 fetch('http://localhost:5000/api/analytics/mock-tests'),
                 fetch('http://localhost:5000/api/analytics/weak-areas?limit=5'),
-                fetch('http://localhost:5000/api/analytics/predictive/all')
+                fetch('http://localhost:5000/api/analytics/predictive/all'),
+                fetch('http://localhost:5000/api/analytics/performance-scatter')
             ]);
 
             const subjectData = await subjectRes.json();
             const mockData = await mockRes.json();
             const weakData = await weakRes.json();
             const predictiveAnalytics = await predictiveRes.json();
+            const perfData = await perfRes.json();
 
             setSubjectData(subjectData);
             setMockTrends(mockData);
             setWeakAreas(weakData);
             setPredictiveData(predictiveAnalytics);
+            setPerformanceData(perfData);
 
             // Show burnout alert if high risk
             if (predictiveAnalytics?.burnout_detection?.burnout_risk === 'high') {
@@ -60,7 +72,7 @@ const AnalyticsDashboard: React.FC = () => {
         }
     };
 
-    if (loading && !overview) return <div className="analytics-loading">Loading analytics...</div>;
+    if ((loading || contextLoading) && !overview) return <div className="analytics-loading">Loading analytics...</div>;
 
     return (
         <div className="analytics-dashboard">
@@ -152,98 +164,7 @@ const AnalyticsDashboard: React.FC = () => {
 
             {/* Predictive Analytics Section */}
             {predictiveData && (
-                <div className="predictive-analytics-section">
-                    <h2 className="section-title">🧠 Predictive Insights</h2>
-
-                    <div className="predictive-grid">
-                        {/* Exam Readiness Score */}
-                        <div className="predictive-card readiness-card">
-                            <h3>📊 Exam Readiness</h3>
-                            <div className="readiness-gauge">
-                                <svg width="200" height="200" viewBox="0 0 200 200">
-                                    <circle
-                                        cx="100"
-                                        cy="100"
-                                        r="80"
-                                        fill="none"
-                                        stroke="#333"
-                                        strokeWidth="15"
-                                    />
-                                    <circle
-                                        cx="100"
-                                        cy="100"
-                                        r="80"
-                                        fill="none"
-                                        stroke="#d4a574"
-                                        strokeWidth="15"
-                                        strokeDasharray={`${(predictiveData.exam_readiness?.overall_score || 0) * 5.03} 503`}
-                                        strokeLinecap="round"
-                                        transform="rotate(-90 100 100)"
-                                    />
-                                    <text x="100" y="100" textAnchor="middle" dy=".3em" fontSize="40" fill="#d4a574">
-                                        {predictiveData.exam_readiness?.overall_score || 0}%
-                                    </text>
-                                </svg>
-                            </div>
-                            <div className="readiness-breakdown">
-                                {predictiveData.exam_readiness?.breakdown && Object.entries(predictiveData.exam_readiness.breakdown).map(([key, value]: [string, any]) => (
-                                    <div key={key} className="breakdown-item">
-                                        <span>{key.replace('_', ' ')}</span>
-                                        <span className="breakdown-bar">
-                                            <div style={{ width: `${value * 4}%`, background: '#d4a574' }}></div>
-                                        </span>
-                                        <span>{value.toFixed(1)}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Success Probability */}
-                        <div className="predictive-card probability-card">
-                            <h3>🎯 Success Probability</h3>
-                            <div className="probability-meter">
-                                <div className="probability-value">
-                                    {predictiveData.success_probability?.probability || 0}%
-                                </div>
-                                <div className="probability-bar">
-                                    <div
-                                        className="probability-fill"
-                                        style={{ width: `${predictiveData.success_probability?.probability || 0}%` }}
-                                    ></div>
-                                </div>
-                                <div className="probability-info">
-                                    <span className={`confidence confidence-${predictiveData.success_probability?.confidence}`}>
-                                        {predictiveData.success_probability?.confidence} confidence
-                                    </span>
-                                    <span className={`trend trend-${predictiveData.success_probability?.trend}`}>
-                                        {predictiveData.success_probability?.trend}
-                                    </span>
-                                </div>
-                                <p className="probability-message">{predictiveData.success_probability?.message}</p>
-                            </div>
-                        </div>
-
-                        {/* Optimal Study Time */}
-                        <div className="predictive-card study-time-card">
-                            <h3>⏰ Optimal Study Time</h3>
-                            {predictiveData.optimal_study_time?.peak_hours ? (
-                                <>
-                                    <div className="study-time-recommendation">
-                                        {predictiveData.optimal_study_time.recommendation}
-                                    </div>
-                                    <div className="peak-hours">
-                                        {predictiveData.optimal_study_time.formatted_times?.map((time: string, i: number) => (
-                                            <div key={i} className="peak-hour-badge">{time}</div>
-                                        ))}
-                                    </div>
-                                    <p className="study-time-suggestion">{predictiveData.optimal_study_time.suggestion}</p>
-                                </>
-                            ) : (
-                                <p className="no-data">{predictiveData.optimal_study_time?.message || 'Not enough data'}</p>
-                            )}
-                        </div>
-                    </div>
-                </div>
+                <OracleDashboard data={predictiveData} />
             )}
 
             {/* Subject-Wise Performance */}
@@ -251,21 +172,10 @@ const AnalyticsDashboard: React.FC = () => {
             {/* Charts Grid */}
             <div className="charts-grid">
                 {/* Subject Performance Radar */}
-                <div className="chart-container radar-container">
-                    <h3>Subject Performance</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <RadarChart data={subjectData}>
-                            <PolarGrid />
-                            <PolarAngleAxis dataKey="subject" />
-                            <PolarRadiusAxis angle={90} domain={[0, 100]} />
-                            <Radar name="Mock Avg" dataKey="mock_avg" stroke="#3498db" fill="#3498db" fillOpacity={0.6} />
-                            <Radar name="Answer Avg" dataKey="answer_avg" stroke="#2ecc71" fill="#2ecc71" fillOpacity={0.6} />
-                            <Radar name="Syllabus %" dataKey="syllabus_pct" stroke="#9b59b6" fill="#9b59b6" fillOpacity={0.6} />
-                            <Tooltip />
-                            <Legend />
-                        </RadarChart>
-                    </ResponsiveContainer>
-                </div>
+                <SubjectRadar data={subjectData} />
+
+                {/* Performance Scatter Plot */}
+                <PerformanceScatter data={performanceData} />
 
                 {/* Mock Test Trends */}
                 {mockTrends && mockTrends.trends && (
@@ -307,28 +217,7 @@ const AnalyticsDashboard: React.FC = () => {
                 )}
 
                 {/* Weak Areas Panel */}
-                <div className="weak-areas-panel">
-                    <h3>🎯 Focus Areas</h3>
-                    {weakAreas.length > 0 ? (
-                        <div className="weak-areas-list">
-                            {weakAreas.map((area, idx) => (
-                                <div key={idx} className="weak-area-item">
-                                    <div className="severity-indicator" style={{
-                                        background: area.weakness_score > 70 ? '#e74c3c' :
-                                            area.weakness_score > 40 ? '#f39c12' : '#2ecc71'
-                                    }}></div>
-                                    <div className="weak-area-content">
-                                        <div className="weak-area-topic">{area.topic}</div>
-                                        <div className="weak-area-action">💡 {area.action}</div>
-                                        <div className="weak-area-source">Source: {area.source}</div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="no-weak-areas">🎉 Great job! No major weak areas identified.</div>
-                    )}
-                </div>
+                <FocusAreasPanel areas={weakAreas} onNavigate={onNavigate} />
             </div>
         </div>
     );

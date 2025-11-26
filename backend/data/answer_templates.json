@@ -1,0 +1,176 @@
+{
+    "templates": [
+        {
+            "id": "examine",
+            "name": "Examine",
+            "description": "For questions asking to examine/scrutinize a topic",
+            "structure": [
+                "Introduction (50 words): Define the concept briefly",
+                "Body (150 words):",
+                "  • Examine multiple dimensions/perspectives",
+                "  • Present facts and arguments",
+                "  • Use relevant examples/case studies",
+                "Conclusion (50 words): Balanced view and way forward"
+            ],
+            "wordCount": 250,
+            "tips": [
+                "Be objective and balanced",
+                "Examine both positive and negative aspects",
+                "Use data/statistics where possible",
+                "Connect to current affairs"
+            ],
+            "example": "Introduction: Define the concept\n\nBody:\n• Dimension 1: [Point with example]\n• Dimension 2: [Point with example]\n• Critical Analysis: [Strengths and limitations]\n\nConclusion: Summarize and suggest way forward"
+        },
+        {
+            "id": "analyze",
+            "name": "Analyze",
+            "description": "For analytical questions requiring deep examination",
+            "structure": [
+                "Introduction (40 words): Context and background",
+                "Body (180 words):",
+                "  • Break down into components",
+                "  • Examine causes and effects",
+                "  • Identify patterns/trends",
+                "  • Critical evaluation",
+                "Conclusion (30 words): Synthesis and implications"
+            ],
+            "wordCount": 250,
+            "tips": [
+                "Go beyond surface-level description",
+                "Show cause-effect relationships",
+                "Use analytical frameworks (SWOT, etc.)",
+                "Be logical and systematic"
+            ],
+            "example": "Introduction: Brief context\n\nAnalysis:\n• Causes: [List and explain]\n• Effects: [Short-term and long-term]\n• Stakeholders: [Who is affected and how]\n• Evaluation: [Pros and cons]\n\nConclusion: Overall assessment"
+        },
+        {
+            "id": "discuss",
+            "name": "Discuss",
+            "description": "For questions requiring debate-style presentation",
+            "structure": [
+                "Introduction (50 words): Present the issue",
+                "Body (150 words):",
+                "  • Arguments in favor (75 words)",
+                "  • Arguments against (75 words)",
+                "  • Cite examples for both sides",
+                "Conclusion (50 words): Your reasoned opinion/middle path"
+            ],
+            "wordCount": 250,
+            "tips": [
+                "Present both sides fairly",
+                "Use 'On one hand... On the other hand' structure",
+                "Avoid being one-sided",
+                "End with a balanced perspective"
+            ],
+            "example": "Introduction: State the debate\n\nArguments in Favor:\n• Point 1 with example\n• Point 2 with example\n\nArguments Against:\n• Counterpoint 1 with example\n• Counterpoint 2 with example\n\nConclusion: Balanced view considering both perspectives"
+        },
+        {
+            "id": "critically-examine",
+            "name": "Critically Examine",
+            "description": "For critical analysis questions",
+            "structure": [
+                "Introduction (40 words): Define and set context",
+                "Body (170 words):",
+                "  • Positive aspects (60 words)",
+                "  • Negative aspects/criticisms (60 words)",
+                "  • Gaps/limitations (50 words)",
+                "Conclusion (40 words): Critical assessment and suggestions"
+            ],
+            "wordCount": 250,
+            "tips": [
+                "Focus on limitations and gaps",
+                "Use critical thinking, not just description",
+                "Question assumptions",
+                "Suggest improvements"
+            ],
+            "example": "Introduction: Context\n\nPositive Aspects:\n• Achievement 1\n• Achievement 2\n\nCriticisms:\n• Limitation 1\n• Limitation 2\n\nGaps:\n• What's missing\n• What needs improvement\n\nConclusion: Overall critical assessment"
+        },
+        {
+            "id": "comment",
+            "name": "Comment",
+            "description": "For opinion-based questions",
+            "structure": [
+                "Introduction (50 words): Brief background",
+                "Body (150 words):",
+                "  • Your perspective/opinion",
+                "  • Justification with reasoning",
+                "  • Examples supporting your view",
+                "Conclusion (50 words): Reiterate your stance"
+            ],
+            "wordCount": 250,
+            "tips": [
+                "Take a clear position",
+                "Back opinion with logic and examples",
+                "Acknowledge other viewpoints briefly",
+                "Be assertive but not dogmatic"
+            ],
+            "example": "Introduction: Context of the issue\n\nMy Perspective:\n• Main argument\n• Supporting point 1 with example\n• Supporting point 2 with data\n• Addressing counter-arguments\n\nConclusion: Reaffirm position with final thought"
+        },
+        {
+            "id": "evaluate",
+            "name": "Evaluate",
+            "description": "For evaluative questions requiring judgment",
+            "structure": [
+                "Introduction (40 words): What is being evaluated",
+                "Body (170 words):",
+                "  • Criteria for evaluation",
+                "  • Strengths (70 words)",
+                "  • Weaknesses (70 words)",
+                "  • Overall assessment (30 words)",
+                "Conclusion (40 words): Final judgment and recommendations"
+            ],
+            "wordCount": 250,
+            "tips": [
+                "Set clear evaluation criteria",
+                "Weigh pros and cons systematically",
+                "Use evidence-based judgment",
+                "Provide constructive suggestions"
+            ],
+            "example": "Introduction: Subject of evaluation\n\nEvaluation Criteria: [List parameters]\n\nStrengths:\n• Point 1\n• Point 2\n\nWeaknesses:\n• Point 1\n• Point 2\n\nOverall Assessment: [Balanced judgment]\n\nConclusion: Final verdict and recommendations"
+        },
+        {
+            "id": "explain",
+            "name": "Explain",
+            "description": "For descriptive/explanatory questions",
+            "structure": [
+                "Introduction (40 words): What needs explaining",
+                "Body (180 words):",
+                "  • What it is (definition/description)",
+                "  • How it works (process/mechanism)",
+                "  • Why it matters (significance/implications)",
+                "  • Examples/case studies",
+                "Conclusion (30 words): Summary of key points"
+            ],
+            "wordCount": 250,
+            "tips": [
+                "Be clear and systematic",
+                "Use simple language",
+                "Break complex concepts into parts",
+                "Use diagrams if helpful (mention)"
+            ],
+            "example": "Introduction: Brief overview\n\nWhat: [Definition and scope]\n\nHow: [Process/mechanism]\n• Step 1\n• Step 2\n\nWhy: [Significance]\n• Impact 1\n• Impact 2\n\nExample: [Relevant case]\n\nConclusion: Summary"
+        },
+        {
+            "id": "enumerate",
+            "name": "Enumerate",
+            "description": "For listing-type questions",
+            "structure": [
+                "Introduction (30 words): Context",
+                "Body (190 words):",
+                "  • Point 1 with brief explanation (30 words)",
+                "  • Point 2 with brief explanation (30 words)",
+                "  • Point 3 with brief explanation (30 words)",
+                "  • Continue listing with examples",
+                "Conclusion (30 words): Significance of these points"
+            ],
+            "wordCount": 250,
+            "tips": [
+                "Organize points logically",
+                "Don't just list - explain each point",
+                "Use subheadings for clarity",
+                "Prioritize important points"
+            ],
+            "example": "Introduction: Context\n\nKey Points:\n\n1. Point 1\n   • Explanation\n   • Example\n\n2. Point 2\n   • Explanation\n   • Example\n\n3. Point 3\n   • Explanation\n   • Example\n\nConclusion: Overall significance"
+        }
+    ]
+}

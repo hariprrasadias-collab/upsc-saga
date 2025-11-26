@@ -103,8 +103,37 @@ class WeakAreaAnalyzer:
         ''', (user_id,)).fetchall()
         
         if not weak_topics:
-            return None
-        
+            # Fallback: Generate random practice set from all topics
+            questions = conn.execute(f'''
+                SELECT id, question_text, subject, topic
+                FROM questions_master
+                ORDER BY RANDOM()
+                LIMIT ?
+            ''', (num_questions,)).fetchall()
+            
+            if not questions:
+                return None
+                
+            question_ids = [str(q['id']) for q in questions]
+            focus_topics = "General Practice (Random)"
+            
+            cursor = conn.execute('''
+                INSERT INTO targeted_practice_sets
+                (user_id, set_name, focus_topics, question_ids, total_questions)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (user_id, "General Practice Set", 
+                  focus_topics, json.dumps(question_ids), len(questions)))
+            
+            conn.commit()
+            
+            return {
+                'practice_set_id': cursor.lastrowid,
+                'set_name': "General Practice Set",
+                'focus_topics': focus_topics,
+                'questions': [dict(q) for q in questions],
+                'total_questions': len(questions)
+            }
+
         # Get questions from these topics
         topic_list = [wt['topic'] for wt in weak_topics]
         placeholders = ','.join('?' * len(topic_list))

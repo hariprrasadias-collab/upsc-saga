@@ -1,0 +1,209 @@
+.mindmap-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    color: var(--text-primary);
+}
+
+.mindmap-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.mindmap-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(45deg, var(--accent-primary), #a855f7);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.mindmap-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.topic-input {
+    padding: 1rem;
+    width: 400px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.generate-btn {
+    padding: 0 2rem;
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.generate-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+.generate-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.mindmap-canvas {
+    min-height: 600px;
+    position: relative;
+}
+
+.canvas-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+}
+
+.save-btn {
+    padding: 0.5rem 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--accent-primary);
+    color: var(--accent-primary);
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.empty-state,
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 400px;
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    color: var(--text-secondary);
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--bg-secondary);
+    border-top: 4px solid var(--accent-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.error-message {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+/* Saved Maps Sidebar Styles */
+.mindmap-content-wrapper {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.saved-maps-sidebar {
+    width: 250px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem;
+    flex-shrink: 0;
+    max-height: 700px;
+    overflow-y: auto;
+}
+
+.saved-maps-sidebar h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    color: var(--accent-primary);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+.saved-maps-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.saved-maps-list li {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background 0.2s;
+    border-radius: 6px;
+}
+
+.saved-maps-list li:last-child {
+    border-bottom: none;
+}
+
+.saved-maps-list li:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.map-title {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.map-date {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.mindmap-main {
+    flex-grow: 1;
+    min-width: 0;
+    /* Prevent flex overflow */
+}
+
+.toggle-saved-btn {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid var(--accent-primary);
+    color: var(--accent-primary);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.toggle-saved-btn:hover {
+    background: var(--accent-primary);
+    color: white;
+}
+
+.no-maps {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 1rem 0;
+    font-style: italic;
+}

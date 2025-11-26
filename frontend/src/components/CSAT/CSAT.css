@@ -41,25 +41,6 @@
     display: flex;
     gap: 1rem;
     margin-bottom: 2rem;
-    background: #1e293b;
-    padding: 1rem;
-    border-radius: 8px;
-    border: 1px solid #334155;
-}
-
-.filters select {
-    background: #0f172a;
-    border: 1px solid #334155;
-    color: #e2e8f0;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    min-width: 200px;
-}
-
-.start-btn {
-    background: #f59e0b;
-    color: #0f172a;
-    border: none;
     padding: 0.5rem 1.5rem;
     border-radius: 6px;
     font-weight: 600;

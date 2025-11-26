@@ -40,6 +40,14 @@ import AnswerWorkbench from './components/Scribe/AnswerWorkbench';
 import BossArena from './components/BossArena/BossArena';
 import PomodoroTimer from './components/PomodoroTimer/PomodoroTimer';
 import TimeBoxing from './components/TimeBoxing/TimeBoxing';
+import StudyPlanDashboard from './components/Planning/StudyPlanDashboard';
+import CommandPalette from './components/CommandPalette/CommandPalette';
+import RevisionCards from './components/Revision/RevisionCards';
+import MnemonicGenerator from './components/Revision/MnemonicGenerator';
+import PYQHeatmap from './components/Analytics/PYQHeatmap';
+import ModelAnswersManager from './components/ModelAnswers/ModelAnswersManager';
+import RevisionCenter from './components/Revision/RevisionCenter';
+import MindMapCreator from './components/MindMap/MindMapCreator';
 
 // --- UTILS ---
 import { audioManager } from './util/AudioManager';
@@ -279,7 +287,7 @@ function App() {
                   <FlashcardsManager onTaskCompleted={handleTaskCompleted} />
                 )}
                 {currentTab === 'analytics' && (
-                  <AnalyticsDashboard />
+                  <AnalyticsDashboard onNavigate={setCurrentTab} />
                 )}
                 {currentTab === 'weak-areas' && (
                   <WeakAreasDashboard />
@@ -293,6 +301,24 @@ function App() {
                 {currentTab === 'arena' && (
                   <BossArena onBattleComplete={handleTaskCompleted} />
                 )}
+                {currentTab === 'planner' && (
+                  <StudyPlanDashboard />
+                )}
+                {currentTab === 'revision-cards' && (
+                  <RevisionCards />
+                )}
+                {currentTab === 'mnemonics' && (
+                  <MnemonicGenerator />
+                )}
+                {currentTab === 'heatmap' && (
+                  <PYQHeatmap />
+                )}
+                {currentTab === 'model-answers' && (
+                  <ModelAnswersManager />
+                )}
+                {currentTab === 'mindmap' && (
+                  <MindMapCreator />
+                )}
               </>
             )}
 
@@ -305,6 +331,8 @@ function App() {
               <Route path="/workbench" element={<AnswerWorkbench />} />
               <Route path="/boss-arena" element={<BossArena onBattleComplete={handleTaskCompleted} />} />
               <Route path="/timebox" element={<TimeBoxing />} />
+              <Route path="/revision-center" element={<RevisionCenter />} />
+              <Route path="/mindmap" element={<MindMapCreator />} />
             </Routes>
           </main>
 
@@ -326,9 +354,7 @@ function App() {
           <MimirChat mode="floating" />
 
           {/* Pomodoro Timer - Global productivity tool (Hidden on Dashboard to avoid duplication) */}
-          {currentTab !== 'dashboard' && (
-            <PomodoroTimer />
-          )}
+          <PomodoroTimer className="pomodoro-above-mimir" />
 
           {showLevelUp && userStats && (
             <LevelUpModal
@@ -336,6 +362,9 @@ function App() {
               onClose={() => setShowLevelUp(false)}
             />
           )}
+
+          {/* Global Command Palette */}
+          <CommandPalette setCurrentTab={setCurrentTab} />
 
         </div>
       </PomodoroProvider>

@@ -70,8 +70,11 @@ const PracticeMode: React.FC = () => {
                 <select
                     value={selectedCategory}
                     onChange={(e) => { setSelectedCategory(e.target.value); setSelectedTopic(''); }}
+                    className="csat-select"
                 >
-                    <option value="">Select Category</option>
+                    <option value="">
+                        {Object.keys(topics).length === 0 ? "Loading categories..." : "Select Category"}
+                    </option>
                     {Object.keys(topics).map(cat => (
                         <option key={cat} value={cat}>{cat}</option>
                     ))}

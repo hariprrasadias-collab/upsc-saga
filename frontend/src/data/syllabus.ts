@@ -16,6 +16,60 @@ export const upscSyllabus: SyllabusNode = {
     status: 'unlocked',
     children: [
         // ==========================
+        // FOUNDATION (NCERTs)
+        // ==========================
+        {
+            id: 'foundation',
+            title: 'Foundation (NCERTs)',
+            description: 'Building the bedrock. Essential for understanding standard books.',
+            status: 'unlocked',
+            children: [
+                {
+                    id: 'ncert_history',
+                    title: 'History NCERTs',
+                    description: 'Our Pasts (6-8), Themes in Indian History (12)',
+                    resources: ['Class 6: Our Pasts I', 'Class 7: Our Pasts II', 'Class 8: Our Pasts III', 'Class 12: Themes I, II, III'],
+                    status: 'unlocked'
+                },
+                {
+                    id: 'ncert_geo',
+                    title: 'Geography NCERTs',
+                    description: 'Fundamentals of Physical & Human Geography',
+                    resources: ['Class 6-10: General', 'Class 11: Physical Geo', 'Class 12: Human Geo'],
+                    status: 'unlocked'
+                },
+                {
+                    id: 'ncert_polity',
+                    title: 'Polity NCERTs',
+                    description: 'Political Theory & Indian Constitution',
+                    resources: ['Class 9: Democratic Politics I', 'Class 10: Democratic Politics II', 'Class 11: Indian Constitution at Work'],
+                    status: 'unlocked'
+                },
+                {
+                    id: 'ncert_eco',
+                    title: 'Economy NCERTs',
+                    description: 'Understanding Economic Development',
+                    resources: ['Class 9: Economics', 'Class 10: Understanding Eco Dev', 'Class 11: Indian Eco Dev', 'Class 12: Macroeconomics'],
+                    status: 'unlocked'
+                },
+                {
+                    id: 'ncert_sci',
+                    title: 'Science NCERTs',
+                    description: 'General Science Basics',
+                    resources: ['Class 6-10: Science Textbooks'],
+                    status: 'unlocked'
+                },
+                {
+                    id: 'ncert_soc',
+                    title: 'Society & Art NCERTs',
+                    description: 'Indian Society & Fine Arts',
+                    resources: ['Class 11: Intro to Indian Art', 'Class 12: Indian Society'],
+                    status: 'unlocked'
+                }
+            ]
+        },
+
+        // ==========================
         // PRELIMS
         // ==========================
         {

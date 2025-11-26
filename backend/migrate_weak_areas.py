@@ -1,9 +1,11 @@
 # Weak Area Analysis Migration
 import sqlite3
+import os
 from datetime import datetime
 
 def migrate():
-    conn = sqlite3.connect('upsc_saga.db')
+    db_path = os.path.join(os.path.dirname(__file__), 'upsc_saga.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
     # Create weak_area_analysis table

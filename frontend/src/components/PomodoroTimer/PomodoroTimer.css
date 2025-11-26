@@ -43,8 +43,8 @@ body {
 
 .pomodoro-widget {
     position: fixed;
-    top: 50%;
-    left: 50%;
+    top: 10%;
+    left: 40%;
     transform: translate(-50%, -50%);
     animation: fadeIn 0.6s ease-out forwards;
     background: var(--glass-bg);
@@ -60,7 +60,7 @@ body {
     width: 90%;
     /* Responsive width */
     z-index: 1000;
-    transition: all 0.3s ease;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .pomodoro-header {
@@ -152,21 +152,119 @@ body {
 
 .timer-text {
     position: absolute;
-    font-size: 3.5rem;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4.5rem;
     font-weight: bold;
     color: var(--text-color);
     font-family: var(--font-mono);
     text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    line-height: 1;
+    margin: 0;
+    padding: 0;
+    pointer-events: none;
+    text-align: center;
+    width: 100%;
+}
+
+.timer-text-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.timer-edit-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 1rem;
+    border-radius: 12px;
+    z-index: 10;
+    width: 120px;
+}
+
+.timer-edit-input {
+    width: 80px;
+    padding: 0.5rem;
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    font-size: 1.5rem;
+    text-align: center;
+    font-family: var(--font-mono);
+}
+
+.timer-edit-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.save-btn,
+.cancel-btn {
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 1rem;
+}
+
+.save-btn {
+    background: var(--success-color);
+    color: white;
+}
+
+.cancel-btn {
+    background: var(--danger-color);
+    color: white;
+}
+
+.edit-time-btn {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: transparent;
+    border: none;
+    color: var(--secondary-text-color);
+    cursor: pointer;
+    font-size: 1.2rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: auto;
+}
+
+.timer-text-container:hover .edit-time-btn {
+    opacity: 1;
 }
 
 .pomodoro-actions {
     display: flex;
     gap: 1rem;
     margin-bottom: 2rem;
+    justify-content: center;
 }
 
 .timer-btn {
-    flex: 2;
+    flex: 1;
     padding: 1rem;
     border: none;
     border-radius: 12px;
@@ -176,6 +274,9 @@ body {
     transition: all 0.3s ease;
     color: #ffffff;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .timer-btn.start {
@@ -184,7 +285,6 @@ body {
 
 .timer-btn.start:hover {
     background: #5cb85c;
-    /* Darker green */
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
@@ -195,7 +295,6 @@ body {
 
 .timer-btn.pause:hover {
     background: #d9534f;
-    /* Darker red */
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
@@ -212,11 +311,13 @@ body {
     font-size: 1.1rem;
     font-weight: 600;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .reset-btn:hover {
     background: #8e8e8e;
-    /* Darker gray */
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
@@ -249,7 +350,7 @@ body {
 }
 
 .pomodoro-minimized {
-    position: fixed;
+    position: sticky;
     bottom: 25px;
     right: 25px;
     padding: 0.8rem 1.5rem;
