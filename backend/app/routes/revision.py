@@ -65,26 +65,40 @@ def get_revision_cards():
         'cards': [dict(card) for card in cards]
     })
 
-@bp.route('/cards/<int:card_id>', methods=['GET'])
-def get_card_detail(card_id):
-    """Get detailed view of a revision card"""
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute('''
-        SELECT id, topic_id, title, one_liner, full_content, created_at
-        FROM revision_cards
-        WHERE id = ?
-    ''', (card_id,))
-    card = cursor.fetchone()
-    conn.close()
+@bp.route('/cards/<int:card_id>', methods=['GET', 'DELETE'])
+def handle_card(card_id):
+    """Get or delete a specific revision card"""
+    if request.method == 'GET':
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT id, topic_id, title, one_liner, full_content, created_at
+            FROM revision_cards
+            WHERE id = ?
+        ''', (card_id,))
+        card = cursor.fetchone()
+        conn.close()
+        
+        if card:
+            return jsonify({
+                'success': True,
+                'card': dict(card)
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Card not found'}), 404
     
-    if card:
-        return jsonify({
-            'success': True,
-            'card': dict(card)
-        })
-    else:
-        return jsonify({'success': False, 'error': 'Card not found'}), 404
+    elif request.method == 'DELETE':
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM revision_cards WHERE id = ?', (card_id,))
+        deleted = cursor.rowcount > 0
+        conn.commit()
+        conn.close()
+        
+        if deleted:
+            return jsonify({'success': True, 'message': 'Card deleted successfully'})
+        else:
+            return jsonify({'success': False, 'error': 'Card not found'}), 404
 
 @bp.route('/mnemonic', methods=['POST'])
 def create_mnemonic():

@@ -7,13 +7,13 @@ CORS(bp)
 
 @bp.route('/questions', methods=['GET'])
 def get_questions():
-    """Get questions with optional filters"""
+    """Get questions with optional filters (supports multi-select)"""
     conn = get_db()
     
-    # Filter parameters
-    year = request.args.get('year')
-    subject = request.args.get('subject')
-    topic = request.args.get('topic')
+    # Filter parameters - support both single and multi-select
+    years = request.args.getlist('years') or ([request.args.get('year')] if request.args.get('year') else [])
+    subjects = request.args.getlist('subjects') or ([request.args.get('subject')] if request.args.get('subject') else [])
+    topics = request.args.getlist('topics') or ([request.args.get('topic')] if request.args.get('topic') else [])
     difficulty = request.args.get('difficulty')
     search = request.args.get('search')
     is_favorite = request.args.get('is_favorite')
@@ -21,17 +21,23 @@ def get_questions():
     query = "SELECT * FROM pyq_questions WHERE 1=1"
     params = []
     
-    if year:
-        query += " AND year = ?"
-        params.append(year)
+    # Multi-select support for years
+    if years:
+        placeholders = ','.join(['?'] * len(years))
+        query += f" AND year IN ({placeholders})"
+        params.extend(years)
     
-    if subject:
-        query += " AND subject = ?"
-        params.append(subject)
+    # Multi-select support for subjects
+    if subjects:
+        placeholders = ','.join(['?'] * len(subjects))
+        query += f" AND subject IN ({placeholders})"
+        params.extend(subjects)
         
-    if topic:
-        query += " AND topic = ?"
-        params.append(topic)
+    # Multi-select support for topics
+    if topics:
+        placeholders = ','.join(['?'] * len(topics))
+        query += f" AND topic IN ({placeholders})"
+        params.extend(topics)
         
     if difficulty:
         query += " AND difficulty = ?"
@@ -65,6 +71,34 @@ def get_filters():
         'subjects': [row['subject'] for row in subjects],
         'topics': [row['topic'] for row in topics]
     })
+
+@bp.route('/topics', methods=['GET'])
+def get_topics():
+    """Get topics filtered by selected subject(s)"""
+    conn = get_db()
+    subjects = request.args.getlist('subjects')
+    
+    if subjects:
+        # Get topics for selected subjects
+        placeholders = ','.join(['?'] * len(subjects))
+        query = f"""
+            SELECT DISTINCT topic, subject
+            FROM pyq_questions 
+            WHERE subject IN ({placeholders}) AND topic IS NOT NULL
+            ORDER BY subject, topic
+        """
+        topics = conn.execute(query, subjects).fetchall()
+    else:
+        # Get all topics if no subject selected
+        query = """
+            SELECT DISTINCT topic, subject
+            FROM pyq_questions 
+            WHERE topic IS NOT NULL
+            ORDER BY subject, topic
+        """
+        topics = conn.execute(query).fetchall()
+    
+    return jsonify([{'topic': row['topic'], 'subject': row['subject']} for row in topics])
 
 @bp.route('/<int:id>/favorite', methods=['POST'])
 def toggle_favorite(id):

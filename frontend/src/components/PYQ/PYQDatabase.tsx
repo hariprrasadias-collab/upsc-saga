@@ -34,26 +34,59 @@ const PYQDatabase: React.FC = () => {
     // Filters
     const [selectedYears, setSelectedYears] = useState<number[]>([]);
     const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
+    const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+    const [availableTopics, setAvailableTopics] = useState<{ topic: string, subject: string }[]>([]);
+    const [loadingTopics, setLoadingTopics] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
     // Expanded state for answers
     const [revealedAnswers, setRevealedAnswers] = useState<Record<number, boolean>>({});
 
+    // Fetch topics dynamically when subjects change
+    useEffect(() => {
+        const fetchTopics = async () => {
+            if (selectedSubjects.length > 0) {
+                setLoadingTopics(true);
+                try {
+                    const params = new URLSearchParams();
+                    selectedSubjects.forEach(subject => params.append('subjects', subject));
+                    const res = await fetch(`http://localhost:5000/api/pyq/topics?${params.toString()}`);
+                    const data = await res.json();
+                    setAvailableTopics(data);
+                } catch (err) {
+                    console.error("Failed to fetch topics", err);
+                    setAvailableTopics([]);
+                } finally {
+                    setLoadingTopics(false);
+                }
+            } else {
+                setAvailableTopics([]);
+                setSelectedTopics([]);  // Clear selected topics when no subject is selected
+            }
+        };
+
+        fetchTopics();
+    }, [selectedSubjects]);
+
     // Fetch Data
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            // Build query string
+            // Build query string with multi-select support
             const params = new URLSearchParams();
+
+            // Multi-select years
+            selectedYears.forEach(year => params.append('years', year.toString()));
+
+            // Multi-select subjects
+            selectedSubjects.forEach(subject => params.append('subjects', subject));
+
+            // Multi-select topics
+            selectedTopics.forEach(topic => params.append('topics', topic));
+
             if (searchQuery) params.append('search', searchQuery);
             if (showFavoritesOnly) params.append('is_favorite', 'true');
-            // Note: API currently supports single value, we might need to update API for multi-select
-            // For now, let's just use client-side filtering for multi-select or simple single select in UI
-            // To keep it simple for this iteration, we'll fetch all and filter client-side if needed, 
-            // or just pass the first selected one. Let's pass the first one for now.
-            if (selectedYears.length > 0) params.append('year', selectedYears[0].toString());
-            if (selectedSubjects.length > 0) params.append('subject', selectedSubjects[0]);
 
             const res = await fetch(`http://localhost:5000/api/pyq/questions?${params.toString()}`);
             const data = await res.json();
@@ -70,7 +103,7 @@ const PYQDatabase: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    }, [searchQuery, showFavoritesOnly, selectedYears, selectedSubjects, analytics]);
+    }, [searchQuery, showFavoritesOnly, selectedYears, selectedSubjects, selectedTopics, analytics]);
 
     useEffect(() => {
         fetchData();
@@ -98,14 +131,28 @@ const PYQDatabase: React.FC = () => {
 
     const handleYearChange = (year: number) => {
         setSelectedYears(prev =>
-            prev.includes(year) ? prev.filter(y => y !== year) : [year] // Single select behavior for now
+            prev.includes(year) ? prev.filter(y => y !== year) : [...prev, year]  // Multi-select
         );
     };
 
     const handleSubjectChange = (subject: string) => {
         setSelectedSubjects(prev =>
-            prev.includes(subject) ? prev.filter(s => s !== subject) : [subject] // Single select behavior for now
+            prev.includes(subject) ? prev.filter(s => s !== subject) : [...prev, subject]  // Multi-select
         );
+    };
+
+    const handleTopicChange = (topic: string) => {
+        setSelectedTopics(prev =>
+            prev.includes(topic) ? prev.filter(t => t !== topic) : [...prev, topic]  // Multi-select
+        );
+    };
+
+    const clearAllFilters = () => {
+        setSelectedYears([]);
+        setSelectedSubjects([]);
+        setSelectedTopics([]);
+        setSearchQuery('');
+        setShowFavoritesOnly(false);
     };
 
     const startQuiz = async () => {
@@ -206,6 +253,32 @@ const PYQDatabase: React.FC = () => {
                 </div>
 
                 <div className="filter-section">
+                    <h3>Topics {loadingTopics && '⏳'}</h3>
+                    {selectedSubjects.length === 0 ? (
+                        <p style={{ opacity: 0.5, fontSize: '12px', padding: '5px 0' }}>
+                            Select a subject first
+                        </p>
+                    ) : availableTopics.length === 0 && !loadingTopics ? (
+                        <p style={{ opacity: 0.5, fontSize: '12px', padding: '5px 0' }}>
+                            No topics available
+                        </p>
+                    ) : (
+                        <div className="filter-group" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                            {availableTopics.map(item => (
+                                <label key={item.topic} className="filter-checkbox">
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedTopics.includes(item.topic)}
+                                        onChange={() => handleTopicChange(item.topic)}
+                                    />
+                                    <span style={{ fontSize: '13px' }}>{item.topic}</span>
+                                </label>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <div className="filter-section">
                     <h3>Options</h3>
                     <label className="filter-checkbox">
                         <input
@@ -215,6 +288,22 @@ const PYQDatabase: React.FC = () => {
                         />
                         Show Favorites Only
                     </label>
+                    <button
+                        onClick={clearAllFilters}
+                        style={{
+                            marginTop: '15px',
+                            width: '100%',
+                            padding: '8px',
+                            background: '#e74c3c',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '13px'
+                        }}
+                    >
+                        🔄 Clear All Filters
+                    </button>
                 </div>
             </div>
 
@@ -251,6 +340,65 @@ const PYQDatabase: React.FC = () => {
                         </button>
                     </div>
                 </div>
+
+                {/* Active Filters Display */}
+                {(selectedYears.length > 0 || selectedSubjects.length > 0 || selectedTopics.length > 0) && (
+                    <div style={{
+                        padding: '10px 20px',
+                        borderBottom: '1px solid #444',
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: '8px',
+                        alignItems: 'center'
+                    }}>
+                        <span style={{ opacity: 0.7, fontSize: '12px', marginRight: '5px' }}>Active Filters:</span>
+                        {selectedYears.map(year => (
+                            <span key={year} style={{
+                                background: '#3498db',
+                                color: 'white',
+                                padding: '4px 10px',
+                                borderRadius: '12px',
+                                fontSize: '12px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px'
+                            }}>
+                                📅 {year}
+                                <span onClick={() => handleYearChange(year)} style={{ cursor: 'pointer', fontWeight: 'bold' }}>×</span>
+                            </span>
+                        ))}
+                        {selectedSubjects.map(subject => (
+                            <span key={subject} style={{
+                                background: '#2ecc71',
+                                color: 'white',
+                                padding: '4px 10px',
+                                borderRadius: '12px',
+                                fontSize: '12px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px'
+                            }}>
+                                📚 {subject}
+                                <span onClick={() => handleSubjectChange(subject)} style={{ cursor: 'pointer', fontWeight: 'bold' }}>×</span>
+                            </span>
+                        ))}
+                        {selectedTopics.map(topic => (
+                            <span key={topic} style={{
+                                background: '#9b59b6',
+                                color: 'white',
+                                padding: '4px 10px',
+                                borderRadius: '12px',
+                                fontSize: '12px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px'
+                            }}>
+                                🏷️ {topic}
+                                <span onClick={() => handleTopicChange(topic)} style={{ cursor: 'pointer', fontWeight: 'bold' }}>×</span>
+                            </span>
+                        ))}
+                    </div>
+                )}
 
                 <div className="question-list">
                     {loading ? (

@@ -26,7 +26,7 @@ const D3Tree: React.FC<D3TreeProps> = ({ data }) => {
         const width = wrapperRef.current.clientWidth;
         const marginTop = 10;
         const marginBottom = 10;
-        const marginLeft = 40;
+        const marginLeft = 150;  // Increased from 40 to prevent text truncation
 
         // Clear previous SVG content
         d3.select(svgRef.current).selectAll("*").remove();

@@ -35,13 +35,16 @@ const RevisionCards: React.FC = () => {
     };
 
     const handleGenerateCard = async () => {
+        console.log('Generate button clicked!', { title: newCard.title, content: newCard.content });
+        
         if (!newCard.title.trim()) {
-            alert('Please enter a topic title');
+            alert('⚠️ Please enter a topic in the TITLE field (the first input box above)');
             return;
         }
 
         setGenerating(true);
         try {
+            console.log('Sending request to backend...');
             const response = await fetch('http://localhost:5000/api/revision/one-liner', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -51,18 +54,57 @@ const RevisionCards: React.FC = () => {
                 })
             });
 
+            console.log('Response status:', response.status);
             const data = await response.json();
+            console.log('Response data:', data);
+            
             if (data.success) {
+                console.log('Card created successfully!', data.card);
                 setCards([data.card, ...cards]);
                 setNewCard({ title: '', content: '' });
+                alert('✅ Revision card created successfully!');
             } else {
+                console.error('Failed to create card:', data);
                 alert('Failed to generate revision card');
             }
         } catch (error) {
             console.error('Error generating card:', error);
-            alert('Error generating revision card');
+            alert('Error generating revision card: ' + (error as Error).message);
         } finally {
             setGenerating(false);
+        }
+    };
+
+    const handleDeleteCard = async (cardId: number) => {
+        console.log('Delete button clicked for card:', cardId);
+        
+        // Use window.confirm explicitly and log the result
+        const confirmDelete = window.confirm('🗑️ Delete this revision card?\n\nThis action cannot be undone.');
+        console.log('Confirm dialog result:', confirmDelete);
+        
+        if (!confirmDelete) {
+            console.log('Delete cancelled by user');
+            return;
+        }
+
+        console.log('Proceeding with delete...');
+        try {
+            const response = await fetch(`http://localhost:5000/api/revision/cards/${cardId}`, {
+                method: 'DELETE'
+            });
+
+            console.log('Delete response status:', response.status);
+            if (response.ok) {
+                console.log('Card deleted successfully');
+                setCards(cards.filter(card => card.id !== cardId));
+                alert('✅ Card deleted successfully');
+            } else {
+                console.error('Delete failed');
+                alert('Failed to delete card');
+            }
+        } catch (error) {
+            console.error('Error deleting card:', error);
+            alert('Error deleting card');
         }
     };
 
@@ -80,13 +122,14 @@ const RevisionCards: React.FC = () => {
                     <input
                         type="text"
                         className="topic-input"
-                        placeholder="Topic Title (e.g., 'Preamble of Indian Constitution')"
+                        placeholder="📝 TITLE: Enter topic name (e.g., 'Preamble of Indian Constitution')"
                         value={newCard.title}
                         onChange={(e) => setNewCard({ ...newCard, title: e.target.value })}
+                        onKeyPress={(e) => e.key === 'Enter' && !generating && handleGenerateCard()}
                     />
                     <textarea
                         className="content-textarea"
-                        placeholder="Topic content (optional - helps generate better summary)"
+                        placeholder="💡 CONTENT (Optional): Add details to generate better summary..."
                         rows={4}
                         value={newCard.content}
                         onChange={(e) => setNewCard({ ...newCard, content: e.target.value })}
@@ -95,7 +138,6 @@ const RevisionCards: React.FC = () => {
                         className="generate-btn"
                         onClick={handleGenerateCard}
                         disabled={generating}
-                        style={{ opacity: generating ? 0.7 : 1, cursor: generating ? 'wait' : 'pointer' }}
                     >
                         {generating ? '✨ Forging Knowledge...' : '🚀 Generate Smart Summary'}
                     </button>
@@ -119,9 +161,21 @@ const RevisionCards: React.FC = () => {
                             <div key={card.id} className="revision-card">
                                 <div className="card-header">
                                     <h3>{card.title}</h3>
-                                    <span className="card-date">
-                                        {new Date(card.created_at).toLocaleDateString()}
-                                    </span>
+                                    <div className="card-header-actions">
+                                        <span className="card-date">
+                                            {new Date(card.created_at).toLocaleDateString()}
+                                        </span>
+                                        <button 
+                                            className="delete-card-btn"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDeleteCard(card.id);
+                                            }}
+                                            title="Delete card"
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className="card-content">
                                     <p className="one-liner">{card.one_liner}</p>

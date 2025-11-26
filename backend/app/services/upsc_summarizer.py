@@ -277,13 +277,20 @@ Requirements:
 SUMMARY:"""
 
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        if not GEMINI_API_KEY:
+            print("ERROR: GEMINI_API_KEY not configured in environment")
+            return f"⚠️ AI service not configured. Please add GEMINI_API_KEY to backend/.env file."
+        
+        model = genai.GenerativeModel('gemini-pro-latest')  # Using stable latest version
         response = model.generate_content(prompt)
         one_liner = response.text.strip()
+        print(f"Successfully generated one-liner for: {title}")
         return one_liner
     except Exception as e:
-        print(f"Error generating one-liner: {e}")
-        return f"Quick Summary: {title}"
+        print(f"ERROR generating one-liner for '{title}': {type(e).__name__}: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return f"⚠️ AI generation failed: {str(e)[:100]}"
 
 def generate_mnemonic(text: str, mnemonic_type: str = "facts") -> str:
     """Generate memory aids (mnemonics) for facts, dates, lists, concepts."""

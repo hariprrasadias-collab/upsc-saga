@@ -18,9 +18,17 @@ interface HeatmapData {
 
 interface CellQuestion {
     id: number;
-    question: string;
-    paper: string;
-    marks: number;
+    question_text: string;
+    option_a: string;
+    option_b: string;
+    option_c: string;
+    option_d: string;
+    correct_option: string;
+    explanation: string;
+    year: number;
+    subject: string;
+    topic: string;
+    difficulty: string;
 }
 
 const PYQHeatmap: React.FC = () => {
@@ -189,10 +197,33 @@ const PYQHeatmap: React.FC = () => {
                                 <div key={q.id} className="question-item">
                                     <div className="question-number">Q{idx + 1}</div>
                                     <div className="question-details">
-                                        <p className="question-text">{q.question}</p>
+                                        <p className="question-text">{q.question_text}</p>
+
+                                        {/* Options */}
+                                        <div className="question-options">
+                                            {['A', 'B', 'C', 'D'].map(opt => {
+                                                const optionKey = `option_${opt.toLowerCase()}` as keyof CellQuestion;
+                                                const optionText = q[optionKey];
+                                                const isCorrect = q.correct_option === opt;
+                                                return (
+                                                    <div key={opt} className={`option ${isCorrect ? 'correct-option' : ''}`}>
+                                                        <strong>{opt}.</strong> {optionText}
+                                                        {isCorrect && <span className="correct-badge"> ✓ Correct</span>}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+
+                                        {/* Explanation */}
+                                        {q.explanation && (
+                                            <div className="question-explanation">
+                                                <strong>Explanation:</strong> {q.explanation}
+                                            </div>
+                                        )}
+
                                         <div className="question-meta">
-                                            <span className="paper-badge">{q.paper}</span>
-                                            <span className="marks-badge">{q.marks} marks</span>
+                                            <span className="difficulty-badge">{q.difficulty}</span>
+                                            <span className="subject-badge">{q.subject}</span>
                                         </div>
                                     </div>
                                 </div>

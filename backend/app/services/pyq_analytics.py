@@ -141,30 +141,36 @@ def get_questions_by_cell(topic: str, year: int, paper: Optional[str] = None) ->
         paper: Not used (column doesn't exist)
     
     Returns:
-        List of questions with details
+        List of questions with complete details
     """
     conn = get_db()
     cursor = conn.cursor()
     
-    # Use actual column names from pyq_questions table
+    # Get ALL question fields for the frontend modal
     query = """
-        SELECT id, question_text as question, subject as paper, difficulty, year
+        SELECT 
+            id, 
+            question_text,
+            option_a,
+            option_b,
+            option_c,
+            option_d,
+            correct_option,
+            explanation,
+            year,
+            subject,
+            topic,
+            difficulty
         FROM pyq_questions
         WHERE topic = ? AND year = ?
+        ORDER BY id
     """
     
     cursor.execute(query, [topic, year])
     results = cursor.fetchall()
     conn.close()
     
-    # Add marks field (not in database, using default value)
-    questions = []
-    for row in results:
-        q = dict(row)
-        q['marks'] = 10  # Default marks since column doesn't exist
-        questions.append(q)
-    
-    return questions
+    return [dict(row) for row in results]
 
 def get_paper_distribution() -> Dict:
     """Get question distribution across subjects (not papers)"""
