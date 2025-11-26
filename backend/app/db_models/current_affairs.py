@@ -166,6 +166,13 @@ def update_user_notes(article_id, notes):
     ''', (notes, article_id))
     conn.commit()
 
+    conn.execute('''
+        UPDATE current_affairs 
+        SET anki_card_id = ?
+        WHERE id = ?
+    ''', (anki_card_id, article_id))
+    conn.commit()
+
 def link_anki_card(article_id, anki_card_id):
     """Link article to Anki card"""
     conn = get_db()
@@ -175,3 +182,34 @@ def link_anki_card(article_id, anki_card_id):
         WHERE id = ?
     ''', (anki_card_id, article_id))
     conn.commit()
+
+def update_article_content_by_link(link, article_data):
+    """Update article content by link (for re-processing)"""
+    conn = get_db()
+    conn.execute('''
+        UPDATE current_affairs 
+        SET upsc_summary = ?,
+            key_points = ?,
+            papers = ?,
+            subjects = ?,
+            importance = ?,
+            image_url = ?,
+            related_pyqs = ?,
+            fetch_date = CURRENT_TIMESTAMP
+        WHERE original_link = ?
+    ''', (
+        article_data.get('upsc_summary', ''),
+        json.dumps(article_data.get('key_points', [])),
+        json.dumps(article_data.get('papers', [])),
+        json.dumps(article_data.get('subjects', [])),
+        article_data.get('importance', 2),
+        article_data.get('image_url', ''),
+        json.dumps(article_data.get('related_pyqs', [])),
+        link
+    ))
+    conn.commit()
+    
+    # Return the ID
+    cursor = conn.execute('SELECT id FROM current_affairs WHERE original_link = ?', (link,))
+    row = cursor.fetchone()
+    return row['id'] if row else None

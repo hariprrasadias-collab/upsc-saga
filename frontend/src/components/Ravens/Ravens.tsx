@@ -74,6 +74,13 @@ const Ravens: React.FC = () => {
         fetchArticles();
     }, [selectedPaper, selectedSubject, selectedSource, showBookmarked, searchQuery]);
 
+    useEffect(() => {
+        // Auto-fetch on mount if no articles
+        if (articles.length === 0 && !loading && !processing) {
+            fetchAndProcessLatest();
+        }
+    }, []); // Run once on mount
+
     const updateChallengeProgress = async (type: string, increment: number = 1) => {
         try {
             const res = await fetch('http://localhost:5000/api/challenges/daily');
@@ -313,115 +320,135 @@ const Ravens: React.FC = () => {
                                 </div>
                             </div>
 
-                            {article.subjects && article.subjects.length > 0 && (
-                                <div className="subject-badges">
-                                    {article.subjects.map((sub, idx) => (
-                                        <span key={idx} className="subject-badge">{sub}</span>
-                                    ))}
-                                </div>
-                            )}
+                            <div className="article-content">
+                                {article.subjects && article.subjects.length > 0 && (
+                                    <div className="subject-badges">
+                                        {article.subjects.map((sub, idx) => (
+                                            <span key={idx} className="subject-badge">{sub}</span>
+                                        ))}
+                                    </div>
+                                )}
 
-                            <h3>
+                                <h3>
+                                    <button
+                                        className="article-title-btn"
+                                        onClick={() => setSelectedArticle(article)}
+                                        style={{
+                                            background: 'none',
+                                            border: 'none',
+                                            padding: 0,
+                                            font: 'inherit',
+                                            cursor: 'pointer',
+                                            textAlign: 'left',
+                                            color: '#e0e0e0',
+                                            textDecoration: 'none'
+                                        }}
+                                        onMouseOver={(e) => e.currentTarget.style.color = '#8ca0ff'}
+                                        onMouseOut={(e) => e.currentTarget.style.color = '#e0e0e0'}
+                                    >
+                                        {article.title}
+                                    </button>
+                                </h3>
+
+                                <p className="summary">{article.upscSummary}</p>
                                 <button
-                                    className="article-title-btn"
+                                    className="read-more-btn"
                                     onClick={() => setSelectedArticle(article)}
                                     style={{
                                         background: 'none',
                                         border: 'none',
-                                        padding: 0,
-                                        font: 'inherit',
+                                        color: '#8ca0ff',
                                         cursor: 'pointer',
+                                        padding: 0,
+                                        fontSize: '0.9rem',
+                                        marginTop: '-1rem',
+                                        marginBottom: '1rem',
                                         textAlign: 'left',
-                                        color: '#2c3e50',
-                                        textDecoration: 'none'
+                                        display: 'inline-block'
                                     }}
-                                    onMouseOver={(e) => e.currentTarget.style.color = '#667eea'}
-                                    onMouseOut={(e) => e.currentTarget.style.color = '#2c3e50'}
                                 >
-                                    {article.title}
+                                    Read More...
                                 </button>
-                            </h3>
 
-                            <p className="summary">{article.upscSummary}</p>
+                                {article.keyPoints && article.keyPoints.length > 0 && (
+                                    <ul className="keypoints">
+                                        {article.keyPoints.slice(0, 3).map((point, idx) => (
+                                            <li key={idx}>{point}</li>
+                                        ))}
+                                    </ul>
+                                )}
 
-                            {article.keyPoints && article.keyPoints.length > 0 && (
-                                <ul className="keypoints">
-                                    {article.keyPoints.slice(0, 3).map((point, idx) => (
-                                        <li key={idx}>{point}</li>
-                                    ))}
-                                </ul>
-                            )}
+                                {article.relatedPyqs && article.relatedPyqs.length > 0 && (
+                                    <div className="pyq-section">
+                                        <strong>📚 Related PYQs:</strong>
+                                        {article.relatedPyqs.map((pyq, idx) => (
+                                            <div key={idx} className="pyq-item">
+                                                <span className="pyq-year">{pyq.year}</span> - {pyq.question}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
 
-                            {article.relatedPyqs && article.relatedPyqs.length > 0 && (
-                                <div className="pyq-section">
-                                    <strong>📚 Related PYQs:</strong>
-                                    {article.relatedPyqs.map((pyq, idx) => (
-                                        <div key={idx} className="pyq-item">
-                                            <span className="pyq-year">{pyq.year}</span> - {pyq.question}
+                                <div className="notes-section">
+                                    {editingNotes === article.id ? (
+                                        <div className="notes-editor">
+                                            <textarea
+                                                defaultValue={article.userNotes || ''}
+                                                placeholder="Add your notes here..."
+                                                onBlur={(e) => article.id && handleNotesSave(article.id, e.target.value)}
+                                                autoFocus
+                                            />
                                         </div>
-                                    ))}
+                                    ) : (
+                                        <div className="notes-display" onClick={() => setEditingNotes(article.id || null)}>
+                                            <span className="notes-label">📝 Notes:</span>
+                                            <span className="notes-text">{article.userNotes || 'Click to add notes...'}</span>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
 
-                            <div className="notes-section">
-                                {editingNotes === article.id ? (
-                                    <div className="notes-editor">
-                                        <textarea
-                                            defaultValue={article.userNotes || ''}
-                                            placeholder="Add your notes here..."
-                                            onBlur={(e) => article.id && handleNotesSave(article.id, e.target.value)}
-                                            autoFocus
-                                        />
-                                    </div>
-                                ) : (
-                                    <div className="notes-display" onClick={() => setEditingNotes(article.id || null)}>
-                                        <span className="notes-label">📝 Notes:</span>
-                                        <span className="notes-text">{article.userNotes || 'Click to add notes...'}</span>
+                                {/* Issue Mapping Viewer - Rendered Inside Card */}
+                                {mappingArticleId === article.id && (
+                                    <div className="mapping-container-embedded">
+                                        <IssueMappingViewer articleId={article.id} articleTitle={article.title} />
                                     </div>
                                 )}
-                            </div>
 
-                            <div className="actions">
-                                <select
-                                    value={article.importance || 2}
-                                    onChange={(e) => article.id && handleImportance(article.id, Number(e.target.value))}
-                                >
-                                    <option value={1}>⭐ Low</option>
-                                    <option value={2}>⭐⭐ Medium</option>
-                                    <option value={3}>⭐⭐⭐ High</option>
-                                </select>
-                                {article.id && (
-                                    <button
-                                        className="mapping-btn"
-                                        onClick={() => setMappingArticleId(prev => prev === article.id ? null : (article.id ?? null))}
+                                <div className="actions">
+                                    <select
+                                        value={article.importance || 2}
+                                        onChange={(e) => article.id && handleImportance(article.id, Number(e.target.value))}
                                     >
-                                        {mappingArticleId === article.id ? 'Hide Mapping' : 'Show Mapping'}
+                                        <option value={1}>⭐ Low</option>
+                                        <option value={2}>⭐⭐ Medium</option>
+                                        <option value={3}>⭐⭐⭐ High</option>
+                                    </select>
+                                    {article.id && (
+                                        <button
+                                            className="mapping-btn"
+                                            onClick={() => setMappingArticleId(prev => prev === article.id ? null : (article.id ?? null))}
+                                        >
+                                            {mappingArticleId === article.id ? 'Hide Mapping' : 'Show Mapping'}
+                                        </button>
+                                    )}
+
+                                    <button
+                                        className="action-btn lore-btn"
+                                        onClick={() => handleAddToLore(article)}
+                                        title="Save to Lore Tablet"
+                                    >
+                                        📜 Add to Lore
                                     </button>
-                                )}
 
-                                <button
-                                    className="action-btn lore-btn"
-                                    onClick={() => handleAddToLore(article)}
-                                    title="Save to Lore Tablet"
-                                >
-                                    📜 Add to Lore
-                                </button>
-
-                                {article.ankiCardId ? (
-                                    <button disabled>✅ In Anki</button>
-                                ) : (
-                                    <button onClick={() => article.id && handleAnki(article.id)}>
-                                        📇 Add to Anki
-                                    </button>
-                                )}
-                            </div>
-
-                            {/* Issue Mapping Viewer - Rendered Inside Card */}
-                            {mappingArticleId === article.id && (
-                                <div className="mapping-container-embedded">
-                                    <IssueMappingViewer articleId={article.id} articleTitle={article.title} />
+                                    {article.ankiCardId ? (
+                                        <button className="action-btn" disabled>✅ In Anki</button>
+                                    ) : (
+                                        <button className="action-btn" onClick={() => article.id && handleAnki(article.id)}>
+                                            📇 Add to Anki
+                                        </button>
+                                    )}
                                 </div>
-                            )}
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -490,6 +517,45 @@ const Ravens: React.FC = () => {
                                 }}
                             >
                                 🥋 Create Flashcard
+                            </button>
+                            <button
+                                className="action-btn"
+                                onClick={() => selectedArticle.id && handleBookmark(selectedArticle.id)}
+                                title={selectedArticle.isBookmarked ? "Remove from Favorites" : "Add to Favorites"}
+                                style={{ color: selectedArticle.isBookmarked ? '#FFD700' : 'inherit' }}
+                            >
+                                {selectedArticle.isBookmarked ? '❤️ Favorited' : '🤍 Favorite'}
+                            </button>
+                            <button
+                                className="action-btn"
+                                onClick={async () => {
+                                    if (!selectedArticle) return;
+                                    const confirm = window.confirm("Refetching will overwrite the current summary and notes with a fresh AI analysis. Continue?");
+                                    if (!confirm) return;
+
+                                    addToast('Refetching content...', 'info');
+                                    try {
+                                        const res = await fetch('http://localhost:5000/api/ravens/process', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ ...selectedArticle, force: true })
+                                        });
+                                        if (res.ok) {
+                                            addToast('Content refetched successfully!', 'success');
+                                            audioManager.play('success');
+                                            fetchArticles();
+                                            setSelectedArticle(null); // Close modal to refresh data
+                                        } else {
+                                            addToast('Failed to refetch content', 'error');
+                                        }
+                                    } catch (err) {
+                                        console.error(err);
+                                        addToast('Error refetching content', 'error');
+                                    }
+                                }}
+                                title="Force refetch content from source"
+                            >
+                                🔄 Refetch Content
                             </button>
                         </div>
                     </div>

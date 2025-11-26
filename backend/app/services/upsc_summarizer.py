@@ -75,7 +75,7 @@ def _simple_extraction(title, content):
     """
     papers, subjects = _infer_tags(title, content)
     return {
-        'upsc_summary': content[:300] + '...' if len(content) > 300 else content,
+        'upsc_summary': content,  # NO TRUNCATION
         'key_points': [title],
         'papers': papers,
         'subjects': subjects,
@@ -92,6 +92,7 @@ def summarize_for_upsc(title, content, link):
         return _simple_extraction(title, content)
     try:
         model = genai.GenerativeModel('gemini-1.5-flash')
+        # Send FULL content to AI (no truncation)
         prompt = f"""You are a UPSC expert analyzer. Tag articles accurately based on content.
 
 EXAMPLES OF CORRECT TAGGING:
@@ -127,7 +128,7 @@ Polity & Governance | Economics | International Relations | Environment & Ecolog
 
 NOW TAG THIS ARTICLE:
 Title: {title}
-Content: {content[:1500]}
+Content: {content}
 
 Return ONLY this JSON (no markdown, no explanation):
 {{"upsc_summary": "...", "key_points": ["...", "..."], "papers": ["GS_"], "subjects": ["..."], "importance": 1-3, "exam_questions": ["..."], "related_topics": ["..."]}}"""
@@ -157,11 +158,12 @@ Return ONLY this JSON (no markdown, no explanation):
             print(f"Invalid subjects for: {title}, using keyword fallback")
             _, inferred_subjects = _infer_tags(title, content)
             result['subjects'] = inferred_subjects
-        # Ensure required keys exist
+        # Ensure required keys exist - NO TRUNCATION on fallback
         result.setdefault('importance', 2)
         result.setdefault('exam_questions', [])
         result.setdefault('related_topics', [])
-        result.setdefault('upsc_summary', content[:300] + '...' if len(content) > 300 else content)
+        result.setdefault('upsc_summary', content)  # NO TRUNCATION
+        result.setdefault('key_points', [title])
         result.setdefault('key_points', [title])
         print(f"✓ Processed: {title[:50]}... → {result['papers']} | {result['subjects']}")
         return result
@@ -198,8 +200,13 @@ def fetch_article_content(url):
         import requests
         from bs4 import BeautifulSoup
         
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
-        response = requests.get(url, headers=headers, timeout=10)
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Referer': 'https://www.google.com/'
+        }
+        response = requests.get(url, headers=headers, timeout=15)
         soup = BeautifulSoup(response.content, 'html.parser')
         
         # Remove scripts and styles

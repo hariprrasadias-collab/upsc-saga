@@ -10,7 +10,8 @@ from app.db_models.current_affairs import (
     toggle_bookmark,
     update_user_notes,
     link_anki_card,
-    article_exists
+    article_exists,
+    update_article_content_by_link
 )
 from app.services.upsc_summarizer import (
     summarize_for_upsc,
@@ -49,7 +50,7 @@ def call_the_ravens():
         try:
             feed = feedparser.parse(url)
             for entry in feed.entries[:10]:
-                summary = entry.get('summary', '')[:200] + "..."
+                summary = entry.get('summary', '')
                 
                 # Check if already saved
                 is_saved = article_exists(entry.link)
@@ -77,9 +78,10 @@ def process_article():
     source = data.get('source')
     published = data.get('published')
     rss_summary = data.get('summary', '')
+    force_reprocess = data.get('force', False)
     
-    # Check for duplicates before processing
-    if article_exists(link):
+    # Check for duplicates before processing (unless forcing)
+    if article_exists(link) and not force_reprocess:
         return jsonify({'success': True, 'message': 'Article already exists', 'skipped': True})
 
     try:
@@ -116,12 +118,18 @@ def process_article():
             'related_pyqs': related_pyqs
         }
         
-        # Save to database
-        article_id = save_article(article_data)
+        # Save or Update
+        if article_exists(link):
+             article_id = update_article_content_by_link(link, article_data)
+             action = 'updated'
+        else:
+             article_id = save_article(article_data)
+             action = 'saved'
         
         return jsonify({
             'success': True,
             'article_id': article_id,
+            'action': action,
             'data': {
                 **article_data,
                 'id': article_id,

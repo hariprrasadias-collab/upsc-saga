@@ -34,11 +34,12 @@ class CompilationService:
     def get_monthly_compilation(year, month):
         """
         Fetch articles for a specific month and year, grouped by subject.
+        Enhanced with full data, importance sorting, and better organization.
         """
         conn = get_db()
         
         # Fetch ALL articles and filter in Python due to inconsistent date formats
-        query = 'SELECT * FROM current_affairs ORDER BY subjects, published_date'
+        query = 'SELECT * FROM current_affairs ORDER BY subjects, importance DESC, published_date DESC'
         rows = conn.execute(query).fetchall()
         
         compilation = {
@@ -46,7 +47,12 @@ class CompilationService:
             "month": month,
             "generated_at": datetime.now().isoformat(),
             "total_articles": 0,
-            "subjects": {}
+            "subjects": {},
+            "stats": {
+                "high_importance": 0,
+                "medium_importance": 0,
+                "low_importance": 0
+            }
         }
         
         for row in rows:
@@ -66,15 +72,26 @@ class CompilationService:
                 article = {
                     'id': row['id'],
                     'title': row['title'],
-                    'upsc_summary': row['upsc_summary'],
-                    'original_summary': row['original_summary'],
+                    'upsc_summary': row['upsc_summary'] or '',  # FULL summary, no truncation
+                    'original_summary': row['original_summary'] or '',
                     'key_points': json.loads(row['key_points'] or '[]'),
                     'papers': json.loads(row['papers'] or '[]'),
                     'subjects': json.loads(row['subjects'] or '[]'),
                     'published_date': pub_date_str or fetch_date_str,
                     'source': row['source'],
-                    'importance': row['importance']
+                    'importance': row['importance'],
+                    'link': row['original_link'],
+                    'image_url': row['image_url'] or '',
+                    'related_pyqs': json.loads(row['related_pyqs'] or '[]')
                 }
+                
+                # Track importance stats
+                if article['importance'] == 3:
+                    compilation['stats']['high_importance'] += 1
+                elif article['importance'] == 2:
+                    compilation['stats']['medium_importance'] += 1
+                else:
+                    compilation['stats']['low_importance'] += 1
                 
                 # Group by primary subject
                 subjects_list = article['subjects']
@@ -85,6 +102,13 @@ class CompilationService:
                     
                 compilation["subjects"][primary_subject].append(article)
                 compilation["total_articles"] += 1
+        
+        # Sort articles within each subject by importance (High → Medium → Low)
+        for subject in compilation["subjects"]:
+            compilation["subjects"][subject].sort(
+                key=lambda x: (-x['importance'], x['published_date']), 
+                reverse=False
+            )
             
         return compilation
 
@@ -92,11 +116,16 @@ class CompilationService:
     def get_available_months():
         """
         Get a list of months that have articles.
+        Always includes current month at the top.
         """
         conn = get_db()
         rows = conn.execute("SELECT published_date, fetch_date FROM current_affairs").fetchall()
         
         months_set = set()
+        
+        # Always add current month
+        now = datetime.now()
+        months_set.add((now.year, now.month))
         
         for row in rows:
             dt = CompilationService.parse_date(row['published_date'])
@@ -111,10 +140,18 @@ class CompilationService:
         
         months = []
         for y, m in sorted_months:
+            label = datetime(y, m, 1).strftime("%B %Y")
+            # Mark current month
+            is_current = (y == now.year and m == now.month)
+            if is_current:
+                label = f"{label} (Current)"
+            
             months.append({
                 "year": y,
                 "month": m,
-                "label": datetime(y, m, 1).strftime("%B %Y")
+                "label": label,
+                "is_current": is_current
             })
             
         return months
+

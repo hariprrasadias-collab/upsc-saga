@@ -18,7 +18,7 @@ interface WeightageData {
 
 interface TrendData {
     year: number;
-    [key: string]: number; // Subject counts
+    [key: string]: number;
 }
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
@@ -54,7 +54,45 @@ const Seer: React.FC = () => {
         fetchData();
     }, []);
 
+    // Helper: Get top N subjects, group rest as "Others"
+    const getTopSubjects = (data: WeightageData[], topN: number = 6) => {
+        if (data.length <= topN) return data;
+
+        const sorted = [...data].sort((a, b) => b.count - a.count);
+        const top = sorted.slice(0, topN);
+        const others = sorted.slice(topN);
+
+        if (others.length > 0) {
+            const othersSum = others.reduce((sum, item) => sum + item.count, 0);
+            top.push({ subject: 'Others', count: othersSum });
+        }
+
+        return top;
+    };
+
+    // Helper: Get top subjects for trends
+    const getTopTrendSubjects = (trendsData: TrendData[], topN: number = 6): string[] => {
+        if (trendsData.length === 0) return [];
+
+        const subjectTotals: { [key: string]: number } = {};
+        trendsData.forEach(yearData => {
+            Object.keys(yearData).forEach(key => {
+                if (key !== 'year') {
+                    subjectTotals[key] = (subjectTotals[key] || 0) + yearData[key];
+                }
+            });
+        });
+
+        return Object.entries(subjectTotals)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, topN)
+            .map(([subject]) => subject);
+    };
+
     if (loading) return <div style={{ color: '#7fdbff', textAlign: 'center', marginTop: '50px' }}>Gazing into the waters...</div>;
+
+    const topWeightage = getTopSubjects(weightage, 6);
+    const topTrendSubjects = getTopTrendSubjects(trends, 6);
 
     return (
         <div className="seer-container">
@@ -112,54 +150,69 @@ const Seer: React.FC = () => {
                     <p className="chart-desc">Your daily XP gains over the last 7 days.</p>
                 </div>
 
-                {/* CHART 3: SUBJECT WEIGHTAGE (PIE) */}
+                {/* CHART 3: SUBJECT WEIGHTAGE (PIE) - Simplified */}
                 <div className="seer-card">
                     <h3>The Weight of Knowledge</h3>
-                    <div style={{ width: '100%', height: 300, minWidth: 0 }}>
+                    <div style={{ width: '100%', height: 380, minWidth: 0 }}>
                         <ResponsiveContainer>
                             <PieChart>
                                 <Pie
-                                    data={weightage}
+                                    data={topWeightage}
                                     cx="50%"
-                                    cy="50%"
-                                    labelLine={false}
-                                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                                    outerRadius={80}
+                                    cy="42%"
+                                    labelLine={true}
+                                    label={({ subject, percent }) => `${subject}: ${((percent || 0) * 100).toFixed(0)}%`}
+                                    outerRadius={95}
                                     fill="#8884d8"
                                     dataKey="count"
+                                    nameKey="subject"
                                 >
-                                    {weightage.map((entry, index) => (
+                                    {topWeightage.map((_, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
-                                <Tooltip contentStyle={{ backgroundColor: '#001f3f', borderColor: '#7fdbff', color: '#fff' }} />
+                                <Tooltip
+                                    contentStyle={{ backgroundColor: '#001f3f', borderColor: '#7fdbff', color: '#fff' }}
+                                    formatter={(value: number, name: string) => [value, name]}
+                                />
+                                <Legend
+                                    verticalAlign="bottom"
+                                    height={60}
+                                    wrapperStyle={{ paddingTop: '10px' }}
+                                    iconType="circle"
+                                />
                             </PieChart>
                         </ResponsiveContainer>
                     </div>
-                    <p className="chart-desc">Distribution of questions by Subject in the Archives.</p>
+                    <p className="chart-desc">Top 6 subjects in Archives{topWeightage.length > 6 && ' (+ Others group)'}.</p>
                 </div>
 
-                {/* CHART 4: YEARLY TRENDS (BAR) */}
+                {/* CHART 4: YEARLY TRENDS (BAR) - Simplified */}
                 <div className="seer-card wide">
                     <h3>Chronicles of the Past</h3>
-                    <div style={{ width: '100%', height: 300, minWidth: 0 }}>
+                    <div style={{ width: '100%', height: 380, minWidth: 0 }}>
                         <ResponsiveContainer>
                             <BarChart data={trends}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#1a3a4a" />
                                 <XAxis dataKey="year" stroke="#3a6e85" tick={{ fill: '#aaa' }} />
                                 <YAxis stroke="#3a6e85" tick={{ fill: '#aaa' }} />
                                 <Tooltip contentStyle={{ backgroundColor: '#001f3f', borderColor: '#7fdbff', color: '#fff' }} />
-                                <Legend />
-                                <Bar dataKey="Economy" stackId="a" fill="#8884d8" />
-                                <Bar dataKey="Polity" stackId="a" fill="#82ca9d" />
-                                <Bar dataKey="Environment" stackId="a" fill="#ffc658" />
-                                <Bar dataKey="History" stackId="a" fill="#ff8042" />
-                                <Bar dataKey="Geography" stackId="a" fill="#0088FE" />
-                                <Bar dataKey="Science & Tech" stackId="a" fill="#00C49F" />
+                                <Legend
+                                    wrapperStyle={{ paddingTop: '10px' }}
+                                    iconType="rect"
+                                />
+                                {topTrendSubjects.map((subject, index) => (
+                                    <Bar
+                                        key={subject}
+                                        dataKey={subject}
+                                        stackId="a"
+                                        fill={COLORS[index % COLORS.length]}
+                                    />
+                                ))}
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
-                    <p className="chart-desc">Subject-wise breakdown of questions over the years.</p>
+                    <p className="chart-desc">Year-wise breakdown of top 6 subjects.</p>
                 </div>
             </div>
         </div>

@@ -165,3 +165,21 @@ def get_mnemonic_history():
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@bp.route('/mnemonic/history/<int:history_id>', methods=['DELETE'])
+def delete_mnemonic_history(history_id):
+    """Delete a mnemonic from history"""
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM mnemonics_history WHERE id = ?', (history_id,))
+        deleted = cursor.rowcount > 0
+        conn.commit()
+        conn.close()
+        
+        if deleted:
+            return jsonify({'success': True, 'message': 'Mnemonic deleted successfully'})
+        else:
+            return jsonify({'success': False, 'error': 'Mnemonic not found'}), 404
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
