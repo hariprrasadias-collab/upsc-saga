@@ -10,8 +10,9 @@ from googleapiclient.discovery import build
 warmap = Blueprint('warmap', __name__)
 
 # Configuration
-CREDENTIALS_FILE = os.path.join(os.getcwd(), 'credentials.json')
-TOKEN_FILE = os.path.join(os.getcwd(), 'token.json')
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+CREDENTIALS_FILE = os.path.join(BASE_DIR, 'credentials.json')
+TOKEN_FILE = os.path.join(BASE_DIR, 'token.json')
 SCOPES = ['https://www.googleapis.com/auth/calendar.events']
 # Allow HTTP for local development
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'

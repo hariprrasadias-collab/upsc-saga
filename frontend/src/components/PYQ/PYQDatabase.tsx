@@ -141,6 +141,34 @@ const PYQDatabase: React.FC = () => {
         }
     };
 
+    const createBossBattle = async () => {
+        const name = prompt("Enter a name for this Boss Battle (e.g., 'Polity 2023 Challenge'):");
+        if (!name) return;
+
+        try {
+            const filters = {
+                year: selectedYears[0],
+                subject: selectedSubjects[0],
+                search: searchQuery
+            };
+
+            const res = await fetch('http://localhost:5000/api/arena/create-custom-boss', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, filters })
+            });
+
+            if (res.ok) {
+                alert("⚔️ Boss Battle Created! Go to the Battle Arena to fight.");
+            } else {
+                alert("Failed to create battle.");
+            }
+        } catch (err) {
+            console.error("Error creating battle:", err);
+            alert("Error creating battle.");
+        }
+    };
+
     return (
         <div className="pyq-container">
             {/* SIDEBAR FILTERS */}
@@ -203,14 +231,25 @@ const PYQDatabase: React.FC = () => {
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
-                    <button
-                        className="start-quiz-btn"
-                        onClick={startQuiz}
-                        disabled={startingQuiz || questions.length === 0}
-                        title="Start an interactive quiz with current filters"
-                    >
-                        {startingQuiz ? 'Starting...' : '🎯 Start Quiz'}
-                    </button>
+                    <div className="header-actions">
+                        <button
+                            className="create-boss-btn"
+                            onClick={createBossBattle}
+                            disabled={questions.length === 0}
+                            title="Create a Boss Battle from current filters"
+                            style={{ marginRight: '10px', background: '#e74c3c', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
+                        >
+                            ⚔️ Create Boss Battle
+                        </button>
+                        <button
+                            className="start-quiz-btn"
+                            onClick={startQuiz}
+                            disabled={startingQuiz || questions.length === 0}
+                            title="Start an interactive quiz with current filters"
+                        >
+                            {startingQuiz ? 'Starting...' : '🎯 Start Quiz'}
+                        </button>
+                    </div>
                 </div>
 
                 <div className="question-list">

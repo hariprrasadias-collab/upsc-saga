@@ -70,7 +70,7 @@ const RevisionCards: React.FC = () => {
         <div className="revision-cards-container">
             <div className="revision-header">
                 <h1>⚡ Quick Revision Cards</h1>
-                <p className="revision-subtitle">One-liner summaries for last-minute revision</p>
+                <p className="revision-subtitle">High-yield smart summaries for last-minute revision</p>
             </div>
 
             {/* Create New Card */}
@@ -94,9 +94,10 @@ const RevisionCards: React.FC = () => {
                     <button
                         className="generate-btn"
                         onClick={handleGenerateCard}
-                        disabled={generating || !newCard.title.trim()}
+                        disabled={generating}
+                        style={{ opacity: generating ? 0.7 : 1, cursor: generating ? 'wait' : 'pointer' }}
                     >
-                        {generating ? '✨ Generating...' : '🚀 Generate One-Liner'}
+                        {generating ? '✨ Forging Knowledge...' : '🚀 Generate Smart Summary'}
                     </button>
                 </div>
             </div>

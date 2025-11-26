@@ -32,22 +32,20 @@ const Ravens: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [processing, setProcessing] = useState(false);
     const [processingStatus, setProcessingStatus] = useState<string>('');
-    const [selectedPaper, setSelectedPaper] = useState<string>('');
-    const [selectedSubject, setSelectedSubject] = useState<string>('');
+
+    const [selectedPaper, setSelectedPaper] = useState<string>('All Papers');
+    const [selectedSubject, setSelectedSubject] = useState<string>('All Subjects');
     const [selectedSource, setSelectedSource] = useState<string>('All Sources');
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [showBookmarked, setShowBookmarked] = useState<boolean>(false);
     const [editingNotes, setEditingNotes] = useState<number | null>(null);
     const [mappingArticleId, setMappingArticleId] = useState<number | null>(null);
+    const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+
     const { addToast } = useToast();
 
-    const papers = ['All Papers', 'GS1', 'GS2', 'GS3', 'GS4'];
-    const subjects = ['All Subjects', 'Polity & Governance', 'Economics', 'International Relations',
-        'Environment & Ecology', 'Science & Technology', 'Internal Security', 'Social Issues'];
-
-    useEffect(() => {
-        fetchArticles();
-    }, [selectedPaper, selectedSubject, selectedSource, showBookmarked, searchQuery]);
+    const papers = ['GS1', 'GS2', 'GS3', 'GS4'];
+    const subjects = ['Polity', 'Economy', 'Environment', 'History', 'Geography', 'Science & Tech', 'International Relations', 'Ethics'];
 
     const fetchArticles = async () => {
         setLoading(true);
@@ -69,6 +67,34 @@ const Ravens: React.FC = () => {
             addToast('Failed to fetch articles', 'error');
         } finally {
             setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchArticles();
+    }, [selectedPaper, selectedSubject, selectedSource, showBookmarked, searchQuery]);
+
+    const updateChallengeProgress = async (type: string, increment: number = 1) => {
+        try {
+            const res = await fetch('http://localhost:5000/api/challenges/daily');
+            if (res.ok) {
+                const challenge = await res.json();
+                if (challenge && challenge.type === type && !challenge.completed) {
+                    const newProgress = Math.min(challenge.progress + increment, challenge.target_value);
+                    await fetch('http://localhost:5000/api/challenges/progress', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ progress: newProgress })
+                    });
+
+                    if (newProgress >= challenge.target_value) {
+                        addToast(`Challenge Completed! +${challenge.xp_reward} XP`, 'success');
+                        audioManager.play('success');
+                    }
+                }
+            }
+        } catch (err) {
+            console.error("Failed to update challenge progress:", err);
         }
     };
 
@@ -130,6 +156,7 @@ const Ravens: React.FC = () => {
             if (res.ok) {
                 addToast('Added to Lore Tablet', 'success');
                 audioManager.play('success');
+                updateChallengeProgress('ravens', 1);
             } else {
                 addToast('Failed to add to Lore', 'error');
             }
@@ -219,9 +246,11 @@ const Ravens: React.FC = () => {
                     className="search-input"
                 />
                 <select value={selectedPaper} onChange={(e) => setSelectedPaper(e.target.value)}>
+                    <option value="All Papers">All Papers</option>
                     {papers.map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
                 <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)}>
+                    <option value="All Subjects">All Subjects</option>
                     {subjects.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
                 <select
@@ -292,7 +321,26 @@ const Ravens: React.FC = () => {
                                 </div>
                             )}
 
-                            <h3><a href={article.link} target="_blank" rel="noreferrer">{article.title}</a></h3>
+                            <h3>
+                                <button
+                                    className="article-title-btn"
+                                    onClick={() => setSelectedArticle(article)}
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        padding: 0,
+                                        font: 'inherit',
+                                        cursor: 'pointer',
+                                        textAlign: 'left',
+                                        color: '#2c3e50',
+                                        textDecoration: 'none'
+                                    }}
+                                    onMouseOver={(e) => e.currentTarget.style.color = '#667eea'}
+                                    onMouseOut={(e) => e.currentTarget.style.color = '#2c3e50'}
+                                >
+                                    {article.title}
+                                </button>
+                            </h3>
 
                             <p className="summary">{article.upscSummary}</p>
 
@@ -376,6 +424,75 @@ const Ravens: React.FC = () => {
                             )}
                         </div>
                     ))}
+                </div>
+            )}
+            {selectedArticle && (
+                <div className="modal-overlay" onClick={() => setSelectedArticle(null)}>
+                    <div className="modal-content" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2>{selectedArticle.title}</h2>
+                            <button className="close-modal-btn" onClick={() => setSelectedArticle(null)}>×</button>
+                        </div>
+
+                        <div className="modal-body">
+                            <div className="modal-meta">
+                                <span>📅 {selectedArticle.published}</span>
+                                <span>📰 {selectedArticle.source}</span>
+                            </div>
+
+                            <div className="modal-section">
+                                <h3>Summary</h3>
+                                <p>{selectedArticle.upscSummary}</p>
+                            </div>
+
+                            {selectedArticle.keyPoints && selectedArticle.keyPoints.length > 0 && (
+                                <div className="modal-section">
+                                    <h3>Key Points</h3>
+                                    <ul className="keypoints">
+                                        {selectedArticle.keyPoints.map((point, idx) => (
+                                            <li key={idx}>{point}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            {selectedArticle.userNotes && (
+                                <div className="modal-section">
+                                    <h3>My Notes</h3>
+                                    <p className="notes-text">{selectedArticle.userNotes}</p>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="modal-actions">
+                            <a
+                                href={selectedArticle.link}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="action-btn btn-secondary"
+                                style={{ textDecoration: 'none', display: 'inline-block' }}
+                            >
+                                🔗 Read Full Article
+                            </a>
+                            <button
+                                className="action-btn btn-primary"
+                                onClick={() => {
+                                    handleAddToLore(selectedArticle);
+                                    setSelectedArticle(null);
+                                }}
+                            >
+                                📜 Add to Lore
+                            </button>
+                            <button
+                                className="action-btn btn-accent"
+                                onClick={() => {
+                                    if (selectedArticle.id) handleAnki(selectedArticle.id);
+                                }}
+                            >
+                                🥋 Create Flashcard
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

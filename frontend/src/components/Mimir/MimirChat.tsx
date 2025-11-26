@@ -107,7 +107,7 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
     // Floating mode - return both the button and the overlay
     if (mode === 'floating') {
         return (
-            <>
+            <div className="mimir-floating-wrapper">
                 {/* Floating Mimir Head Button */}
                 <button
                     className="mimir-head-btn"
@@ -160,7 +160,7 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
                         </form>
                     </div>
                 )}
-            </>
+            </div>
         );
     }
 

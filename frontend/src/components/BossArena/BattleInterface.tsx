@@ -64,6 +64,25 @@ const BattleInterface: React.FC<BattleInterfaceProps> = ({ boss, onBattleEnd }) 
         }
     };
 
+    const updateChallengeProgress = async (type: string, increment: number = 1) => {
+        try {
+            const res = await fetch('http://localhost:5000/api/challenges/daily');
+            if (res.ok) {
+                const challenge = await res.json();
+                if (challenge && challenge.type === type && !challenge.completed) {
+                    const newProgress = Math.min(challenge.progress + increment, challenge.target_value);
+                    await fetch('http://localhost:5000/api/challenges/progress', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ progress: newProgress })
+                    });
+                }
+            }
+        } catch (err) {
+            console.error("Failed to update challenge progress:", err);
+        }
+    };
+
     const handleAnswer = (index: number) => {
         const currentQ = questions[currentQuestionIndex];
         const selectedOption = ['A', 'B', 'C', 'D'][index];
@@ -75,6 +94,7 @@ const BattleInterface: React.FC<BattleInterfaceProps> = ({ boss, onBattleEnd }) 
             setDamageDealt(prev => prev + 1);
             setShake('boss');
             audioManager.play('success');
+            updateChallengeProgress('mcq', 1);
 
             if (newBossHp <= 0) {
                 endBattle('VICTORY');

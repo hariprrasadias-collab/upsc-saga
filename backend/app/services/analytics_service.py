@@ -224,18 +224,23 @@ def get_streak_days(conn, user_id):
     if not dates:
         return 0
     
-    # Sort dates
-    sorted_dates = sorted([datetime.fromisoformat(d).date() for d in dates], reverse=True)
+    # Convert to set of date objects for O(1) lookup
+    dates_objs = {datetime.fromisoformat(d).date() for d in dates}
     
-    # Count consecutive days from today
     today = datetime.now().date()
-    streak = 0
+    yesterday = today - timedelta(days=1)
     
-    for i, date in enumerate(sorted_dates):
-        expected_date = today - timedelta(days=i)
-        if date == expected_date:
-            streak += 1
-        else:
-            break
+    # Determine where the streak ends (today or yesterday)
+    if today in dates_objs:
+        current_date = today
+    elif yesterday in dates_objs:
+        current_date = yesterday
+    else:
+        return 0
+        
+    streak = 0
+    while current_date in dates_objs:
+        streak += 1
+        current_date -= timedelta(days=1)
     
     return streak

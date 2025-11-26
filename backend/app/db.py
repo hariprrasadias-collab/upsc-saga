@@ -1,7 +1,10 @@
 import sqlite3
 from flask import g
 
-DATABASE = 'upsc_saga.db'
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATABASE = os.path.join(BASE_DIR, 'upsc_saga.db')
 
 def get_db():
     db = getattr(g, '_database', None)

@@ -462,6 +462,24 @@
     object-fit: cover;
 }
 
+/* Floating Wrapper to isolate from Grid Layout */
+.mimir-floating-wrapper {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 1000;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+.mimir-floating-wrapper>* {
+    pointer-events: auto;
+}
+
 /* Floating Chat Window */
 .mimir-chat-window {
     position: fixed;

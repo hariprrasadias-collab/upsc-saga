@@ -15,7 +15,8 @@ from app.db_models.current_affairs import (
 from app.services.upsc_summarizer import (
     summarize_for_upsc,
     extract_image_from_article,
-    find_related_pyqs
+    find_related_pyqs,
+    fetch_article_content
 )
 import anki_client
 
@@ -37,7 +38,7 @@ def call_the_ravens():
         'hugin': [
             'https://www.thehindu.com/opinion/editorial/feeder/default.rss',
             'https://www.project-syndicate.org/rss',
-            'https://www.livemint.com/rss/opinion'
+            'https://indianexpress.com/section/opinion/editorials/feed/'
         ]
     }
     
@@ -75,15 +76,20 @@ def process_article():
     link = data.get('link')
     source = data.get('source')
     published = data.get('published')
-    content = data.get('summary', '')
+    rss_summary = data.get('summary', '')
     
     # Check for duplicates before processing
     if article_exists(link):
         return jsonify({'success': True, 'message': 'Article already exists', 'skipped': True})
 
     try:
+        # Fetch full content
+        full_content = fetch_article_content(link)
+        if not full_content or len(full_content) < 100:
+            full_content = rss_summary # Fallback
+            
         # Get AI summary and tags
-        ai_result = summarize_for_upsc(title, content, link)
+        ai_result = summarize_for_upsc(title, full_content, link)
         
         # Extract image
         image_url = extract_image_from_article(link)
@@ -100,7 +106,7 @@ def process_article():
             'link': link,
             'source': source,
             'published': published,
-            'original_summary': content,
+            'original_summary': rss_summary,
             'upsc_summary': ai_result['upsc_summary'],
             'key_points': ai_result['key_points'],
             'papers': ai_result['papers'],

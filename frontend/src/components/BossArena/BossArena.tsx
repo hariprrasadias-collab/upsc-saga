@@ -16,7 +16,7 @@ interface Battle {
 
 interface Boss {
     id: string | number;
-    type: 'YEAR' | 'SUBJECT';
+    type: 'YEAR' | 'SUBJECT' | 'CUSTOM';
     name: string;
     hp: number;
     max_hp: number;
@@ -32,6 +32,7 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
     const [battles, setBattles] = useState<Battle[]>([]);
     const [yearBosses, setYearBosses] = useState<Boss[]>([]);
     const [subjectBosses, setSubjectBosses] = useState<Boss[]>([]);
+    const [customBosses, setCustomBosses] = useState<Boss[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(true);
     const [activeBattleBoss, setActiveBattleBoss] = useState<Boss | null>(null);
@@ -61,6 +62,7 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
                 const data = await res.json();
                 setYearBosses(data.year_bosses);
                 setSubjectBosses(data.subject_bosses);
+                setCustomBosses(data.custom_bosses || []);
             }
         } catch (err) {
             console.error("Failed to load bosses", err);
@@ -203,6 +205,48 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
                     );
                 })}
             </div>
+
+            {/* Custom Bosses Section */}
+            {customBosses.length > 0 && (
+                <>
+                    <h2 style={{ fontSize: '28px', margin: '40px 0 20px', color: '#9b59b6' }}>👹 Custom Challenges</h2>
+                    <div className="boss-grid">
+                        {customBosses.map(boss => {
+                            const difficultyLevel = 'medium';
+                            return (
+                                <div key={'custom-' + boss.id} className={`boss-card ${difficultyLevel}`}>
+                                    <div className="boss-image-container">
+                                        <div className="boss-avatar-placeholder" style={{ background: '#8e44ad' }}>C</div>
+                                    </div>
+                                    <div className="boss-info">
+                                        <h3 className="boss-name">{boss.name}</h3>
+                                        <div className="boss-meta">
+                                            <span className="boss-subject">🎯 Custom</span>
+                                            <span className="boss-difficulty medium">Medium</span>
+                                        </div>
+                                        <p className="boss-desc">
+                                            A custom challenge created from the Archives. Prove your mastery over these specific topics.
+                                        </p>
+                                        <div className="boss-stats">
+                                            <div className="stat">
+                                                <span className="label">Health</span>
+                                                <span className="value">{boss.hp}/{boss.max_hp}</span>
+                                            </div>
+                                            <div className="stat">
+                                                <span className="label">Reward</span>
+                                                <span className="value">{boss.xp_reward} XP</span>
+                                            </div>
+                                        </div>
+                                        <button className="challenge-btn" onClick={() => startBossBattle(boss)}>
+                                            ⚔️ Challenge
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </>
+            )}
 
             {/* Battle History */}
             <div className="battle-list" style={{ marginTop: '50px' }}>

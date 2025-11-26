@@ -179,7 +179,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
 
             {/* DASHBOARD */}
             <div className="syllabus-dashboard">
-                {['GS1', 'GS2', 'GS3', 'GS4'].map(paper => (
+                {['Prelims', 'GS1', 'GS2', 'GS3', 'GS4', 'Optional'].map(paper => (
                     <div key={paper} className="paper-card">
                         <div className="paper-title">{paper}</div>
                         <div className="progress-container">

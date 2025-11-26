@@ -6,6 +6,26 @@ from app.services.xp_service import award_xp
 
 arena_bp = Blueprint('arena', __name__)
 
+@arena_bp.route('/create-custom-boss', methods=['POST'])
+def create_custom_boss():
+    """Create a new custom boss from filters"""
+    try:
+        data = request.json
+        name = data.get('name')
+        filters = data.get('filters')
+        
+        if not name or not filters:
+            return jsonify({'error': 'Name and filters are required'}), 400
+            
+        conn = get_db()
+        cursor = conn.execute('INSERT INTO custom_bosses (name, filters) VALUES (?, ?)', 
+                            (name, json.dumps(filters)))
+        conn.commit()
+        
+        return jsonify({'success': True, 'id': cursor.lastrowid})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 def get_boss_stats(boss_type, boss_id):
     """Generate boss stats dynamically based on DB content"""
     conn = get_db()
@@ -20,6 +40,31 @@ def get_boss_stats(boss_type, boss_id):
         count = conn.execute("SELECT COUNT(*) FROM pyq_questions WHERE subject = ?", (boss_id,)).fetchone()[0]
         name = f"The {boss_id} Golem"
         loot = ["Subject Mastery Token", "Skill Point"]
+    elif boss_type == 'CUSTOM':
+        # Boss ID is the Custom Boss ID
+        boss_row = conn.execute("SELECT * FROM custom_bosses WHERE id = ?", (boss_id,)).fetchone()
+        if not boss_row:
+            raise ValueError("Custom Boss not found")
+            
+        filters = json.loads(boss_row['filters'])
+        name = boss_row['name']
+        loot = ["Custom Reward", "Glory"]
+        
+        # Calculate count based on filters
+        query = "SELECT COUNT(*) FROM pyq_questions WHERE 1=1"
+        params = []
+        if filters.get('year'):
+            query += " AND year = ?"
+            params.append(filters['year'])
+        if filters.get('subject'):
+            query += " AND subject = ?"
+            params.append(filters['subject'])
+        if filters.get('search'):
+            query += " AND (question_text LIKE ? OR topic LIKE ?)"
+            term = f"%{filters['search']}%"
+            params.extend([term, term])
+            
+        count = conn.execute(query, params).fetchone()[0]
     else:
         # Default/Random Boss
         count = 10
@@ -42,7 +87,7 @@ def get_boss_stats(boss_type, boss_id):
 
 @arena_bp.route('/bosses', methods=['GET'])
 def get_available_bosses():
-    """Get list of available bosses (Years and Subjects)"""
+    """Get list of available bosses (Years, Subjects, and Custom)"""
     conn = get_db()
     
     # Year Bosses
@@ -53,9 +98,19 @@ def get_available_bosses():
     subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
     subject_bosses = [get_boss_stats('SUBJECT', row['subject']) for row in subjects]
     
+    # Custom Bosses
+    custom = conn.execute("SELECT id FROM custom_bosses WHERE is_active = 1 ORDER BY created_at DESC").fetchall()
+    custom_bosses = []
+    for row in custom:
+        try:
+            custom_bosses.append(get_boss_stats('CUSTOM', row['id']))
+        except:
+            continue
+    
     return jsonify({
         "year_bosses": year_bosses,
-        "subject_bosses": subject_bosses
+        "subject_bosses": subject_bosses,
+        "custom_bosses": custom_bosses
     })
 
 @arena_bp.route('/fight/start', methods=['POST'])
@@ -75,6 +130,28 @@ def start_fight():
             rows = conn.execute("SELECT * FROM pyq_questions WHERE year = ? ORDER BY RANDOM() LIMIT ?", (boss_id, boss['hp'])).fetchall()
         elif boss_type == 'SUBJECT':
             rows = conn.execute("SELECT * FROM pyq_questions WHERE subject = ? ORDER BY RANDOM() LIMIT ?", (boss_id, boss['hp'])).fetchall()
+        elif boss_type == 'CUSTOM':
+            # Fetch filters again
+            boss_row = conn.execute("SELECT * FROM custom_bosses WHERE id = ?", (boss_id,)).fetchone()
+            filters = json.loads(boss_row['filters'])
+            
+            query = "SELECT * FROM pyq_questions WHERE 1=1"
+            params = []
+            if filters.get('year'):
+                query += " AND year = ?"
+                params.append(filters['year'])
+            if filters.get('subject'):
+                query += " AND subject = ?"
+                params.append(filters['subject'])
+            if filters.get('search'):
+                query += " AND (question_text LIKE ? OR topic LIKE ?)"
+                term = f"%{filters['search']}%"
+                params.extend([term, term])
+            
+            query += " ORDER BY RANDOM() LIMIT ?"
+            params.append(boss['hp'])
+            
+            rows = conn.execute(query, params).fetchall()
             
         # Format questions for frontend
         for row in rows:

@@ -192,6 +192,54 @@ def extract_image_from_article(link):
         print(f"Image extraction failed for {link}: {e}")
         return None
 
+def fetch_article_content(url):
+    """Fetch full article content from URL."""
+    try:
+        import requests
+        from bs4 import BeautifulSoup
+        
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+        response = requests.get(url, headers=headers, timeout=10)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        
+        # Remove scripts and styles
+        for script in soup(["script", "style", "nav", "header", "footer", "aside"]):
+            script.extract()
+            
+        # Try to find main content based on common classes/ids
+        content = None
+        
+        # The Hindu
+        if 'thehindu.com' in url:
+            content = soup.find('div', {'id': re.compile(r'content-body-.*')})
+            
+        # Indian Express
+        if not content and 'indianexpress.com' in url:
+            content = soup.find('div', class_='story_details') or soup.find('div', class_='full-details')
+            
+        # Generic fallback: find the element with the most <p> tags
+        if not content:
+             candidates = soup.find_all('div')
+             best_candidate = None
+             max_p = 0
+             for c in candidates:
+                 p_count = len(c.find_all('p', recursive=False))
+                 if p_count > max_p:
+                     max_p = p_count
+                     best_candidate = c
+             content = best_candidate
+
+        if content:
+            text = content.get_text(separator=' ', strip=True)
+        else:
+            # Fallback to all paragraphs
+            text = ' '.join([p.get_text() for p in soup.find_all('p')])
+            
+        return text[:15000] # Limit length
+    except Exception as e:
+        print(f"Failed to fetch content from {url}: {e}")
+        return ""
+
 def find_related_pyqs(subjects, papers):
     """Placeholder for fetching related previous year questions.
     Returns up to three mock PYQs based on subject.
@@ -214,19 +262,19 @@ def find_related_pyqs(subjects, papers):
 
 def generate_one_liner(title: str, content: str) -> str:
     """Generate a concise one-liner summary for quick revision."""
-    prompt = f"""You are an expert UPSC educator. Create a ONE-LINE summary for quick revision.
-
+    prompt = f"""You are an expert UPSC educator. Create a HIGH-YIELD REVISION SUMMARY for this topic.
+    
 Topic: {title}
-Content: {content[:500]}
+Context: {content[:1000] if content else "Generate based on your knowledge of this UPSC topic."}
 
 Requirements:
-- MUST be exactly ONE sentence (40-50 words max)
-- Capture the MOST IMPORTANT concept/fact
-- Use active voice and clear language
-- Include key dates/names if relevant
-- Make it memorable and easy to recall
+- Create a dense, information-rich summary (2-3 sentences max).
+- Focus on KEYWORDS, FACTS, DATES, and CONSTITUTIONAL ARTICLES relevant to UPSC.
+- If the topic is broad, focus on the most examinable aspects.
+- Make it punchy and memorable.
+- Do not use fluff words.
 
-ONE-LINER:"""
+SUMMARY:"""
 
     try:
         model = genai.GenerativeModel('gemini-1.5-flash')
