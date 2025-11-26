@@ -123,7 +123,7 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
 
                 {/* Chat Window Overlay */}
                 {isOpen && (
-                    <div className="mimir-chat-window">
+                    <div className="mimir-chat-window" onClick={(e) => e.stopPropagation()}>
                         <div className="mimir-window-header">
                             <h3>MIMIR'S WISDOM</h3>
                             <div className="header-actions">

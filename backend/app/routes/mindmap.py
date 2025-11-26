@@ -53,3 +53,14 @@ def get_mindmap(map_id):
         return jsonify({'error': 'Mind map not found'}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@bp.route('/<int:map_id>', methods=['DELETE'])
+def delete_mindmap(map_id):
+    """Delete a specific mind map"""
+    try:
+        success = MindMapService.delete_mindmap(map_id)
+        if success:
+            return jsonify({'message': 'Mind map deleted successfully'})
+        return jsonify({'error': 'Mind map not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

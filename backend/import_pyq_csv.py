@@ -64,6 +64,9 @@ def import_csv():
                 option_b = row['option_b']
                 option_c = row['option_c']
                 option_d = row['option_d']
+                if not row['correct_option']:
+                    print(f"Skipping row with missing correct_option: {row}")
+                    continue
                 correct_option = row['correct_option'].strip().upper()
                 explanation = row['explanation']
                 difficulty = row['difficulty']

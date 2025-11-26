@@ -367,12 +367,16 @@ const Ravens: React.FC = () => {
                                     </button>
                                 )}
                             </div>
+
+                            {/* Issue Mapping Viewer - Rendered Inside Card */}
+                            {mappingArticleId === article.id && (
+                                <div className="mapping-container-embedded">
+                                    <IssueMappingViewer articleId={article.id} articleTitle={article.title} />
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
-            )}
-            {mappingArticleId && (
-                <IssueMappingViewer articleId={mappingArticleId} />
             )}
         </div>
     );

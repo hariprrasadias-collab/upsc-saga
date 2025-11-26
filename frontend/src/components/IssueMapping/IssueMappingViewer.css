@@ -195,3 +195,79 @@
         width: 100%;
     }
 }
+
+/* Tagging UI */
+.tags-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 16px;
+    background: #f8f9fd;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    background: #e0e7ff;
+    color: #4338ca;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.remove-tag-btn {
+    background: none;
+    border: none;
+    color: #6366f1;
+    margin-left: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 2px;
+    line-height: 1;
+}
+
+.remove-tag-btn:hover {
+    color: #dc2626;
+}
+
+.add-tag-form {
+    display: flex;
+    gap: 8px;
+}
+
+.add-tag-form input {
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+}
+
+.add-tag-form input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.add-tag-form button {
+    padding: 6px 12px;
+    background: #6366f1;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.add-tag-form button:hover {
+    background: #4f46e5;
+}

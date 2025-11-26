@@ -156,6 +156,10 @@
     cursor: pointer;
     transition: background 0.2s;
     border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .saved-maps-list li:last-child {
@@ -164,6 +168,11 @@
 
 .saved-maps-list li:hover {
     background: rgba(255, 255, 255, 0.05);
+}
+
+.map-info {
+    flex: 1;
+    min-width: 0;
 }
 
 .map-title {
@@ -178,10 +187,36 @@
     color: var(--text-secondary);
 }
 
+.delete-map-btn {
+    background: transparent;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    flex-shrink: 0;
+}
+
+.delete-map-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: #ef4444;
+    transform: scale(1.1) rotate(10deg);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.delete-map-btn:active {
+    transform: scale(0.95) rotate(5deg);
+}
+
 .mindmap-main {
     flex-grow: 1;
     min-width: 0;
-    /* Prevent flex overflow */
 }
 
 .toggle-saved-btn {

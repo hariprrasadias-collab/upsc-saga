@@ -1,0 +1,2 @@
+Error in get_article_mappings: name 'get_db' is not defined
+Error in analyze_article: no such column: content

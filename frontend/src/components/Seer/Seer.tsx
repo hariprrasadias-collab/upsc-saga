@@ -1,9 +1,9 @@
-// /frontend/src/components/Seer/Seer.tsx
 import React, { useEffect, useState } from 'react';
 import './Seer.css';
 import {
     Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer,
-    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip
+    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
+    PieChart, Pie, Cell, BarChart, Bar, Legend
 } from 'recharts';
 
 interface SeerData {
@@ -11,18 +11,47 @@ interface SeerData {
     xp_history: Array<{ date: string; xp: number }>;
 }
 
+interface WeightageData {
+    subject: string;
+    count: number;
+}
+
+interface TrendData {
+    year: number;
+    [key: string]: number; // Subject counts
+}
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
+
 const Seer: React.FC = () => {
     const [data, setData] = useState<SeerData | null>(null);
+    const [weightage, setWeightage] = useState<WeightageData[]>([]);
+    const [trends, setTrends] = useState<TrendData[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch('http://localhost:5000/api/seer')
-            .then(res => res.json())
-            .then(d => {
-                setData(d);
+        const fetchData = async () => {
+            try {
+                const [seerRes, weightRes, trendRes] = await Promise.all([
+                    fetch('http://localhost:5000/api/seer'),
+                    fetch('http://localhost:5000/api/seer/weightage'),
+                    fetch('http://localhost:5000/api/seer/trends')
+                ]);
+
+                const seerData = await seerRes.json();
+                const weightData = await weightRes.json();
+                const trendData = await trendRes.json();
+
+                setData(seerData);
+                setWeightage(weightData);
+                setTrends(trendData);
                 setLoading(false);
-            })
-            .catch(err => console.error("The pool is clouded...", err));
+            } catch (err) {
+                console.error("The pool is clouded...", err);
+            }
+        };
+
+        fetchData();
     }, []);
 
     if (loading) return <div style={{ color: '#7fdbff', textAlign: 'center', marginTop: '50px' }}>Gazing into the waters...</div>;
@@ -54,9 +83,7 @@ const Seer: React.FC = () => {
                             </RadarChart>
                         </ResponsiveContainer>
                     </div>
-                    <p style={{ textAlign: 'center', fontSize: '0.9rem', color: '#aaa', marginTop: '10px' }}>
-                        Shows your focus distribution across GS Papers.
-                    </p>
+                    <p className="chart-desc">Shows your focus distribution across GS Papers.</p>
                 </div>
 
                 {/* CHART 2: CONSISTENCY (AREA) */}
@@ -82,9 +109,57 @@ const Seer: React.FC = () => {
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
-                    <p style={{ textAlign: 'center', fontSize: '0.9rem', color: '#aaa', marginTop: '10px' }}>
-                        Your daily XP gains over the last 7 days.
-                    </p>
+                    <p className="chart-desc">Your daily XP gains over the last 7 days.</p>
+                </div>
+
+                {/* CHART 3: SUBJECT WEIGHTAGE (PIE) */}
+                <div className="seer-card">
+                    <h3>The Weight of Knowledge</h3>
+                    <div style={{ width: '100%', height: 300 }}>
+                        <ResponsiveContainer>
+                            <PieChart>
+                                <Pie
+                                    data={weightage}
+                                    cx="50%"
+                                    cy="50%"
+                                    labelLine={false}
+                                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                    outerRadius={80}
+                                    fill="#8884d8"
+                                    dataKey="count"
+                                >
+                                    {weightage.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip contentStyle={{ backgroundColor: '#001f3f', borderColor: '#7fdbff', color: '#fff' }} />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+                    <p className="chart-desc">Distribution of questions by Subject in the Archives.</p>
+                </div>
+
+                {/* CHART 4: YEARLY TRENDS (BAR) */}
+                <div className="seer-card wide">
+                    <h3>Chronicles of the Past</h3>
+                    <div style={{ width: '100%', height: 300 }}>
+                        <ResponsiveContainer>
+                            <BarChart data={trends}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#1a3a4a" />
+                                <XAxis dataKey="year" stroke="#3a6e85" tick={{ fill: '#aaa' }} />
+                                <YAxis stroke="#3a6e85" tick={{ fill: '#aaa' }} />
+                                <Tooltip contentStyle={{ backgroundColor: '#001f3f', borderColor: '#7fdbff', color: '#fff' }} />
+                                <Legend />
+                                <Bar dataKey="Economy" stackId="a" fill="#8884d8" />
+                                <Bar dataKey="Polity" stackId="a" fill="#82ca9d" />
+                                <Bar dataKey="Environment" stackId="a" fill="#ffc658" />
+                                <Bar dataKey="History" stackId="a" fill="#ff8042" />
+                                <Bar dataKey="Geography" stackId="a" fill="#0088FE" />
+                                <Bar dataKey="Science & Tech" stackId="a" fill="#00C49F" />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                    <p className="chart-desc">Subject-wise breakdown of questions over the years.</p>
                 </div>
             </div>
         </div>

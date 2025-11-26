@@ -48,6 +48,7 @@ import PYQHeatmap from './components/Analytics/PYQHeatmap';
 import ModelAnswersManager from './components/ModelAnswers/ModelAnswersManager';
 import RevisionCenter from './components/Revision/RevisionCenter';
 import MindMapCreator from './components/MindMap/MindMapCreator';
+import CompilationGenerator from './components/Ravens/CompilationGenerator';
 
 // --- UTILS ---
 import { audioManager } from './util/AudioManager';
@@ -254,7 +255,7 @@ function App() {
                 {currentTab === 'codex' && (
                   <YggdrasilTree />
                 )}
-                {currentTab === 'lore' && (
+                {currentTab === 'lore-tablets' && (
                   <LoreTablets />
                 )}
                 {currentTab === 'pyq' && (
@@ -282,6 +283,7 @@ function App() {
                   <EssayWorkshop onTaskCompleted={handleTaskCompleted} />
                 )}
                 {currentTab === 'csat' && <CSATModule />}
+                {currentTab === 'compilation' && <CompilationGenerator />}
                 {currentTab === 'mimir' && <MimirChat />}
                 {currentTab === 'flashcards' && (
                   <FlashcardsManager onTaskCompleted={handleTaskCompleted} />
@@ -301,7 +303,7 @@ function App() {
                 {currentTab === 'arena' && (
                   <BossArena onBattleComplete={handleTaskCompleted} />
                 )}
-                {currentTab === 'planner' && (
+                {(currentTab === 'planner' || currentTab === 'study-plan') && (
                   <StudyPlanDashboard />
                 )}
                 {currentTab === 'revision-cards' && (

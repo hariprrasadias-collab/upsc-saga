@@ -8,6 +8,10 @@ import os
 import json
 import re
 import google.generativeai as genai
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Configure Gemini API
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
@@ -235,6 +239,11 @@ ONE-LINER:"""
 
 def generate_mnemonic(text: str, mnemonic_type: str = "facts") -> str:
     """Generate memory aids (mnemonics) for facts, dates, lists, concepts."""
+    
+    # Check if Gemini API key is configured
+    if not GEMINI_API_KEY:
+        return "⚠️ Gemini API Key not configured. Please add GEMINI_API_KEY to your environment variables to use AI-powered mnemonic generation."
+    
     type_instructions = {
         "facts": "Create a memorable acronym or phrase to remember key facts",
         "dates": "Create a rhyme or pattern to remember important dates",
@@ -258,10 +267,13 @@ Requirements:
 MNEMONIC:"""
 
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-pro-latest')
         response = model.generate_content(prompt)
         mnemonic = response.text.strip()
         return mnemonic
     except Exception as e:
         print(f"Error generating mnemonic: {e}")
-        return "Memory aid could not be generated"
+        return f"⚠️ Error generating mnemonic: {str(e)}. Please check your Gemini API configuration."
+
+
+

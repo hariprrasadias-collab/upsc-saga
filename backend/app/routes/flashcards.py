@@ -422,3 +422,63 @@ def get_analytics():
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+# ==================== CSV IMPORT ====================
+
+@flashcards.route('/api/flashcards/import', methods=['POST'])
+def import_flashcards_csv():
+    """Import flashcards from CSV file"""
+    try:
+        import csv
+        import io
+        
+        deck_id = request.form.get('deck_id', type=int)
+        if not deck_id:
+            return jsonify({'error': 'deck_id is required'}), 400
+        
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file uploaded'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+        
+        # Read CSV with proper quote handling
+        stream = io.StringIO(file.stream.read().decode('UTF8'), newline=None)
+        csv_reader = csv.DictReader(stream)
+        
+        conn = get_db()
+        imported_count = 0
+        errors = []
+        
+        for i, row in enumerate(csv_reader, start=2):  # Start at 2 (line 1 is header)
+            try:
+                front = row.get('Front', '').strip()
+                back = row.get('Back', '').strip()
+                
+                if not front or not back:
+                    errors.append(f"Line {i}: Missing front or back content")
+                    continue
+                
+                # Insert flashcard
+                conn.execute('''\
+                    INSERT INTO flashcards (deck_id, front, back, card_type, source)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (deck_id, front, back, 'basic', 'csv_import'))
+                
+                imported_count += 1
+                
+            except Exception as e:
+                errors.append(f"Line {i}: {str(e)}")
+        
+        conn.commit()
+        
+        return jsonify({
+            'success': True,
+            'imported': imported_count,
+            'errors': errors
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

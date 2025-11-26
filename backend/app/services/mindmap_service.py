@@ -82,3 +82,14 @@ class MindMapService:
             data['root_node'] = json.loads(data['root_node'])
             return data
         return None
+
+    @staticmethod
+    def delete_mindmap(map_id):
+        conn = db.get_db()
+        cursor = conn.cursor()
+        
+        cursor.execute('DELETE FROM mind_maps WHERE id = ?', (map_id,))
+        conn.commit()
+        
+        return cursor.rowcount > 0
+

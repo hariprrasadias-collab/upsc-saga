@@ -57,6 +57,9 @@ def create_app():
     app.register_blueprint(model_answers.bp)
     app.register_blueprint(issue_mapping.bp)
     app.register_blueprint(mindmap.bp)
+    
+    from app.routes import compilation
+    app.register_blueprint(compilation.bp)
 
     from app.routes.scribe import scribe_bp
     app.register_blueprint(scribe_bp, url_prefix='/api/scribe')

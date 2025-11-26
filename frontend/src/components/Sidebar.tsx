@@ -63,6 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab }) => {
         { id: 'flashcards', label: 'Flashcards', icon: '🎴' },
         { id: 'seer', label: 'The Seer', icon: '🔮' },
         { id: 'ravens', label: 'The Ravens', icon: '🐦' },
+        { id: 'compilation', label: 'Monthly Compilation', icon: '📚' },
         { id: 'pyq', label: 'The Archives', icon: '🏛️' },
         { id: 'heatmap', label: 'PYQ Heatmap', icon: '📊' },
         { id: 'model-answers', label: 'Model Answers', icon: '📝' },

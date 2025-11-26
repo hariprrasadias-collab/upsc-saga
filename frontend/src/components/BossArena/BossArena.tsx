@@ -1,4 +1,3 @@
-// /frontend/src/components/BossArena/BossArena.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import './BossArena.css';
 import BattleInterface from './BattleInterface';
@@ -15,18 +14,28 @@ interface Battle {
     type: 'Mock Test' | 'Answer Writing' | 'Boss Fight';
 }
 
-// Props to notify App to refresh XP stats
+interface Boss {
+    id: string | number;
+    type: 'YEAR' | 'SUBJECT';
+    name: string;
+    hp: number;
+    max_hp: number;
+    xp_reward: number;
+    loot: string[];
+}
+
 interface BossArenaProps {
     onBattleComplete: () => void;
 }
 
 const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
     const [battles, setBattles] = useState<Battle[]>([]);
+    const [yearBosses, setYearBosses] = useState<Boss[]>([]);
+    const [subjectBosses, setSubjectBosses] = useState<Boss[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [activeBattleBoss, setActiveBattleBoss] = useState<{ id: number, name: string, hp: number } | null>(null);
+    const [activeBattleBoss, setActiveBattleBoss] = useState<Boss | null>(null);
 
-    // Form State
     const [bossName, setBossName] = useState('');
     const [subject, setSubject] = useState('General Studies I');
     const [totalMarks, setTotalMarks] = useState(200);
@@ -42,6 +51,19 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
             }
         } catch (err) {
             console.error("Failed to load battle history", err);
+        }
+    }, []);
+
+    const fetchBosses = useCallback(async () => {
+        try {
+            const res = await fetch('http://localhost:5000/api/arena/bosses');
+            if (res.ok) {
+                const data = await res.json();
+                setYearBosses(data.year_bosses);
+                setSubjectBosses(data.subject_bosses);
+            }
+        } catch (err) {
+            console.error("Failed to load bosses", err);
         } finally {
             setLoading(false);
         }
@@ -49,11 +71,11 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
 
     useEffect(() => {
         fetchBattles();
-    }, [fetchBattles]);
+        fetchBosses();
+    }, [fetchBattles, fetchBosses]);
 
     const handleFight = async (e: React.FormEvent) => {
         e.preventDefault();
-
         try {
             const res = await fetch('http://localhost:5000/api/battles/manual', {
                 method: 'POST',
@@ -70,10 +92,9 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
             if (res.ok) {
                 const result = await res.json();
                 alert(result.is_victory ? "VICTORY! BOSS SLAIN!" : "DEFEAT. TRAIN HARDER.");
-                await fetchBattles(); // Refresh list
-                onBattleComplete(); // Refresh User XP in Sidebar
-                setShowModal(false); // Close modal
-                // Reset form
+                await fetchBattles();
+                onBattleComplete();
+                setShowModal(false);
                 setBossName('');
                 setMyScore(0);
             }
@@ -82,8 +103,8 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
         }
     };
 
-    const startBossBattle = (bossId: number, bossName: string, hp: number) => {
-        setActiveBattleBoss({ id: bossId, boss_name: bossName, total_hp: hp, image_url: '' } as any);
+    const startBossBattle = (boss: Boss) => {
+        setActiveBattleBoss(boss);
     };
 
     const handleBattleEnd = () => {
@@ -93,32 +114,98 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
     };
 
     if (activeBattleBoss) {
-        return <BattleInterface boss={activeBattleBoss as any} onBattleEnd={handleBattleEnd} />;
+        return <BattleInterface boss={activeBattleBoss} onBattleEnd={handleBattleEnd} />;
     }
 
     return (
         <div className="arena-container">
-            <h1 className="arena-header">The Proving Grounds</h1>
-
-            <div className="arena-bosses-grid">
-                <div className="boss-card-entry" onClick={() => startBossBattle(1, "Vision Test 1", 5)}>
-                    <h3>Vision Test 1</h3>
-                    <p>HP: 5 | Reward: 100 XP</p>
-                    <button className="fight-btn-small">FIGHT</button>
-                </div>
-                <div className="boss-card-entry" onClick={() => startBossBattle(2, "Mains Answer Writing", 8)}>
-                    <h3>Mains Answer Writing</h3>
-                    <p>HP: 8 | Reward: 200 XP</p>
-                    <button className="fight-btn-small">FIGHT</button>
-                </div>
-                <div className="boss-card-entry" onClick={() => startBossBattle(3, "CSAT Demon", 10)}>
-                    <h3>CSAT Demon</h3>
-                    <p>HP: 10 | Reward: 500 XP</p>
-                    <button className="fight-btn-small">FIGHT</button>
-                </div>
+            <div className="arena-header">
+                <h1 className="arena-title">The Proving Grounds</h1>
+                <p className="arena-subtitle">Face mighty bosses and prove your knowledge</p>
             </div>
 
-            <div className="battle-list">
+            {/* Year Titans Section */}
+            <h2 style={{ fontSize: '28px', margin: '30px 0 20px', color: '#ff4081' }}>⚔️ Year Titans</h2>
+            <div className="boss-grid">
+                {yearBosses.map(boss => {
+                    const difficultyLevel = boss.hp <= boss.max_hp * 0.3 ? 'hard' : boss.hp <= boss.max_hp * 0.7 ? 'medium' : 'easy';
+                    return (
+                        <div key={'year-' + boss.id} className={`boss-card ${difficultyLevel}`}>
+                            <div className="boss-image-container">
+                                <div className="boss-avatar-placeholder">{boss.name.substring(4, 8)}</div>
+                            </div>
+                            <div className="boss-info">
+                                <h3 className="boss-name">{boss.name}</h3>
+                                <div className="boss-meta">
+                                    <span className="boss-subject">📅 History</span>
+                                    <span className={`boss-difficulty ${difficultyLevel}`}>
+                                        {difficultyLevel.charAt(0).toUpperCase() + difficultyLevel.slice(1)}
+                                    </span>
+                                </div>
+                                <p className="boss-desc">
+                                    Challenge the {boss.name.split(' ')[1]} year examination. Test your knowledge across all subjects.
+                                </p>
+                                <div className="boss-stats">
+                                    <div className="stat">
+                                        <span className="label">Health</span>
+                                        <span className="value">{boss.hp}/{boss.max_hp}</span>
+                                    </div>
+                                    <div className="stat">
+                                        <span className="label">Reward</span>
+                                        <span className="value">{boss.xp_reward} XP</span>
+                                    </div>
+                                </div>
+                                <button className="challenge-btn" onClick={() => startBossBattle(boss)}>
+                                    ⚔️ Challenge
+                                </button>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* Subject Golems Section */}
+            <h2 style={{ fontSize: '28px', margin: '40px 0 20px', color: '#ff4081' }}>🛡️ Subject Golems</h2>
+            <div className="boss-grid">
+                {subjectBosses.map(boss => {
+                    const difficultyLevel = boss.hp <= boss.max_hp * 0.3 ? 'hard' : boss.hp <= boss.max_hp * 0.7 ? 'medium' : 'easy';
+                    return (
+                        <div key={'sub-' + boss.id} className={`boss-card ${difficultyLevel}`}>
+                            <div className="boss-image-container">
+                                <div className="boss-avatar-placeholder">{boss.name[0]}</div>
+                            </div>
+                            <div className="boss-info">
+                                <h3 className="boss-name">{boss.name}</h3>
+                                <div className="boss-meta">
+                                    <span className="boss-subject">📚 {boss.name}</span>
+                                    <span className={`boss-difficulty ${difficultyLevel}`}>
+                                        {difficultyLevel.charAt(0).toUpperCase() + difficultyLevel.slice(1)}
+                                    </span>
+                                </div>
+                                <p className="boss-desc">
+                                    Master the {boss.name} domain. Face questions from this crucial subject area.
+                                </p>
+                                <div className="boss-stats">
+                                    <div className="stat">
+                                        <span className="label">Health</span>
+                                        <span className="value">{boss.hp}/{boss.max_hp}</span>
+                                    </div>
+                                    <div className="stat">
+                                        <span className="label">Reward</span>
+                                        <span className="value">{boss.xp_reward} XP</span>
+                                    </div>
+                                </div>
+                                <button className="challenge-btn" onClick={() => startBossBattle(boss)}>
+                                    ⚔️ Challenge
+                                </button>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* Battle History */}
+            <div className="battle-list" style={{ marginTop: '50px' }}>
                 <h2>Battle History</h2>
                 {loading ? (
                     <div style={{ textAlign: 'center' }}>Summoning opponents...</div>
@@ -144,11 +231,11 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
                 )}
             </div>
 
-            <button className="challenge-btn" onClick={() => setShowModal(true)}>
+            <button className="challenge-btn" onClick={() => setShowModal(true)} style={{ marginTop: '30px' }}>
                 LOG MANUAL BATTLE
             </button>
 
-            {/* BATTLE MODAL */}
+            {/* Battle Modal */}
             {showModal && (
                 <div className="arena-modal-overlay">
                     <div className="arena-modal">

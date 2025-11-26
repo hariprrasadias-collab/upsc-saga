@@ -94,35 +94,35 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onStartReview }) => {
         if (!csvFile || !showCsvImport) return;
 
         setImporting(true);
-        const text = await csvFile.text();
-        const lines = text.split('\n').filter(l => l.trim());
 
-        let successCount = 0;
-        for (const line of lines) {
-            const [front, back] = line.split(',').map(s => s.trim());
-            if (front && back) {
-                try {
-                    await fetch('http://localhost:5000/api/flashcards', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            deck_id: showCsvImport,
-                            front,
-                            back
-                        })
-                    });
-                    successCount++;
-                } catch (err) {
-                    console.error('Failed to import card:', err);
-                }
+        try {
+            // Use FormData to send file to backend for proper CSV parsing
+            const formData = new FormData();
+            formData.append('file', csvFile);
+            formData.append('deck_id', showCsvImport.toString());
+
+            const response = await fetch('http://localhost:5000/api/flashcards/import', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert(`Successfully imported ${result.imported} cards!${result.errors.length > 0 ? `\n\nErrors: ${result.errors.join('\n')}` : ''}`);
+            } else {
+                alert(`Import failed: ${result.error}`);
             }
-        }
 
-        alert(`Imported ${successCount} cards successfully!`);
-        setCsvFile(null);
-        setShowCsvImport(null);
-        setImporting(false);
-        fetchDecks();
+            setCsvFile(null);
+            setShowCsvImport(null);
+            fetchDecks();
+        } catch (err) {
+            console.error('Failed to import CSV:', err);
+            alert('Import failed. Please check console for details.');
+        } finally {
+            setImporting(false);
+        }
     };
 
     if (loading) return <div className="loading">Loading decks...</div>;

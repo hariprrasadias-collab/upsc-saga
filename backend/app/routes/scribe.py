@@ -5,7 +5,7 @@ import json
 
 scribe_bp = Blueprint('scribe', __name__)
 
-@scribe_bp.route('/api/scribe/evaluate', methods=['POST'])
+@scribe_bp.route('/evaluate', methods=['POST'])
 def evaluate_answer():
     try:
         data = request.json
@@ -55,7 +55,7 @@ def evaluate_answer():
         print(f"Scribe evaluation error: {e}")
         return jsonify({'error': str(e)}), 500
 
-@scribe_bp.route('/api/scribe/history', methods=['GET'])
+@scribe_bp.route('/history', methods=['GET'])
 def get_history():
     try:
         user_id = 1

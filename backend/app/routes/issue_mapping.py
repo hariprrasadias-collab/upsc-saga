@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from app.db import get_db
 from app.services.issue_mapper import (
     map_article_to_syllabus,
     get_mappings_for_article,
@@ -37,10 +38,18 @@ def get_article_mappings(article_id):
     try:
         mappings = get_mappings_for_article(article_id)
         
+        # Fetch tags
+        conn = get_db()
+        article = conn.execute("SELECT tags FROM current_affairs WHERE id = ?", (article_id,)).fetchone()
+        tags = []
+        if article and article['tags']:
+            tags = article['tags'].split(',')
+        
         return jsonify({
             'success': True,
             'article_id': article_id,
             'mappings': mappings,
+            'tags': tags,
             'count': len(mappings)
         })
     except Exception as e:
@@ -60,6 +69,38 @@ def get_topic_articles(topic):
             'topic': topic,
             'articles': articles,
             'count': len(articles)
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@bp.route('/tags', methods=['POST'])
+def update_tags():
+    """Update tags for an article"""
+    data = request.get_json()
+    article_id = data.get('article_id')
+    tags = data.get('tags') # List of strings
+    
+    if not article_id:
+        return jsonify({'success': False, 'error': 'article_id required'}), 400
+        
+    conn = get_db()
+    try:
+        # Convert list to comma-separated string
+        tags_str = ",".join(tags) if tags else ""
+        
+        conn.execute(
+            "UPDATE current_affairs SET tags = ? WHERE id = ?", 
+            (tags_str, article_id)
+        )
+        conn.commit()
+        
+        return jsonify({
+            'success': True,
+            'article_id': article_id,
+            'tags': tags
         })
     except Exception as e:
         return jsonify({

@@ -107,11 +107,15 @@ class MimirService:
             
             Provide a detailed evaluation in strict JSON format with the following structure:
             {{
-                "score": <float, 0-10>,
+                "score": <float, 0-15>,
+                "introduction_quality": "<string, brief assessment of the intro>",
+                "body_quality": "<string, assessment of content, flow, and arguments>",
+                "conclusion_quality": "<string, assessment of the conclusion>",
                 "strengths": [<list of strings>],
                 "weaknesses": [<list of strings>],
-                "improvements": [<list of strings>],
-                "model_comparison": "<string, brief comparison with an ideal answer>"
+                "missing_keywords": [<list of strings, important terms missing from the answer>],
+                "improvement_roadmap": [<list of strings, actionable steps to improve>],
+                "model_answer_structure": "<string, brief outline of an ideal answer>"
             }}
             
             Do not include any markdown formatting (like ```json) in the response, just the raw JSON string.

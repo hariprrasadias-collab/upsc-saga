@@ -98,6 +98,26 @@ const MindMapCreator: React.FC = () => {
         }
     };
 
+    const deleteMap = async (id: number, event: React.MouseEvent) => {
+        event.stopPropagation(); // Prevent loadMap from firing
+        if (!confirm('Are you sure you want to delete this mind map?')) return;
+
+        try {
+            const res = await fetch(`http://localhost:5000/api/mindmap/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (res.ok) {
+                alert('Mind map deleted successfully!');
+                fetchSavedMaps(); // Refresh list
+            } else {
+                throw new Error('Failed to delete mind map');
+            }
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
     return (
         <div className="mindmap-container">
             <div className="mindmap-header">
@@ -121,8 +141,17 @@ const MindMapCreator: React.FC = () => {
                             <ul className="saved-maps-list">
                                 {savedMaps.map(map => (
                                     <li key={map.id} onClick={() => loadMap(map.id)}>
-                                        <span className="map-title">{map.title}</span>
-                                        <span className="map-date">{new Date(map.created_at).toLocaleDateString()}</span>
+                                        <div className="map-info">
+                                            <span className="map-title">{map.title}</span>
+                                            <span className="map-date">{new Date(map.created_at).toLocaleDateString()}</span>
+                                        </div>
+                                        <button
+                                            className="delete-map-btn"
+                                            onClick={(e) => deleteMap(map.id, e)}
+                                            title="Delete this map"
+                                        >
+                                            🗑️
+                                        </button>
                                     </li>
                                 ))}
                             </ul>

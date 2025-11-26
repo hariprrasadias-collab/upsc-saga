@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+// Force rebuild
 import './Scribe.css';
-import EvaluationReport from './EvaluationReport';
+import DetailedReport from './DetailedReport';
 
 interface HistoryItem {
     id: number;
@@ -69,7 +70,7 @@ const AnswerWorkbench: React.FC = () => {
     return (
         <div className="scribe-container">
             <div className="scribe-header">
-                <h1 className="scribe-title">THE SCRIBE</h1>
+                <h1 className="scribe-title">THE SCRIBE 2.0</h1>
                 <div className="scribe-tabs">
                     <button
                         className={`tab-btn ${activeTab === 'write' ? 'active' : ''}`}
@@ -93,19 +94,17 @@ const AnswerWorkbench: React.FC = () => {
                         {/* Left Panel: Question */}
                         <div className="question-panel">
                             <h3 className="panel-title">Question</h3>
-                            <div className="question-input-group">
-                                <label>Enter Question Text</label>
-                                <textarea
-                                    className="question-textarea"
-                                    placeholder="Type or paste your UPSC Mains question here..."
-                                    value={question}
-                                    onChange={(e) => setQuestion(e.target.value)}
-                                />
-                            </div>
+                            <textarea
+                                className="question-textarea"
+                                placeholder="Type or paste your UPSC Mains question here..."
+                                value={question}
+                                onChange={(e) => setQuestion(e.target.value)}
+                            />
                         </div>
 
                         {/* Right Panel: Writing Area */}
                         <div className="writing-panel">
+                            <h3 className="panel-title">Your Answer</h3>
                             <textarea
                                 className="writing-area"
                                 placeholder="Begin your answer here, aspirant..."
@@ -124,7 +123,7 @@ const AnswerWorkbench: React.FC = () => {
                             </div>
 
                             {evaluation && (
-                                <EvaluationReport
+                                <DetailedReport
                                     data={evaluation}
                                     onClose={() => setEvaluation(null)}
                                 />
@@ -142,8 +141,8 @@ const AnswerWorkbench: React.FC = () => {
                                 history.map(item => (
                                     <div key={item.id} className="history-item">
                                         <div className="history-score-circle" style={{
-                                            borderColor: item.score >= 7 ? '#4ade80' : item.score >= 4 ? '#f59e0b' : '#f44336',
-                                            color: item.score >= 7 ? '#4ade80' : item.score >= 4 ? '#f59e0b' : '#f44336'
+                                            borderColor: item.score >= 8 ? '#4ade80' : item.score >= 5 ? '#f59e0b' : '#f44336',
+                                            color: item.score >= 8 ? '#4ade80' : item.score >= 5 ? '#f59e0b' : '#f44336'
                                         }}>
                                             {item.score}
                                         </div>
@@ -165,8 +164,8 @@ const AnswerWorkbench: React.FC = () => {
                                         <div
                                             className="trend-bar"
                                             style={{
-                                                height: `${item.score * 10}%`,
-                                                backgroundColor: item.score >= 7 ? '#4ade80' : item.score >= 4 ? '#f59e0b' : '#f44336'
+                                                height: `${(item.score / 15) * 100}%`, // Adjusted for max score 15
+                                                backgroundColor: item.score >= 8 ? '#4ade80' : item.score >= 5 ? '#f59e0b' : '#f44336'
                                             }}
                                         ></div>
                                         <span className="trend-label">{i + 1}</span>

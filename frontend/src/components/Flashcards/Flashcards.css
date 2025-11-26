@@ -294,6 +294,9 @@
     color: #ecf0f1;
     text-align: center;
     line-height: 1.6;
+    max-height: 100%;
+    overflow-y: auto;
+    width: 100%;
 }
 
 .flip-hint {

@@ -60,3 +60,53 @@ def consult_the_seer():
         ],
         "xp_history": xp_history
     })
+
+@bp.route('/weightage', methods=['GET'])
+def get_subject_weightage():
+    """Get subject-wise question distribution for Pie Chart"""
+    conn = get_db()
+    try:
+        rows = conn.execute('''
+            SELECT subject, COUNT(*) as count 
+            FROM pyq_questions 
+            GROUP BY subject 
+            ORDER BY count DESC
+        ''').fetchall()
+        
+        return jsonify([dict(row) for row in rows])
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@bp.route('/trends', methods=['GET'])
+def get_year_trends():
+    """Get year-wise subject distribution for Stacked Bar Chart"""
+    conn = get_db()
+    try:
+        # Get all years and subjects
+        years = conn.execute("SELECT DISTINCT year FROM pyq_questions ORDER BY year").fetchall()
+        subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
+        
+        data = []
+        for year_row in years:
+            year = year_row['year']
+            year_data = {"year": year}
+            
+            # Get counts for this year
+            counts = conn.execute('''
+                SELECT subject, COUNT(*) as count 
+                FROM pyq_questions 
+                WHERE year = ? 
+                GROUP BY subject
+            ''', (year,)).fetchall()
+            
+            count_map = {row['subject']: row['count'] for row in counts}
+            
+            for sub_row in subjects:
+                subject = sub_row['subject']
+                year_data[subject] = count_map.get(subject, 0)
+                
+            data.append(year_data)
+            
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

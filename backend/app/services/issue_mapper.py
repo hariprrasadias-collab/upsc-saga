@@ -31,7 +31,7 @@ def map_article_to_syllabus(article_id: int) -> List[Dict]:
     cursor = conn.cursor()
     
     # Fetch article content
-    cursor.execute("SELECT title, content FROM current_affairs WHERE id = ?", (article_id,))
+    cursor.execute("SELECT title, upsc_summary FROM current_affairs WHERE id = ?", (article_id,))
     article = cursor.fetchone()
     
     if not article:
@@ -43,7 +43,7 @@ def map_article_to_syllabus(article_id: int) -> List[Dict]:
 You are a UPSC exam expert. Analyze this current affairs article and map it to relevant UPSC syllabus topics.
 
 Article Title: {article['title']}
-Article Content: {article['content'][:2000]}
+Article Content: {article['upsc_summary'][:2000]}
 
 For each mapping, provide:
 1. Subject area (e.g., Polity, Economy, Geography, IR, etc.)

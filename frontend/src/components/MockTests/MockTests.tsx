@@ -44,7 +44,6 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [results, setResults] = useState<any>(null);
     const [view, setView] = useState<'list' | 'test' | 'results'>('list');
-    const [examMode, setExamMode] = useState(false); // NEW: Strict 3-hour mode
     const { refreshAnalytics } = useAnalytics();
 
     // Fetch available tests
@@ -74,11 +73,23 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
     }, [view, timeLeft]);
 
     const startTest = async (test: Test) => {
+        console.log('Starting test:', test);
         try {
             const res = await fetch(`http://localhost:5000/api/mock-tests/${test.id}/start`, {
                 method: 'POST'
             });
+
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+
             const data = await res.json();
+            console.log('Test data received:', data);
+
+            if (!data.questions || data.questions.length === 0) {
+                alert('This test has no questions available. Please try another test.');
+                return;
+            }
 
             setCurrentTest(test);
             setQuestions(data.questions);
@@ -88,8 +99,8 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
             setAnswers({});
             setView('test');
         } catch (err) {
-            console.error(err);
-            alert('Failed to start test');
+            console.error('Error starting test:', err);
+            alert(`Failed to start test: ${err instanceof Error ? err.message : 'Unknown error'}`);
         }
     };
 
@@ -181,8 +192,8 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
                             <div className="test-meta">
                                 <span>📝 {test.total_questions} Questions</span>
                                 <span>⏱️ {test.duration_minutes} mins</span>
-                                <span className={`difficulty ${test.difficulty.toLowerCase()}`}>
-                                    {test.difficulty}
+                                <span className={`difficulty ${test.difficulty?.toLowerCase() || 'medium'}`}>
+                                    {test.difficulty || 'Medium'}
                                 </span>
                             </div>
                             <button onClick={() => startTest(test)} className="start-btn">
