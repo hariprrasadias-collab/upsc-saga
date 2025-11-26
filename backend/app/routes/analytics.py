@@ -43,12 +43,12 @@ def get_overview():
         
         # Activities completed - handle missing tables gracefully
         try:
-            mock_count = conn.execute('SELECT COUNT(*) FROM mock_test_attempts WHERE user_id = ? AND submitted_at >= ?', (user_id, start_date)).fetchone()[0]
+            mock_count = conn.execute('SELECT COUNT(*) FROM test_attempts WHERE user_id = ? AND submitted_at >= ?', (user_id, start_date)).fetchone()[0]
         except:
             mock_count = 0
             
         try:
-            answer_count = conn.execute('SELECT COUNT(*) FROM answer_submissions WHERE user_id = ? AND submitted_at >= ?', (user_id, start_date)).fetchone()[0]
+            answer_count = conn.execute('SELECT COUNT(*) FROM user_answers WHERE user_id = ? AND submitted_at >= ?', (user_id, start_date)).fetchone()[0]
         except:
             answer_count = 0
             
@@ -57,7 +57,12 @@ def get_overview():
         except:
             review_count = 0
         
-        total_activities = mock_count + answer_count + review_count
+        try:
+            task_count = conn.execute('SELECT COUNT(*) FROM tasks WHERE user_id = ? AND isCompleted = 1', (user_id,)).fetchone()[0]
+        except:
+            task_count = 0
+        
+        total_activities = mock_count + answer_count + review_count + task_count
         
         # Current streak
         streak = get_streak_days(conn, user_id)
@@ -134,10 +139,10 @@ def get_time_distribution():
         
         # Group by date
         dates = conn.execute('''
-            SELECT DATE(submitted_at) as date FROM mock_test_attempts
+            SELECT DATE(submitted_at) as date FROM test_attempts
             WHERE user_id = ? AND submitted_at >= ?
             UNION ALL
-            SELECT DATE(submitted_at) FROM answer_submissions
+            SELECT DATE(submitted_at) FROM user_answers
             WHERE user_id = ? AND submitted_at >= ?
             UNION ALL
             SELECT DATE(reviewed_at) FROM review_sessions
@@ -176,7 +181,7 @@ def get_mock_test_analytics():
                     DATE(submitted_at) as date,
                     score,
                     mt.subject
-                FROM mock_test_attempts mta
+                FROM test_attempts mta
                 JOIN mock_tests mt ON mta.test_id = mt.id
                 WHERE mta.user_id = ?
                 ORDER BY submitted_at ASC
@@ -195,7 +200,7 @@ def get_mock_test_analytics():
                     mt.subject,
                     AVG(mta.score) as avg_score,
                     COUNT(*) as attempts
-                FROM mock_test_attempts mta
+                FROM test_attempts mta
                 JOIN mock_tests mt ON mta.test_id = mt.id
                 WHERE mta.user_id = ?
                 GROUP BY mt.subject
@@ -226,11 +231,12 @@ def get_answer_writing_analytics():
         # Retrieve scores with date and subject
         try:
             scores = conn.execute('''
-                SELECT ans.overall_score, DATE(ans.submitted_at) as date, aq.subject
-                FROM answer_submissions ans
-                JOIN answer_questions aq ON ans.question_id = aq.id
-                WHERE ans.user_id = ?
-                ORDER BY ans.submitted_at ASC
+                SELECT ae.overall_score, DATE(ua.submitted_at) as date, aq.subject
+                FROM answer_evaluations ae
+                JOIN user_answers ua ON ae.answer_id = ua.id
+                JOIN answer_questions aq ON ua.prompt_id = aq.id
+                WHERE ua.user_id = ?
+                ORDER BY ua.submitted_at ASC
             ''', (user_id,)).fetchall()
             score_data = [dict(s) for s in scores]
             # Improvement rate based on overall scores
@@ -242,10 +248,11 @@ def get_answer_writing_analytics():
         # Average score per subject
         try:
             subject_avg = conn.execute('''
-                SELECT aq.subject, AVG(ans.overall_score) as avg_score, COUNT(*) as count
-                FROM answer_submissions ans
-                JOIN answer_questions aq ON ans.question_id = aq.id
-                WHERE ans.user_id = ?
+                SELECT aq.subject, AVG(ae.overall_score) as avg_score, COUNT(*) as count
+                FROM answer_evaluations ae
+                JOIN user_answers ua ON ae.answer_id = ua.id
+                JOIN answer_questions aq ON ua.prompt_id = aq.id
+                WHERE ua.user_id = ?
                 GROUP BY aq.subject
             ''', (user_id,)).fetchall()
             subject_avg_data = [dict(s) for s in subject_avg]
@@ -314,7 +321,7 @@ def get_progress_trend():
             # Mock test scores over time
             scores = conn.execute('''
                 SELECT DATE(submitted_at) as date, AVG(score) as avg_score
-                FROM mock_test_attempts
+                FROM test_attempts
                 WHERE user_id = ? AND DATE(submitted_at) >= ?
                 GROUP BY DATE(submitted_at)
                 ORDER BY date ASC

@@ -45,6 +45,11 @@ const WeakAreasDashboard: React.FC = () => {
     };
 
     const generatePractice = async () => {
+        if (weakAreas.length === 0) {
+            alert("You haven't identified any weak areas yet! Take some regular quizzes first to analyze your performance.");
+            return;
+        }
+
         setGenerating(true);
         try {
             const response = await fetch('http://localhost:5000/api/weak-areas/practice', {
@@ -56,8 +61,12 @@ const WeakAreasDashboard: React.FC = () => {
             const data = await response.json();
 
             if (data.success) {
-                alert(`Generated ${data.count} practice questions from weak topics!`);
-                // TODO: Navigate to practice quiz
+                // Navigate to the quiz session
+                if (data.session_id) {
+                    window.location.href = `/pyq-quiz/${data.session_id}`;
+                } else {
+                    alert(`Generated ${data.count} practice questions from weak topics!`);
+                }
             } else {
                 alert(data.error || 'Failed to generate practice set');
             }

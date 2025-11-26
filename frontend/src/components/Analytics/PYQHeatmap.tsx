@@ -204,10 +204,17 @@ const PYQHeatmap: React.FC = () => {
                                             {['A', 'B', 'C', 'D'].map(opt => {
                                                 const optionKey = `option_${opt.toLowerCase()}` as keyof CellQuestion;
                                                 const optionText = q[optionKey];
-                                                const isCorrect = q.correct_option === opt;
+                                                const isCorrect = q.correct_option?.toUpperCase() === opt;
+
+                                                // Debug logging
+                                                if (idx === 0 && opt === 'A') {
+                                                    console.log('Question Data:', q);
+                                                }
+
                                                 return (
                                                     <div key={opt} className={`option ${isCorrect ? 'correct-option' : ''}`}>
-                                                        <strong>{opt}.</strong> {optionText}
+                                                        <span className="opt-label">{opt}.</span>
+                                                        <span className="opt-text">{optionText || 'Option text missing'}</span>
                                                         {isCorrect && <span className="correct-badge"> ✓ Correct</span>}
                                                     </div>
                                                 );

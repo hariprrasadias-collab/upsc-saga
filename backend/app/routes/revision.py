@@ -126,8 +126,42 @@ def create_mnemonic():
         conn.commit()
         conn.close()
     
+    # Save to history
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO mnemonics_history (mnemonic_text, original_text, mnemonic_type)
+            VALUES (?, ?, ?)
+        ''', (mnemonic, text, mnemonic_type))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"Error saving mnemonic history: {e}")
+    
     return jsonify({
         'success': True,
         'mnemonic': mnemonic,
         'type': mnemonic_type
     })
+
+@bp.route('/mnemonic/history', methods=['GET'])
+def get_mnemonic_history():
+    """Get mnemonic generation history"""
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT id, mnemonic_text, original_text, mnemonic_type, created_at
+            FROM mnemonics_history
+            ORDER BY created_at DESC
+        ''')
+        history = cursor.fetchall()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'history': [dict(row) for row in history]
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500

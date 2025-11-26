@@ -6,7 +6,9 @@ import DetailedReport from './DetailedReport';
 interface HistoryItem {
     id: number;
     question_text: string;
+    answer_text: string;
     score: number;
+    feedback_json: any;
     created_at: string;
 }
 
@@ -18,6 +20,7 @@ const AnswerWorkbench: React.FC = () => {
     const [evaluation, setEvaluation] = useState<any>(null);
     const [history, setHistory] = useState<HistoryItem[]>([]);
     const [historyLoading, setHistoryLoading] = useState(false);
+    const [selectedHistoryItem, setSelectedHistoryItem] = useState<HistoryItem | null>(null);
 
     const fetchHistory = async () => {
         setHistoryLoading(true);
@@ -139,7 +142,11 @@ const AnswerWorkbench: React.FC = () => {
                                 <div className="empty-text">No past evaluations found.</div>
                             ) : (
                                 history.map(item => (
-                                    <div key={item.id} className="history-item">
+                                    <div
+                                        key={item.id}
+                                        className="history-item clickable"
+                                        onClick={() => setSelectedHistoryItem(item)}
+                                    >
                                         <div className="history-score-circle" style={{
                                             borderColor: item.score >= 8 ? '#4ade80' : item.score >= 5 ? '#f59e0b' : '#f44336',
                                             color: item.score >= 8 ? '#4ade80' : item.score >= 5 ? '#f59e0b' : '#f44336'
@@ -150,6 +157,7 @@ const AnswerWorkbench: React.FC = () => {
                                             <div className="history-question">{item.question_text}</div>
                                             <div className="history-date">{new Date(item.created_at).toLocaleDateString()}</div>
                                         </div>
+                                        <div className="history-arrow">→</div>
                                     </div>
                                 ))
                             )}
@@ -176,6 +184,38 @@ const AnswerWorkbench: React.FC = () => {
                     </div>
                 )}
             </div>
+
+            {/* History Detail Modal */}
+            {selectedHistoryItem && (
+                <div className="modal-overlay" onClick={() => setSelectedHistoryItem(null)}>
+                    <div className="modal-content history-modal" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2>Evaluation Details</h2>
+                            <button className="close-btn" onClick={() => setSelectedHistoryItem(null)}>×</button>
+                        </div>
+                        <div className="modal-body">
+                            <div className="history-modal-section">
+                                <h3>Question</h3>
+                                <div className="history-modal-text">{selectedHistoryItem.question_text}</div>
+                            </div>
+
+                            <div className="history-modal-section">
+                                <h3>Your Answer</h3>
+                                <div className="history-modal-text answer-text">{selectedHistoryItem.answer_text}</div>
+                            </div>
+
+                            <div className="history-modal-section">
+                                <h3>AI Feedback (Score: {selectedHistoryItem.score}/15)</h3>
+                                <DetailedReport
+                                    data={selectedHistoryItem.feedback_json}
+                                    onClose={() => setSelectedHistoryItem(null)}
+                                    embedded={true}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

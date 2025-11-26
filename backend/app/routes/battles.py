@@ -31,7 +31,8 @@ def get_battles():
     
     for t in test_attempts:
         # Determine victory (e.g., > 40% is a pass/victory for now, or use cutoff if we had it)
-        is_victory = t['percentage'] >= 40 
+        percentage = t['percentage'] if t['percentage'] is not None else 0
+        is_victory = percentage >= 40 
         battles.append({
             'id': f"mt_{t['id']}",
             'boss_name': t['boss_name'],

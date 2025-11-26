@@ -15,7 +15,7 @@ def calculate_study_hours(conn, user_id, start_date, end_date):
     
     # Mock tests
     mock_tests = conn.execute('''
-        SELECT submitted_at FROM mock_test_attempts
+        SELECT submitted_at FROM test_attempts
         WHERE user_id = ? AND submitted_at BETWEEN ? AND ?
         ORDER BY submitted_at
     ''', (user_id, start_date, end_date)).fetchall()
@@ -23,7 +23,7 @@ def calculate_study_hours(conn, user_id, start_date, end_date):
     
     # Answer writing
     answers = conn.execute('''
-        SELECT submitted_at FROM answer_submissions
+        SELECT submitted_at FROM user_answers
         WHERE user_id = ? AND submitted_at BETWEEN ? AND ?
         ORDER BY submitted_at
     ''', (user_id, start_date, end_date)).fetchall()
@@ -36,6 +36,16 @@ def calculate_study_hours(conn, user_id, start_date, end_date):
         ORDER BY reviewed_at
     ''', (user_id, start_date, end_date)).fetchall()
     activities.extend([r['reviewed_at'] for r in reviews])
+
+    # Pomodoro Sessions
+    pomodoros = conn.execute('''
+        SELECT timestamp, duration FROM pomodoro_sessions
+        WHERE user_id = ? AND timestamp BETWEEN ? AND ?
+        ORDER BY timestamp
+    ''', (user_id, start_date, end_date)).fetchall()
+    # For study hours, we can use the actual duration
+    pomodoro_minutes = sum([r['duration'] for r in pomodoros])
+    pomodoro_hours = pomodoro_minutes / 60.0
     
     if not activities:
         return 0
@@ -50,7 +60,15 @@ def calculate_study_hours(conn, user_id, start_date, end_date):
     # Count unique days with activity and estimate
     unique_days = set(a.date() for a in activities)
     # Conservative estimate: 2 hours per active day
-    total_hours = len(unique_days) * 2
+    # Conservative estimate: 2 hours per active day
+    estimated_hours = len(unique_days) * 2
+    
+    # Add actual Pomodoro time (avoid double counting if we assume Pomodoro is part of "active day")
+    # Strategy: Use the max of (estimated, pomodoro) OR add them if we consider them separate.
+    # User request: "add pomodoro timer... spent on those timer as well"
+    # Let's add Pomodoro hours to the estimated hours, but cap daily estimate if needed.
+    # For now, simple addition as requested.
+    total_hours = estimated_hours + pomodoro_hours
     
     return round(total_hours, 1)
 
@@ -71,7 +89,7 @@ def get_subject_performance(conn, user_id, subject):
     # Mock tests
     mock_avg = conn.execute('''
         SELECT AVG(score) as avg_score
-        FROM mock_test_attempts mta
+        FROM test_attempts mta
         JOIN mock_tests mt ON mta.test_id = mt.id
         WHERE mta.user_id = ? AND mt.subject = ?
     ''', (user_id, subject)).fetchone()
@@ -80,10 +98,11 @@ def get_subject_performance(conn, user_id, subject):
     
     # Answer writing
     answer_avg = conn.execute('''
-        SELECT AVG(overall_score) as avg_score
-        FROM answer_submissions ans
-        JOIN answer_questions aq ON ans.question_id = aq.id
-        WHERE ans.user_id = ? AND aq.subject = ?
+        SELECT AVG(ae.overall_score) as avg_score
+        FROM answer_evaluations ae
+        JOIN user_answers ua ON ae.answer_id = ua.id
+        JOIN answer_questions aq ON ua.prompt_id = aq.id
+        WHERE ua.user_id = ? AND aq.subject = ?
     ''', (user_id, subject)).fetchone()
     if answer_avg and answer_avg['avg_score']:
         result['answer_avg'] = round(answer_avg['avg_score'], 1)
@@ -129,7 +148,7 @@ def identify_weak_areas(conn, user_id, limit=10):
     # Check mock test subjects with low scores (get bottom performing ones)
     low_scores = conn.execute('''
         SELECT mt.subject, AVG(mta.score) as avg_score, COUNT(*) as attempts
-        FROM mock_test_attempts mta
+        FROM test_attempts mta
         JOIN mock_tests mt ON mta.test_id = mt.id
         WHERE mta.user_id = ?
         GROUP BY mt.subject
@@ -141,7 +160,7 @@ def identify_weak_areas(conn, user_id, limit=10):
         # Calculate trend for this subject
         subject_scores = conn.execute('''
             SELECT mta.score
-            FROM mock_test_attempts mta
+            FROM test_attempts mta
             JOIN mock_tests mt ON mta.test_id = mt.id
             WHERE mta.user_id = ? AND mt.subject = ?
             ORDER BY mta.submitted_at ASC
@@ -202,14 +221,14 @@ def get_streak_days(conn, user_id):
     
     # Mock tests
     mock_dates = conn.execute('''
-        SELECT DATE(submitted_at) as date FROM mock_test_attempts
+        SELECT DATE(submitted_at) as date FROM test_attempts
         WHERE user_id = ?
     ''', (user_id,)).fetchall()
     dates.update([r['date'] for r in mock_dates])
     
     # Answer writing
     answer_dates = conn.execute('''
-        SELECT DATE(submitted_at) as date FROM answer_submissions
+        SELECT DATE(submitted_at) as date FROM user_answers
         WHERE user_id = ?
     ''', (user_id,)).fetchall()
     dates.update([r['date'] for r in answer_dates])
@@ -220,12 +239,32 @@ def get_streak_days(conn, user_id):
         WHERE user_id = ?
     ''', (user_id,)).fetchall()
     dates.update([r['date'] for r in review_dates])
+
+    # Pomodoro Sessions
+    pomodoro_dates = conn.execute('''
+        SELECT DATE(timestamp) as date FROM pomodoro_sessions
+        WHERE user_id = ?
+    ''', (user_id,)).fetchall()
+    dates.update([r['date'] for r in pomodoro_dates])
+
+    # War Map (Calendar Events) Completed
+    warmap_dates = conn.execute('''
+        SELECT DATE(updated_at) as date FROM calendar_event_metadata
+        WHERE user_id = ? AND is_completed = 1
+    ''', (user_id,)).fetchall()
+    dates.update([r['date'] for r in warmap_dates])
     
     if not dates:
         return 0
     
-    # Convert to set of date objects for O(1) lookup
-    dates_objs = {datetime.fromisoformat(d).date() for d in dates}
+    # Filter out None values and convert to set of date objects
+    dates_objs = set()
+    for d in dates:
+        if d:
+            try:
+                dates_objs.add(datetime.fromisoformat(d).date())
+            except ValueError:
+                pass # Ignore invalid date formats
     
     today = datetime.now().date()
     yesterday = today - timedelta(days=1)

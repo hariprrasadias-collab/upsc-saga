@@ -67,20 +67,29 @@ const D3Tree: React.FC<D3TreeProps> = ({ data }) => {
 
             let left = root;
             let right = root;
+            let maxRight = 0;
             root.eachBefore((node: any) => {
                 if (node.x < (left.x ?? 0)) left = node;
                 if (node.x > (right.x ?? 0)) right = node;
+
+                // Estimate text width (approx 8px per char) + node position
+                const textWidth = (node.data.name.length * 8) + 20; // 20px padding
+                const nodeRight = (node.y ?? 0) + textWidth;
+                if (nodeRight > maxRight) maxRight = nodeRight;
             });
 
             const height = (right.x ?? 0) - (left.x ?? 0) + marginTop + marginBottom;
+            const contentWidth = maxRight + marginLeft + 50; // Add extra padding
+            const newWidth = Math.max(width, contentWidth);
 
             // Update SVG height to accommodate the tree size, preventing zooming out
             const newHeight = Math.max(600, height);
             d3.select(svgRef.current).attr("height", newHeight);
+            d3.select(svgRef.current).attr("width", newWidth); // Update width too
 
             const transition = svg.transition()
                 .duration(duration)
-                .attr("viewBox", [-marginLeft, (left.x ?? 0) - marginTop, width, height].join(" "))
+                .attr("viewBox", [-marginLeft, (left.x ?? 0) - marginTop, newWidth, height].join(" "))
                 .tween("resize", (window.ResizeObserver ? null : () => () => svg.dispatch("toggle")) as any);
 
             // Update the nodes…

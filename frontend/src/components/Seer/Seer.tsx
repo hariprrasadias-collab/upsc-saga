@@ -67,7 +67,7 @@ const Seer: React.FC = () => {
                 {/* CHART 1: SUBJECT BALANCE (RADAR) */}
                 <div className="seer-card">
                     <h3>Warrior's Balance</h3>
-                    <div style={{ width: '100%', height: 300 }}>
+                    <div style={{ width: '100%', height: 300, minWidth: 0 }}>
                         <ResponsiveContainer>
                             <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data?.radar_data}>
                                 <PolarGrid stroke="#3a6e85" />
@@ -89,7 +89,7 @@ const Seer: React.FC = () => {
                 {/* CHART 2: CONSISTENCY (AREA) */}
                 <div className="seer-card">
                     <h3>Tides of Effort (XP)</h3>
-                    <div style={{ width: '100%', height: 300 }}>
+                    <div style={{ width: '100%', height: 300, minWidth: 0 }}>
                         <ResponsiveContainer>
                             <AreaChart data={data?.xp_history}>
                                 <defs>
@@ -115,7 +115,7 @@ const Seer: React.FC = () => {
                 {/* CHART 3: SUBJECT WEIGHTAGE (PIE) */}
                 <div className="seer-card">
                     <h3>The Weight of Knowledge</h3>
-                    <div style={{ width: '100%', height: 300 }}>
+                    <div style={{ width: '100%', height: 300, minWidth: 0 }}>
                         <ResponsiveContainer>
                             <PieChart>
                                 <Pie
@@ -142,7 +142,7 @@ const Seer: React.FC = () => {
                 {/* CHART 4: YEARLY TRENDS (BAR) */}
                 <div className="seer-card wide">
                     <h3>Chronicles of the Past</h3>
-                    <div style={{ width: '100%', height: 300 }}>
+                    <div style={{ width: '100%', height: 300, minWidth: 0 }}>
                         <ResponsiveContainer>
                             <BarChart data={trends}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#1a3a4a" />

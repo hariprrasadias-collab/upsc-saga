@@ -87,7 +87,7 @@ def generate_practice():
             return jsonify({
                 'success': False,
                 'error': 'No weak areas found. Complete some quizzes first!'
-            }), 404
+            }), 200
         
         questions = generate_practice_set(weak_topics, count)
         

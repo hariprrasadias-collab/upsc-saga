@@ -25,7 +25,8 @@ def calculate_exam_readiness():
             COUNT(CASE WHEN status IN ('mastered', 'in-progress') THEN 1 END) * 100.0 / COUNT(*) as coverage
         FROM syllabus_topics
     """)
-    topic_coverage = c.fetchone()['coverage'] or 0
+    topic_coverage = c.fetchone()['coverage']
+    topic_coverage = topic_coverage if topic_coverage is not None else 0
     coverage_score = (topic_coverage / 100) * 25
     
     # 2. Study Hours (0-25 points): At least 6 hours/day avg in last 30 days
@@ -40,8 +41,9 @@ def calculate_exam_readiness():
     # 3. Mock Performance (0-30 points): Avg score of last 5 mocks
     c.execute("""
         SELECT AVG(score) as avg_score
-        FROM mock_test_results
-        ORDER BY created_at DESC
+        FROM test_attempts
+        WHERE status = 'completed'
+        ORDER BY submitted_at DESC
         LIMIT 5
     """)
     avg_mock_score = c.fetchone()['avg_score'] or 0
@@ -104,9 +106,10 @@ def calculate_success_probability():
     
     # Get last 5 mock test scores
     c.execute("""
-        SELECT score, created_at
-        FROM mock_test_results
-        ORDER BY created_at DESC
+        SELECT score, submitted_at as created_at
+        FROM test_attempts
+        WHERE status = 'completed'
+        ORDER BY submitted_at DESC
         LIMIT 5
     """)
     mocks = c.fetchall()
@@ -164,11 +167,9 @@ def calculate_optimal_study_time():
     c.execute("""
         SELECT strftime('%H', created_at) as hour, COUNT(*) as activity_count
         FROM (
-            SELECT created_at FROM mock_test_results
+            SELECT submitted_at as created_at FROM test_attempts WHERE status = 'completed'
             UNION ALL
-            SELECT created_at FROM flashcard_reviews
-            UNION ALL
-            SELECT created_at FROM battle_history
+            SELECT reviewed_at as created_at FROM review_sessions
         )
         WHERE created_at >= datetime('now', '-30 days')
         GROUP BY hour
@@ -224,8 +225,9 @@ def detect_burnout():
     
     # Check for declining mock scores despite high effort
     c.execute("""
-        SELECT score FROM mock_test_results
-        ORDER BY created_at DESC
+        SELECT score FROM test_attempts
+        WHERE status = 'completed'
+        ORDER BY submitted_at DESC
         LIMIT 3
     """)
     recent_scores = [r['score'] for r in c.fetchall()]

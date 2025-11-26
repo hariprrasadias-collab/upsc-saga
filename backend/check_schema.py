@@ -1,20 +1,17 @@
 import sqlite3
-import os
-
-DB_PATH = 'backend/upsc_saga.db'
 
 def check_schema():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    
-    cursor.execute("PRAGMA table_info(current_affairs)")
-    columns = cursor.fetchall()
-    print("Columns:")
-    for col in columns:
-        print(f"- {col['name']}")
-    
-    conn.close()
+    try:
+        conn = sqlite3.connect('upsc_saga.db')
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA table_info(test_attempts)")
+        columns = cursor.fetchall()
+        print("Columns in test_attempts:")
+        for col in columns:
+            print(col)
+        conn.close()
+    except Exception as e:
+        print(f"Error: {e}")
 
 if __name__ == "__main__":
     check_schema()

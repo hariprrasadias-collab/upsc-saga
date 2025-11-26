@@ -61,13 +61,21 @@ def get_history():
         user_id = 1
         conn = get_db()
         rows = conn.execute('''
-            SELECT id, question_text, score, created_at 
+            SELECT id, question_text, answer_text, score, feedback_json, created_at 
             FROM scribe_evaluations
             WHERE user_id = ?
             ORDER BY created_at DESC
         ''', (user_id,)).fetchall()
         
-        history = [dict(row) for row in rows]
+        history = []
+        for row in rows:
+            item = dict(row)
+            if item.get('feedback_json'):
+                try:
+                    item['feedback_json'] = json.loads(item['feedback_json'])
+                except:
+                    item['feedback_json'] = {}
+            history.append(item)
         return jsonify(history)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
