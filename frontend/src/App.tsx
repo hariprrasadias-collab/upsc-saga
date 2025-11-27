@@ -128,51 +128,7 @@ function App() {
         due_date: task.due_date,
       }));
 
-      // Fetch today's Google Calendar events
-      const today = new Date().toISOString().split('T')[0];
-      try {
-        const gcalRes = await fetch(`http://localhost:5000/api/warmap/google-events?date=${today}`);
-        if (gcalRes.ok) {
-          const gcalEvents = await gcalRes.json();
-
-          // Fetch metadata for each event to get XP and completion status
-          const gcalTasksPromises = gcalEvents.map(async (event: any, index: number) => {
-            try {
-              const metaRes = await fetch(`http://localhost:5000/api/warmap/google-events/${event.id}/metadata`);
-              const metadata = metaRes.ok ? await metaRes.json() : { xp_reward: 0, is_completed: false };
-
-              return {
-                id: -1000 - index, // Negative IDs to avoid conflicts with DB tasks
-                title: event.title,
-                isCompleted: metadata.is_completed || false,
-                xp_reward: metadata.xp_reward || 0,
-                associated_stat: metadata.associated_stat || null,
-                due_date: today,
-              };
-            } catch (err) {
-              console.error(`Error fetching metadata for event ${event.id}:`, err);
-              return {
-                id: -1000 - index,
-                title: event.title,
-                isCompleted: false,
-                xp_reward: 0,
-                associated_stat: null,
-                due_date: today,
-              };
-            }
-          });
-
-          const gcalTasks: Task[] = await Promise.all(gcalTasksPromises);
-          // Merge with local tasks
-          setTodayTasks([...tasksWithBooleanCompletion, ...gcalTasks]);
-        } else {
-          setTodayTasks(tasksWithBooleanCompletion);
-        }
-      } catch (err) {
-        console.error("Error fetching Google Calendar events:", err);
-        setTodayTasks(tasksWithBooleanCompletion);
-      }
-
+      setTodayTasks(tasksWithBooleanCompletion);
 
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");

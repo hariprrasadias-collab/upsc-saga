@@ -126,10 +126,83 @@ const StudyPlanDashboard: React.FC = () => {
         const completedTasks = new Set(JSON.parse(localStorage.getItem('completedTasks') || '[]'));
         if (newStatus === 'completed') {
             completedTasks.add(task.id);
-        } else {
             completedTasks.delete(task.id);
         }
         localStorage.setItem('completedTasks', JSON.stringify(Array.from(completedTasks)));
+    };
+
+    // --- Dynamic Flow Engine ---
+    const [isDynamicMode, setIsDynamicMode] = useState<boolean>(() => {
+        return localStorage.getItem('mimir_dynamic_mode') === 'true';
+    });
+
+    useEffect(() => {
+        localStorage.setItem('mimir_dynamic_mode', String(isDynamicMode));
+    }, [isDynamicMode]);
+
+    const generateDynamicPlan = (originalPlan: DayPlan[]): DayPlan[] => {
+        if (!isDynamicMode) return originalPlan;
+
+        const allSlots = originalPlan.flatMap(d => d.slots);
+        const completedSlots = allSlots.filter(s => s.status === 'completed');
+        const pendingSlots = allSlots.filter(s => s.status !== 'completed' && s.subject !== 'Break' && s.subject !== 'Buffer');
+
+        // 1. Keep completed slots on their original dates (History)
+        const historyMap: { [date: string]: Slot[] } = {};
+        completedSlots.forEach(s => {
+            const originalDay = originalPlan.find(d => d.slots.includes(s));
+            if (originalDay) {
+                if (!historyMap[originalDay.date]) historyMap[originalDay.date] = [];
+                historyMap[originalDay.date].push(s);
+            }
+        });
+
+        // 2. Reschedule pending slots starting from Today
+        const dynamicPlan: DayPlan[] = [];
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Add history days first (up to yesterday)
+        Object.keys(historyMap).sort().forEach(dateStr => {
+            if (new Date(dateStr) < today) {
+                dynamicPlan.push({
+                    date: dateStr,
+                    day: new Date(dateStr).toLocaleDateString('en-US', { weekday: 'long' }),
+                    slots: historyMap[dateStr]
+                });
+            }
+        });
+
+        // Schedule pending tasks
+        let currentDay = new Date(today);
+        let slotIndex = 0;
+        const SLOTS_PER_DAY = 6; // Configurable velocity
+
+        while (slotIndex < pendingSlots.length) {
+            const dateStr = currentDay.toISOString().split('T')[0];
+
+            // Merge with any completed tasks done Today (if any)
+            const todayCompleted = historyMap[dateStr] || [];
+            const slotsNeeded = SLOTS_PER_DAY - todayCompleted.length;
+
+            const daySlots = [
+                ...todayCompleted,
+                ...pendingSlots.slice(slotIndex, slotIndex + Math.max(0, slotsNeeded))
+            ];
+
+            if (daySlots.length > 0) {
+                dynamicPlan.push({
+                    date: dateStr,
+                    day: currentDay.toLocaleDateString('en-US', { weekday: 'long' }),
+                    slots: daySlots
+                });
+            }
+
+            slotIndex += Math.max(0, slotsNeeded);
+            currentDay.setDate(currentDay.getDate() + 1);
+        }
+
+        return dynamicPlan.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     };
 
     // Analytics Helpers
@@ -154,54 +227,86 @@ const StudyPlanDashboard: React.FC = () => {
         const completed = monthSlots.filter(s => s.status === 'completed').length;
         const consistency = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-        // Determine Phase (Mock logic based on dates or content)
-        // For now, simple date check or just "Phase 1"
         const phase = "Phase 1: Foundation";
 
         return { consistency, phase };
     };
 
+    const activePlan = React.useMemo(() => generateDynamicPlan(plan), [plan, isDynamicMode]);
+
     const renderContent = () => {
         if (viewMode === 'flashcards') {
             return <FlashcardsManager />;
         } else if (viewMode === 'daily') {
-            return plan.map((day, idx) => (
-                <div key={idx} className="day-card">
-                    <div className="day-header">
-                        <span className="day-date">{day.date}</span>
-                        <span className="day-name">{day.day}</span>
-                    </div>
-                    <div className="day-slots">
-                        {day.slots.length > 0 ? (
-                            day.slots.map((slot, sIdx) => (
-                                <div
-                                    key={sIdx}
-                                    className={`slot-card ${slot.subject.toLowerCase().replace(/\s+/g, '-')}`}
-                                    onClick={() => handleTaskClick(slot)}
-                                >
-                                    <div className={`slot-status ${slot.status}`} title={slot.status}></div>
-                                    <div className="slot-time">{slot.time}</div>
-                                    <div className="slot-subject">{slot.subject}</div>
-                                    <div className="slot-activity">{slot.activity}</div>
-                                    {slot.resource_link && (
-                                        <div className="resource-link">🔗 {slot.resource_link}</div>
-                                    )}
-                                </div>
-                            ))
-                        ) : (
-                            <div className="no-slots">Rest Day / Buffer</div>
-                        )}
-                    </div>
+            const today = new Date().toISOString().split('T')[0];
+            // In Dynamic Mode, "Today" is always the first incomplete day or actual today
+            const todayPlan = activePlan.find(p => p.date === today) || (isDynamicMode ? activePlan.find(p => new Date(p.date) >= new Date(today)) : undefined);
+
+            return (
+                <div className="daily-view">
+                    {todayPlan ? (
+                        <div className="day-card active">
+                            <div className="day-header">
+                                <h2>{new Date(todayPlan.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</h2>
+                                <span className="day-badge">TODAY'S MISSION</span>
+                            </div>
+                            <div className="day-slots">
+                                {todayPlan.slots.map((slot, idx) => (
+                                    <div key={idx} className={`slot-card ${slot.subject.toLowerCase().replace(/\s+/g, '-')}`} onClick={() => handleTaskClick(slot)}>
+                                        <div className={`slot-status ${slot.status}`}></div>
+                                        <div className="slot-time">{slot.time}</div>
+                                        <div className="slot-subject">{slot.subject}</div>
+                                        <div className="slot-activity">{slot.activity}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="empty-state">
+                            <h3>No missions scheduled for today. Rest and recover! 🌿</h3>
+                        </div>
+                    )}
+
+                    <h3>Upcoming Days</h3>
+                    {activePlan.filter(p => p.date > today).slice(0, 3).map((day, idx) => (
+                        <div key={idx} className="day-card">
+                            <div className="day-header">
+                                <h3>{new Date(day.date).toLocaleDateString('default', { weekday: 'long', month: 'short', day: 'numeric' })}</h3>
+                                <span className="day-name">{day.day}</span>
+                            </div>
+                            <div className="day-slots">
+                                {day.slots.length > 0 ? (
+                                    day.slots.map((slot, sIdx) => (
+                                        <div
+                                            key={sIdx}
+                                            className={`slot-card ${slot.subject.toLowerCase().replace(/\s+/g, '-')}`}
+                                            onClick={() => handleTaskClick(slot)}
+                                        >
+                                            <div className={`slot-status ${slot.status}`} title={slot.status}></div>
+                                            <div className="slot-time">{slot.time}</div>
+                                            <div className="slot-subject">{slot.subject}</div>
+                                            <div className="slot-activity">{slot.activity}</div>
+                                            {slot.resource_link && (
+                                                <div className="resource-link">🔗 {slot.resource_link}</div>
+                                            )}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="no-slots">Rest Day / Buffer</div>
+                                )}
+                            </div>
+                        </div>
+                    ))}
                 </div>
-            ));
+            );
         } else if (viewMode === 'weekly') {
-            // Group by Week (assuming plan starts on start_date)
+            // Group by Week
             const weeks: DayPlan[][] = [];
             let currentWeek: DayPlan[] = [];
 
-            plan.forEach((day, i) => {
+            activePlan.forEach((day, i) => {
                 currentWeek.push(day);
-                if ((i + 1) % 7 === 0 || i === plan.length - 1) {
+                if ((i + 1) % 7 === 0 || i === activePlan.length - 1) {
                     weeks.push(currentWeek);
                     currentWeek = [];
                 }
@@ -216,11 +321,9 @@ const StudyPlanDashboard: React.FC = () => {
                 const startDate = week[0].date;
                 const endDate = week[week.length - 1].date;
 
-                // Insight Logic
                 let insight = "Maintain steady pace.";
                 if (totalStudySlots > 40) insight = "⚠️ Heavy Load: Prioritize sleep & recovery.";
                 else if (focusSubject === 'History') insight = "📜 History Week: Use timelines for better retention.";
-                else if (focusSubject === 'Polity') insight = "⚖️ Polity Focus: Review relevant articles daily.";
                 else if (progress > 90) insight = "🔥 Crushing it! Consider an extra mock test.";
 
                 return (
@@ -237,23 +340,15 @@ const StudyPlanDashboard: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-
                         <div className="mission-body">
                             <div className="mission-intel">
                                 <h4>INTEL BRIEF</h4>
                                 <p>{insight}</p>
                                 <div className="key-stats">
-                                    <div className="stat-box">
-                                        <label>FOCUS</label>
-                                        <span>{focusSubject}</span>
-                                    </div>
-                                    <div className="stat-box">
-                                        <label>LOAD</label>
-                                        <span>{totalStudySlots} Slots</span>
-                                    </div>
+                                    <div className="stat-box"><label>FOCUS</label><span>{focusSubject}</span></div>
+                                    <div className="stat-box"><label>LOAD</label><span>{totalStudySlots} Slots</span></div>
                                 </div>
                             </div>
-
                             <div className="mission-radar">
                                 <h4>SUBJECT DISTRIBUTION</h4>
                                 <ResponsiveContainer width="100%" height={150}>
@@ -262,9 +357,7 @@ const StudyPlanDashboard: React.FC = () => {
                                         <YAxis dataKey="name" type="category" width={80} tick={{ fill: '#bdc3c7', fontSize: 10 }} />
                                         <RechartsTooltip contentStyle={{ background: '#1e1e1e', border: 'none' }} />
                                         <Bar dataKey="value" fill="#3498db" radius={[0, 4, 4, 0]}>
-                                            {data.map((_, index) => (
-                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                            ))}
+                                            {data.map((_, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
                                         </Bar>
                                     </BarChart>
                                 </ResponsiveContainer>
@@ -276,7 +369,7 @@ const StudyPlanDashboard: React.FC = () => {
         } else if (viewMode === 'monthly') {
             // Group by Month
             const months: { [key: string]: DayPlan[] } = {};
-            plan.forEach(day => {
+            activePlan.forEach(day => {
                 const monthKey = day.date.substring(0, 7); // YYYY-MM
                 if (!months[monthKey]) months[monthKey] = [];
                 months[monthKey].push(day);
@@ -284,8 +377,6 @@ const StudyPlanDashboard: React.FC = () => {
 
             return Object.entries(months).map(([month, days]) => {
                 const { consistency, phase } = getMonthlyAnalytics(days.flatMap(d => d.slots));
-
-                // Calculate Subject Distribution for Pie Chart
                 const subjectCounts: { [key: string]: number } = {};
                 days.flatMap(d => d.slots).forEach(s => {
                     if (s.subject !== 'Break') subjectCounts[s.subject] = (subjectCounts[s.subject] || 0) + 1;
@@ -304,14 +395,12 @@ const StudyPlanDashboard: React.FC = () => {
                                 <span className={consistency > 80 ? 'high' : consistency > 50 ? 'med' : 'low'}>{consistency}%</span>
                             </div>
                         </div>
-
                         <div className="strategy-body">
                             <div className="calendar-grid">
                                 {days.map((day, dIdx) => {
                                     const dayTasks = day.slots.length;
                                     const dayCompleted = day.slots.filter(s => s.status === 'completed').length;
                                     const statusClass = dayTasks === 0 ? 'empty' : dayCompleted === dayTasks ? 'full' : dayCompleted > 0 ? 'partial' : 'none';
-
                                     return (
                                         <div key={dIdx} className={`calendar-day ${statusClass}`} title={`${day.date}: ${dayCompleted}/${dayTasks}`}>
                                             {day.date.split('-')[2]}
@@ -319,23 +408,12 @@ const StudyPlanDashboard: React.FC = () => {
                                     );
                                 })}
                             </div>
-
                             <div className="month-analytics">
                                 <h4>DISTRIBUTION</h4>
                                 <ResponsiveContainer width="100%" height={180}>
                                     <PieChart>
-                                        <Pie
-                                            data={pieData}
-                                            cx="50%"
-                                            cy="50%"
-                                            innerRadius={40}
-                                            outerRadius={60}
-                                            paddingAngle={5}
-                                            dataKey="value"
-                                        >
-                                            {pieData.map((_, index) => (
-                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                            ))}
+                                        <Pie data={pieData} cx="50%" cy="50%" innerRadius={40} outerRadius={60} paddingAngle={5} dataKey="value">
+                                            {pieData.map((_, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
                                         </Pie>
                                         <RechartsTooltip contentStyle={{ background: '#1e1e1e', border: 'none', fontSize: '12px' }} />
                                     </PieChart>
@@ -356,7 +434,7 @@ const StudyPlanDashboard: React.FC = () => {
         } else if (viewMode === 'yearly') {
             // Calculate Subject Mastery for Radar Chart
             const subjectCounts: { [key: string]: { total: number, completed: number } } = {};
-            plan.flatMap(d => d.slots).forEach(s => {
+            activePlan.flatMap(d => d.slots).forEach(s => {
                 if (s.subject === 'Break' || s.subject === 'Buffer') return;
                 if (!subjectCounts[s.subject]) subjectCounts[s.subject] = { total: 0, completed: 0 };
                 subjectCounts[s.subject].total++;
@@ -373,10 +451,10 @@ const StudyPlanDashboard: React.FC = () => {
                 .slice(0, 6); // Top 6 subjects for cleaner radar
 
             // Strategic Insights Logic
-            const daysElapsed = Math.floor((Date.now() - new Date(plan[0]?.date).getTime()) / (1000 * 60 * 60 * 24));
+            const daysElapsed = Math.floor((Date.now() - new Date(activePlan[0]?.date).getTime()) / (1000 * 60 * 60 * 24));
             const safeDaysElapsed = daysElapsed < 0 ? 0 : daysElapsed; // Fix negative days
-            const totalCompleted = plan.reduce((acc, day) => acc + day.slots.filter(s => s.status === 'completed').length, 0);
-            const totalTasks = plan.reduce((acc, day) => acc + day.slots.length, 0);
+            const totalCompleted = activePlan.reduce((acc, day) => acc + day.slots.filter(s => s.status === 'completed').length, 0);
+            const totalTasks = activePlan.reduce((acc, day) => acc + day.slots.length, 0);
             const completionRate = totalTasks > 0 ? (totalCompleted / totalTasks) * 100 : 0;
 
             let strategicNote = "Maintain current velocity.";
@@ -489,7 +567,7 @@ const StudyPlanDashboard: React.FC = () => {
                                     <div className="heatmap-mini">
                                         <h4>ACTIVITY SIGNATURE</h4>
                                         <div className="heatmap-grid">
-                                            {plan.slice(0, 180).map((day, idx) => {
+                                            {activePlan.slice(0, 180).map((day, idx) => {
                                                 const dayTasks = day.slots.length;
                                                 const dayCompleted = day.slots.filter(s => s.status === 'completed').length;
                                                 const intensity = dayTasks === 0 ? 0 : Math.ceil((dayCompleted / dayTasks) * 4);
@@ -510,8 +588,8 @@ const StudyPlanDashboard: React.FC = () => {
                 </div>
             );
         } else if (viewMode === 'overall') {
-            const totalTasks = plan.reduce((acc, day) => acc + day.slots.length, 0);
-            const completedTasks = plan.reduce((acc, day) => acc + day.slots.filter(s => s.status === 'completed').length, 0);
+            const totalTasks = activePlan.reduce((acc, day) => acc + day.slots.length, 0);
+            const completedTasks = activePlan.reduce((acc, day) => acc + day.slots.filter(s => s.status === 'completed').length, 0);
             const overallProgress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
             return (
@@ -528,14 +606,14 @@ const StudyPlanDashboard: React.FC = () => {
                         </div>
                         <div className="stat-card">
                             <h3>Projected End</h3>
-                            <p>{plan.length > 0 ? plan[plan.length - 1].date : 'N/A'}</p>
+                            <p>{activePlan.length > 0 ? activePlan[activePlan.length - 1].date : 'N/A'}</p>
                         </div>
                     </div>
                     <div className="subject-progress">
                         <h3>Subject Breakdown</h3>
                         {['History', 'Geography', 'Polity', 'Economy', 'Science', 'Environment'].map(subject => {
-                            const subjectTasks = plan.flatMap(d => d.slots).filter(s => s.subject === subject).length;
-                            const subjectCompleted = plan.flatMap(d => d.slots).filter(s => s.subject === subject && s.status === 'completed').length;
+                            const subjectTasks = activePlan.flatMap(d => d.slots).filter(s => s.subject === subject).length;
+                            const subjectCompleted = activePlan.flatMap(d => d.slots).filter(s => s.subject === subject && s.status === 'completed').length;
                             const subProgress = subjectTasks > 0 ? (subjectCompleted / subjectTasks) * 100 : 0;
 
                             return (
@@ -564,13 +642,20 @@ const StudyPlanDashboard: React.FC = () => {
                     <button className={viewMode === 'flashcards' ? 'active' : ''} onClick={() => setViewMode('flashcards')}>🎴 Flashcards</button>
                 </div>
                 <div className="controls">
+                    <button
+                        className={`toggle-btn ${isDynamicMode ? 'active' : ''}`}
+                        onClick={() => setIsDynamicMode(!isDynamicMode)}
+                        title="Dynamic Mode: Automatically reschedules pending tasks"
+                    >
+                        {isDynamicMode ? '⚡ Auto-Pilot ON' : '⚓ Static Mode'}
+                    </button>
                     <button onClick={fetchCSVPlan} disabled={loading}>
                         🔄 Refresh Plan
                     </button>
                 </div>
             </div>
 
-            {plan.length > 0 ? (
+            {activePlan.length > 0 ? (
                 <div className="plan-timeline">
                     {renderContent()}
                 </div>
