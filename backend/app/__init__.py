@@ -10,6 +10,11 @@ def create_app():
     from . import db
     db.init_app(app)
 
+    # Initialize DB tables
+    from app.db_models.study_plan import init_study_plan_tables
+    with app.app_context():
+        init_study_plan_tables()
+
     # Import blueprints
     from .routes import (
         dashboard, tasks, quests, battles, shop, codex, lore, mimir, 
@@ -17,7 +22,7 @@ def create_app():
         syllabus, flashcards, analytics, essay, csat, badges, challenges, 
         shop_new, weak_areas, admin, predictive, pomodoro, timebox, planner, 
         templates, revision, heatmap, model_answers, issue_mapping, scheduler,
-        mindmap
+        mindmap, study_plan
     )
     
     # Register blueprints
@@ -57,6 +62,7 @@ def create_app():
     app.register_blueprint(model_answers.bp)
     app.register_blueprint(issue_mapping.bp)
     app.register_blueprint(mindmap.bp)
+    app.register_blueprint(study_plan.study_plan_bp)
     
     from app.routes import compilation
     app.register_blueprint(compilation.bp)
