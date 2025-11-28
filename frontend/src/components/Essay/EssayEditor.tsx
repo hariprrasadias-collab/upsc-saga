@@ -18,7 +18,7 @@ const EssayEditor: React.FC<EssayEditorProps> = ({ onSubmitSuccess }) => {
     }, []);
 
     useEffect(() => {
-        let interval: NodeJS.Timeout;
+        let interval: ReturnType<typeof setInterval>;
         if (timerActive && timeLeft > 0) {
             interval = setInterval(() => {
                 setTimeLeft((prev) => prev - 1);

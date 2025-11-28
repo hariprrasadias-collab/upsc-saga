@@ -4,7 +4,7 @@ import { audioManager } from '../../util/AudioManager';
 
 interface Boss {
     id: string | number;
-    type: 'YEAR' | 'SUBJECT';
+    type: 'YEAR' | 'SUBJECT' | 'CUSTOM';
     name: string;
     hp: number;
     max_hp: number;

@@ -33,7 +33,7 @@ import AnswerWriting from './components/AnswerWriting/AnswerWriting';
 import MockTests from './components/MockTests/MockTests';
 import EssayWorkshop from './components/Essay/EssayWorkshop';
 import CSATModule from './components/CSAT/CSATModule';
-import MimirChat from './components/Mimir/MimirChat';
+import MimirChat from './components/Mimir/Mimir';
 import FlashcardsManager from './components/Flashcards/FlashcardsManager';
 import AnalyticsDashboard from './components/Analytics/AnalyticsDashboard';
 import AnswerWorkbench from './components/Scribe/AnswerWorkbench';
@@ -187,7 +187,11 @@ function App() {
           <main className="content" style={{
             backgroundImage: currentTab === 'dashboard' ? `url(/assets/bg_sidebar.png)` : undefined,
             backgroundSize: 'cover',
-            minHeight: '100vh',
+            height: '100vh',
+            maxHeight: '100vh',
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
             zIndex: 10,
             position: 'relative'
           }}>

@@ -55,7 +55,7 @@ const AnswerWriting: React.FC<AnswerWritingProps> = ({ onTaskCompleted }) => {
 
     // Timer
     useEffect(() => {
-        let interval: NodeJS.Timeout;
+        let interval: ReturnType<typeof setInterval>;
         if (isTimerRunning) {
             interval = setInterval(() => {
                 setTimeElapsed(prev => prev + 1);

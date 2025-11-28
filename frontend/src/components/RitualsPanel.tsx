@@ -52,9 +52,9 @@ const RitualsPanel: React.FC<RitualsPanelProps> = ({ tasks = [], onTaskComplete,
       const dayName = columns[1];
       const time = columns[3];
       const subject = columns[4];
-      const topic = columns[5];
-      const activityType = columns[6];
-      const resources = columns[7];
+      const topic = columns[5] || '';
+      const activityType = columns[6] || '';
+      const resources = columns[7] || 'N/A';
 
       if (!date || columns.length < 5) return;
 

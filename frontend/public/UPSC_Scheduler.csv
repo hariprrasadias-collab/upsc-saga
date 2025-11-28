@@ -1496,3 +1496,1829 @@ Date,Day,Slot_Type,Time,Subject,Topic,Activity_Type,Resources
 2026-04-07,Tuesday,Evening,21:00-21:50,Revision,SRS Review: Protected Areas (Studied Apr 2),Revise,Flashcards created Apr 2
 2026-04-07,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
 2026-04-07,Tuesday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Acts (EPA/WPA) & Bodies (NGT),Flashcard Creation,Anki / Paper
+2026-04-08,Wednesday,Morning,04:00-04:50,Economy,Standard Book (Ramesh Singh/Mrunal): Introduction (Growth/Dev/Happiness Index),Read,Standard Economy Book
+2026-04-08,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-04-08,Wednesday,Morning,05:00-05:50,Economy,Standard Book: National Income (GDP/GNP/NDP/NNP - Current vs Constant Prices),Read,Standard Economy Book
+2026-04-08,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-04-08,Wednesday,Morning,06:00-06:50,Economy,Standard Book: National Income (Calculation Methods & Issues),Read,Standard Economy Book
+2026-04-08,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-04-08,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-04-08,Wednesday,Evening,21:00-21:50,Revision,SRS Review: Environment Acts/Policies (Studied Apr 7),Revise,Flashcards created Apr 7
+2026-04-08,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-04-08,Wednesday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for National Income Concepts,Flashcard Creation,Anki / Paper
+2026-04-09,Thursday,Morning,04:00-04:50,Environment,Shankar IAS: Ch 27 - International Organisations (UNEP/UNDP),Read,Shankar IAS Environment
+2026-04-09,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-04-09,Thursday,Morning,05:00-05:50,Environment,Shankar IAS: Ch 27 - International Organisations (IUCN/GEF/IPCC),Read,Shankar IAS Environment
+2026-04-09,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-04-09,Thursday,Morning,06:00-06:50,Environment,Shankar IAS: Ch 28 - International Conventions (CBD/Cartagena/Nagoya),Read,Shankar IAS Environment
+2026-04-09,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-04-09,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-04-09,Thursday,Evening,21:00-21:50,Revision,SRS Review: History Cabinet Mission/Independence (Studied Apr 1),Revise,Flashcards created Apr 1
+2026-04-09,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-04-09,Thursday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for IUCN/Protocols (Nagoya/Cartagena),Flashcard Creation,Anki / Paper
+2026-04-10,Friday,Morning,04:00-04:50,Economy,Standard Book: Inflation (Types: Creeping/Galloping/Hyper),Read,Standard Economy Book
+2026-04-10,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-04-10,Friday,Morning,05:00-05:50,Economy,Standard Book: Inflation (Causes: Demand Pull/Cost Push & Phillips Curve),Read,Standard Economy Book
+2026-04-10,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-04-10,Friday,Morning,06:00-06:50,Economy,Standard Book: Inflation (Measures to Control: Monetary/Fiscal),Read,Standard Economy Book
+2026-04-10,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-04-10,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-04-10,Friday,Evening,21:00-21:50,Revision,SRS Review: Environment Protected Areas (Studied Apr 2),Revise,Flashcards created Apr 2
+2026-04-10,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-04-10,Friday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Inflation Curves & Indices (WPI/CPI),Flashcard Creation,Anki / Paper
+2026-04-11,Saturday,Weekend_Slot_1,09:00-09:50,Environment,Shankar IAS: Ch 28 - International Conventions (Ramsar/CITES/CMS),Read,Shankar IAS Environment
+2026-04-11,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-04-11,Saturday,Weekend_Slot_1,10:00-10:50,Environment,Shankar IAS: Ch 28 - Conventions (Vienna/Montreal/Kigali - Ozone),Read,Shankar IAS Environment
+2026-04-11,Saturday,Weekend_Slot_1,10:50-11:00,Break,Walk,Break,N/A
+2026-04-11,Saturday,Weekend_Slot_1,11:00-11:50,Environment,Shankar IAS: Ch 28 - Conventions (Minamata/Stockholm/Rotterdam/Basel),Read,Shankar IAS Environment
+2026-04-11,Saturday,Weekend_Slot_2,13:00-13:50,Economy,Standard Book: Banking (Evolution/Nationalisation),Read,Standard Economy Book
+2026-04-11,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-04-11,Saturday,Weekend_Slot_2,14:00-14:50,Economy,Standard Book: Banking (RBI Structure/Functions),Read,Standard Economy Book
+2026-04-11,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-04-11,Saturday,Weekend_Slot_2,15:00-16:00,Flashcards,Task: CREATE Flashcards for Conventions (Targets/Years) - CRITICAL,Flashcard Creation,Anki / Paper
+2026-04-11,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Time & Work (Advanced - Efficiency),Practice,RS Aggarwal
+2026-04-11,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-04-11,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Reasoning: Syllogism (Possibility Cases),Practice,RS Aggarwal
+2026-04-11,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-04-11,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 1-10 (April Wk 2),Read,Monthly Magazine
+2026-04-11,Saturday,Weekend_Slot_4,21:00-22:00,Revision,SRS Review: Environment Climate Change (Studied Apr 5/6),Revise,Flashcards created Apr 5/6
+2026-04-12,Sunday,Weekend_Slot_1,09:00-09:50,Mock Test,TEST 18: Environment Full Syllabus (Shankar IAS),Mock Test,Sectional Test Series
+2026-04-12,Sunday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-04-12,Sunday,Weekend_Slot_1,10:00-10:50,Mock Test,TEST 18: Continue/Finish,Mock Test,Sectional Test Series
+2026-04-12,Sunday,Weekend_Slot_1,10:50-11:00,Break,Walk,Break,N/A
+2026-04-12,Sunday,Weekend_Slot_1,11:00-12:00,Analysis,Review Answers: Focus on Protocol Targets (e.g. Kyoto vs Paris),Analysis,Self-Analysis Journal
+2026-04-12,Sunday,Weekend_Slot_2,13:00-13:50,Economy,Standard Book: Banking (Monetary Policy - Repo/Reverse Repo/MSF/Bank Rate),Read,Standard Economy Book
+2026-04-12,Sunday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-04-12,Sunday,Weekend_Slot_2,14:00-14:50,Economy,Standard Book: Banking (CRR/SLR/Open Market Operations),Read,Standard Economy Book
+2026-04-12,Sunday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-04-12,Sunday,Weekend_Slot_2,15:00-16:00,Economy,Standard Book: Banking (NPA Issue/Basel Norms),Read,Standard Economy Book
+2026-04-12,Sunday,Weekend_Slot_3,17:00-17:50,Flashcards,Task: CREATE Flashcards for Monetary Policy Tools & Basel Norms,Flashcard Creation,Anki / Paper
+2026-04-12,Sunday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-04-12,Sunday,Weekend_Slot_3,18:00-18:50,Revision,SRS Review: Environment Acts/Institutions (Studied Apr 7),Revise,Flashcards created Apr 7
+2026-04-12,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 20: Financial Market & External Sector,Admin,Planner
+2026-04-13,Monday,Morning,04:00-04:50,Economy,Standard Book: Financial Market (Money Market vs Capital Market),Read,Standard Economy Book
+2026-04-13,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-04-13,Monday,Morning,05:00-05:50,Economy,Standard Book: Financial Market (Stock Exchanges/SEBI),Read,Standard Economy Book
+2026-04-13,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-04-13,Monday,Morning,06:00-06:50,Economy,Standard Book: Financial Market (Instruments: T-Bills/Bonds/Commercial Papers),Read,Standard Economy Book
+2026-04-13,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-04-13,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-04-13,Monday,Evening,21:00-21:50,Revision,SRS Review: Economy National Income (Studied Apr 8),Revise,Flashcards created Apr 8
+2026-04-13,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-04-13,Monday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Financial Instruments (Bonds/Bills),Flashcard Creation,Anki / Paper
+2026-04-14,Tuesday,Morning,04:00-04:50,Environment,Shankar IAS: Appendix Study (Tiger Reserves List - State wise),Read,Shankar IAS Environment
+2026-04-14,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-04-14,Tuesday,Morning,05:00-05:50,Environment,Shankar IAS: Appendix Study (Elephant Reserves/Biosphere Reserves List),Read,Shankar IAS Environment
+2026-04-14,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-04-14,Tuesday,Morning,06:00-06:50,Environment,Shankar IAS: BOOK COMPLETION & Review of Weak Areas,Revise,Shankar IAS Environment
+2026-04-14,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-04-14,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-04-14,Tuesday,Evening,21:00-21:50,Revision,SRS Review: Economy Inflation (Studied Apr 10),Revise,Flashcards created Apr 10
+2026-04-14,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-04-14,Tuesday,Evening,22:00-22:50,Flashcards,Task: Review Biosphere Reserves & Tiger Reserves Flashcards,Flashcard Review,Anki Deck
+2026-04-15,Wednesday,Morning,04:00-04:50,Economy,Standard Book: Public Finance (Budget/Fiscal Deficit/Primary Deficit),Read,Standard Economy Book
+2026-04-15,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-04-15,Wednesday,Morning,05:00-05:50,Economy,Standard Book: Public Finance (Deficit Financing/FRBM Act),Read,Standard Economy Book
+2026-04-15,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-04-15,Wednesday,Morning,06:00-06:50,Economy,Standard Book: Public Finance (Taxation: Direct/Indirect/GST),Read,Standard Economy Book
+2026-04-15,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-04-15,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-04-15,Wednesday,Evening,21:00-21:50,Revision,SRS Review: Environment Conventions (Studied Apr 11),Revise,Flashcards created Apr 11
+2026-04-15,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-04-15,Wednesday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Deficits (Formulas) & FRBM Act,Flashcard Creation,Anki / Paper
+2026-04-16,Thursday,Morning,04:00-04:50,Economy,Standard Book: External Sector (Balance of Payments - Current/Capital Account),Read,Standard Economy Book
+2026-04-16,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-04-16,Thursday,Morning,05:00-05:50,Economy,Standard Book: External Sector (Forex Reserves/Exchange Rate Systems),Read,Standard Economy Book
+2026-04-16,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-04-16,Thursday,Morning,06:00-06:50,Economy,Standard Book: External Sector (Convertibility/FDI vs FII),Read,Standard Economy Book
+2026-04-16,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-04-16,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-04-16,Thursday,Evening,21:00-21:50,Revision,SRS Review: Economy Banking (Studied Apr 12),Revise,Flashcards created Apr 12
+2026-04-16,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-04-16,Thursday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for BoP & FDI/FII,Flashcard Creation,Anki / Paper
+2026-04-17,Friday,Morning,04:00-04:50,Economy,Standard Book: International Organizations (IMF - Quota/SDR/Reports),Read,Standard Economy Book
+2026-04-17,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-04-17,Friday,Morning,05:00-05:50,Economy,Standard Book: International Organizations (World Bank Group - IBRD/IDA/IFC/MIGA/ICSID),Read,Standard Economy Book
+2026-04-17,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-04-17,Friday,Morning,06:00-06:50,Economy,Standard Book: International Organizations (Asian Development Bank/AIIB/NDB),Read,Standard Economy Book
+2026-04-17,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-04-17,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-04-17,Friday,Evening,21:00-21:50,Revision,SRS Review: Economy Financial Markets (Studied Apr 13),Revise,Flashcards created Apr 13
+2026-04-17,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-04-17,Friday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for IMF/WB Reports & Headquarters,Flashcard Creation,Anki / Paper
+2026-04-18,Saturday,Weekend_Slot_1,09:00-09:50,Economy,Standard Book: WTO (History: GATT to WTO/Marrakesh Agreement),Read,Standard Economy Book
+2026-04-18,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-04-18,Saturday,Weekend_Slot_1,10:00-10:50,Economy,Standard Book: WTO Agreements (AoA - Amber/Blue/Green Boxes),Read,Standard Economy Book
+2026-04-18,Saturday,Weekend_Slot_1,10:50-11:00,Break,Walk,Break,N/A
+2026-04-18,Saturday,Weekend_Slot_1,11:00-11:50,Economy,Standard Book: WTO (TRIPS/TRIMS/Doha Development Agenda),Read,Standard Economy Book
+2026-04-18,Saturday,Weekend_Slot_2,13:00-13:50,Art & Culture,Nitin Singhania: Ch 1 - Indian Architecture (Harappan Civilization),Read,Nitin Singhania
+2026-04-18,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-04-18,Saturday,Weekend_Slot_2,14:00-14:50,Art & Culture,Nitin Singhania: Ch 1 - Mauryan Art (Pillars/Stupas/Caves),Read,Nitin Singhania
+2026-04-18,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-04-18,Saturday,Weekend_Slot_2,15:00-16:00,Flashcards,Task: CREATE Flashcards for WTO Boxes & Mauryan Art Terms,Flashcard Creation,Anki / Paper
+2026-04-18,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Simple Equations (Linear),Practice,RS Aggarwal
+2026-04-18,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-04-18,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Quant: Quadratic Equations,Practice,RS Aggarwal
+2026-04-18,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-04-18,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 1-10 (April Wk 3),Read,Monthly Magazine
+2026-04-18,Saturday,Weekend_Slot_4,21:00-22:00,Revision,SRS Review: Economy Public Finance (Studied Apr 15),Revise,Flashcards created Apr 15
+2026-04-19,Sunday,Weekend_Slot_1,09:00-09:50,Mock Test,TEST 19: Economy Sectional (Banking, Inflation, BoP, Public Finance),Mock Test,Sectional Test Series
+2026-04-19,Sunday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-04-19,Sunday,Weekend_Slot_1,10:00-10:50,Mock Test,TEST 19: Continue/Finish,Mock Test,Sectional Test Series
+2026-04-19,Sunday,Weekend_Slot_1,10:50-11:00,Break,Walk,Break,N/A
+2026-04-19,Sunday,Weekend_Slot_1,11:00-12:00,Analysis,Review Answers: Analyze mistakes in conceptual questions (e.g., Repo rate effect),Analysis,Self-Analysis Journal
+2026-04-19,Sunday,Weekend_Slot_2,13:00-13:50,Art & Culture,Nitin Singhania: Ch 1 - Post-Mauryan Art (Gandhara/Mathura/Amravati Schools),Read,Nitin Singhania
+2026-04-19,Sunday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-04-19,Sunday,Weekend_Slot_2,14:00-14:50,Art & Culture,Nitin Singhania: Ch 1 - Gupta Age Architecture (Temple beginnings),Read,Nitin Singhania
+2026-04-19,Sunday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-04-19,Sunday,Weekend_Slot_2,15:00-16:00,Art & Culture,Nitin Singhania: Ch 1 - Temple Architecture Styles (Nagara/Dravida/Vesara),Read,Nitin Singhania
+2026-04-19,Sunday,Weekend_Slot_3,17:00-17:50,Flashcards,Task: CREATE Flashcards for Temple Styles (Compare features),Flashcard Creation,Anki / Paper
+2026-04-19,Sunday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-04-19,Sunday,Weekend_Slot_3,18:00-18:50,Revision,SRS Review: Economy External Sector (Studied Apr 16),Revise,Flashcards created Apr 16
+2026-04-19,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 21: Agriculture Economy & Indian Paintings,Admin,Planner
+2026-04-20,Monday,Morning,04:00-04:50,Economy,Standard Book: Agriculture (Land Reforms in India - Critical Review),Read,Standard Economy Book
+2026-04-20,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-04-20,Monday,Morning,05:00-05:50,Economy,Standard Book: Agriculture (Green Revolution - I & II),Read,Standard Economy Book
+2026-04-20,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-04-20,Monday,Morning,06:00-06:50,Economy,Standard Book: Agriculture (Cropping Patterns & Irrigation Issues),Read,Standard Economy Book
+2026-04-20,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-04-20,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-04-20,Monday,Evening,21:00-21:50,Revision,SRS Review: Economy Intl Org (Studied Apr 17),Revise,Flashcards created Apr 17
+2026-04-20,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-04-20,Monday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Land Reforms/Green Rev dates & impacts,Flashcard Creation,Anki / Paper
+2026-04-21,Tuesday,Morning,04:00-04:50,Economy,Standard Book: Agriculture (Food Security & PDS System),Read,Standard Economy Book
+2026-04-21,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-04-21,Tuesday,Morning,05:00-05:50,Economy,Standard Book: Agriculture (MSP Regime/FCI roles),Read,Standard Economy Book
+2026-04-21,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-04-21,Tuesday,Morning,06:00-06:50,Economy,Standard Book: Agriculture (Food Processing Industry - Scope/Significance),Read,Standard Economy Book
+2026-04-21,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-04-21,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-04-21,Tuesday,Evening,21:00-21:50,Revision,SRS Review: Economy WTO (Studied Apr 18),Revise,Flashcards created Apr 18
+2026-04-21,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-04-21,Tuesday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for MSP Crops list & PDS Evolution,Flashcard Creation,Anki / Paper
+2026-04-22,Wednesday,Morning,04:00-04:50,Economy,Standard Book: Infrastructure (Energy Sector - Thermal/Renewable stats),Read,Standard Economy Book
+2026-04-22,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-04-22,Wednesday,Morning,05:00-05:50,Economy,Standard Book: Infrastructure (Transport: Roads/Railways/Ports/Aviation),Read,Standard Economy Book
+2026-04-22,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-04-22,Wednesday,Morning,06:00-06:50,Economy,Standard Book: Investment Models (PPP Models: BOT, BOOT, HAM),Read,Standard Economy Book
+2026-04-22,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-04-22,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-04-22,Wednesday,Evening,21:00-21:50,Revision,SRS Review: Art & Culture Mauryan Art (Studied Apr 18),Revise,Flashcards created Apr 18
+2026-04-22,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-04-22,Wednesday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for PPP Models differences,Flashcard Creation,Anki / Paper
+2026-04-23,Thursday,Morning,04:00-04:50,Economy,Standard Book: Poverty (Estimation Committees: Lakdawala/Tendulkar/Rangarajan),Read,Standard Economy Book
+2026-04-23,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-04-23,Thursday,Morning,05:00-05:50,Economy,Standard Book: Unemployment (Types/Measurement - PLFS),Read,Standard Economy Book
+2026-04-23,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-04-23,Thursday,Morning,06:00-06:50,Economy,Standard Book: Planning in India (History/Five Year Plans Summary) - BOOK COMPLETE,Read,Standard Economy Book
+2026-04-23,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-04-23,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-04-23,Thursday,Evening,21:00-21:50,Revision,SRS Review: Art & Culture Temple Arch (Studied Apr 19),Revise,Flashcards created Apr 19
+2026-04-23,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-04-23,Thursday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Poverty Committees & 5 Year Plans,Flashcard Creation,Anki / Paper
+2026-04-24,Friday,Morning,04:00-04:50,Art & Culture,Nitin Singhania: Ch 2 - Indian Paintings (Pre-historic/Murals - Ajanta/Ellora),Read,Nitin Singhania
+2026-04-24,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-04-24,Friday,Morning,05:00-05:50,Art & Culture,Nitin Singhania: Ch 2 - Miniature Paintings (Mughal School),Read,Nitin Singhania
+2026-04-24,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-04-24,Friday,Morning,06:00-06:50,Art & Culture,Nitin Singhania: Ch 2 - Miniature Paintings (Rajasthani/Pahari/Deccan Schools),Read,Nitin Singhania
+2026-04-24,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-04-24,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-04-24,Friday,Evening,21:00-21:50,Revision,SRS Review: Economy Agriculture (Studied Apr 20/21),Revise,Flashcards created Apr 21
+2026-04-24,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-04-24,Friday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Painting Schools features,Flashcard Creation,Anki / Paper
+2026-04-25,Saturday,Weekend_Slot_1,09:00-09:50,Art & Culture,Nitin Singhania: Ch 1 - Medieval Architecture (Delhi Sultanate),Read,Nitin Singhania
+2026-04-25,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-04-25,Saturday,Weekend_Slot_1,10:00-10:50,Art & Culture,Nitin Singhania: Ch 1 - Medieval Architecture (Mughal Architecture),Read,Nitin Singhania
+2026-04-25,Saturday,Weekend_Slot_1,10:50-11:00,Break,Walk,Break,N/A
+2026-04-25,Saturday,Weekend_Slot_1,11:00-11:50,Art & Culture,Nitin Singhania: Ch 1 - Modern Architecture (Indo-Gothic/Neo-Roman),Read,Nitin Singhania
+2026-04-25,Saturday,Weekend_Slot_2,13:00-13:50,Art & Culture,Nitin Singhania: Ch 5 - Indian Music (Hindustani vs Carnatic - Basic Differences),Read,Nitin Singhania
+2026-04-25,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-04-25,Saturday,Weekend_Slot_2,14:00-14:50,Art & Culture,Nitin Singhania: Ch 5 - Musical Instruments & Folk Music,Read,Nitin Singhania
+2026-04-25,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-04-25,Saturday,Weekend_Slot_2,15:00-16:00,Flashcards,Task: CREATE Flashcards for Mughal Buildings & Music Styles,Flashcard Creation,Anki / Paper
+2026-04-25,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Reasoning: Directions & Distance (Complex),Practice,RS Aggarwal
+2026-04-25,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-04-25,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Quant: Profit & Loss (Dishonest Dealer problems),Practice,RS Aggarwal
+2026-04-25,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-04-25,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 11-20 (April Wk 4),Read,Monthly Magazine
+2026-04-25,Saturday,Weekend_Slot_4,21:00-22:00,Revision,SRS Review: Economy Infrastructure (Studied Apr 22),Revise,Flashcards created Apr 22
+2026-04-26,Sunday,Weekend_Slot_1,09:00-09:50,Mock Test,TEST 20: Full Economy Syllabus (Standard Book),Mock Test,Subject-Wise Test
+2026-04-26,Sunday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-04-26,Sunday,Weekend_Slot_1,10:00-10:50,Mock Test,TEST 20: Continue/Finish,Mock Test,Subject-Wise Test
+2026-04-26,Sunday,Weekend_Slot_1,10:50-11:00,Break,Walk,Break,N/A
+2026-04-26,Sunday,Weekend_Slot_1,11:00-12:00,Analysis,DEEP ANALYSIS: Economy weak areas identification (Concepts vs Facts),Analysis,Self-Analysis Journal
+2026-04-26,Sunday,Weekend_Slot_2,13:00-13:50,Art & Culture,Nitin Singhania: Ch 6 - Indian Dance Forms (Classical Dances - Bharatnatyam/Kathak/Kuchipudi etc),Read,Nitin Singhania
+2026-04-26,Sunday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-04-26,Sunday,Weekend_Slot_2,14:00-14:50,Art & Culture,Nitin Singhania: Ch 6 - Indian Dance Forms (Classical Dances - Mohiniyattam/Odissi/Manipuri/Sattriya),Read,Nitin Singhania
+2026-04-26,Sunday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-04-26,Sunday,Weekend_Slot_2,15:00-16:00,Art & Culture,Nitin Singhania: Ch 6 - Folk Dances of India (State-wise),Read,Nitin Singhania
+2026-04-26,Sunday,Weekend_Slot_3,17:00-17:50,Flashcards,Task: CREATE Flashcards for Classical Dances (Features/States),Flashcard Creation,Anki / Paper
+2026-04-26,Sunday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-04-26,Sunday,Weekend_Slot_3,18:00-18:50,Revision,SRS Review: Economy Poverty/Unemployment (Studied Apr 23),Revise,Flashcards created Apr 23
+2026-04-26,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 22: Performance Arts & Literature,Admin,Planner
+2026-04-27,Monday,Morning,04:00-04:50,Art & Culture,Nitin Singhania: Ch 7 - Indian Theatre (Classical Sanskrit Theatre),Read,Nitin Singhania
+2026-04-27,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-04-27,Monday,Morning,05:00-05:50,Art & Culture,Nitin Singhania: Ch 7 - Indian Theatre (Folk Theatre forms),Read,Nitin Singhania
+2026-04-27,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-04-27,Monday,Morning,06:00-06:50,Art & Culture,Nitin Singhania: Ch 8 - Indian Puppetry (String/Shadow/Rod/Glove),Read,Nitin Singhania
+2026-04-27,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-04-27,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-04-27,Monday,Evening,21:00-21:50,Revision,SRS Review: Art & Culture Paintings (Studied Apr 24),Revise,Flashcards created Apr 24
+2026-04-27,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-04-27,Monday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Theatre/Puppetry forms & states,Flashcard Creation,Anki / Paper
+2026-04-28,Tuesday,Morning,04:00-04:50,Art & Culture,Nitin Singhania: Ch 9 - Indian Circus & Ch 10 - Martial Arts,Read,Nitin Singhania
+2026-04-28,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-04-28,Tuesday,Morning,05:00-05:50,Art & Culture,Nitin Singhania: Ch 11 - UNESCO Intangible Cultural Heritage List,Read,Nitin Singhania
+2026-04-28,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-04-28,Tuesday,Morning,06:00-06:50,Art & Culture,Nitin Singhania: Ch 12 - UNESCO World Heritage Sites (Cultural/Natural/Mixed),Read,Nitin Singhania
+2026-04-28,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-04-28,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-04-28,Tuesday,Evening,21:00-21:50,Revision,SRS Review: Art & Culture Architecture (Studied Apr 25),Revise,Flashcards created Apr 25
+2026-04-28,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-04-28,Tuesday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for UNESCO Sites & Martial Arts,Flashcard Creation,Anki / Paper
+2026-04-29,Wednesday,Morning,04:00-04:50,Art & Culture,Nitin Singhania: Ch 13 - Languages in India (Classical Languages status),Read,Nitin Singhania
+2026-04-29,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-04-29,Wednesday,Morning,05:00-05:50,Art & Culture,Nitin Singhania: Ch 14 - Religion in India (Philosophy/Sects),Read,Nitin Singhania
+2026-04-29,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-04-29,Wednesday,Morning,06:00-06:50,Art & Culture,Nitin Singhania: Ch 15 - Indian Literature (Ancient/Medieval),Read,Nitin Singhania
+2026-04-29,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-04-29,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-04-29,Wednesday,Evening,21:00-21:50,Revision,SRS Review: Art & Culture Music/Dance (Studied Apr 25/26),Revise,Flashcards created Apr 25/26
+2026-04-29,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-04-29,Wednesday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Classical Languages & Literature,Flashcard Creation,Anki / Paper
+2026-04-30,Thursday,Morning,04:00-04:50,Art & Culture,Nitin Singhania: Ch 16 - Schools of Philosophy (Orthodox/Heterodox),Read,Nitin Singhania
+2026-04-30,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-04-30,Thursday,Morning,05:00-05:50,Art & Culture,Nitin Singhania: Ch 17 - Fairs and Festivals of India (State-wise),Read,Nitin Singhania
+2026-04-30,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-04-30,Thursday,Morning,06:00-06:50,Art & Culture,Nitin Singhania: Ch 22 - GI Tags (Geographical Indications) - Recent list,Read,Nitin Singhania
+2026-04-30,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-04-30,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-04-30,Thursday,Evening,21:00-21:50,Revision,SRS Review: Art & Culture Theatre/Puppetry (Studied Apr 27),Revise,Flashcards created Apr 27
+2026-04-30,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-04-30,Thursday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Philosophies & Major Festivals,Flashcard Creation,Anki / Paper
+2026-05-01,Friday,Morning,04:00-04:50,Ethics (GS4),Lexicon: Ch 1 - Ethics and Human Interface (Essence/Determinants),Read,Lexicon for Ethics
+2026-05-01,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-05-01,Friday,Morning,05:00-05:50,Ethics (GS4),Lexicon: Ch 1 - Consequences of Ethics (Private vs Public Relationships),Read,Lexicon for Ethics
+2026-05-01,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-05-01,Friday,Morning,06:00-06:50,Ethics (GS4),Lexicon: Ch 1 - Human Values (Role of Family/Society/Education),Read,Lexicon for Ethics
+2026-05-01,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-05-01,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-05-01,Friday,Evening,21:00-21:50,Revision,SRS Review: Art & Culture Theatre/Puppetry (Studied Apr 27),Revise,Flashcards created Apr 27
+2026-05-01,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-05-01,Friday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Ethics Definitions (Values/Integrity),Flashcard Creation,Anki / Paper
+2026-05-02,Saturday,Weekend_Slot_1,09:00-09:50,Sci-Tech,Space Tech: Orbits (LEO/MEO/GEO/HEO) & Launch Vehicles (PSLV/GSLV),Read,Ravi Agrahari / Notes
+2026-05-02,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-05-02,Saturday,Weekend_Slot_1,10:00-10:50,Sci-Tech,Space Tech: Cryogenic Engines & Reusable Launch Vehicles (RLV),Read,Ravi Agrahari / Notes
+2026-05-02,Saturday,Weekend_Slot_1,10:50-11:00,Break,Walk,Break,N/A
+2026-05-02,Saturday,Weekend_Slot_1,11:00-11:50,Sci-Tech,Space Tech: Indian Space Missions (Chandrayaan/Mangalyaan/Gaganyaan),Read,Ravi Agrahari / Notes
+2026-05-02,Saturday,Weekend_Slot_2,13:00-13:50,Sci-Tech,Space Tech: Navigation Systems (GPS/NavIC/Galileo),Read,Ravi Agrahari / Notes
+2026-05-02,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-05-02,Saturday,Weekend_Slot_2,14:00-14:50,Sci-Tech,Space Tech: Space Debris & International Space Station,Read,Ravi Agrahari / Notes
+2026-05-02,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-05-02,Saturday,Weekend_Slot_2,15:00-16:00,Flashcards,Task: CREATE Flashcards for Space Missions & Orbits,Flashcard Creation,Anki / Paper
+2026-05-02,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Probability (Dice/Cards problems),Practice,RS Aggarwal
+2026-05-02,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-05-02,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Reasoning: Statement & Assumptions,Practice,RS Aggarwal
+2026-05-02,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-05-02,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 81-90 (April Wk 4 / May Wk 1),Read,Monthly Magazine
+2026-05-02,Saturday,Weekend_Slot_4,21:00-22:00,Revision,SRS Review: Art & Culture UNESCO/Martial Arts (Studied Apr 28),Revise,Flashcards created Apr 28
+2026-05-03,Sunday,Weekend_Slot_1,09:00-09:50,Mock Test,TEST 21: Art & Culture Full Syllabus (Nitin Singhania),Mock Test,Subject-Wise Test
+2026-05-03,Sunday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-05-03,Sunday,Weekend_Slot_1,10:00-10:50,Mock Test,TEST 21: Continue/Finish,Mock Test,Subject-Wise Test
+2026-05-03,Sunday,Weekend_Slot_1,10:50-11:00,Break,Walk,Break,N/A
+2026-05-03,Sunday,Weekend_Slot_1,11:00-12:00,Analysis,Review Answers: Focus on Temple Architecture & Folk Dances,Analysis,Self-Analysis Journal
+2026-05-03,Sunday,Weekend_Slot_2,13:00-13:50,Ethics (GS4),Lexicon: Ch 2 - Attitude (Content/Structure/Function),Read,Lexicon for Ethics
+2026-05-03,Sunday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-05-03,Sunday,Weekend_Slot_2,14:00-14:50,Ethics (GS4),Lexicon: Ch 2 - Attitude (Influence of Thought/Behavior),Read,Lexicon for Ethics
+2026-05-03,Sunday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-05-03,Sunday,Weekend_Slot_2,15:00-16:00,Ethics (GS4),Lexicon: Ch 2 - Political & Moral Attitude,Read,Lexicon for Ethics
+2026-05-03,Sunday,Weekend_Slot_3,17:00-17:50,Flashcards,Task: CREATE Flashcards for Attitude definitions & examples,Flashcard Creation,Anki / Paper
+2026-05-03,Sunday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-05-03,Sunday,Weekend_Slot_3,18:00-18:50,Revision,SRS Review: Art & Culture Literature/Philosophy (Studied Apr 29/30),Revise,Flashcards created Apr 29/30
+2026-05-03,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 23: Biotechnology & Emotional Intelligence,Admin,Planner
+2026-05-04,Monday,Morning,04:00-04:50,Sci-Tech,Biotech: Basics (Cell Structure/DNA/RNA - NCERT Class 11 Bio Ref),Read,Ravi Agrahari / NCERT
+2026-05-04,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-05-04,Monday,Morning,05:00-05:50,Sci-Tech,Biotech: Genetic Engineering (CRISPR-Cas9/Recombinant DNA),Read,Ravi Agrahari / Notes
+2026-05-04,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-05-04,Monday,Morning,06:00-06:50,Sci-Tech,Biotech: Cloning/Stem Cells/Three Parent Baby,Read,Ravi Agrahari / Notes
+2026-05-04,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-05-04,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-05-04,Monday,Evening,21:00-21:50,Revision,SRS Review: Ethics Human Interface (Studied May 1),Revise,Flashcards created May 1
+2026-05-04,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-05-04,Monday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Biotech Terms (CRISPR/Stem Cells),Flashcard Creation,Anki / Paper
+2026-05-05,Tuesday,Morning,04:00-04:50,Ethics (GS4),Lexicon: Ch 3 - Aptitude and Foundational Values for Civil Service,Read,Lexicon for Ethics
+2026-05-05,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-05-05,Tuesday,Morning,05:00-05:50,Ethics (GS4),Lexicon: Ch 3 - Integrity/Impartiality/Non-partisanship,Read,Lexicon for Ethics
+2026-05-05,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-05-05,Tuesday,Morning,06:00-06:50,Ethics (GS4),Lexicon: Ch 3 - Objectivity/Dedication/Empathy/Tolerance,Read,Lexicon for Ethics
+2026-05-05,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-05-05,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-05-05,Tuesday,Evening,21:00-21:50,Revision,SRS Review: Space Tech (Studied May 2),Revise,Flashcards created May 2
+2026-05-05,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-05-05,Tuesday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Civil Service Values (Definitions),Flashcard Creation,Anki / Paper
+2026-05-06,Wednesday,Morning,04:00-04:50,Sci-Tech,Biotech: Applications (Agriculture - Bt Cotton/GM Mustard),Read,Ravi Agrahari / Notes
+2026-05-06,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-05-06,Wednesday,Morning,05:00-05:50,Sci-Tech,Biotech: Applications (Health - Vaccines/Gene Therapy),Read,Ravi Agrahari / Notes
+2026-05-06,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-05-06,Sci-Tech,Biotech: IPR Issues (Biopiracy/Patents),Read,Ravi Agrahari / Notes
+2026-05-06,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-05-06,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-05-06,Wednesday,Evening,21:00-21:50,Revision,SRS Review: Ethics Attitude (Studied May 3),Revise,Flashcards created May 3
+2026-05-06,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-05-06,Wednesday,Evening,22:00-22:50,Buffer,Buffer Slot,Buffer,N/A
+2026-05-07,Thursday,Morning,04:00-04:50,Ethics (GS4),Lexicon: Ch 4 - Emotional Intelligence (Concepts/Utilities),Read,Lexicon for Ethics
+2026-05-07,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-05-07,Thursday,Morning,05:00-05:50,Ethics (GS4),Lexicon: Ch 4 - EI in Administration and Governance,Read,Lexicon for Ethics
+2026-05-07,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-05-07,Thursday,Morning,06:00-06:50,Case Study,Practice: Solve 1 Case Study on "Conflict of Interest",Write,Previous Year Papers (PYQ)
+2026-05-07,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-05-07,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-05-07,Thursday,Evening,21:00-21:50,Revision,SRS Review: Biotech Basics (Studied May 4),Revise,Flashcards created May 4
+2026-05-07,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-05-07,Thursday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Emotional Intelligence Components,Flashcard Creation,Anki / Paper
+2026-05-08,Friday,Morning,04:00-04:50,Sci-Tech,Defence Tech: Missiles (Ballistic vs Cruise/IGMDP/Brahmos/Agni),Read,Ravi Agrahari / Notes
+2026-05-08,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-05-08,Friday,Morning,05:00-05:50,Sci-Tech,Defence Tech: Aircrafts/Submarines (Tejas/Rafale/Scorpene/Arihant),Read,Ravi Agrahari / Notes
+2026-05-08,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-05-08,Friday,Morning,06:00-06:50,Sci-Tech,Defence Tech: Chemical/Biological Weapons & Treaties,Read,Ravi Agrahari / Notes
+2026-05-08,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-05-08,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-05-08,Friday,Evening,21:00-21:50,Revision,SRS Review: Ethics Aptitude (Studied May 5),Revise,Flashcards created May 5
+2026-05-08,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-05-08,Friday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Missile Systems & Submarines,Flashcard Creation,Anki / Paper
+2026-05-09,Saturday,Weekend_Slot_1,09:00-09:50,Ethics (GS4),Lexicon: Ch 5 - Contributions of Moral Thinkers (Western: Socrates/Plato/Aristotle),Read,Lexicon for Ethics
+2026-05-09,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-05-09,Saturday,Weekend_Slot_1,10:00-10:50,Ethics (GS4),Lexicon: Ch 5 - Moral Thinkers (Utilitarianism: Bentham/Mill),Read,Lexicon for Ethics
+2026-05-09,Saturday,Weekend_Slot_1,10:50-11:00,Break,Walk,Break,N/A
+2026-05-09,Saturday,Weekend_Slot_1,11:00-11:50,Ethics (GS4),Lexicon: Ch 5 - Moral Thinkers (Deontology: Kant),Read,Lexicon for Ethics
+2026-05-09,Saturday,Weekend_Slot_2,13:00-13:50,Sci-Tech,IT & Computers: Basics (Supercomputers/Quantum Computing),Read,Ravi Agrahari / Notes
+2026-05-09,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-05-09,Saturday,Weekend_Slot_2,14:00-14:50,Sci-Tech,IT & Computers: AI/Machine Learning/Blockchain/IoT,Read,Ravi Agrahari / Notes
+2026-05-09,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-05-09,Saturday,Weekend_Slot_2,15:00-16:00,Flashcards,Task: CREATE Flashcards for Emerging Tech (Blockchain/AI) & Thinkers,Flashcard Creation,Anki / Paper
+2026-05-09,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Permutation & Combination (Advanced),Practice,RS Aggarwal
+2026-05-09,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-05-09,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Reasoning: Statement & Argument,Practice,RS Aggarwal
+2026-05-09,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-05-09,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 1-10 (May Wk 2),Read,Monthly Magazine
+2026-05-09,Saturday,Weekend_Slot_4,21:00-22:00,Revision,SRS Review: Biotech Applications (Studied May 6),Revise,Flashcards created May 6
+2026-05-10,Sunday,Weekend_Slot_1,09:00-09:50,Mock Test,TEST 22: Science & Tech (Space, Biotech, Defence, IT),Mock Test,Subject-Wise Test
+2026-05-10,Sunday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-05-10,Sunday,Weekend_Slot_1,10:00-10:50,Mock Test,TEST 22: Continue/Finish,Mock Test,Subject-Wise Test
+2026-05-10,Sunday,Weekend_Slot_1,10:50-11:00,Break,Walk,Break,N/A
+2026-05-10,Sunday,Weekend_Slot_1,11:00-12:00,Analysis,Review Answers: Focus on Current Affairs links in Sci-Tech,Analysis,Self-Analysis Journal
+2026-05-10,Sunday,Weekend_Slot_2,13:00-13:50,Ethics (GS4),Lexicon: Ch 5 - Indian Thinkers (Kautilya/Gandhi/Ambedkar/Vivekananda),Read,Lexicon for Ethics
+2026-05-10,Sunday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-05-10,Sunday,Weekend_Slot_2,14:00-14:50,Ethics (GS4),Lexicon: Ch 6 - Public/Civil Service Values & Ethics in Public Admin,Read,Lexicon for Ethics
+2026-05-10,Sunday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-05-10,Sunday,Weekend_Slot_2,15:00-16:00,Case Study,Practice: Solve 1 Case Study on "Corruption vs Efficiency",Write,PYQ
+2026-05-10,Sunday,Weekend_Slot_3,17:00-17:50,Sci-Tech,Nanotechnology: Basics & Applications (Medicine/Electronics),Read,Ravi Agrahari / Notes
+2026-05-10,Sunday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-05-10,Sunday,Weekend_Slot_3,18:00-18:50,Sci-Tech,Robotics: Basics & Industrial Applications,Read,Ravi Agrahari / Notes
+2026-05-10,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 24: Finish Ethics Theory & Sci-Tech Diseases,Admin,Planner
+2026-05-11,Monday,Morning,04:00-04:50,Sci-Tech,Diseases: Communicable vs Non-Communicable (Viral/Bacterial),Read,Ravi Agrahari / Notes
+2026-05-11,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-05-11,Monday,Morning,05:00-05:50,Sci-Tech,Diseases: COVID-19/TB/Malaria/Dengue (Recent Developments),Read,Ravi Agrahari / Notes
+2026-05-11,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-05-11,Monday,Morning,06:00-06:50,Sci-Tech,Public Health: Immunity (Types) & Vaccines (Types: mRNA etc),Read,Ravi Agrahari / Notes
+2026-05-11,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-05-11,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-05-11,Monday,Evening,21:00-21:50,Revision,SRS Review: Ethics Emotional Intelligence (Studied May 7),Revise,Flashcards created May 7
+2026-05-11,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-05-11,Monday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Diseases & Vaccine types,Flashcard Creation,Anki / Paper
+2026-05-12,Tuesday,Morning,04:00-04:50,Ethics (GS4),Lexicon: Ch 7 - Probity in Governance (Concept/Philosophical basis),Read,Lexicon for Ethics
+2026-05-12,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-05-12,Tuesday,Morning,05:00-05:50,Ethics (GS4),Lexicon: Ch 7 - Information Sharing/RTI/Codes of Ethics/Codes of Conduct,Read,Lexicon for Ethics
+2026-05-12,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-05-12,Tuesday,Morning,06:00-06:50,Ethics (GS4),Lexicon: Ch 7 - Citizen's Charters/Work Culture/Corruption,Read,Lexicon for Ethics
+2026-05-12,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-05-12,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-05-12,Tuesday,Evening,21:00-21:50,Revision,SRS Review: Defence Tech (Studied May 8),Revise,Flashcards created May 8
+2026-05-12,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-05-12,Tuesday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Probity Terms (Code of Conduct vs Ethics),Flashcard Creation,Anki / Paper
+2026-05-13,Wednesday,Morning,04:00-04:50,Sci-Tech,Nuclear Tech: Basics (Fission vs Fusion/Isotopes),Read,Ravi Agrahari / Notes
+2026-05-13,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-05-13,Wednesday,Morning,05:00-05:50,Sci-Tech,Nuclear Tech: India's 3-Stage Nuclear Program (Reactors: PHWR/FBR),Read,Ravi Agrahari / Notes
+2026-05-13,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-05-13,Wednesday,Morning,06:00-06:50,Sci-Tech,Energy: Renewable Tech (Solar PV/Wind/Green Hydrogen - Tech aspect),Read,Ravi Agrahari / Notes
+2026-05-13,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-05-13,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-05-13,Wednesday,Evening,21:00-21:50,Revision,SRS Review: Ethics Western Thinkers (Studied May 9),Revise,Flashcards created May 9
+2026-05-13,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-05-13,Wednesday,Evening,22:00-22:50,Buffer,Buffer Slot,Buffer,N/A
+2026-05-14,Thursday,Morning,04:00-04:50,Ethics (GS4),Lexicon: Ch 8 - Corporate Governance,Read,Lexicon for Ethics
+2026-05-14,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-05-14,Thursday,Morning,05:00-05:50,Case Study,Practice: Solve 1 Case Study on "Personal vs Professional Ethics",Write,PYQ
+2026-05-14,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-05-14,Thursday,Morning,06:00-06:50,Revision,Ethics: Review Definitions of all Keywords (Syllabus mapping),Revise,Lexicon for Ethics
+2026-05-14,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-05-14,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-05-14,Thursday,Evening,21:00-21:50,Revision,SRS Review: IT/Computers (Studied May 9),Revise,Flashcards created May 9
+2026-05-14,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-05-14,Thursday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Nuclear Program stages,Flashcard Creation,Anki / Paper
+2026-05-15,Friday,Morning,04:00-04:50,Sci-Tech,Intellectual Property Rights: Patents/Copyrights/Trademarks/GI (Legal Framework),Read,Ravi Agrahari / Notes
+2026-05-15,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-05-15,Friday,Morning,05:00-05:50,Sci-Tech,Miscellaneous: Particle Physics (CERN/Higgs Boson/Dark Matter),Read,Ravi Agrahari / Notes
+2026-05-15,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-05-15,Friday,Morning,06:00-06:50,Sci-Tech,BOOK COMPLETION: Review Index & Current Affairs compilations for missing tech,Revise,Ravi Agrahari / Notes
+2026-05-15,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-05-15,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-05-15,Friday,Evening,21:00-21:50,Revision,SRS Review: Ethics Indian Thinkers (Studied May 10),Revise,Flashcards created May 10
+2026-05-15,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-05-15,Friday,Evening,22:00-22:50,Buffer,Buffer Slot,Buffer,N/A
+2026-05-16,Saturday,Weekend_Slot_1,09:00-11:00,Mock Test,TEST 23: FULL LENGTH GS MOCK 1 (Simulate Exam Conditions),Mock Test,Full Length Test Series
+2026-05-16,Saturday,Weekend_Slot_1,11:00-12:00,Break,Light Lunch & Rest,Break,N/A
+2026-05-16,Saturday,Weekend_Slot_2,13:00-15:00,Mock Test,TEST 24: FULL LENGTH CSAT MOCK 1 (Simulate Exam Conditions),Mock Test,Full Length Test Series
+2026-05-16,Saturday,Weekend_Slot_2,15:00-16:00,Analysis,Quick Analysis: Check Score & Time Management (Don't over-analyze),Analysis,Self-Analysis Journal
+2026-05-16,Saturday,Weekend_Slot_3,17:00-19:00,Revision,Polity: Rapid Scan of Art 1-51A (FR/DPSP/FD) & Emergency Provisions,Revise,Laxmikanth/Flashcards
+2026-05-16,Saturday,Weekend_Slot_4,21:00-22:00,Revision,History: 1857-1947 Chronology Timeline Scan,Revise,Spectrum/Flashcards
+2026-05-17,Sunday,Weekend_Slot_1,09:00-11:00,Mock Test,TEST 25: FULL LENGTH GS MOCK 2,Mock Test,Full Length Test Series
+2026-05-17,Sunday,Weekend_Slot_2,13:00-15:00,Analysis,Analysis: Identify "Silly Mistakes" to avoid next week,Analysis,Self-Analysis Journal
+2026-05-17,Sunday,Weekend_Slot_3,17:00-19:00,Revision,Environment: Protected Areas/National Parks/Ramsar Sites Map,Revise,Shankar IAS/Maps
+2026-05-17,Sunday,Weekend_Slot_4,21:00-22:00,Revision,Geography: Ocean Currents & Climatic Regions Map,Revise,GC Leong/Atlas
+2026-05-18,Monday,Morning,04:00-05:00,Revision,Economy: Trends (Inflation/GDP/Fiscal Deficit) & Budget Schemes,Revise,Notes/Budget Summary
+2026-05-18,Morning,05:00-06:00,Revision,Sci-Tech: Missiles/Space Missions/ Diseases (Recent News),Revise,Notes
+2026-05-18,Monday,Morning,06:00-06:50,CSAT,Maths: Formula Revision (Mensuration/Interest/Speed),Revise,Formula Sheet
+2026-05-18,Monday,Evening,20:00-21:00,Current Affairs,Past 6 Months: Index/Reports & Military Exercises,Revise,Compilations
+2026-05-18,Monday,Evening,21:00-22:00,Revision,Art & Culture: Dance Forms/UNESCO Sites/Paintings,Revise,Nitin Singhania/Flashcards
+2026-05-19,Tuesday,Morning,04:00-05:00,Revision,History: Ancient Terms (Admin/Taxes) & Medieval Books/Authors,Revise,Notes/Flashcards
+2026-05-19,Tuesday,Morning,05:00-06:00,Revision,Polity: Constitutional Bodies & Parliament (Bills/Budget),Revise,Laxmikanth
+2026-05-19,Tuesday,Morning,06:00-06:50,Revision,Environment: International Conventions (Targets/Protocols),Revise,Shankar IAS
+2026-05-19,Tuesday,Evening,20:00-21:00,Current Affairs,Past 6 Months: Environment News (Species in News),Revise,Compilations
+2026-05-19,Tuesday,Evening,21:00-22:00,Revision,Geography: Rivers & Tributaries Map Work,Revise,Atlas
+2026-05-20,Wednesday,Morning,04:00-05:00,Revision,Economy: BoP/Forex/International Organizations (Reports),Revise,Notes
+2026-05-20,Wednesday,Morning,05:00-06:00,Revision,History: Modern History Acts (1909/1919/1935) & Governor Generals,Revise,Notes/Flashcards
+2026-05-20,Wednesday,Morning,06:00-06:50,CSAT,Reasoning: Syllogism & Blood Relations (Quick Practice),Practice,RS Aggarwal
+2026-05-20,Wednesday,Evening,20:00-21:00,Current Affairs,Past 6 Months: Govt Schemes & Portals,Revise,Compilations
+2026-05-20,Wednesday,Evening,21:00-22:00,Revision,Sci-Tech: Biotech Basics & IPR (Patents/GI Tags),Revise,Notes
+2026-05-21,Thursday,Morning,04:00-05:00,Revision,Polity: Schedules/Parts/Amendments (Latest),Revise,Laxmikanth
+2026-05-21,Thursday,Morning,05:00-06:00,Revision,Environment: Pollution/Acts (WPA/EPA/Forest Act),Revise,Notes
+2026-05-21,Thursday,Morning,06:00-06:50,Revision,Art & Culture: Buddhism/Jainism/Philosophy (High Yield),Revise,Notes
+2026-05-21,Thursday,Evening,20:00-21:00,Current Affairs,Past 6 Months: Places in News (International),Revise,Atlas
+2026-05-21,Thursday,Evening,21:00-22:00,Revision,Geography: Soils/Vegetation/Minerals of India,Revise,NCERT
+2026-05-22,Friday,Morning,04:00-06:50,Strategy,PRE-EXAM STRATEGY: Review OMR Filling strategy & "Art of Guessing" Logic,Strategy,YouTube/Notes
+2026-05-22,Friday,Evening,20:00-21:00,Relax,Light Revision: Flip through Maps/Diagrams (No heavy reading),Revise,Visuals
+2026-05-22,Friday,Evening,21:00-22:00,Admin,Admit Card/Pen/ID Card Check & Logistics Plan,Admin,Prep
+2026-05-23,Saturday,Weekend_Slot_1,09:00-12:00,Relax,NO STUDY: Light Walk/Meditation/Music (Keep mind fresh),Rest,N/A
+2026-05-23,Saturday,Weekend_Slot_2,13:00-15:00,Relax,Nap/Light Reading (Non-UPSC),Rest,N/A
+2026-05-23,Saturday,Weekend_Slot_3,17:00-18:00,Admin,Final Gear Check. Early Dinner.,Admin,N/A
+2026-05-23,Saturday,Weekend_Slot_4,21:00-04:00,Sleep,SLEEP: 7-8 Hours Mandatory,Sleep,Bed
+2026-05-24,Sunday,All_Day,09:30-11:30,EXAM,**UPSC PRELIMS 2026: GS PAPER 1** (Focus/Calm),Exam,Exam Centre
+2026-05-24,Sunday,All_Day,14:30-16:30,EXAM,**UPSC PRELIMS 2026: CSAT PAPER 2** (Accuracy),Exam,Exam Centre
+2026-05-24,Sunday,Evening,18:00-23:00,Rest,Chill. Do NOT check answer keys immediately. Just breathe.,Rest,N/A
+2026-05-25,Monday,All_Day,00:00-23:59,Break,POST-EXAM BREAK: Recover from burnout.,Rest,N/A
+2026-05-26,Tuesday,All_Day,00:00-23:59,Break,POST-EXAM BREAK: Recover from burnout.,Rest,N/A
+2026-05-27,Wednesday,All_Day,00:00-23:59,Analysis,Check Answer Keys (Optional) & Accept the Result (Pass or Fail - Journey Continues),Analysis,Various Keys
+2026-05-28,Thursday,Morning,04:00-04:50,Transition,Phase 3 (Mains Mastery) Launch: Intro to World History,Read,NCERT/Notes
+2026-05-28,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-05-28,Thursday,Morning,05:00-05:50,History,World History: Industrial Revolution (Causes/Impact),Read,Arjun Dev (NCERT)
+2026-05-28,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-05-28,Thursday,Morning,06:00-06:50,History,World History: American Revolution (Causes/Significance),Read,Arjun Dev (NCERT)
+2026-05-28,Thursday,Evening,20:00-20:50,Essay,Essay Paper (GS1): Introduction to Structure (Intro/Body/Conclusion),Read,Anudeep Durishetty Book/Blogs
+2026-05-28,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-05-28,Thursday,Evening,21:00-21:50,Essay,Brainstorming Practice: "Health is Wealth" (Simple topic to start),Practice,Rough Notebook
+2026-05-29,Friday,Morning,04:00-04:50,History,World History: French Revolution (Causes/Estates/Ideas),Read,Arjun Dev (NCERT)
+2026-05-29,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-05-29,Friday,Morning,05:00-05:50,History,World History: Napoleon (Rise/Reforms/Fall),Read,Arjun Dev (NCERT)
+2026-05-29,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-05-29,Friday,Morning,06:00-06:50,History,World History: Unification of Germany & Italy,Read,Arjun Dev (NCERT)
+2026-05-29,Friday,Evening,20:00-20:50,Current Affairs,Resuming Daily News Analysis (Mains Focus - Editorials),Read,The Hindu
+2026-05-29,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-05-29,Friday,Evening,21:00-21:50,Ethics (GS4),Review: Lexicon Definitions (Getting back into Ethics groove),Revise,Lexicon for Ethics
+2026-05-30,Saturday,Weekend_Slot_1,09:00-09:50,History,World History: World War I (Causes/Events),Read,Arjun Dev (NCERT)
+2026-05-30,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-05-30,Saturday,Weekend_Slot_1,10:00-10:50,History,World History: Russian Revolution (1917),Read,Arjun Dev (NCERT)
+2026-05-30,Saturday,Weekend_Slot_1,10:50-11:00,Break,Walk,Break,N/A
+2026-05-30,Saturday,Weekend_Slot_1,11:00-11:50,History,World History: Great Depression (1929),Read,Arjun Dev (NCERT)
+2026-05-30,Saturday,Weekend_Slot_2,13:00-13:50,Essay,Essay Writing: Write 1 Full Essay (1000 words) Topic: "Education system in India",Practice,A4 Sheets
+2026-05-30,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-05-30,Saturday,Weekend_Slot_2,14:00-16:00,Essay,Self-Review: Check Flow/Coherence/Examples,Analysis,Self-Analysis
+2026-05-30,Saturday,Weekend_Slot_3,17:00-17:50,Flashcards,Task: CREATE Flashcards for World Hist (Revolutions/Dates),Flashcard Creation,Anki / Paper
+2026-05-31,Sunday,Weekend_Slot_1,09:00-09:50,History,World History: Rise of Fascism (Mussolini in Italy),Read,Arjun Dev (NCERT)
+2026-05-31,Sunday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-05-31,Sunday,Weekend_Slot_1,10:00-10:50,History,World History: Rise of Nazism (Hitler in Germany),Read,Arjun Dev (NCERT)
+2026-05-31,Sunday,Weekend_Slot_1,10:50-11:00,Break,Walk,Break,N/A
+2026-05-31,Sunday,Weekend_Slot_1,11:00-11:50,History,World History: World War II (Causes/Events/Impact),Read,Arjun Dev (NCERT)
+2026-05-31,Sunday,Weekend_Slot_2,13:00-13:50,History,World History: Decolonization (Asia/Africa),Read,Arjun Dev (NCERT)
+2026-05-31,Sunday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-05-31,Sunday,Weekend_Slot_2,14:00-14:50,Essay,Essay Practice: Topic "The relevance of NAM in 21st Century",Write,Rough Notebook
+2026-05-31,Sunday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-05-31,Sunday,Weekend_Slot_2,15:00-16:00,Flashcards,Task: CREATE Flashcards for WWII Dates/Events,Flashcard Creation,Anki / Paper
+2026-05-31,Sunday,Weekend_Slot_3,17:00-17:50,Ethics (GS4),Case Study Practice: "Ethical Dilemma in International Aid",Write,PYQ
+2026-05-31,Sunday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-05-31,Sunday,Weekend_Slot_3,18:00-18:50,Ethics (GS4),Review: Best Practices for Case Studies (Stakeholder Analysis),Read,Topper Blogs
+2026-06-01,Monday,Morning,04:00-04:50,History,World History: The Cold War (Ideological Clash: Capitalism vs Communism),Read,Arjun Dev (NCERT)
+2026-06-01,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-01,Monday,Morning,05:00-05:50,History,World History: Cold War Events (Korean War/Cuban Missile Crisis),Read,Arjun Dev (NCERT)
+2026-06-01,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-01,Monday,Morning,06:00-06:50,History,World History: Vietnam War & US Intervention,Read,Arjun Dev (NCERT)
+2026-06-01,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial (IR Focus),Read,The Hindu
+2026-06-01,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-01,Monday,Evening,21:00-21:50,Revision,SRS Review: French Revolution (Studied May 29),Revise,Flashcards created May 30
+2026-06-01,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-01,Monday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Cold War Timeline,Flashcard Creation,Anki / Paper
+2026-06-02,Tuesday,Morning,04:00-04:50,History,World History: Disintegration of USSR (Gorbachev/Perestroika/Glasnost),Read,Arjun Dev (NCERT)
+2026-06-02,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-02,Tuesday,Morning,05:00-05:50,History,World History: Fall of Berlin Wall & Unification of Germany,Read,Arjun Dev (NCERT)
+2026-06-02,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-02,Tuesday,Morning,06:00-06:50,History,World History: Unipolar World (US Hegemony) - WORLD HISTORY COMPLETE,Read,Arjun Dev (NCERT)
+2026-06-02,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-02,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-02,Tuesday,Evening,21:00-21:50,Revision,SRS Review: World War I (Studied May 30),Revise,Flashcards created May 30
+2026-06-02,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-02,Tuesday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for USSR Disintegration factors,Flashcard Creation,Anki / Paper
+2026-06-03,Wednesday,Morning,04:00-04:50,IR (GS2),International Relations: Determinants of India's Foreign Policy,Read,MEA Website / Notes
+2026-06-03,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-03,Wednesday,Morning,05:00-05:50,IR (GS2),International Relations: Evolution (Non-Alignment to Multi-Alignment),Read,MEA Website / Notes
+2026-06-03,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-03,Wednesday,Morning,06:00-06:50,IR (GS2),International Relations: Gujral Doctrine & Neighborhood First Policy,Read,MEA Website / Notes
+2026-06-03,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-03,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-03,Wednesday,Evening,21:00-21:50,Revision,SRS Review: WWII/Fascism (Studied May 31),Revise,Flashcards created May 31
+2026-06-03,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-03,Wednesday,Evening,22:00-22:50,Buffer,Buffer Slot,Buffer,N/A
+2026-06-04,Thursday,Morning,04:00-04:50,IR (GS2),India-Neighborhood: India-Pakistan (History of Conflict/Kashmir/Terrorism),Read,Standard IR Notes
+2026-06-04,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-04,Thursday,Morning,05:00-05:50,IR (GS2),India-Neighborhood: India-China (Border Dispute/Trade/String of Pearls),Read,Standard IR Notes
+2026-06-04,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-04,Thursday,Morning,06:00-06:50,IR (GS2),India-Neighborhood: Review Map of Border Infrastructure (India-China),Analysis,Atlas / Google Maps
+2026-06-04,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-04,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-04,Thursday,Evening,21:00-21:50,Revision,SRS Review: Cold War (Studied Jun 1),Revise,Flashcards created Jun 1
+2026-06-04,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-04,Thursday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for India-China Border points (Galwan/Tawang),Flashcard Creation,Anki / Paper
+2026-06-05,Friday,Morning,04:00-04:50,IR (GS2),India-Neighborhood: India-Nepal (Treaty of 1950/Kalapani Issue),Read,Standard IR Notes
+2026-06-05,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-05,Friday,Morning,05:00-05:50,IR (GS2),India-Neighborhood: India-Bangladesh (Land Boundary Agreement/River Water Sharing),Read,Standard IR Notes
+2026-06-05,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-05,Friday,Morning,06:00-06:50,IR (GS2),India-Neighborhood: India-Bhutan (Hydropower cooperation/Security),Read,Standard IR Notes
+2026-06-05,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-05,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-05,Friday,Evening,21:00-21:50,Revision,SRS Review: USSR Disintegration (Studied Jun 2),Revise,Flashcards created Jun 2
+2026-06-05,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-05,Friday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Key Treaties (Nepal/Bangladesh),Flashcard Creation,Anki / Paper
+2026-06-06,Saturday,Weekend_Slot_1,09:00-09:50,IR (GS2),India-Neighborhood: India-Sri Lanka (Fishermen Issue/13th Amendment/China factor),Read,Standard IR Notes
+2026-06-06,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-06-06,Saturday,Weekend_Slot_1,10:00-10:50,IR (GS2),India-Neighborhood: India-Maldives (Strategic Importance/Political shifts),Read,Standard IR Notes
+2026-06-06,Saturday,Weekend_Slot_1,10:50-11:00,Break,Walk,Break,N/A
+2026-06-06,Saturday,Weekend_Slot_1,11:00-11:50,IR (GS2),India-Neighborhood: India-Afghanistan (Taliban 2.0/Strategic Investments),Read,Standard IR Notes
+2026-06-06,Saturday,Weekend_Slot_2,13:00-13:50,Internal Security (GS3),Intro to Internal Security: Extremism vs Development linkage,Read,Ashok Kumar / Notes
+2026-06-06,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-06-06,Saturday,Weekend_Slot_2,14:00-14:50,Internal Security,Left Wing Extremism (Naxalism) - History & Current Status,Read,Ashok Kumar / Notes
+2026-06-06,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-06-06,Saturday,Weekend_Slot_2,15:00-16:00,Flashcards,Task: CREATE Flashcards for Red Corridor Areas & Govt Schemes for LWE,Flashcard Creation,Anki / Paper
+2026-06-06,Saturday,Weekend_Slot_3,17:00-17:50,Essay,Essay Practice: "Peace in the neighborhood is a prerequisite for development",Write,Rough Notebook
+2026-06-06,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-06-06,Saturday,Weekend_Slot_3,18:00-18:50,Ethics (GS4),Case Study: "National Security vs Human Rights",Write,PYQ
+2026-06-06,Saturday,Weekend_Slot_4,21:00-22:00,Revision,SRS Review: IR Foreign Policy Determinants (Studied Jun 3),Revise,Flashcards created Jun 3
+2026-06-07,Sunday,Weekend_Slot_1,09:00-12:00,Mock Test,TEST 26: MAINS MOCK (World History + Ethics Theory),Mock Test,Mains Answer Writing
+2026-06-07,Sunday,Weekend_Slot_2,13:00-14:00,Analysis,Review Answers: Check Structure (Intro-Body-Conclusion) & World History facts,Analysis,Self-Analysis
+2026-06-07,Sunday,Weekend_Slot_3,17:00-19:00,Revision,Comprehensive Review of World History Timeline (1750-1991),Revise,Notes/Flashcards
+2026-06-07,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 26: Big Powers IR & North East Insurgency,Admin,Planner
+2026-06-08,Monday,Morning,04:00-04:50,IR (GS2),Bilateral Relations: India-USA (Strategic Partnership/Defense/Trade/Diaspora),Read,Standard IR Notes
+2026-06-08,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-08,Monday,Morning,05:00-05:50,IR (GS2),Bilateral Relations: India-USA (Areas of Friction: IPR/Visa/WTO),Read,Standard IR Notes
+2026-06-08,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-08,Monday,Morning,06:00-06:50,IR (GS2),Bilateral Relations: India-Russia (Historical ties/Defense dependence/Oil),Read,Standard IR Notes
+2026-06-08,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-08,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-08,Monday,Evening,21:00-21:50,Revision,SRS Review: India-China/Pak (Studied Jun 4),Revise,Flashcards created Jun 4
+2026-06-08,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-08,Monday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Foundational Agreements (LEMOA/BECA with US),Flashcard Creation,Anki / Paper
+2026-06-09,Tuesday,Morning,04:00-04:50,IR (GS2),Bilateral Relations: India-Japan (Investment/Bullet Train/Quad),Read,Standard IR Notes
+2026-06-09,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-09,Tuesday,Morning,05:00-05:50,IR (GS2),Bilateral Relations: India-Australia (Critical Minerals/Indo-Pacific),Read,Standard IR Notes
+2026-06-09,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-09,Tuesday,Morning,06:00-06:50,IR (GS2),Bilateral Relations: India-Africa (Development partnership/Resource diplomacy),Read,Standard IR Notes
+2026-06-09,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-09,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-09,Tuesday,Evening,21:00-21:50,Revision,SRS Review: India-Nepal/Bangla (Studied Jun 5),Revise,Flashcards created Jun 5
+2026-06-09,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-09,Tuesday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Indo-Pacific groupings (Quad/AUKUS),Flashcard Creation,Anki / Paper
+2026-06-10,Wednesday,Morning,04:00-04:50,Internal Security,North East Insurgency: Historical Background & Ethnic Conflicts,Read,Ashok Kumar / Notes
+2026-06-10,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-10,Wednesday,Morning,05:00-05:50,Internal Security,North East Insurgency: Nagaland (Naga Peace Accord issue),Read,Ashok Kumar / Notes
+2026-06-10,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-10,Wednesday,Morning,06:00-06:50,Internal Security,North East Insurgency: Manipur/Assam issues (AFSPA debate),Read,Ashok Kumar / Notes
+2026-06-10,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-10,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-10,Wednesday,Evening,21:00-21:50,Revision,SRS Review: India-Sri Lanka/Maldives (Studied Jun 6),Revise,Flashcards created Jun 6
+2026-06-10,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-10,Wednesday,Evening,22:00-22:50,Buffer,Buffer Slot,Buffer,N/A
+2026-06-11,Thursday,Morning,04:00-04:50,Internal Security,Terrorism: Definition/Types (State-sponsored vs Non-state actors),Read,Ashok Kumar / Notes
+2026-06-11,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-11,Thursday,Morning,05:00-05:50,Internal Security,Terrorism: Cross-border terrorism in J&K,Read,Ashok Kumar / Notes
+2026-06-11,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-11,Thursday,Morning,06:00-06:50,Internal Security,Terrorism: Radicalization & Over-Ground Workers (OGWs),Read,Ashok Kumar / Notes
+2026-06-11,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-11,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-11,Thursday,Evening,21:00-21:50,Revision,SRS Review: Naxalism (Studied Jun 6),Revise,Flashcards created Jun 6
+2026-06-11,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-11,Thursday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Insurgency groups & Govt Responses,Flashcard Creation,Anki / Paper
+2026-06-12,Friday,Morning,04:00-04:50,Internal Security,Organised Crime: Money Laundering (PMLA Act),Read,Ashok Kumar / Notes
+2026-06-12,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-12,Friday,Morning,05:00-05:50,Internal Security,Organised Crime: Linkage with Terrorism (Terror Financing/Fake Currency),Read,Ashok Kumar / Notes
+2026-06-12,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-12,Friday,Morning,06:00-06:50,Internal Security,Border Management: Challenges (Porus borders/Trafficking),Read,Ashok Kumar / Notes
+2026-06-12,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-12,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-12,Friday,Evening,21:00-21:50,Revision,SRS Review: India-US/Russia (Studied Jun 8),Revise,Flashcards created Jun 8
+2026-06-12,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-12,Friday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for PMLA provisions & Border Agencies,Flashcard Creation,Anki / Paper
+2026-06-13,Saturday,Weekend_Slot_1,09:00-09:50,IR (GS2),Regional Groupings: SAARC vs BIMSTEC (Relevance),Read,Standard IR Notes
+2026-06-13,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-06-13,Saturday,Weekend_Slot_1,10:00-10:50,IR (GS2),Regional Groupings: ASEAN & India's Act East Policy,Read,Standard IR Notes
+2026-06-13,Saturday,Weekend_Slot_1,10:50-11:00,Break,Walk,Break,N/A
+2026-06-13,Saturday,Weekend_Slot_1,11:00-11:50,IR (GS2),Regional Groupings: SCO & BRICS (Strategic autonomy),Read,Standard IR Notes
+2026-06-13,Saturday,Weekend_Slot_2,13:00-13:50,Internal Security,Cyber Security: Threats (Phishing/Malware/Cyber Warfare),Read,Ashok Kumar / Notes
+2026-06-13,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-06-13,Saturday,Weekend_Slot_2,14:00-14:50,Internal Security,Cyber Security: Institutions (CERT-In/NCIIPC),Read,Ashok Kumar / Notes
+2026-06-13,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-06-13,Saturday,Weekend_Slot_2,15:00-16:00,Flashcards,Task: CREATE Flashcards for Cyber Agencies & IR Groupings,Flashcard Creation,Anki / Paper
+2026-06-13,Saturday,Weekend_Slot_3,17:00-17:50,Ethics (GS4),Case Study Practice: "Disaster Management & Official Negligence",Write,PYQ
+2026-06-13,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-06-13,Saturday,Weekend_Slot_3,18:00-18:50,Revision,SRS Review: India-Japan/Australia (Studied Jun 9),Revise,Flashcards created Jun 9
+2026-06-13,Saturday,Weekend_Slot_4,21:00-22:00,Buffer,Buffer Slot,Buffer,N/A
+2026-06-14,Sunday,Weekend_Slot_1,09:00-12:00,Mock Test,TEST 27: MAINS MOCK (International Relations + Internal Security),Mock Test,Mains Answer Writing
+2026-06-14,Sunday,Weekend_Slot_2,13:00-14:00,Analysis,Review Answers: Check mapping of Border issues to Security challenges,Analysis,Self-Analysis
+2026-06-14,Sunday,Weekend_Slot_3,17:00-19:00,Revision,Map Work: India's Border Infrastructure & Critical Corridors,Revise,Atlas
+2026-06-14,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 27: Disaster Management & Society,Admin,Planner
+2026-06-15,Monday,Morning,04:00-04:50,Disaster Mgmt (GS3),Introduction: Disaster Mgmt Act 2005 & NDMA Structure,Read,NDMA Guidelines / Notes
+2026-06-15,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-15,Monday,Morning,05:00-05:50,Disaster Mgmt (GS3),Sendai Framework (2015-2030) for DRR,Read,NDMA Guidelines / Notes
+2026-06-15,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-15,Monday,Morning,06:00-06:50,Disaster Mgmt (GS3),Earthquakes: Vulnerability Profile & Mitigation Guidelines,Read,NDMA Guidelines / Notes
+2026-06-15,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-15,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-15,Monday,Evening,21:00-21:50,Revision,SRS Review: North East Insurgency (Studied Jun 10),Revise,Flashcards created Jun 10
+2026-06-15,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-15,Monday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Sendai Targets & Earthquake Zones,Flashcard Creation,Anki / Paper
+2026-06-16,Tuesday,Morning,04:00-04:50,Disaster Mgmt (GS3),Floods (Urban Flooding focus) & Cyclones: Guidelines,Read,NDMA Guidelines / Notes
+2026-06-16,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-16,Tuesday,Morning,05:00-05:50,Disaster Mgmt (GS3),Tsunamis & Landslides: Early Warning Systems & Zoning,Read,NDMA Guidelines / Notes
+2026-06-16,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-16,Tuesday,Morning,06:00-06:50,Disaster Mgmt (GS3),Droughts: Prevention & Management (Watershed Mgmt),Read,NDMA Guidelines / Notes
+2026-06-16,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-16,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-16,Tuesday,Evening,21:00-21:50,Revision,SRS Review: Terrorism & Organised Crime (Studied Jun 11/12),Revise,Flashcards created Jun 11/12
+2026-06-16,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-16,Tuesday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for NDMA Guidelines (Floods/Landslides),Flashcard Creation,Anki / Paper
+2026-06-17,Wednesday,Morning,04:00-04:50,Disaster Mgmt (GS3),Man-made Disasters: Nuclear/Biological/Chemical (NBC),Read,NDMA Guidelines / Notes
+2026-06-17,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-17,Wednesday,Morning,05:00-05:50,Disaster Mgmt (GS3),Fire Hazards (Forest Fires/Building Fires),Read,NDMA Guidelines / Notes
+2026-06-17,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-17,Wednesday,Morning,06:00-06:50,Disaster Mgmt (GS3),Crowd Management (Stampedes) - Case Studies,Read,NDMA Guidelines / Notes
+2026-06-17,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-17,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-17,Wednesday,Evening,21:00-21:50,Revision,SRS Review: Cyber Security (Studied Jun 13),Revise,Flashcards created Jun 13
+2026-06-17,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-17,Wednesday,Evening,22:00-22:50,Buffer,Buffer Slot,Buffer,N/A
+2026-06-18,Thursday,Morning,04:00-04:50,Governance (GS2),Role of Civil Services in a Democracy (Evolution/Issues/Reforms),Read,Laxmikanth Governance / Notes
+2026-06-18,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-18,Thursday,Morning,05:00-05:50,Governance (GS2),e-Governance: Applications/Models/Successes/Limitations,Read,Laxmikanth Governance / Notes
+2026-06-18,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-18,Thursday,Morning,06:00-06:50,Governance (GS2),Citizens Charters: Components/Issues in Implementation,Read,Laxmikanth Governance / Notes
+2026-06-18,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-18,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-18,Thursday,Evening,21:00-21:50,Revision,SRS Review: IR Groupings (ASEAN/BIMSTEC - Studied Jun 13),Revise,Flashcards created Jun 13
+2026-06-18,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-18,Thursday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for e-Gov Models & Citizens Charter,Flashcard Creation,Anki / Paper
+2026-06-19,Friday,Morning,04:00-04:50,Governance (GS2),Development Processes: Role of NGOs (Funding/FCRA Issues),Read,Laxmikanth Governance / Notes
+2026-06-19,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-19,Friday,Morning,05:00-05:50,Governance (GS2),Self Help Groups (SHGs): Role in microfinance & women empowerment,Read,Laxmikanth Governance / Notes
+2026-06-19,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-19,Friday,Morning,06:00-06:50,Governance (GS2),Pressure Groups: Types/Role in Polity,Read,Laxmikanth Governance / Notes
+2026-06-19,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-19,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-19,Friday,Evening,21:00-21:50,Revision,SRS Review: Disaster Management Act (Studied Jun 15),Revise,Flashcards created Jun 15
+2026-06-19,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-19,Friday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for SHG Case Studies (Kudumbashree etc.),Flashcard Creation,Anki / Paper
+2026-06-20,Saturday,Weekend_Slot_1,09:00-09:50,Society (GS1),Salient Features of Indian Society (Unity in Diversity),Read,NCERT Class 12 Society
+2026-06-20,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-06-20,Saturday,Weekend_Slot_1,10:00-10:50,Society (GS1),Role of Women & Women's Organizations,Read,NCERT Class 12 Society
+2026-06-20,Saturday,Weekend_Slot_1,10:50-11:00,Break,Walk,Break,N/A
+2026-06-20,Saturday,Weekend_Slot_1,11:00-11:50,Society (GS1),Population & Associated Issues (Demographic Dividend),Read,NCERT Class 12 Society
+2026-06-20,Saturday,Weekend_Slot_2,13:00-13:50,Society (GS1),Poverty and Developmental Issues (Society perspective),Read,Notes/Current Affairs
+2026-06-20,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-06-20,Saturday,Weekend_Slot_2,14:00-14:50,Society (GS1),Urbanization: Problems and Remedies (Slums/Migration),Read,Notes/Current Affairs
+2026-06-20,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-06-20,Saturday,Weekend_Slot_2,15:00-16:00,Flashcards,Task: CREATE Flashcards for Society Keywords (Patriarchy/Urbanization),Flashcard Creation,Anki / Paper
+2026-06-20,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Time Speed Distance (Boats/Streams),Practice,RS Aggarwal
+2026-06-20,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-06-20,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Reasoning: Sitting Arrangement (Circular),Practice,RS Aggarwal
+2026-06-20,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-06-20,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 11-20 (June Wk 3),Read,Monthly Magazine
+2026-06-20,Saturday,Weekend_Slot_4,21:00-22:00,Revision,SRS Review: Disaster Guidelines (Studied Jun 16/17),Revise,Flashcards created Jun 16/17
+2026-06-21,Sunday,Weekend_Slot_1,09:00-12:00,Mock Test,TEST 28: MAINS MOCK (Society + Governance + Disaster Mgmt),Mock Test,Mains Answer Writing
+2026-06-21,Sunday,Weekend_Slot_2,13:00-14:00,Analysis,Review Answers: Check inclusion of data/reports in Society answers,Analysis,Self-Analysis
+2026-06-21,Sunday,Weekend_Slot_3,17:00-19:00,Revision,Comprehensive Review of Society Terms & Definitions,Revise,Notes
+2026-06-21,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 28: Society Challenges (Communalism) & Social Justice,Admin,Planner
+2026-06-22,Monday,Morning,04:00-04:50,Society (GS1),Effects of Globalization on Indian Society (Women/Culture/Elderly),Read,Notes/Current Affairs
+2026-06-22,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-22,Monday,Morning,05:00-05:50,Society (GS1),Social Empowerment,Read,Notes/Current Affairs
+2026-06-22,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-22,Monday,Morning,06:00-06:50,Society (GS1),Communalism: History/Causes/Impact,Read,Notes/Current Affairs
+2026-06-22,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-22,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-22,Monday,Evening,21:00-21:50,Revision,SRS Review: Governance NGOs/SHGs (Studied Jun 19),Revise,Flashcards created Jun 19
+2026-06-22,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-22,Monday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Globalization Impacts,Flashcard Creation,Anki / Paper
+2026-06-23,Tuesday,Morning,04:00-04:50,Society (GS1),Regionalism: Types/Causes/Impact on Nation Building,Read,Notes/Current Affairs
+2026-06-23,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-23,Tuesday,Morning,05:00-05:50,Society (GS1),Secularism: Western vs Indian Model,Read,Notes/Current Affairs
+2026-06-23,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-23,Tuesday,Morning,06:00-06:50,Society (GS1),SOCIETY COMPLETE: Review Key Definitions & Data,Revise,Notes
+2026-06-23,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-23,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-23,Tuesday,Evening,21:00-21:50,Revision,SRS Review: Society Basics (Studied Jun 20),Revise,Flashcards created Jun 20
+2026-06-23,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-23,Tuesday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Regionalism/Secularism,Flashcard Creation,Anki / Paper
+2026-06-24,Wednesday,Morning,04:00-04:50,Social Justice (GS2),Welfare Schemes for Vulnerable Sections: SCs/STs,Read,India Year Book / Notes
+2026-06-24,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-24,Wednesday,Morning,05:00-05:50,Social Justice (GS2),Welfare Schemes: Women & Children (ICDS/Beti Bachao etc),Read,India Year Book / Notes
+2026-06-24,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-24,Wednesday,Morning,06:00-06:50,Social Justice (GS2),Welfare Schemes: Elderly & Disabled,Read,India Year Book / Notes
+2026-06-24,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-24,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-24,Wednesday,Evening,21:00-21:50,Revision,SRS Review: Society Globalization/Communalism (Studied Jun 22),Revise,Flashcards created Jun 22
+2026-06-24,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-24,Wednesday,Evening,22:00-22:50,Buffer,Buffer Slot,Buffer,N/A
+2026-06-25,Thursday,Morning,04:00-04:50,Social Justice (GS2),Issues related to Health (Public Healthcare/NHM/Ayushman Bharat),Read,Notes/Current Affairs
+2026-06-25,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-25,Thursday,Morning,05:00-05:50,Social Justice (GS2),Issues related to Education (NEP 2020/RTE/Higher Ed),Read,Notes/Current Affairs
+2026-06-25,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-25,Thursday,Morning,06:00-06:50,Social Justice (GS2),Issues related to Human Resources (Skill Development/Demography),Read,Notes/Current Affairs
+2026-06-25,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-25,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-25,Thursday,Evening,21:00-21:50,Revision,SRS Review: Society Regionalism/Secularism (Studied Jun 23),Revise,Flashcards created Jun 23
+2026-06-25,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-25,Thursday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Health/Education stats & schemes,Flashcard Creation,Anki / Paper
+2026-06-26,Friday,Morning,04:00-04:50,Social Justice (GS2),Issues related to Poverty & Hunger (GHI/Poshan Abhiyan),Read,Notes/Current Affairs
+2026-06-26,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-26,Friday,Morning,05:00-05:50,Social Justice (GS2),Institutional Mechanisms for Vulnerable Sections,Read,Notes/Current Affairs
+2026-06-26,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-26,Friday,Morning,06:00-06:50,Social Justice (GS2),SOCIAL JUSTICE COMPLETE: Review Key Schemes,Revise,Notes
+2026-06-26,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-26,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-26,Friday,Evening,21:00-21:50,Revision,SRS Review: Welfare Schemes (Studied Jun 24),Revise,Flashcards created Jun 24
+2026-06-26,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-26,Friday,Evening,22:00-22:50,Buffer,Buffer Slot,Buffer,N/A
+2026-06-27,Saturday,Weekend_Slot_1,09:00-09:50,Essay,Essay Practice: "Globalisation and its impact on Indian culture",Write,Rough Notebook
+2026-06-27,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-06-27,Saturday,Weekend_Slot_1,10:00-11:00,Essay,Self-Review: Check Dimensions (Social/Eco/Pol/Cultural),Analysis,Self-Analysis
+2026-06-27,Saturday,Weekend_Slot_1,11:00-11:50,Ethics (GS4),Case Study Practice: "Healthcare Ethics",Write,PYQ
+2026-06-27,Saturday,Weekend_Slot_2,13:00-13:50,Revision,30-DAY REVIEW: World History (Revolutions/Wars) - Rapid Fire,Revise,Flashcards created May 28-Jun 2
+2026-06-27,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-06-27,Saturday,Weekend_Slot_2,14:00-14:50,Revision,30-DAY REVIEW: IR (Neighborhood/Bilateral) - Rapid Fire,Revise,Flashcards created Jun 3-9
+2026-06-27,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-06-27,Saturday,Weekend_Slot_2,15:00-16:00,Revision,30-DAY REVIEW: Internal Security (Terrorism/Naxalism) - Rapid Fire,Revise,Flashcards created Jun 6-13
+2026-06-27,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Probability (Repeated trials),Practice,RS Aggarwal
+2026-06-27,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-06-27,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Reasoning: Logic (Causes & Effects),Practice,RS Aggarwal
+2026-06-27,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-06-27,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 21-30 (June Wk 4),Read,Monthly Magazine
+2026-06-27,Saturday,Weekend_Slot_4,21:00-22:00,Flashcards,Task: CREATE Flashcards for Social Justice Schemes,Flashcard Creation,Anki / Paper
+2026-06-28,Sunday,Weekend_Slot_1,09:00-12:00,Mock Test,TEST 29: MAINS MOCK (Social Justice + Society + Ethics Case Studies),Mock Test,Mains Answer Writing
+2026-06-28,Sunday,Weekend_Slot_2,13:00-14:00,Analysis,Review Answers: Verify scheme details and constitutional article references,Analysis,Self-Analysis
+2026-06-28,Sunday,Weekend_Slot_3,17:00-19:00,Revision,Map Work: India's Health & Education indicators (State-wise disparity),Revise,Maps/Graphs
+2026-06-28,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 29: Post-Independence History & Revision Cycle,Admin,Planner
+2026-06-29,Monday,Morning,04:00-04:50,History,Post-Independence: Consolidation of India (Integration of Princely States),Read,Bipan Chandra / Notes
+2026-06-29,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-29,Monday,Morning,05:00-05:50,History,Post-Independence: Reorganisation of States (Tribal Policy/Language Issue),Read,Bipan Chandra / Notes
+2026-06-29,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-29,Monday,Morning,06:00-06:50,History,Post-Independence: Foreign Policy (Non-Alignment/Panchsheel),Read,Bipan Chandra / Notes
+2026-06-29,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-29,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-29,Monday,Evening,21:00-21:50,Revision,SRS Review: Social Justice Education/Health (Studied Jun 25),Revise,Flashcards created Jun 25
+2026-06-29,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-29,Monday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Post-Independence Events,Flashcard Creation,Anki / Paper
+Date,Day,Slot_Type,Time,Subject,Topic,Activity_Type,Resources
+2026-06-30,Tuesday,Morning,04:00-04:50,History,Post-Independence: Era of One-Party Dominance & Opposition Parties,Read,Bipan Chandra / Notes
+2026-06-30,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-06-30,Tuesday,Morning,05:00-05:50,History,Post-Independence: Economic Consolidation (Land Reforms/Green Revolution),Read,Bipan Chandra / Notes
+2026-06-30,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-06-30,Tuesday,Morning,06:00-06:50,History,Post-Independence: India's Wars (1962 China, 1965/1971 Pakistan),Read,Bipan Chandra / Notes
+2026-06-30,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-06-30,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-06-30,Tuesday,Evening,21:00-21:50,Revision,SRS Review: Social Justice Poverty/Hunger (Studied Jun 26),Revise,Flashcards created Jun 26
+2026-06-30,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-06-30,Tuesday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Land Reforms acts & Wars Timeline,Flashcard Creation,Anki / Paper
+2026-07-01,Wednesday,Morning,04:00-04:50,History,Post-Independence: The Emergency (1975-77) - Causes & Consequences,Read,Bipan Chandra / Notes
+2026-07-01,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-01,Wednesday,Morning,05:00-05:50,History,Post-Independence: Regional Aspirations (Punjab Crisis/Assam Accord),Read,Bipan Chandra / Notes
+2026-07-01,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-01,Wednesday,Morning,06:00-06:50,History,Post-Independence: Rise of Coalition Politics (1989 onwards),Read,Bipan Chandra / Notes
+2026-07-01,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-01,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-01,Wednesday,Evening,21:00-21:50,Revision,SRS Review: World History (Cold War Era - Studied Jun 1),Revise,Flashcards created Jun 1
+2026-07-01,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-01,Wednesday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Emergency Provisions & Accords,Flashcard Creation,Anki / Paper
+2026-07-02,Thursday,Morning,04:00-04:50,History,Post-Independence: Popular Movements (Chipko/Narmada Bachao/Dalit Panthers),Read,Bipan Chandra / Notes
+2026-07-02,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-02,Thursday,Morning,05:00-05:50,History,Post-Independence: New Economic Policy 1991 (LPG Reforms),Read,Bipan Chandra / Notes
+2026-07-02,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-02,Thursday,Morning,06:00-06:50,History,POST-INDEPENDENCE COMPLETE: Review Chronology 1947-2000,Revise,Bipan Chandra / Notes
+2026-07-02,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-02,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-02,Thursday,Evening,21:00-21:50,Revision,SRS Review: IR India-China/Pak (Studied Jun 4),Revise,Flashcards created Jun 4
+2026-07-02,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-02,Thursday,Evening,22:00-22:50,Transition,Admin: Setup Optional Subject Books & Syllabus Printout,Admin,Prep
+2026-07-03,Friday,Morning,04:00-04:50,Optional (Paper 1),Syllabus Decoding: Read Paper 1 Unit 1 Syllabus & PYQs (Previous Year Questions),Analysis,Syllabus/PYQ Book
+2026-07-03,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-03,Friday,Morning,05:00-05:50,Optional (Paper 1),Unit 1 Topic 1: Core Concepts / Definitions (Introductory Reading),Read,Standard Optional Book
+2026-07-03,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-03,Friday,Morning,06:00-06:50,Optional (Paper 1),Unit 1 Topic 1: Theoretical Framework & Thinkers,Read,Standard Optional Book
+2026-07-03,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-03,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-03,Friday,Evening,21:00-21:50,Revision,SRS Review: Internal Security Terrorism (Studied Jun 11),Revise,Flashcards created Jun 11
+2026-07-03,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-03,Friday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Optional Unit 1 Definitions,Flashcard Creation,Anki / Paper
+2026-07-04,Saturday,Weekend_Slot_1,09:00-09:50,Optional (Paper 1),Unit 1 Topic 2: Evolution of the Discipline/Subject,Read,Standard Optional Book
+2026-07-04,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-07-04,Saturday,Weekend_Slot_1,10:00-10:50,Optional (Paper 1),Unit 1 Topic 2: Key Debates & Schools of Thought,Read,Standard Optional Book
+2026-07-04,Saturday,Weekend_Slot_1,10:50-11:00,Break,Walk,Break,N/A
+2026-07-04,Saturday,Weekend_Slot_1,11:00-11:50,Optional (Paper 1),Unit 1 Topic 3: Basic Concepts (Liberty/Equality/Justice etc - subject specific),Read,Standard Optional Book
+2026-07-04,Saturday,Weekend_Slot_2,13:00-13:50,Ethics (GS4),Case Study Practice: "Environmental Ethics vs Development",Write,PYQ
+2026-07-04,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-07-04,Saturday,Weekend_Slot_2,14:00-14:50,Essay,Essay Practice: "Technology is a double-edged sword",Write,Rough Notebook
+2026-07-04,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-07-04,Saturday,Weekend_Slot_2,15:00-16:00,Revision,GS REVISION: Polity - Fundamental Rights (Articles 12-35) - Detailed Recall,Revise,Laxmikanth Notes
+2026-07-04,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Time & Work (Pipes and Cisterns - Complex),Practice,RS Aggarwal
+2026-07-04,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-07-04,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Reasoning: Cubes and Dice,Practice,RS Aggarwal
+2026-07-04,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-07-04,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 1-10 (July Wk 1),Read,Monthly Magazine
+2026-07-04,Saturday,Weekend_Slot_4,21:00-22:00,Flashcards,Task: CREATE Flashcards for Optional Unit 1 Thinkers,Flashcard Creation,Anki / Paper
+2026-07-05,Sunday,Weekend_Slot_1,09:00-12:00,Mock Test,TEST 30: MAINS MOCK (Post-Independence History + World History),Mock Test,Mains Answer Writing
+2026-07-05,Sunday,Weekend_Slot_2,13:00-14:00,Analysis,Review Answers: Check mapping of Post-Independence events to current issues,Analysis,Self-Analysis
+2026-07-05,Sunday,Weekend_Slot_3,17:00-19:00,Revision,GS REVISION: Modern History - 1857 to 1905 (Socio-Religious Reforms),Revise,Spectrum Notes
+2026-07-05,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 30: Optional Unit 2 & GS Revision Cycle,Admin,Planner
+2026-07-06,Monday,Morning,04:00-04:50,Optional (Paper 1),Unit 2 Topic 1: Key Theories/Approaches,Read,Standard Optional Book
+2026-07-06,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-06,Monday,Morning,05:00-05:50,Optional (Paper 1),Unit 2 Topic 1: Criticism & Analysis of Theories,Read,Standard Optional Book
+2026-07-06,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-06,Monday,Morning,06:00-06:50,Optional (Paper 1),Unit 2 Topic 2: Comparative Analysis with other schools,Read,Standard Optional Book
+2026-07-06,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-06,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-06,Monday,Evening,21:00-21:50,Revision,SRS Review: Disaster Management Floods/Cyclones (Studied Jun 16),Revise,Flashcards created Jun 16
+2026-07-06,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-06,Monday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Optional Unit 2 Theories,Flashcard Creation,Anki / Paper
+2026-07-07,Tuesday,Morning,04:00-04:50,Optional (Paper 1),Unit 2 Topic 3: Application of Theories (Current Context),Read,Standard Optional Book
+2026-07-07,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-07,Tuesday,Morning,05:00-05:50,Optional (Paper 1),Unit 3 Topic 1: New Topic Introduction (e.g. State/Society),Read,Standard Optional Book
+2026-07-07,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-07,Tuesday,Morning,06:00-06:50,Optional (Paper 1),Unit 3 Topic 1: Perspectives of Western Thinkers,Read,Standard Optional Book
+2026-07-07,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-07,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-07,Tuesday,Evening,21:00-21:50,Revision,SRS Review: Governance e-Gov (Studied Jun 18),Revise,Flashcards created Jun 18
+2026-07-07,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-07,Tuesday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Optional Unit 3,Flashcard Creation,Anki / Paper
+2026-07-08,Wednesday,Morning,04:00-04:50,Optional (Paper 1),Unit 3 Topic 2: Perspectives of Indian Thinkers,Read,Standard Optional Book
+2026-07-08,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-08,Wednesday,Morning,05:00-05:50,Optional (Paper 1),Unit 3 Topic 2: Critical Evaluation of Indian Thinkers,Read,Standard Optional Book
+2026-07-08,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-08,Wednesday,Morning,06:00-06:50,Optional (Paper 1),PYQ Analysis: Write answers for 2 Previous Year Questions (Unit 1-3),Write,PYQ Book
+2026-07-08,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-08,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-08,Wednesday,Evening,21:00-21:50,Revision,SRS Review: Society Population/Women (Studied Jun 20),Revise,Flashcards created Jun 20
+2026-07-08,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-08,Wednesday,Evening,22:00-22:50,Buffer,Buffer Slot,Buffer,N/A
+2026-07-09,Thursday,Morning,04:00-04:50,Optional (Paper 1),Unit 4 Topic 1: Major Concept (e.g. Democracy/Power/Caste),Read,Standard Optional Book
+2026-07-09,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-09,Thursday,Morning,05:00-05:50,Optional (Paper 1),Unit 4 Topic 1: Evolution & Contemporary Relevance,Read,Standard Optional Book
+2026-07-09,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-09,Thursday,Morning,06:00-06:50,Optional (Paper 1),Unit 4 Topic 2: Challenges & Debates,Read,Standard Optional Book
+2026-07-09,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-09,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-09,Thursday,Evening,21:00-21:50,Revision,SRS Review: Social Justice Welfare Schemes (Studied Jun 24),Revise,Flashcards created Jun 24
+2026-07-09,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-09,Thursday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Optional Unit 4 Concepts,Flashcard Creation,Anki / Paper
+2026-07-10,Friday,Morning,04:00-04:50,Optional (Paper 1),Unit 5 Topic 1: Grassroots/Micro-level analysis,Read,Standard Optional Book
+2026-07-10,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-10,Friday,Morning,05:00-05:50,Optional (Paper 1),Unit 5 Topic 1: Case Studies & Examples,Read,Standard Optional Book
+2026-07-10,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-10,Friday,Morning,06:00-06:50,Optional (Paper 1),Unit 5 Topic 2: Institutional Framework,Read,Standard Optional Book
+2026-07-10,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-10,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-10,Friday,Evening,21:00-21:50,Revision,SRS Review: Post-Independence Wars/Emergency (Studied Jun 30/Jul 1),Revise,Flashcards created Jun 30/Jul 1
+2026-07-10,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-10,Friday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Optional Unit 5,Flashcard Creation,Anki / Paper
+2026-07-11,Saturday,Weekend_Slot_1,09:00-09:50,Optional (Paper 1),Unit 6 Topic 1: Advanced Concept/Ideology,Read,Standard Optional Book
+2026-07-11,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-07-11,Saturday,Weekend_Slot_1,10:00-10:50,Optional (Paper 1),Unit 6 Topic 1: Critiques by various scholars,Read,Standard Optional Book
+2026-07-11,Saturday,Weekend_Slot_1,10:50-11:00,Break,Walk,Break,N/A
+2026-07-11,Saturday,Weekend_Slot_1,11:00-11:50,Optional (Paper 1),Unit 6 Topic 2: Comparison with Global trends,Read,Standard Optional Book
+2026-07-11,Saturday,Weekend_Slot_2,13:00-13:50,Ethics (GS4),Case Study Practice: "Corruption in Public Office",Write,PYQ
+2026-07-11,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-07-11,Saturday,Weekend_Slot_2,14:00-14:50,Essay,Essay Brainstorming: "Education is the manifestation of perfection already in man",Practice,Rough Notebook
+2026-07-11,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-07-11,Saturday,Weekend_Slot_2,15:00-16:00,Revision,GS REVISION: Geography - Physical Geography (Geomorphology/Climatology),Revise,GC Leong/Notes
+2026-07-11,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Average & Mixture (Combined Problems),Practice,RS Aggarwal
+2026-07-11,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-07-11,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Reasoning: Clocks & Calendars (Revision),Practice,RS Aggarwal
+2026-07-11,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-07-11,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 11-20 (July Wk 2),Read,Monthly Magazine
+2026-07-11,Saturday,Weekend_Slot_4,21:00-22:00,Flashcards,Task: CREATE Flashcards for Optional Unit 6,Flashcard Creation,Anki / Paper
+2026-07-12,Sunday,Weekend_Slot_1,09:00-12:00,Mock Test,TEST 31: OPTIONAL PAPER 1 SECTIONAL (Units 1-5),Mock Test,Mains Answer Writing
+2026-07-12,Sunday,Weekend_Slot_2,13:00-14:00,Analysis,Review Answers: Check conceptual clarity and scholar quoting in Optional,Analysis,Self-Analysis
+2026-07-12,Sunday,Weekend_Slot_3,17:00-19:00,Revision,GS REVISION: Economy - Banking & Inflation (Concepts),Revise,Standard Book Notes
+2026-07-12,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 31: Optional Paper 1 Continuation & Environment Revision,Admin,Planner
+2026-07-13,Monday,Morning,04:00-04:50,Optional (Paper 1),Unit 7 Topic 1: Dynamic/Current topic in Optional,Read,Standard Optional Book
+2026-07-13,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-13,Monday,Morning,05:00-05:50,Optional (Paper 1),Unit 7 Topic 1: Recent Reports/Indices relevance,Read,Standard Optional Book
+2026-07-13,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-13,Monday,Morning,06:00-06:50,Optional (Paper 1),Unit 7 Topic 2: Linkage with GS Papers,Read,Standard Optional Book
+2026-07-13,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-13,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-13,Monday,Evening,21:00-21:50,Revision,SRS Review: Post-Independence LPG/Movements (Studied Jul 2),Revise,Flashcards created Jul 2
+2026-07-13,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-13,Monday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Optional Unit 7,Flashcard Creation,Anki / Paper
+2026-07-14,Tuesday,Morning,04:00-04:50,Optional (Paper 1),Unit 8 Topic 1: Syllabus specific topic,Read,Standard Optional Book
+2026-07-14,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-14,Tuesday,Morning,05:00-05:50,Optional (Paper 1),Unit 8 Topic 1: Syllabus specific topic (Deep Dive),Read,Standard Optional Book
+2026-07-14,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-14,Tuesday,Morning,06:00-06:50,Optional (Paper 1),Unit 8 Topic 2: Syllabus specific topic,Read,Standard Optional Book
+2026-07-14,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-14,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-14,Tuesday,Evening,21:00-21:50,Revision,SRS Review: Optional Unit 1 (Studied Jul 3/4),Revise,Flashcards created Jul 3/4
+2026-07-14,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-14,Tuesday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Optional Unit 8,Flashcard Creation,Anki / Paper
+2026-07-15,Wednesday,Morning,04:00-04:50,Optional (Paper 1),Unit 9 Topic 1: Advanced Theory/Models,Read,Standard Optional Book
+2026-07-15,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-15,Wednesday,Morning,05:00-05:50,Optional (Paper 1),Unit 9 Topic 1: Contemporary Debates,Read,Standard Optional Book
+2026-07-15,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-15,Wednesday,Morning,06:00-06:50,Optional (Paper 1),Unit 9 Topic 2: Comparative Analysis,Read,Standard Optional Book
+2026-07-15,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-15,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-15,Wednesday,Evening,21:00-21:50,Revision,GS REVISION: Polity - President/VP/PM (Studied Feb 16-17),Revise,Flashcards created Feb 16/17
+2026-07-15,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-15,Wednesday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Optional Unit 9,Flashcard Creation,Anki / Paper
+2026-07-16,Thursday,Morning,04:00-04:50,Optional (Paper 1),Unit 10 Topic 1: Concluding Topics of Paper 1,Read,Standard Optional Book
+2026-07-16,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-16,Thursday,Morning,05:00-05:50,Optional (Paper 1),Unit 10 Topic 2: Emerging Trends in Discipline,Read,Standard Optional Book
+2026-07-16,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-16,Thursday,Morning,06:00-06:50,Optional (Paper 1),PAPER 1 REVIEW: Scan Syllabus vs Notes for Gaps,Analysis,Syllabus
+2026-07-16,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-16,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-16,Thursday,Evening,21:00-21:50,Revision,GS REVISION: Environment - Climate Change (Studied Apr 5/6),Revise,Flashcards created Apr 5/6
+2026-07-16,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-16,Thursday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Optional Unit 10,Flashcard Creation,Anki / Paper
+2026-07-17,Friday,Morning,04:00-04:50,Optional (Paper 1),PYQ Marathon: Solve 3 questions from Unit 1-5 (Theory),Write,PYQ Book
+2026-07-17,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-17,Friday,Morning,05:00-05:50,Optional (Paper 1),PYQ Marathon: Solve 3 questions from Unit 6-10 (Applied),Write,PYQ Book
+2026-07-17,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-17,Friday,Morning,06:00-06:50,Optional (Paper 1),Self-Evaluation: Check answers against Topper Copies/Model Answers,Analysis,Self-Analysis
+2026-07-17,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-17,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-17,Friday,Evening,21:00-21:50,Revision,GS REVISION: Modern History - 1905-1919 Phase (Studied Mar 11-19),Revise,Spectrum Notes
+2026-07-17,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-17,Friday,Evening,22:00-22:50,Buffer,Buffer Slot,Buffer,N/A
+2026-07-18,Saturday,Weekend_Slot_1,09:00-09:50,Essay,Essay Brainstorming: "Crisis of Conscience in Public Administration",Practice,Rough Notebook
+2026-07-18,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-07-18,Saturday,Weekend_Slot_1,10:00-11:00,Essay,Essay Writing: Write Introduction & Conclusion only (Focus on hooks),Practice,Rough Notebook
+2026-07-18,Saturday,Weekend_Slot_1,11:00-11:50,Ethics (GS4),Case Study Practice: "Gender Discrimination at Workplace",Write,PYQ
+2026-07-18,Saturday,Weekend_Slot_2,13:00-13:50,Revision,GS REVISION: Economy - Public Finance & Budgeting (Studied Apr 15),Revise,Standard Book Notes
+2026-07-18,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-07-18,Saturday,Weekend_Slot_2,14:00-14:50,Revision,GS REVISION: Art & Culture - Architecture (Studied Apr 19/25),Revise,Nitin Singhania Notes
+2026-07-18,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-07-18,Saturday,Weekend_Slot_2,15:00-16:00,Revision,GS REVISION: Internal Security - Cyber Security (Studied Jun 13),Revise,Notes
+2026-07-18,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Mensuration (Volume of Spheres/Cones),Practice,RS Aggarwal
+2026-07-18,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-07-18,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Reasoning: Critical Reasoning (Paragraph based),Practice,RS Aggarwal
+2026-07-18,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-07-18,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 21-30 (July Wk 3),Read,Monthly Magazine
+2026-07-18,Saturday,Weekend_Slot_4,21:00-22:00,Flashcards,Task: CREATE Flashcards for Essay Quotes/Anecdotes,Flashcard Creation,Anki / Paper
+2026-07-19,Sunday,Weekend_Slot_1,09:00-12:00,Mock Test,TEST 32: OPTIONAL PAPER 1 FULL LENGTH MOCK,Mock Test,Mains Answer Writing
+2026-07-19,Sunday,Weekend_Slot_2,13:00-14:00,Analysis,Review Answers: Identify Time Management issues in full length paper,Analysis,Self-Analysis
+2026-07-19,Sunday,Weekend_Slot_3,17:00-19:00,Transition,Prep for Optional Paper 2: Organize Books/Notes (Indian Context),Admin,Book Prep
+2026-07-19,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 32: Start Optional Paper 2,Admin,Planner
+2026-07-20,Monday,Morning,04:00-04:50,Optional (Paper 2),Unit 1 Topic 1: Evolution of Indian Administration/System,Read,Standard Optional Book
+2026-07-20,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-20,Monday,Morning,05:00-05:50,Optional (Paper 2),Unit 1 Topic 1: Legacy of British Rule,Read,Standard Optional Book
+2026-07-20,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-20,Monday,Morning,06:00-06:50,Optional (Paper 2),Unit 1 Topic 2: Constitutional Framework (Specific to Optional),Read,Standard Optional Book
+2026-07-20,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-20,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-20,Monday,Evening,21:00-21:50,Revision,SRS Review: Optional Unit 2 (Studied Jul 6/7),Revise,Flashcards created Jul 6/7
+2026-07-20,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-20,Monday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Optional Paper 2 Unit 1,Flashcard Creation,Anki / Paper
+2026-07-21,Tuesday,Morning,04:00-04:50,Optional (Paper 2),Unit 2 Topic 1: Philosophical/Ideological Framework,Read,Standard Optional Book
+2026-07-21,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-21,Tuesday,Morning,05:00-05:50,Optional (Paper 2),Unit 2 Topic 2: Key Issues in Indian Context (Caste/Religion etc),Read,Standard Optional Book
+2026-07-21,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-21,Tuesday,Morning,06:00-06:50,Optional (Paper 2),Unit 2 Topic 2: Impact of Liberalization,Read,Standard Optional Book
+2026-07-21,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-21,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-21,Tuesday,Evening,21:00-21:50,Revision,SRS Review: Optional Unit 3 (Studied Jul 7/8),Revise,Flashcards created Jul 7/8
+2026-07-21,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-21,Tuesday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Optional Paper 2 Unit 2,Flashcard Creation,Anki / Paper
+2026-07-22,Wednesday,Morning,04:00-04:50,Optional (Paper 2),Unit 3 Topic 1: Structure of Government (Union),Read,Standard Optional Book
+2026-07-22,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-22,Wednesday,Morning,05:00-05:50,Optional (Paper 2),Unit 3 Topic 1: Structure of Government (State),Read,Standard Optional Book
+2026-07-22,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-22,Wednesday,Morning,06:00-06:50,Optional (Paper 2),Unit 3 Topic 2: District Administration (Role of Collector),Read,Standard Optional Book
+2026-07-22,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-22,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-22,Wednesday,Evening,21:00-21:50,Revision,SRS Review: Optional Unit 4 (Studied Jul 9),Revise,Flashcards created Jul 9
+2026-07-22,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-22,Wednesday,Evening,22:00-22:50,Buffer,Buffer Slot,Buffer,N/A
+2026-07-23,Thursday,Morning,04:00-04:50,Optional (Paper 2),Unit 4 Topic 1: Plans and Priorities (Planning Commission to NITI),Read,Standard Optional Book
+2026-07-23,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-23,Thursday,Morning,05:00-05:50,Optional (Paper 2),Unit 4 Topic 1: Decentralization (73rd/74th Amendment impact),Read,Standard Optional Book
+2026-07-23,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-23,Thursday,Morning,06:00-06:50,Optional (Paper 2),Unit 4 Topic 2: Urban Local Government Issues,Read,Standard Optional Book
+2026-07-23,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-23,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-23,Thursday,Evening,21:00-21:50,Revision,SRS Review: Optional Unit 5 (Studied Jul 10),Revise,Flashcards created Jul 10
+2026-07-23,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-23,Thursday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Optional Paper 2 Unit 3-4,Flashcard Creation,Anki / Paper
+2026-07-24,Friday,Morning,04:00-04:50,Optional (Paper 2),Unit 5 Topic 1: Rural Development (Schemes/Strategies),Read,Standard Optional Book
+2026-07-24,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-24,Friday,Morning,05:00-05:50,Optional (Paper 2),Unit 5 Topic 1: Urban Development (Smart Cities/AMRUT),Read,Standard Optional Book
+2026-07-24,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-24,Friday,Morning,06:00-06:50,Optional (Paper 2),Unit 5 Topic 2: Law and Order Administration,Read,Standard Optional Book
+2026-07-24,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-24,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-24,Friday,Evening,21:00-21:50,Revision,SRS Review: Optional Unit 6 (Studied Jul 11),Revise,Flashcards created Jul 11
+2026-07-24,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-24,Friday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Optional Paper 2 Unit 5,Flashcard Creation,Anki / Paper
+2026-07-25,Saturday,Weekend_Slot_1,09:00-09:50,Optional (Paper 2),Unit 6 Topic 1: Significant Issues (Corruption/Lokpal),Read,Standard Optional Book
+2026-07-25,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-07-25,Saturday,Weekend_Slot_1,10:00-10:50,Optional (Paper 2),Unit 6 Topic 1: Administrative Reforms (ARC Reports),Read,Standard Optional Book
+2026-07-25,Saturday,Weekend_Slot_1,10:50-11:00,Break,Walk,Break,N/A
+2026-07-25,Saturday,Weekend_Slot_1,11:00-11:50,Optional (Paper 2),Unit 6 Topic 2: Values in Public Service,Read,Standard Optional Book
+2026-07-25,Saturday,Weekend_Slot_2,13:00-13:50,Ethics (GS4),Case Study Practice: "Riots and Communal Harmony",Write,PYQ
+2026-07-25,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-07-25,Saturday,Weekend_Slot_2,14:00-14:50,Essay,Essay Practice: "Is the Indian Constitution a living document?",Write,Rough Notebook
+2026-07-25,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-07-25,Saturday,Weekend_Slot_2,15:00-16:00,Revision,GS REVISION: Polity - Emergency Provisions/Centre-State (Studied Feb 14-15),Revise,Laxmikanth Notes
+2026-07-25,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Data Interpretation (Mixed Graphs),Practice,RS Aggarwal
+2026-07-25,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-07-25,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Reasoning: Puzzles (Complex),Practice,RS Aggarwal
+2026-07-25,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-07-25,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 31-40 (July Wk 4),Read,Monthly Magazine
+2026-07-25,Saturday,Weekend_Slot_4,21:00-22:00,Revision,SRS Review: Optional Unit 7 (Studied Jul 13),Revise,Flashcards created Jul 13
+2026-07-26,Sunday,Weekend_Slot_1,09:00-12:00,Mock Test,TEST 33: OPTIONAL PAPER 2 SECTIONAL (Units 1-3),Mock Test,Mains Answer Writing
+2026-07-26,Sunday,Weekend_Slot_2,13:00-14:00,Analysis,Review Answers: Check use of "Indian examples" in Paper 2 answers,Analysis,Self-Analysis
+2026-07-26,Sunday,Weekend_Slot_3,17:00-19:00,Revision,GS REVISION: Modern History - 1920-1930 (Gandhi/Revolutionaries),Revise,Spectrum Notes
+2026-07-26,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 33: Finish Optional Paper 2 & GS2 Governance Revision,Admin,Planner
+2026-07-27,Monday,Morning,04:00-04:50,Optional (Paper 2),Unit 7 Topic 1: Major Issue (e.g. Disaster/Environment in India),Read,Standard Optional Book
+2026-07-27,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-27,Monday,Morning,05:00-05:50,Optional (Paper 2),Unit 7 Topic 1: Policy Response & Evaluation,Read,Standard Optional Book
+2026-07-27,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-27,Monday,Morning,06:00-06:50,Optional (Paper 2),Unit 7 Topic 2: Contemporary relevance,Read,Standard Optional Book
+2026-07-27,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-27,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-27,Monday,Evening,21:00-21:50,Revision,SRS Review: Optional Unit 8 (Studied Jul 14),Revise,Flashcards created Jul 14
+2026-07-27,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-27,Monday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Optional Paper 2 Unit 6-7,Flashcard Creation,Anki / Paper
+2026-07-28,Tuesday,Morning,04:00-04:50,Optional (Paper 2),Unit 8 Topic 1: Final Topics (Miscellaneous),Read,Standard Optional Book
+2026-07-28,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-28,Tuesday,Morning,05:00-05:50,Optional (Paper 2),Unit 8 Topic 1: Recent Developments (last 1 year),Read,Standard Optional Book
+2026-07-28,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-28,Tuesday,Morning,06:00-06:50,Optional (Paper 2),PAPER 2 COMPLETION: Review Syllabus for any missed topics,Analysis,Syllabus
+2026-07-28,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-28,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-28,Tuesday,Evening,21:00-21:50,Revision,SRS Review: Optional Unit 9 (Studied Jul 15),Revise,Flashcards created Jul 15
+2026-07-28,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-28,Tuesday,Evening,22:00-22:50,Flashcards,Task: CREATE Flashcards for Optional Paper 2 Unit 8,Flashcard Creation,Anki / Paper
+2026-07-29,Wednesday,Morning,04:00-04:50,Optional (Paper 2),PYQ Marathon: Solve 3 questions from Paper 2 (Theory),Write,PYQ Book
+2026-07-29,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-29,Wednesday,Morning,05:00-05:50,Optional (Paper 2),PYQ Marathon: Solve 3 questions from Paper 2 (Applied),Write,PYQ Book
+2026-07-29,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-29,Wednesday,Morning,06:00-06:50,Optional (Paper 2),Self-Evaluation: Compare with Topper Answers,Analysis,Self-Analysis
+2026-07-29,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-29,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-29,Wednesday,Evening,21:00-21:50,Revision,SRS Review: Optional Unit 10 (Studied Jul 16),Revise,Flashcards created Jul 16
+2026-07-29,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-29,Wednesday,Evening,22:00-22:50,Buffer,Buffer Slot,Buffer,N/A
+2026-07-30,Thursday,Morning,04:00-04:50,Optional (Paper 1),Answer Writing: Pick 2 PYQs from Unit 1 (Thinkers/Theory),Practice,PYQ Book/Rough Sheet
+2026-07-30,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-30,Thursday,Morning,05:00-05:50,Optional (Paper 1),Self-Evaluation: Compare with Model Answers (Check Keywords/Scholars),Analysis,Self-Analysis
+2026-07-30,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-30,Thursday,Morning,06:00-06:50,Optional (Paper 1),Value Addition: Add missing points from Model Answer to Short Notes,Revise,Short Notes
+2026-07-30,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-30,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-30,Thursday,Evening,21:00-21:50,GS Revision (History),Modern History: 1857-1905 Phase (Rapid Scan of Flashcards),Revise,Flashcards/Notes
+2026-07-30,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-30,Thursday,Evening,22:00-22:50,GS Answer Writing,GS1 History: Write 1 Answer on "Impact of Socio-Religious Reform Movements",Practice,PYQ
+2026-07-31,Friday,Morning,04:00-04:50,Optional (Paper 1),Answer Writing: Pick 2 PYQs from Unit 2 (Key Concepts),Practice,PYQ Book
+2026-07-31,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-07-31,Friday,Morning,05:00-05:50,Optional (Paper 1),Self-Evaluation: Check Structure (Intro-Body-Conclusion),Analysis,Self-Analysis
+2026-07-31,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-07-31,Friday,Morning,06:00-06:50,Optional (Paper 1),Value Addition: Quote 2 new scholars/examples in notes,Revise,Short Notes
+2026-07-31,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-07-31,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-07-31,Friday,Evening,21:00-21:50,GS Revision (Polity),Polity: Preamble/FR/DPSP (Key Articles & Supreme Court Judgments),Revise,Laxmikanth Notes
+2026-07-31,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-07-31,Friday,Evening,22:00-22:50,GS Answer Writing,GS2 Polity: Write 1 Answer on "Basic Structure Doctrine evolution",Practice,PYQ
+2026-08-01,Saturday,Weekend_Slot_1,09:00-09:50,Essay,Essay Brainstorming: "Science without religion is lame religion without science is blind",Practice,Rough Notebook
+2026-08-01,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-08-01,Saturday,Weekend_Slot_1,10:00-11:00,Essay,Essay Writing: Draft Body Paragraphs (Focus on dimensions: Social/Pol/Eco),Practice,Rough Notebook
+2026-08-01,Saturday,Weekend_Slot_1,11:00-11:50,Ethics (GS4),Case Study: "Administrative Ethics in Crisis Management",Write,PYQ
+2026-08-01,Saturday,Weekend_Slot_2,13:00-13:50,GS Revision (Geog),Geography: Physical Geography (Geomorphology/Climatology Concepts),Revise,GC Leong Notes
+2026-08-01,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-08-01,Saturday,Weekend_Slot_2,14:00-14:50,GS Revision (Eco),Economy: Banking & Monetary Policy (Repo/Reverse Repo Trends),Revise,Notes
+2026-08-01,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-08-01,Saturday,Weekend_Slot_2,15:00-16:00,Flashcards,Task: CREATE Flashcards for Essay Quotes (Science/Religion themes),Flashcard Creation,Anki / Paper
+2026-08-01,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Number System (Revision of Divisibility/Remainders),Practice,RS Aggarwal
+2026-08-01,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-08-01,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Reasoning: Logical Connectives,Practice,RS Aggarwal
+2026-08-01,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-08-01,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 1-10 (August Wk 1),Read,Monthly Magazine
+2026-08-01,Saturday,Weekend_Slot_4,21:00-22:00,Revision,Review: Mistakes made in this week's Answer Writing,Analysis,Mistake Log
+2026-08-02,Sunday,Weekend_Slot_1,09:00-12:00,Mock Test,TEST 34: OPTIONAL PAPER 1 FULL SYLLABUS MOCK,Mock Test,Mains Answer Writing
+2026-08-02,Sunday,Weekend_Slot_2,13:00-14:00,Analysis,Review Answers: Check flow and interconnection between units,Analysis,Self-Analysis
+2026-08-02,Sunday,Weekend_Slot_3,17:00-19:00,GS Revision (Env),Environment: Biodiversity & Conservation (Protected Areas Map),Revise,Shankar IAS Notes
+2026-08-02,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 34: Optional Paper 2 Writing & GS3 Security/Science,Admin,Planner
+2026-08-03,Monday,Morning,04:00-04:50,Optional (Paper 2),Answer Writing: Pick 2 PYQs from Unit 1 (Indian Admin Evolution),Practice,PYQ Book
+2026-08-03,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-03,Monday,Morning,05:00-05:50,Optional (Paper 2),Self-Evaluation: Check Indian Context examples (Article references/ARC reports),Analysis,Self-Analysis
+2026-08-03,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-03,Monday,Morning,06:00-06:50,Optional (Paper 2),Value Addition: Add recent Govt schemes relevance to notes,Revise,Short Notes
+2026-08-03,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-03,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-03,Monday,Evening,21:00-21:50,GS Revision (Security),Internal Security: Extremism/Naxalism & Cyber Security,Revise,Notes
+2026-08-03,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-03,Monday,Evening,22:00-22:50,GS Answer Writing,GS3 Security: Write 1 Answer on "Cyber Warfare Challenges",Practice,PYQ
+2026-08-04,Tuesday,Morning,04:00-04:50,Optional (Paper 2),Answer Writing: Pick 2 PYQs from Unit 2 (Constitutional Framework/Issues),Practice,PYQ Book
+2026-08-04,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-04,Tuesday,Morning,05:00-05:50,Optional (Paper 2),Self-Evaluation: Compare with Topper Copies,Analysis,Self-Analysis
+2026-08-04,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-04,Tuesday,Morning,06:00-06:50,Optional (Paper 2),Value Addition: Update notes with recent Supreme Court judgments,Revise,Short Notes
+2026-08-04,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-04,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-04,Tuesday,Evening,21:00-21:50,GS Revision (Sci-Tech),Science & Tech: Space/Biotech/Defence (Current Developments),Revise,Notes
+2026-08-04,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-04,Tuesday,Evening,22:00-22:50,GS Answer Writing,GS3 Sci-Tech: Write 1 Answer on "Applications of Nano-tech in Health",Practice,PYQ
+2026-08-05,Wednesday,Morning,04:00-04:50,Optional (Paper 2),Answer Writing: Pick 2 PYQs from Unit 3 (District/Local Govt),Practice,PYQ Book
+2026-08-05,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-05,Wednesday,Morning,05:00-05:50,Optional (Paper 2),Self-Evaluation: Check use of data (PRIs success rate etc),Analysis,Self-Analysis
+2026-08-05,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-05,Wednesday,Morning,06:00-06:50,Optional (Paper 2),Value Addition: Case studies of successful Gram Panchayats,Revise,Short Notes
+2026-08-05,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-05,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-05,Wednesday,Evening,21:00-21:50,GS Revision (Society),Indian Society: Salient Features/Diversity/Women Issues,Revise,Notes
+2026-08-05,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-05,Wednesday,Evening,22:00-22:50,GS Answer Writing,GS1 Society: Write 1 Answer on "Impact of Regionalism",Practice,PYQ
+2026-08-06,Thursday,Morning,04:00-04:50,Optional (Paper 2),Answer Writing: Pick 2 PYQs from Unit 4 (Public Sector/Liberalization),Practice,PYQ Book
+2026-08-06,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-06,Thursday,Morning,05:00-05:50,Optional (Paper 2),Self-Evaluation: Check clarity on LPG impact,Analysis,Self-Analysis
+2026-08-06,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-06,Thursday,Morning,06:00-06:50,Optional (Paper 2),Value Addition: Note examples of PSUs (Miniratna/Maharatna),Revise,Short Notes
+2026-08-06,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-06,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-06,Thursday,Evening,21:00-21:50,GS Revision (Governance),Governance: NGO/SHG/e-Governance,Revise,Notes
+2026-08-06,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-06,Thursday,Evening,22:00-22:50,GS Answer Writing,GS2 Governance: Write 1 Answer on "Role of SHGs in Poverty Alleviation",Practice,PYQ
+2026-08-07,Friday,Morning,04:00-04:50,Optional (Paper 2),Answer Writing: Pick 2 PYQs from Unit 5 (Plans/NITI Aayog),Practice,PYQ Book
+2026-08-07,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-07,Friday,Morning,05:00-05:50,Optional (Paper 2),Self-Evaluation: Critical analysis of Planning Commission vs NITI,Analysis,Self-Analysis
+2026-08-07,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-07,Friday,Morning,06:00-06:50,Optional (Paper 2),Value Addition: Add NITI Aayog's recent initiatives to notes,Revise,Short Notes
+2026-08-07,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-07,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-07,Friday,Evening,21:00-21:50,GS Revision (Ethics),Ethics: Theory (Thinkers/Values/Attitude),Revise,Lexicon Notes
+2026-08-07,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-07,Friday,Evening,22:00-22:50,GS Answer Writing,GS4 Ethics: Solve 1 Theory Question on "Integrity",Practice,PYQ
+2026-08-08,Saturday,Weekend_Slot_1,09:00-09:50,Essay,Essay Brainstorming: "Digital Economy: A leveller or a source of inequality",Practice,Rough Notebook
+2026-08-08,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-08-08,Saturday,Weekend_Slot_1,10:00-11:00,Essay,Essay Writing: Outline Full Structure (Pestle Analysis),Practice,Rough Notebook
+2026-08-08,Saturday,Weekend_Slot_1,11:00-11:50,Ethics (GS4),Case Study: "Conflict of Interest in Public Tender",Write,PYQ
+2026-08-08,Saturday,Weekend_Slot_2,13:00-13:50,GS Revision (History),Modern History: Freedom Struggle 1919-1947,Revise,Flashcards
+2026-08-08,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-08-08,Saturday,Weekend_Slot_2,14:00-14:50,GS Revision (Polity),Polity: Parliament & State Legislature,Revise,Flashcards
+2026-08-08,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-08-08,Saturday,Weekend_Slot_2,15:00-16:00,Flashcards,Task: CREATE Flashcards for Essay Anecdotes (Digital/Tech),Flashcard Creation,Anki / Paper
+2026-08-08,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Data Interpretation (Tables),Practice,RS Aggarwal
+2026-08-08,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-08-08,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Reasoning: Series Completion (Complex),Practice,RS Aggarwal
+2026-08-08,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-08-08,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 11-20 (August Wk 2),Read,Monthly Magazine
+2026-08-08,Saturday,Weekend_Slot_4,21:00-22:00,Revision,Review: Weekly Progress (Did I write enough answers?),Analysis,Journal
+2026-08-09,Sunday,Weekend_Slot_1,09:00-12:00,Mock Test,TEST 35: OPTIONAL PAPER 2 FULL SYLLABUS MOCK,Mock Test,Mains Answer Writing
+2026-08-09,Sunday,Weekend_Slot_2,13:00-14:00,Analysis,Review Answers: Identify weak areas in Paper 2 (Application),Analysis,Self-Analysis
+2026-08-09,Sunday,Weekend_Slot_3,17:00-19:00,GS Revision (Eco),Economy: External Sector & Agriculture,Revise,Notes
+2026-08-09,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 35: Optional Mix & GS1/GS2 Deep Revision,Admin,Planner
+2026-08-10,Monday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-08-10,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-10,Monday,Morning,05:00-05:50,Optional (Mix),Evaluation: Cross check concepts between papers,Analysis,Self-Analysis
+2026-08-10,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-10,Monday,Morning,06:00-06:50,Optional (Mix),Revision: Weakest Topic identified in Sunday Mock,Revise,Standard Optional Book
+2026-08-10,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-10,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-10,Monday,Evening,21:00-21:50,GS Revision (ArtCulture),Art & Culture: Architecture & Paintings (Terms),Revise,Flashcards
+2026-08-10,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-10,Monday,Evening,22:00-22:50,GS Answer Writing,GS1 Art & Culture: Write 1 Answer on "Cave Architecture",Practice,PYQ
+2026-08-11,Tuesday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-08-11,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-11,Tuesday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-08-11,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-11,Tuesday,Morning,06:00-06:50,Optional (Mix),Revision: Weakest Topic identified in Sunday Mock,Revise,Standard Optional Book
+2026-08-11,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-11,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-11,Tuesday,Evening,21:00-21:50,GS Revision (IR),IR: India-Neighborhood Relations (Issues),Revise,Notes
+2026-08-11,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-11,Tuesday,Evening,22:00-22:50,GS Answer Writing,GS2 IR: Write 1 Answer on "India's Neighborhood First Policy",Practice,PYQ
+2026-08-12,Wednesday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-08-12,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-12,Wednesday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-08-12,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-12,Wednesday,Morning,06:00-06:50,Optional (Mix),Revision: Weakest Topic identified in Sunday Mock,Revise,Standard Optional Book
+2026-08-12,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-12,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-12,Wednesday,Evening,21:00-21:50,GS Revision (Disaster),Disaster Management: Earthquakes/Cyclones,Revise,Notes
+2026-08-12,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-12,Wednesday,Evening,22:00-22:50,GS Answer Writing,GS3 Disaster: Write 1 Answer on "NDMA Guidelines for Cyclones",Practice,PYQ
+2026-08-13,Thursday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-08-13,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-13,Thursday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-08-13,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-13,Thursday,Morning,06:00-06:50,Optional (Mix),Revision: Weakest Topic identified in Sunday Mock,Revise,Standard Optional Book
+2026-08-13,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-13,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-13,Thursday,Evening,21:00-21:50,GS Revision (Ethics),Ethics: Public Service Values,Revise,Notes
+2026-08-13,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-13,Thursday,Evening,22:00-22:50,GS Answer Writing,GS4 Ethics: Solve 1 Theory Question on "Compassion",Practice,PYQ
+2026-08-14,Friday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-08-14,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-14,Friday,Morning,05:00-05:50,Optional (Mix),Evaluation: Check introduction and conclusion quality,Analysis,Self-Analysis
+2026-08-14,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-14,Friday,Morning,06:00-06:50,Optional (Mix),Revision: Review Short Notes for the specific topics written,Revise,Short Notes
+2026-08-14,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-14,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-14,Friday,Evening,21:00-21:50,GS Revision (Governance),Governance: Role of Civil Services/Citizen Charters (Studied Jun 18),Revise,Notes
+2026-08-14,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-14,Friday,Evening,22:00-22:50,GS Answer Writing,GS2 Governance: Write 1 Answer on "Citizen Charter Effectiveness",Practice,PYQ
+2026-08-15,Saturday,Weekend_Slot_1,09:00-09:50,Essay,Special Essay: "India at 100: Vision for a Developed Nation" (Independence Day),Practice,Rough Notebook
+2026-08-15,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-08-15,Saturday,Weekend_Slot_1,10:00-11:00,Essay,Essay Writing: Focus on Achievements vs Challenges format,Practice,Rough Notebook
+2026-08-15,Saturday,Weekend_Slot_1,11:00-11:50,Ethics (GS4),Case Study: "Patriotism vs Global Ethics in decision making",Write,PYQ
+2026-08-15,Saturday,Weekend_Slot_2,13:00-13:50,GS Revision (Soc Justice),Social Justice: Health & Education Schemes (Studied Jun 25),Revise,Notes
+2026-08-15,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-08-15,Saturday,Weekend_Slot_2,14:00-14:50,GS Revision (Soc Justice),Social Justice: Vulnerable Sections (SC/ST/Women) mechanisms,Revise,Notes
+2026-08-15,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-08-15,Saturday,Weekend_Slot_2,15:00-16:00,Flashcards,Task: CREATE Flashcards for Health/Edu Data (Recent Reports),Flashcard Creation,Anki / Paper
+2026-08-15,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Time Speed Distance (Trains),Practice,RS Aggarwal
+2026-08-15,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-08-15,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Reasoning: Blood Relations (Coded),Practice,RS Aggarwal
+2026-08-15,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-08-15,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 21-30 (August Wk 2),Read,Monthly Magazine
+2026-08-15,Saturday,Weekend_Slot_4,21:00-22:00,Revision,Review: Check Essay Structure & Flow,Analysis,Self-Analysis
+2026-08-16,Sunday,Weekend_Slot_1,09:00-12:00,Mock Test,TEST 36: OPTIONAL COMBINED (Paper 1 + Paper 2 Mix),Mock Test,Mains Answer Writing
+2026-08-16,Sunday,Weekend_Slot_2,13:00-14:00,Analysis,Review Answers: Check ability to switch context between Theory and Indian application,Analysis,Self-Analysis
+2026-08-16,Sunday,Weekend_Slot_3,17:00-19:00,GS Revision (Society),Society: Urbanization/Globalization issues (Studied Jun 20/22),Revise,Notes
+2026-08-16,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 36: World History Revision & Ethics Case Studies,Admin,Planner
+2026-08-17,Monday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-08-17,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-17,Monday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-08-17,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-17,Monday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-08-17,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-17,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-17,Monday,Evening,21:00-21:50,GS Revision (World Hist),World History: Industrial Revolution/World Wars (Studied May 28-31),Revise,Flashcards created May/Jun
+2026-08-17,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-17,Monday,Evening,22:00-22:50,GS Answer Writing,GS1 World History: Write 1 Answer on "Impact of Industrial Revolution on Society",Practice,PYQ
+2026-08-18,Tuesday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-08-18,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-18,Tuesday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-08-18,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-18,Tuesday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-08-18,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-18,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-18,Tuesday,Evening,21:00-21:50,GS Revision (Post-Indp),Post-Independence: Consolidation/Wars (Studied Jun 29/30),Revise,Flashcards created Jun 29
+2026-08-18,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-18,Tuesday,Evening,22:00-22:50,GS Answer Writing,GS1 Post-Independence: Write 1 Answer on "Integration of Princely States",Practice,PYQ
+2026-08-19,Wednesday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-08-19,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-19,Wednesday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-08-19,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-19,Wednesday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-08-19,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-19,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-19,Wednesday,Evening,21:00-21:50,GS Revision (Security),Internal Security: Border Management/Money Laundering (Studied Jun 12),Revise,Notes
+2026-08-19,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-19,Wednesday,Evening,22:00-22:50,GS Answer Writing,GS3 Security: Write 1 Answer on "Role of External State Actors in Border Instability",Practice,PYQ
+2026-08-20,Thursday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-08-20,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-20,Thursday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-08-20,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-20,Thursday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-08-20,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-20,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-20,Thursday,Evening,21:00-21:50,GS Revision (IR),IR: India-US/Russia/China (Studied Jun 8/9),Revise,Notes
+2026-08-20,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-20,Thursday,Evening,22:00-22:50,GS Answer Writing,GS2 IR: Write 1 Answer on "Strategic Autonomy in India-US Relations",Practice,PYQ
+2026-08-21,Friday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-08-21,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-21,Friday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-08-21,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-21,Friday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-08-21,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-21,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-21,Friday,Evening,21:00-21:50,GS Revision (Disaster),Disaster Management: Man-made/NBC Disasters (Studied Jun 17),Revise,Notes
+2026-08-21,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-21,Friday,Evening,22:00-22:50,GS Answer Writing,GS3 Disaster: Write 1 Answer on "Chemical Disaster Preparedness",Practice,PYQ
+2026-08-22,Saturday,Weekend_Slot_1,09:00-09:50,Essay,Essay Brainstorming: "The best way to predict the future is to create it",Practice,Rough Notebook
+2026-08-22,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-08-22,Saturday,Weekend_Slot_1,10:00-11:00,Essay,Essay Writing: Focus on flow and coherence between paragraphs,Practice,Rough Notebook
+2026-08-22,Saturday,Weekend_Slot_1,11:00-11:50,Ethics (GS4),Case Study: "Whistleblowing in Administration",Write,PYQ
+2026-08-22,Saturday,Weekend_Slot_2,13:00-13:50,GS Revision (Sci-Tech),Science & Tech: Biotech/Nano/Robotics (Studied May 4-10),Revise,Notes
+2026-08-22,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-08-22,Saturday,Weekend_Slot_2,14:00-14:50,GS Revision (Polity),Polity: Federalism & Local Government (Studied Feb 14/26),Revise,Flashcards
+2026-08-22,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-08-22,Saturday,Weekend_Slot_2,15:00-16:00,Flashcards,Task: CREATE Flashcards for Sci-Tech Emerging Areas (AI/Quantum),Flashcard Creation,Anki / Paper
+2026-08-22,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Data Interpretation (Charts),Practice,RS Aggarwal
+2026-08-22,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-08-22,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Reasoning: Syllogism (Revision),Practice,RS Aggarwal
+2026-08-22,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-08-22,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 31-40 (August Wk 3),Read,Monthly Magazine
+2026-08-22,Saturday,Weekend_Slot_4,21:00-22:00,Revision,Review: Weekly Progress (Answers Written count),Analysis,Journal
+2026-08-23,Sunday,Weekend_Slot_1,09:00-12:00,Mock Test,TEST 37: GS PAPER 1 FULL SYLLABUS MOCK (History/Geo/Society),Mock Test,Mains Answer Writing
+2026-08-23,Sunday,Weekend_Slot_2,13:00-14:00,Analysis,Review Answers: Check Art & Culture factual accuracy and Society examples,Analysis,Self-Analysis
+2026-08-23,Sunday,Weekend_Slot_3,17:00-19:00,GS Revision (Ethics),Ethics: Probity & Corporate Governance (Studied May 12/14),Revise,Notes
+2026-08-23,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 37: Continue Answer Writing & GS3 Deep Revision,Admin,Planner
+2026-08-24,Monday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-08-24,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-24,Monday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-08-24,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-24,Monday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-08-24,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-24,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-24,Monday,Evening,21:00-21:50,GS Revision (Agriculture),Economy: Agriculture (Land Reforms/MSP/Food Processing - Studied Apr 20/21),Revise,Notes
+2026-08-24,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-24,Monday,Evening,22:00-22:50,GS Answer Writing,GS3 Economy: Write 1 Answer on "Challenges in Food Processing Sector",Practice,PYQ
+2026-08-25,Tuesday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-08-25,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-25,Tuesday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-08-25,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-25,Tuesday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-08-25,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-25,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-25,Tuesday,Evening,21:00-21:50,GS Revision (Infra),Economy: Infrastructure & Investment Models (Studied Apr 22),Revise,Notes
+2026-08-25,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-25,Tuesday,Evening,22:00-22:50,GS Answer Writing,GS3 Economy: Write 1 Answer on "Issues with PPP Models in Infrastructure",Practice,PYQ
+2026-08-26,Wednesday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-08-26,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-26,Wednesday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-08-26,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-26,Wednesday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-08-26,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-26,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-26,Wednesday,Evening,21:00-21:50,GS Revision (Env),Environment: Climate Change & Organisations (Studied Apr 6/9),Revise,Notes
+2026-08-26,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-26,Wednesday,Evening,22:00-22:50,GS Answer Writing,GS3 Environment: Write 1 Answer on "India's Climate Leadership",Practice,PYQ
+2026-08-27,Thursday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-08-27,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-27,Thursday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-08-27,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-27,Thursday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-08-27,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-27,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-27,Thursday,Evening,21:00-21:50,GS Revision (Geography),Geography: Human Geography (Census/Migration/Resources - Studied Jan 20-22),Revise,Notes
+2026-08-27,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-27,Thursday,Evening,22:00-22:50,GS Answer Writing,GS1 Geography: Write 1 Answer on "Urbanization Trends in India",Practice,PYQ
+2026-08-28,Friday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-08-28,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-28,Friday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-08-28,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-28,Friday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-08-28,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-28,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-28,Friday,Evening,21:00-21:50,GS Revision (History),Modern History: Gandhian Phase 1917-1947 (Studied Mar 17-29),Revise,Spectrum Notes
+2026-08-28,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-28,Friday,Evening,22:00-22:50,GS Answer Writing,GS1 History: Write 1 Answer on "Role of Women in Freedom Struggle",Practice,PYQ
+2026-08-29,Saturday,Weekend_Slot_1,09:00-09:50,Essay,Essay Brainstorming: "Education is not preparation for life; education is life itself",Practice,Rough Notebook
+2026-08-29,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-08-29,Saturday,Weekend_Slot_1,10:00-11:00,Essay,Essay Writing: Write Body Paragraphs (Social/Cultural/Ethical dimensions),Practice,Rough Notebook
+2026-08-29,Saturday,Weekend_Slot_1,11:00-11:50,Ethics (GS4),Case Study: "Environmental Clearance vs Economic Development",Write,PYQ
+2026-08-29,Saturday,Weekend_Slot_2,13:00-13:50,GS Revision (Polity),Polity: Constitutional Bodies (CAG/EC/UPSC - Studied Mar 2),Revise,Flashcards
+2026-08-29,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-08-29,Saturday,Weekend_Slot_2,14:00-14:50,GS Revision (History),Modern History: 1930-1947 (CDM to Partition - Studied Mar 23-Apr 1),Revise,Flashcards
+2026-08-29,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-08-29,Saturday,Weekend_Slot_2,15:00-16:00,Flashcards,Task: CREATE Flashcards for Essay Quotes (Education/Values),Flashcard Creation,Anki / Paper
+2026-08-29,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Permutation & Combination (Revision),Practice,RS Aggarwal
+2026-08-29,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-08-29,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Reasoning: Blood Relations (Complex),Practice,RS Aggarwal
+2026-08-29,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-08-29,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 1-10 (Sept Wk 1),Read,Monthly Magazine
+2026-08-29,Saturday,Weekend_Slot_4,21:00-22:00,Revision,Review: Check Essay Flow & Ethics Case Study Solution,Analysis,Self-Analysis
+2026-08-30,Sunday,Weekend_Slot_1,09:00-12:00,Mock Test,TEST 38: GS PAPER 2 FULL LENGTH MOCK (Polity/Governance/IR/Social Justice),Mock Test,Mains Answer Writing
+2026-08-30,Sunday,Weekend_Slot_2,13:00-14:00,Analysis,Review Answers: Check Article citations & Supreme Court judgments usage,Analysis,Self-Analysis
+2026-08-30,Sunday,Weekend_Slot_3,17:00-19:00,GS Revision (Society),Society: Communalism/Regionalism/Secularism (Studied Jun 22/23),Revise,Notes
+2026-08-30,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 38: Optional Mix & GS3 Economy/Env Focus,Admin,Planner
+2026-08-31,Monday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-08-31,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-08-31,Monday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-08-31,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-08-31,Monday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-08-31,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-08-31,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-08-31,Monday,Evening,21:00-21:50,GS Revision (ArtCulture),Art & Culture: Literature/Music (Studied Apr 29),Revise,Flashcards
+2026-08-31,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-08-31,Monday,Evening,22:00-22:50,GS Answer Writing,GS1 Art & Culture: Write 1 Answer on "Bhakti Movement Literature",Practice,PYQ
+2026-09-01,Tuesday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-01,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-01,Tuesday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-01,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-01,Tuesday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-01,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-01,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-01,Tuesday,Evening,21:00-21:50,GS Revision (Polity),Polity: Parliament (Bills/Committees - Studied Feb 19-21),Revise,Notes
+2026-09-01,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-01,Tuesday,Evening,22:00-22:50,GS Answer Writing,GS2 Polity: Write 1 Answer on "Role of Parliamentary Committees",Practice,PYQ
+2026-09-02,Wednesday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-02,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-02,Wednesday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-02,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-02,Wednesday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-02,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-02,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-02,Wednesday,Evening,21:00-21:50,GS Revision (Economy),Economy: Budgeting/Fiscal Policy (Studied Apr 15),Revise,Notes
+2026-09-02,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-02,Wednesday,Evening,22:00-22:50,GS Answer Writing,GS3 Economy: Write 1 Answer on "Fiscal Federalism Issues",Practice,PYQ
+2026-09-03,Thursday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-03,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-03,Thursday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-03,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-03,Thursday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-03,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-03,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-03,Thursday,Evening,21:00-21:50,GS Revision (Ethics),Ethics: Foundational Values (Integrity/Objectivity - Studied May 5),Revise,Notes
+2026-09-03,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-03,Thursday,Evening,22:00-22:50,GS Answer Writing,GS4 Ethics: Solve 1 Theory Question on "Objectivity in Civil Services",Practice,PYQ
+2026-09-04,Friday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-04,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-04,Friday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-04,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-04,Friday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-04,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-04,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-04,Friday,Evening,21:00-21:50,GS Revision (Geography),Geography: Indian Geography (Monsoon/Rivers - Studied Jan 14/15),Revise,Notes
+2026-09-04,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-04,Friday,Evening,22:00-22:50,GS Answer Writing,GS1 Geography: Write 1 Answer on "Monsoon Mechanism & El Nino",Practice,PYQ
+2026-09-05,Saturday,Weekend_Slot_1,09:00-09:50,Essay,Essay Brainstorming: "History repeats itself, first as tragedy, second as farce",Practice,Rough Notebook
+2026-09-05,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-09-05,Saturday,Weekend_Slot_1,10:00-11:00,Essay,Essay Writing: Draft Conclusion (Summary/Way Forward),Practice,Rough Notebook
+2026-09-05,Saturday,Weekend_Slot_1,11:00-11:50,Ethics (GS4),Case Study: "Police Ethics & Custodial Violence",Write,PYQ
+2026-09-05,Saturday,Weekend_Slot_2,13:00-13:50,GS Revision (Environment),Environment: Pollution/Climate Change (Studied Mar 28/Apr 5),Revise,Notes
+2026-09-05,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-09-05,Saturday,Weekend_Slot_2,14:00-14:50,GS Revision (Sci-Tech),Sci-Tech: Space/Defence (Studied May 2/8),Revise,Notes
+2026-09-05,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-09-05,Saturday,Weekend_Slot_2,15:00-16:00,Flashcards,Task: CREATE Flashcards for Sci-Tech Current Affairs (Last 1 month),Flashcard Creation,Anki / Paper
+2026-09-05,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Probability (Revision),Practice,RS Aggarwal
+2026-09-05,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-09-05,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Reasoning: Puzzles (Advanced),Practice,RS Aggarwal
+2026-09-05,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-09-05,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 11-20 (Sept Wk 1),Read,Monthly Magazine
+2026-09-05,Saturday,Weekend_Slot_4,21:00-22:00,Revision,Review: Weekly Progress,Analysis,Journal
+2026-09-06,Sunday,Weekend_Slot_1,09:00-12:00,Mock Test,TEST 39: GS PAPER 3 FULL LENGTH MOCK (Eco/Env/Sci/Security/Disaster),Mock Test,Mains Answer Writing
+2026-09-06,Sunday,Weekend_Slot_2,13:00-14:00,Analysis,Review Answers: Check data usage in Economy and technical terms in Science,Analysis,Self-Analysis
+2026-09-06,Sunday,Weekend_Slot_3,17:00-19:00,GS Revision (IR),IR: India-US/Russia/China (Studied Jun 8),Revise,Notes
+2026-09-06,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 39: Optional Mix & Ethics/Social Justice Focus,Admin,Planner
+2026-09-07,Monday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-07,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-07,Monday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-07,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-07,Monday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-07,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-07,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-07,Monday,Evening,21:00-21:50,GS Revision (IR),IR: India-Neighborhood (Studied Jun 4/5/6),Revise,Notes
+2026-09-07,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-07,Monday,Evening,22:00-22:50,GS Answer Writing,GS2 IR: Write 1 Answer on "Connectivity Projects in South Asia",Practice,PYQ
+2026-09-08,Tuesday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-08,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-08,Tuesday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-08,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-08,Tuesday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-08,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-08,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-08,Tuesday,Evening,21:00-21:50,GS Revision (Sci-Tech),Sci-Tech: Biotech/Nano (Studied May 4-10),Revise,Notes
+2026-09-08,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-08,Tuesday,Evening,22:00-22:50,GS Answer Writing,GS3 Sci-Tech: Write 1 Answer on "GM Crops Debate",Practice,PYQ
+2026-09-09,Wednesday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-09,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-09,Wednesday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-09,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-09,Wednesday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-09,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-09,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-09,Wednesday,Evening,21:00-21:50,GS Revision (History),Modern History: 1857-1947 (Complete Review),Revise,Spectrum Notes
+2026-09-09,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-09,Wednesday,Evening,22:00-22:50,GS Answer Writing,GS1 History: Write 1 Answer on "Partition of India",Practice,PYQ
+2026-09-10,Thursday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-10,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-10,Thursday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-10,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-10,Thursday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-10,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-10,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-10,Thursday,Evening,21:00-21:50,GS Revision (Ethics),Ethics: Probity in Governance (Studied May 12),Revise,Notes
+2026-09-10,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-10,Thursday,Evening,22:00-22:50,GS Answer Writing,GS4 Ethics: Solve 1 Theory Question on "Code of Conduct vs Code of Ethics",Practice,PYQ
+2026-09-11,Friday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-11,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-11,Friday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-11,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-11,Friday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-11,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-11,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-11,Friday,Evening,21:00-21:50,GS Revision (Soc Justice),Social Justice: Vulnerable Sections/Schemes (Studied Jun 24),Revise,Notes
+2026-09-11,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-11,Friday,Evening,22:00-22:50,GS Answer Writing,GS2 Social Justice: Write 1 Answer on "Issues in implementation of Welfare Schemes",Practice,PYQ
+Date,Day,Slot_Type,Time,Subject,Topic,Activity_Type,Resources
+2026-09-12,Saturday,Weekend_Slot_1,09:00-09:50,Essay,Essay Brainstorming: "The hand that rocks the cradle rules the world",Practice,Rough Notebook
+2026-09-12,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-09-12,Saturday,Weekend_Slot_1,10:00-11:00,Essay,Essay Writing: Write Introduction & 2-3 Body Paragraphs,Practice,Rough Notebook
+2026-09-12,Saturday,Weekend_Slot_1,11:00-11:50,Ethics (GS4),Case Study: "Corporate Social Responsibility (CSR) & Ethical Evasion",Write,PYQ
+2026-09-12,Saturday,Weekend_Slot_2,13:00-13:50,GS Revision (World Hist),World History: Cold War/Decolonization (Studied Jun 1),Revise,Flashcards
+2026-09-12,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-09-12,Saturday,Weekend_Slot_2,14:00-14:50,GS Revision (Post-Indp),Post-Independence: Regional Aspirations (Studied Jul 1),Revise,Flashcards
+2026-09-12,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-09-12,Saturday,Weekend_Slot_2,15:00-16:00,Flashcards,Task: CREATE Flashcards for Essay Quotes (Gender/Society),Flashcard Creation,Anki / Paper
+2026-09-12,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Mensuration (Revision),Practice,RS Aggarwal
+2026-09-12,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-09-12,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Reasoning: Critical Reasoning (Practice),Practice,RS Aggarwal
+2026-09-12,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-09-12,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 21-30 (Sept Wk 2),Read,Monthly Magazine
+2026-09-12,Saturday,Weekend_Slot_4,21:00-22:00,Revision,Review: Check Ethics Definitions (Probity/Integrity),Analysis,Lexicon
+2026-09-13,Sunday,Weekend_Slot_1,09:00-12:00,Mock Test,TEST 40: GS PAPER 4 (ETHICS) FULL LENGTH MOCK (Theory + Case Studies),Mock Test,Mains Answer Writing
+2026-09-13,Sunday,Weekend_Slot_2,13:00-14:00,Analysis,Review Answers: Check time management (Case Studies usually take longer),Analysis,Self-Analysis
+2026-09-13,Sunday,Weekend_Slot_3,17:00-19:00,GS Revision (IR),IR: Bilateral Relations (India-Japan/Aus/Africa - Studied Jun 9),Revise,Notes
+2026-09-13,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 40: Optional Writing & Internal Security Focus,Admin,Planner
+2026-09-14,Monday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-14,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-14,Monday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-14,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-14,Monday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-14,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-14,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-14,Monday,Evening,21:00-21:50,GS Revision (Security),Internal Security: Naxalism/Terrorism (Studied Jun 6/11),Revise,Notes
+2026-09-14,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-14,Monday,Evening,22:00-22:50,GS Answer Writing,GS3 Security: Write 1 Answer on "Developmental deficit leading to Extremism",Practice,PYQ
+2026-09-15,Tuesday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-15,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-15,Tuesday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-15,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-15,Tuesday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-15,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-15,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-15,Tuesday,Evening,21:00-21:50,GS Revision (Disaster),Disaster Management: Earthquakes/Floods (Studied Jun 15/16),Revise,Notes
+2026-09-15,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-15,Tuesday,Evening,22:00-22:50,GS Answer Writing,GS3 Disaster: Write 1 Answer on "Urban Flooding: Causes & Mitigation",Practice,PYQ
+2026-09-16,Wednesday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-16,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-16,Wednesday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-16,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-16,Wednesday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-16,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-16,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-16,Wednesday,Evening,21:00-21:50,GS Revision (Society),Society: Globalization/Communalism (Studied Jun 22),Revise,Notes
+2026-09-16,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-16,Wednesday,Evening,22:00-22:50,GS Answer Writing,GS1 Society: Write 1 Answer on "Impact of Globalization on Elderly",Practice,PYQ
+2026-09-17,Thursday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-17,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-17,Thursday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-17,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-17,Thursday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-17,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-17,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-17,Thursday,Evening,21:00-21:50,GS Revision (Governance),Governance: e-Gov/Citizen Charter (Studied Jun 18),Revise,Notes
+2026-09-17,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-17,Thursday,Evening,22:00-22:50,GS Answer Writing,GS2 Governance: Write 1 Answer on "Digital Divide in e-Governance",Practice,PYQ
+2026-09-18,Friday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-18,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-18,Friday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-18,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-18,Friday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-18,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-18,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-18,Friday,Evening,21:00-21:50,GS Revision (Soc Justice),Social Justice: Health/Education/Vulnerable Sections (Studied Jun 24/25),Revise,Notes
+2026-09-18,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-18,Friday,Evening,22:00-22:50,GS Answer Writing,GS2 Social Justice: Write 1 Answer on "Issues in Primary Healthcare",Practice,PYQ
+2026-09-19,Saturday,Weekend_Slot_1,09:00-09:50,Essay,Essay Brainstorming: "Patriotism cannot be our final spiritual shelter",Practice,Rough Notebook
+2026-09-19,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-09-19,Saturday,Weekend_Slot_1,10:00-11:00,Essay,Essay Writing: Write Body Paragraphs (Philosophical dimension),Practice,Rough Notebook
+2026-09-19,Saturday,Weekend_Slot_1,11:00-11:50,Ethics (GS4),Case Study: "Ethics in Private Corporate Sector",Write,PYQ
+2026-09-19,Saturday,Weekend_Slot_2,13:00-13:50,GS Revision (World Hist),World History: World Wars/Cold War (Studied Jun 1/2),Revise,Flashcards
+2026-09-19,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-09-19,Saturday,Weekend_Slot_2,14:00-14:50,GS Revision (Post-Indp),Post-Independence: LPG/Movements (Studied Jul 2),Revise,Flashcards
+2026-09-19,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-09-19,Saturday,Weekend_Slot_2,15:00-16:00,Flashcards,Task: CREATE Flashcards for Essay Quotes (Philosophy/Ethics),Flashcard Creation,Anki / Paper
+2026-09-19,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Number Systems (Reminders),Practice,RS Aggarwal
+2026-09-19,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-09-19,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Reasoning: Data Interpretation (Charts),Practice,RS Aggarwal
+2026-09-19,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-09-19,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 31-40 (Sept Wk 3),Read,Monthly Magazine
+2026-09-19,Saturday,Weekend_Slot_4,21:00-22:00,Revision,Review: Essay structure check,Analysis,Self-Analysis
+2026-09-20,Sunday,Weekend_Slot_1,09:00-12:00,Mock Test,TEST 41: FULL LENGTH ESSAY MOCK (2 Essays in 3 Hours),Mock Test,Mains Answer Writing
+2026-09-20,Sunday,Weekend_Slot_2,13:00-14:00,Analysis,Review Answers: Check diversity of examples and flow of arguments,Analysis,Self-Analysis
+2026-09-20,Sunday,Weekend_Slot_3,17:00-19:00,GS Revision (IR),IR: India-Neighbors/Groupings (Studied Jun 6/13),Revise,Notes
+2026-09-20,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 41: Optional Writing & Science/Eco Revision,Admin,Planner
+2026-09-21,Monday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-21,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-21,Monday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-21,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-21,Monday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-21,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-21,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-21,Monday,Evening,21:00-21:50,GS Revision (Sci-Tech),Sci-Tech: Space/Defence/IT (Studied May 2/8/9),Revise,Notes
+2026-09-21,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-21,Monday,Evening,22:00-22:50,GS Answer Writing,GS3 Sci-Tech: Write 1 Answer on "Significance of Gaganyaan Mission",Practice,PYQ
+2026-09-22,Tuesday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-22,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-22,Tuesday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-22,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-22,Tuesday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-22,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-22,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-22,Tuesday,Evening,21:00-21:50,GS Revision (Economy),Economy: Banking/Finance/Ext Sector (Studied Apr 11-16),Revise,Notes
+2026-09-22,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-22,Tuesday,Evening,22:00-22:50,GS Answer Writing,GS3 Economy: Write 1 Answer on "NPA Crisis & Resolution",Practice,PYQ
+2026-09-23,Wednesday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-23,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-23,Wednesday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-23,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-23,Wednesday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-23,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-23,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-23,Wednesday,Evening,21:00-21:50,GS Revision (Economy),Economy: Agriculture/Infrastructure (Studied Apr 20-22),Revise,Notes
+2026-09-23,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-23,Wednesday,Evening,22:00-22:50,GS Answer Writing,GS3 Economy: Write 1 Answer on "Renewable Energy Targets & Challenges",Practice,PYQ
+2026-09-24,Thursday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-24,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-24,Thursday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-24,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-24,Thursday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-24,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-24,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-24,Thursday,Evening,21:00-21:50,GS Revision (Env),Environment: Biodiversity/Climate Change (Studied Mar 29-Apr 6),Revise,Notes
+2026-09-24,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-24,Thursday,Evening,22:00-22:50,GS Answer Writing,GS3 Environment: Write 1 Answer on "Climate Change Impact on Indian Agriculture",Practice,PYQ
+2026-09-25,Friday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-25,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-25,Friday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-25,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-25,Friday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-25,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-25,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-25,Friday,Evening,21:00-21:50,GS Revision (History),Modern History: 1930-1947 & Partition (Studied Mar 23-Apr 1),Revise,Flashcards
+2026-09-25,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-25,Friday,Evening,22:00-22:50,GS Answer Writing,GS1 History: Write 1 Answer on "Communalism in 1940s",Practice,PYQ
+2026-09-26,Saturday,Weekend_Slot_1,09:00-09:50,Essay,Essay Brainstorming: "Poverty anywhere is a threat to prosperity everywhere",Practice,Rough Notebook
+2026-09-26,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-09-26,Saturday,Weekend_Slot_1,10:00-11:00,Essay,Essay Writing: Write Introduction & Conclusion,Practice,Rough Notebook
+2026-09-26,Saturday,Weekend_Slot_1,11:00-11:50,Ethics (GS4),Case Study: "Values in International Relations",Write,PYQ
+2026-09-26,Saturday,Weekend_Slot_2,13:00-13:50,GS Revision (Polity),Polity: Federalism/Centre-State (Studied Feb 14),Revise,Flashcards
+2026-09-26,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-09-26,Saturday,Weekend_Slot_2,14:00-14:50,GS Revision (Polity),Polity: Emergency/President (Studied Feb 15-16),Revise,Flashcards
+2026-09-26,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-09-26,Saturday,Weekend_Slot_2,15:00-16:00,Flashcards,Task: CREATE Flashcards for Ethics Keywords (Accountability/Transparency),Flashcard Creation,Anki / Paper
+2026-09-26,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Time Speed Distance (Boats),Practice,RS Aggarwal
+2026-09-26,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-09-26,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Reasoning: Seating Arrangement (Complex),Practice,RS Aggarwal
+2026-09-26,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-09-26,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 41-50 (Sept Wk 4),Read,Monthly Magazine
+2026-09-26,Saturday,Weekend_Slot_4,21:00-22:00,Revision,Review: Check Ethics Case Study approach (Stakeholders/Options),Analysis,Self-Analysis
+2026-09-27,Sunday,Weekend_Slot_1,09:00-12:00,Mock Test,TEST 42: GS PAPER 1 FULL LENGTH MOCK (History/Geography/Society),Mock Test,Mains Answer Writing
+2026-09-27,Sunday,Weekend_Slot_2,13:00-14:00,Analysis,Review Answers: Check mapping of geography questions (diagrams) and history chronology,Analysis,Self-Analysis
+2026-09-27,Sunday,Weekend_Slot_3,17:00-19:00,GS Revision (Ancient),Ancient History: Indus Valley to Guptas (Rapid Review),Revise,Notes/Flashcards
+2026-09-27,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 42: Optional Mix & Governance/Polity Focus,Admin,Planner
+2026-09-28,Monday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-28,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-28,Monday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-28,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-28,Monday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-28,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-28,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-28,Monday,Evening,21:00-21:50,GS Revision (Medieval),Medieval History: Delhi Sultanate & Mughals (Admin/Culture),Revise,Satish Chandra Notes
+2026-09-28,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-28,Monday,Evening,22:00-22:50,GS Answer Writing,GS1 History: Write 1 Answer on "Temple Architecture Evolution",Practice,PYQ
+2026-09-29,Tuesday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-29,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-29,Tuesday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-29,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-29,Tuesday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-29,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-29,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-29,Tuesday,Evening,21:00-21:50,GS Revision (ArtCulture),Art & Culture: Buddhism/Jainism Philosophy,Revise,Nitin Singhania Notes
+2026-09-29,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-29,Tuesday,Evening,22:00-22:50,GS Answer Writing,GS1 Art & Culture: Write 1 Answer on "Contribution of Buddhism to Indian Culture",Practice,PYQ
+2026-09-30,Wednesday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-09-30,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-09-30,Wednesday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-09-30,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-09-30,Wednesday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-09-30,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-09-30,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-09-30,Wednesday,Evening,21:00-21:50,GS Revision (Geography),Geography: Physical (Climatology/Oceanography) - Rapid Review,Revise,GC Leong Notes
+2026-09-30,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-09-30,Wednesday,Evening,22:00-22:50,GS Answer Writing,GS1 Geography: Write 1 Answer on "Ocean Currents & Fishing Zones",Practice,PYQ
+2026-10-01,Thursday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-10-01,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-10-01,Thursday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-10-01,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-10-01,Thursday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-10-01,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-10-01,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-10-01,Thursday,Evening,21:00-21:50,GS Revision (Geography),Geography: Indian (Physiography/Drainage/Resources),Revise,NCERT Notes
+2026-10-01,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-10-01,Thursday,Evening,22:00-22:50,GS Answer Writing,GS1 Geography: Write 1 Answer on "River Linking Project",Practice,PYQ
+2026-10-02,Friday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-10-02,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-10-02,Friday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-10-02,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-10-02,Friday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-10-02,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-10-02,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-10-02,Friday,Evening,21:00-21:50,GS Revision (Society),Society: Women/Population/Urbanization,Revise,Notes
+2026-10-02,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-10-02,Friday,Evening,22:00-22:50,GS Answer Writing,GS1 Society: Write 1 Answer on "Feminization of Agriculture",Practice,PYQ
+2026-10-03,Saturday,Weekend_Slot_1,09:00-09:50,Essay,Essay Brainstorming: "Be the change you want to see in the world" (Gandhi Jayanti theme),Practice,Rough Notebook
+2026-10-03,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-10-03,Saturday,Weekend_Slot_1,10:00-11:00,Essay,Essay Writing: Focus on Examples (Historical/Current),Practice,Rough Notebook
+2026-10-03,Saturday,Weekend_Slot_1,11:00-11:50,Ethics (GS4),Case Study: "Political Interference in Administration",Write,PYQ
+2026-10-03,Saturday,Weekend_Slot_2,13:00-13:50,GS Revision (Polity),Polity: FR/DPSP/Duties (Core Concepts),Revise,Laxmikanth Notes
+2026-10-03,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-10-03,Saturday,Weekend_Slot_2,14:00-14:50,GS Revision (Polity),Polity: Constitutional Bodies (Review Articles),Revise,Flashcards
+2026-10-03,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-10-03,Saturday,Weekend_Slot_2,15:00-16:00,Flashcards,Task: CREATE Flashcards for Essay Quotes (Environment/Change),Flashcard Creation,Anki / Paper
+2026-10-03,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Permutation/Combination (Advanced),Practice,RS Aggarwal
+2026-10-03,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-10-03,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Reasoning: Puzzles (Floor/Flat based),Practice,RS Aggarwal
+2026-10-03,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-10-03,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 1-10 (October Wk 1),Read,Monthly Magazine
+2026-10-03,Saturday,Weekend_Slot_4,21:00-22:00,Revision,Review: Weekly Answer Writing performance,Analysis,Journal
+2026-10-04,Sunday,Weekend_Slot_1,09:00-12:00,Mock Test,TEST 43: GS PAPER 2 FULL LENGTH MOCK (Polity/Governance/IR/Social Justice),Mock Test,Mains Answer Writing
+2026-10-04,Sunday,Weekend_Slot_2,13:00-14:00,Analysis,Review Answers: Check usage of Supreme Court Judgments & Committee Reports,Analysis,Self-Analysis
+2026-10-04,Sunday,Weekend_Slot_3,17:00-19:00,GS Revision (Governance),Governance: e-Gov/Citizen Charter/SHG/NGO,Revise,Notes
+2026-10-04,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 43: Optional Mix & IR/Security Focus,Admin,Planner
+2026-10-05,Monday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-10-05,Monday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-10-05,Monday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-10-05,Monday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-10-05,Monday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-10-05,Monday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-10-05,Monday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-10-05,Monday,Evening,21:00-21:50,GS Revision (Social Justice),Social Justice: Health/Education/Vulnerable Sections,Revise,Notes
+2026-10-05,Monday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-10-05,Monday,Evening,22:00-22:50,GS Answer Writing,GS2 Social Justice: Write 1 Answer on "New Education Policy 2020 Implementation",Practice,PYQ
+2026-10-06,Tuesday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-10-06,Tuesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-10-06,Tuesday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-10-06,Tuesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-10-06,Tuesday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-10-06,Tuesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-10-06,Tuesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-10-06,Tuesday,Evening,21:00-21:50,GS Revision (IR),IR: India-Neighborhood (China/Pak/Nepal/Bangla/SL),Revise,Notes
+2026-10-06,Tuesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-10-06,Tuesday,Evening,22:00-22:50,GS Answer Writing,GS2 IR: Write 1 Answer on "India-China Border Infrastructure",Practice,PYQ
+2026-10-07,Wednesday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-10-07,Wednesday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-10-07,Wednesday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-10-07,Wednesday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-10-07,Wednesday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-10-07,Wednesday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-10-07,Wednesday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-10-07,Wednesday,Evening,21:00-21:50,GS Revision (IR),IR: Global Groupings (Quad/BRICS/SCO),Revise,Notes
+2026-10-07,Wednesday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-10-07,Wednesday,Evening,22:00-22:50,GS Answer Writing,GS2 IR: Write 1 Answer on "Relevance of Non-Alignment Movement",Practice,PYQ
+2026-10-08,Thursday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-10-08,Thursday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-10-08,Thursday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-10-08,Thursday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-10-08,Thursday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-10-08,Thursday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-10-08,Thursday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-10-08,Thursday,Evening,21:00-21:50,GS Revision (Economy),Economy: Agriculture/Infrastructure (Studied Apr 20-22),Revise,Notes
+2026-10-08,Thursday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-10-08,Thursday,Evening,22:00-22:50,GS Answer Writing,GS3 Economy: Write 1 Answer on "Doubling Farmers Income Strategies",Practice,PYQ
+2026-10-09,Friday,Morning,04:00-04:50,Optional (Mix),Answer Writing: 1 Question Paper 1 + 1 Question Paper 2,Practice,PYQ Book
+2026-10-09,Friday,Morning,04:50-05:00,Break,Hydrate,Break,N/A
+2026-10-09,Friday,Morning,05:00-05:50,Optional (Mix),Evaluation & Improvement,Analysis,Self-Analysis
+2026-10-09,Friday,Morning,05:50-06:00,Break,Walk,Break,N/A
+2026-10-09,Friday,Morning,06:00-06:50,Optional (Mix),Revision: Topic specific reading based on errors,Revise,Standard Optional Book
+2026-10-09,Friday,Evening,20:00-20:50,Current Affairs,Daily News Analysis: Editorial + Notes,Read,The Hindu
+2026-10-09,Friday,Evening,20:50-21:00,Break,Eye Rest,Break,N/A
+2026-10-09,Friday,Evening,21:00-21:50,GS Revision (Security),Internal Security: Border Mgmt/Cyber/Money Laundering,Revise,Notes
+2026-10-09,Friday,Evening,21:50-22:00,Break,Stretch,Break,N/A
+2026-10-09,Friday,Evening,22:00-22:50,GS Answer Writing,GS3 Security: Write 1 Answer on "Challenges in Border Management (Porous borders)",Practice,PYQ
+2026-10-10,Saturday,Weekend_Slot_1,09:00-09:50,Essay,Essay Brainstorming: "The real voyage of discovery consists not in seeking new landscapes, but in having new eyes",Practice,Rough Notebook
+2026-10-10,Saturday,Weekend_Slot_1,09:50-10:00,Break,Hydrate,Break,N/A
+2026-10-10,Saturday,Weekend_Slot_1,10:00-11:00,Essay,Essay Writing: Focus on flow and coherence,Practice,Rough Notebook
+2026-10-10,Saturday,Weekend_Slot_1,11:00-11:50,Ethics (GS4),Case Study: "Integrity in Public Service vs Political Pressure",Write,PYQ
+2026-10-10,Saturday,Weekend_Slot_2,13:00-13:50,GS Revision (Sci-Tech),Science & Tech: Biotech/Space/Defence,Revise,Notes
+2026-10-10,Saturday,Weekend_Slot_2,13:50-14:00,Break,Rest,Break,N/A
+2026-10-10,Saturday,Weekend_Slot_2,14:00-14:50,GS Revision (Disaster),Disaster Management: Guidelines & Frameworks,Revise,Notes
+2026-10-10,Saturday,Weekend_Slot_2,14:50-15:00,Break,Rest,Break,N/A
+2026-10-10,Saturday,Weekend_Slot_2,15:00-16:00,Flashcards,Task: CREATE Flashcards for Essay Quotes (Discovery/Perspective),Flashcard Creation,Anki / Paper
+2026-10-10,Saturday,Weekend_Slot_3,17:00-17:50,CSAT,Quant: Probability (Advanced),Practice,RS Aggarwal
+2026-10-10,Saturday,Weekend_Slot_3,17:50-18:00,Break,Eye Rest,Break,N/A
+2026-10-10,Saturday,Weekend_Slot_3,18:00-18:50,CSAT,Reasoning: Cubes & Dice (Revision),Practice,RS Aggarwal
+2026-10-10,Saturday,Weekend_Slot_3,18:50-19:00,Break,Snack,Break,N/A
+2026-10-10,Saturday,Weekend_Slot_3,19:00-19:50,Current Affairs,Weekly Compilation: Pages 11-20 (October Wk 2),Read,Monthly Magazine
+2026-10-10,Saturday,Weekend_Slot_4,21:00-22:00,Revision,Review: Weekly Progress,Analysis,Journal
+2026-10-11,Sunday,Weekend_Slot_1,09:00-12:00,Mock Test,TEST 44: GS PAPER 3 FULL LENGTH MOCK (Eco/Env/Sci/Security/Disaster),Mock Test,Mains Answer Writing
+2026-10-11,Sunday,Weekend_Slot_2,13:00-14:00,Analysis,Review Answers: Check data/examples in Economy/Env answers,Analysis,Self-Analysis
+2026-10-11,Sunday,Weekend_Slot_3,17:00-19:00,GS Revision (Ethics),Ethics: Theory & Thinkers (Studied May 1/5/9),Revise,Lexicon Notes
+2026-10-11,Sunday,Weekend_Slot_4,21:00-22:00,Planning,Plan Week 44: Optional Mix & Ethics/Essay Focus,Admin,Planner
