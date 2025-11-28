@@ -7,8 +7,10 @@ import {
     Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from 'recharts';
 
+import { generateCSVTaskId } from '../../util/taskUtils';
+
 interface Slot {
-    id: number;
+    id: string; // Changed from number to string for hash-based IDs
     time: string;
     subject: string;
     activity: string;
@@ -84,11 +86,12 @@ const StudyPlanDashboard: React.FC = () => {
                 };
             }
 
-            const taskId = index + 1;
+            // Use content-based ID to prevent collisions on CSV regeneration
+            const taskId = generateCSVTaskId(date, time, subject, topic);
             const isCompleted = completedTasks.has(taskId);
 
             dayMap[date].slots.push({
-                id: taskId,
+                id: taskId, // Now a string
                 time: time,
                 subject: subject,
                 activity: `${topic} (${activityType})`,
@@ -126,9 +129,13 @@ const StudyPlanDashboard: React.FC = () => {
         const completedTasks = new Set(JSON.parse(localStorage.getItem('completedTasks') || '[]'));
         if (newStatus === 'completed') {
             completedTasks.add(task.id);
+        } else {
             completedTasks.delete(task.id);
         }
         localStorage.setItem('completedTasks', JSON.stringify(Array.from(completedTasks)));
+
+        // Dispatch event for other components
+        window.dispatchEvent(new Event('taskUpdate'));
     };
 
     // --- Dynamic Flow Engine ---

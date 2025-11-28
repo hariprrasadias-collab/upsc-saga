@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './RitualsPanel.css';
 import type { Task } from '../App';
 import StudyTimer from './StudyTimer';
+import { generateCSVTaskId } from '../util/taskUtils';
 
 interface RitualsPanelProps {
   tasks?: Task[];
@@ -11,7 +12,7 @@ interface RitualsPanelProps {
 }
 
 interface Slot {
-  id: number;
+  id: string;
   time: string;
   subject: string;
   activity: string;
@@ -65,7 +66,8 @@ const RitualsPanel: React.FC<RitualsPanelProps> = ({ tasks = [], onTaskComplete,
         };
       }
 
-      const taskId = index + 1;
+      // Use content-based ID to prevent collisions on CSV regeneration
+      const taskId = generateCSVTaskId(date, time, subject, topic);
       const isCompleted = completedTasks.has(taskId);
 
       dayMap[date].slots.push({

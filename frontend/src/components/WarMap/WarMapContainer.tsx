@@ -5,12 +5,13 @@ import 'react-calendar/dist/Calendar.css';
 import './WarMap.css';
 import WarMapHeader from './WarMapHeader';
 import type { Task, RawTaskFromAPI } from '../../App';
+import { generateCSVTaskId } from '../../util/taskUtils';
 
 type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 interface Slot {
-  id: number;
+  id: string;
   time: string;
   subject: string;
   activity: string;
@@ -72,7 +73,8 @@ const WarMapContainer: React.FC<WarMapContainerProps> = ({ onTaskCompleted }) =>
         };
       }
 
-      const taskId = index + 1;
+      // Use content-based ID to prevent collisions on CSV regeneration
+      const taskId = generateCSVTaskId(date, time, subject, topic);
       const isCompleted = completedTasks.has(taskId);
 
       dayMap[date].slots.push({
@@ -119,6 +121,9 @@ const WarMapContainer: React.FC<WarMapContainerProps> = ({ onTaskCompleted }) =>
 
     // Trigger any parent updates if necessary (though this is local state mostly)
     onTaskCompleted();
+
+    // Dispatch event for other components
+    window.dispatchEvent(new Event('taskUpdate'));
   };
 
   // --- Backend Task Fetching (Existing) ---
