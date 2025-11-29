@@ -320,13 +320,17 @@ function App() {
 
           {showLevelUp && userStats && (
             <LevelUpModal
+
               newLevel={userStats.level}
               onClose={() => setShowLevelUp(false)}
             />
           )}
 
           {/* Global Command Palette */}
-          <CommandPalette setCurrentTab={setCurrentTab} />
+          <CommandPalette 
+            setCurrentTab={setCurrentTab} 
+            toggleRageMode={() => setIsRageMode(prev => !prev)}
+          />
 
         </div>
       </PomodoroProvider>

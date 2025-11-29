@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './CommandPalette.css';
 
+import { usePomodoro } from '../../contexts/PomodoroContext';
+
 interface CommandOption {
     id: string;
     label: string;
@@ -12,14 +14,16 @@ interface CommandOption {
 
 interface CommandPaletteProps {
     setCurrentTab: (tab: string) => void;
+    toggleRageMode: () => void;
 }
 
-const CommandPalette: React.FC<CommandPaletteProps> = ({ setCurrentTab }) => {
+const CommandPalette: React.FC<CommandPaletteProps> = ({ setCurrentTab, toggleRageMode }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [query, setQuery] = useState('');
     const [selectedIndex, setSelectedIndex] = useState(0);
     const inputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
+    const { toggleTimer, isRunning, mode } = usePomodoro();
 
     // Define available commands
     const commands: CommandOption[] = [
@@ -48,8 +52,18 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ setCurrentTab }) => {
         { id: 'nav-arena', label: 'Go to Boss Arena', category: 'Navigation', action: () => setCurrentTab('arena') },
 
         // Tools
-        { id: 'tool-pomodoro', label: 'Start Pomodoro Timer', category: 'Tool', action: () => { /* Trigger Pomodoro */ } }, // TODO: Hook into Pomodoro context
-        { id: 'tool-rage', label: 'Toggle Spartan Rage', category: 'Tool', action: () => { /* Trigger Rage Mode */ } }, // TODO: Hook into Rage Mode
+        {
+            id: 'tool-pomodoro',
+            label: isRunning ? 'Pause Pomodoro Timer' : 'Start Pomodoro Timer',
+            category: 'Tool',
+            action: () => toggleTimer()
+        },
+        {
+            id: 'tool-rage',
+            label: 'Toggle Spartan Rage',
+            category: 'Tool',
+            action: () => toggleRageMode()
+        },
     ];
 
     const filteredCommands = commands.filter(cmd =>
