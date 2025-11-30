@@ -1,80 +1,161 @@
 import React, { useState, useEffect } from 'react';
 import './RevisionWidget.css';
+import { parseCSV, type Slot } from '../../util/csvParser';
+import { usePomodoro } from '../../contexts/PomodoroContext';
 
-interface DueTopic {
-    id: number;
-    title: string;
-    subject: string;
-    paper: string;
-    revision_count: number;
-    next_revision_date: string;
-}
+import { audioManager } from '../../util/AudioManager';
 
 const RevisionWidget: React.FC = () => {
-    const [dueTopics, setDueTopics] = useState<DueTopic[]>([]);
+    const [revisionTasks, setRevisionTasks] = useState<Slot[]>([]);
     const [loading, setLoading] = useState(true);
+    const { startTask } = usePomodoro();
 
-    const fetchDueTopics = async () => {
+    const fetchRevisionTasks = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/syllabus/due');
-            const data = await res.json();
-            setDueTopics(data);
+            const response = await fetch('/UPSC_Scheduler.csv');
+            if (!response.ok) throw new Error('Failed to fetch schedule');
+
+            const csvText = await response.text();
+            const plan = parseCSV(csvText);
+
+            // Filter logic:
+            // STRICTLY tasks explicitly marked as "Revision", "Revise", or "Review"
+            // per user request ("only review task")
+
+            const allTasks = plan.flatMap(day => day.slots);
+
+            const targets = allTasks.filter(task => {
+                const activity = task.activity.toLowerCase();
+                const subject = task.subject.toLowerCase();
+
+                const isRevision =
+                    activity.includes('revise') ||
+                    activity.includes('revision') ||
+                    activity.includes('review') ||
+                    subject === 'revision' ||
+                    subject === 'review';
+
+                const isPending = task.status === 'pending';
+
+                // Only show pending revision tasks
+                return isPending && isRevision;
+            });
+
+            // Sort: By date, then by time
+            targets.sort((a, b) => {
+                return (a.originalDate || '').localeCompare(b.originalDate || '');
+            });
+
+            setRevisionTasks(targets);
         } catch (err) {
-            console.error('Failed to load due revisions', err);
+            console.error('Failed to load revision targets', err);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchDueTopics();
+        fetchRevisionTasks();
+
+        // Listen for task updates from other components
+        const handleUpdate = () => fetchRevisionTasks();
+        window.addEventListener('taskUpdate', handleUpdate);
+        return () => window.removeEventListener('taskUpdate', handleUpdate);
     }, []);
 
-    const handleQuickRevise = async (id: number) => {
-        try {
-            await fetch(`http://localhost:5000/api/syllabus/${id}/revise`, {
-                method: 'POST',
-            });
-            setDueTopics(prev => prev.filter(t => t.id !== id));
-        } catch (err) {
-            console.error('Failed to revise', err);
-        }
+    const [completingId, setCompletingId] = useState<string | null>(null);
+
+    const handleComplete = (task: Slot) => {
+        audioManager.play('success');
+        setCompletingId(task.id);
+
+        // Delay actual removal to allow animation to play
+        setTimeout(() => {
+            // Update local storage
+            const completedTasks = new Set(JSON.parse(localStorage.getItem('completedTasks') || '[]'));
+            completedTasks.add(task.id);
+            localStorage.setItem('completedTasks', JSON.stringify(Array.from(completedTasks)));
+
+            // Dispatch event
+            window.dispatchEvent(new Event('taskUpdate'));
+
+            // Optimistic update
+            setRevisionTasks(prev => prev.filter(t => t.id !== task.id));
+            setCompletingId(null);
+        }, 800); // Match CSS animation duration
     };
 
-    if (loading) return <div className="revision-widget loading">Loading Revisions...</div>;
+    const formatDate = (dateStr?: string) => {
+        if (!dateStr) return '';
+        const date = new Date(dateStr);
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        if (date.toDateString() === today.toDateString()) return 'Today';
+        if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
+        if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
+
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
+
+    if (loading) return <div className="revision-widget loading"><div className="rune-loader"></div></div>;
 
     return (
         <div className="revision-widget">
             <div className="widget-header">
-                <h3>📅 Revision Targets</h3>
-                <span className="due-count">{dueTopics.length} Due</span>
+                <h3>⚔️ REVISION TARGETS</h3>
+                <span className="due-count">{revisionTasks.length} PENDING</span>
             </div>
 
-            {dueTopics.length === 0 ? (
+            {revisionTasks.length === 0 ? (
                 <div className="empty-state">
-                    <div className="empty-icon">🎉</div>
-                    <p>All caught up! No revisions due today.</p>
+                    <div className="empty-icon">🛡️</div>
+                    <p>No enemies remain. Rest, warrior.</p>
                 </div>
             ) : (
                 <div className="due-list">
-                    {dueTopics.slice(0, 5).map(topic => (
-                        <div key={topic.id} className="due-item">
+                    {revisionTasks.slice(0, 5).map(task => (
+                        <div
+                            key={task.id}
+                            className={`due-item ${completingId === task.id ? 'completing' : ''}`}
+                        >
                             <div className="due-info">
-                                <div className="due-subject">{topic.paper} • {topic.subject}</div>
-                                <div className="due-title">{topic.title}</div>
+                                <div className="due-subject">{task.subject}</div>
+                                <div className="due-title">{task.activity}</div>
+                                {task.originalDate && <div className="due-date">{formatDate(task.originalDate)}</div>}
                             </div>
-                            <button
-                                className="quick-revise-btn"
-                                onClick={() => handleQuickRevise(topic.id)}
-                                title="Mark Revised"
-                            >
-                                ✓
-                            </button>
+                            <div className="due-actions">
+                                <button
+                                    className="focus-btn"
+                                    onClick={() => {
+                                        // Auto-start Pomodoro
+                                        // Infer duration? Default to 25 for now.
+                                        // Check if it's a break task (unlikely here but safe to check)
+                                        const isBreak = task.activity.toLowerCase().includes('break');
+                                        startTask(task.id, task.activity, 25, isBreak);
+                                    }}
+                                    title="Focus (Start Timer)"
+                                    disabled={completingId === task.id}
+                                >
+                                    👁️
+                                </button>
+                                <button
+                                    className="quick-revise-btn"
+                                    onClick={() => handleComplete(task)}
+                                    title="Mark Complete"
+                                    disabled={completingId === task.id}
+                                >
+                                    ⚔️
+                                </button>
+                            </div>
                         </div>
                     ))}
-                    {dueTopics.length > 5 && (
+                    {revisionTasks.length > 5 && (
                         <div className="more-count">
-                            + {dueTopics.length - 5} more topics due
+                            + {revisionTasks.length - 5} more battles awaiting
                         </div>
                     )}
                 </div>

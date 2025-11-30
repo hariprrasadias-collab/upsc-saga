@@ -1,0 +1,355 @@
+/* ===== ADVANCED PREMIUM REFINEMENTS ===== */
+
+/* Animated Background Particles */
+.pomodoro-widget::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(212, 165, 116, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(212, 165, 116, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(212, 165, 116, 0.02) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: particles-float 10s ease-in-out infinite;
+}
+
+@keyframes particles-float {
+
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: translate(10px, -10px) scale(1.05);
+        opacity: 0.8;
+    }
+}
+
+/* Premium Preset Buttons */
+.preset-btn {
+    position: relative;
+    background: linear-gradient(135deg,
+            rgba(212, 165, 116, 0.08),
+            rgba(212, 165, 116, 0.03)) !important;
+    border: 1px solid rgba(212, 165, 116, 0.2) !important;
+    box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(212, 165, 116, 0.05) inset !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    overflow: hidden;
+}
+
+.preset-btn::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle,
+            rgba(212, 165, 116, 0.15) 0%,
+            transparent 70%);
+    transform: scale(0);
+    transition: transform 0.6s ease;
+}
+
+.preset-btn:hover::before {
+    transform: scale(1);
+}
+
+.preset-btn:hover {
+    transform: translateY(-3px) !important;
+    border-color: rgba(212, 165, 116, 0.4) !important;
+    box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(212, 165, 116, 0.15),
+        0 0 0 1px rgba(212, 165, 116, 0.1) inset !important;
+}
+
+.preset-btn.active {
+    background: linear-gradient(135deg,
+            rgba(212, 165, 116, 0.25),
+            rgba(212, 165, 116, 0.15)) !important;
+    border-color: var(--kratos-gold) !important;
+    box-shadow:
+        0 6px 15px rgba(212, 165, 116, 0.3),
+        0 0 30px rgba(212, 165, 116, 0.2),
+        0 0 0 2px rgba(212, 165, 116, 0.1) inset !important;
+}
+
+.preset-btn.active .preset-icon {
+    animation: icon-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes icon-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+/* Enhanced Sound Cards */
+.sound-card {
+    background: linear-gradient(135deg,
+            rgba(212, 165, 116, 0.05),
+            rgba(0, 0, 0, 0.3)) !important;
+    border: 1px solid rgba(212, 165, 116, 0.15) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.sound-card::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(212, 165, 116, 0.1),
+            transparent);
+    transition: left 0.6s;
+}
+
+.sound-card:hover::after {
+    left: 100%;
+}
+
+.sound-card:hover {
+    transform: translateY(-4px) !important;
+    border-color: rgba(212, 165, 116, 0.3) !important;
+    box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.4),
+        0 0 15px rgba(212, 165, 116, 0.1) !important;
+}
+
+.sound-card.active {
+    background: linear-gradient(135deg,
+            rgba(212, 165, 116, 0.15),
+            rgba(212, 165, 116, 0.08)) !important;
+    border-color: var(--kratos-gold) !important;
+    box-shadow:
+        0 6px 15px rgba(212, 165, 116, 0.25),
+        0 0 25px rgba(212, 165, 116, 0.15) !important;
+}
+
+.sound-card.active .sound-icon {
+    animation: sound-pulse 2s ease-in-out infinite;
+}
+
+@keyframes sound-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 5px rgba(212, 165, 116, 0.5));
+    }
+
+    50% {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 10px rgba(212, 165, 116, 0.8));
+    }
+}
+
+/* Volume Slider Enhancement */
+.volume-slider {
+    position: relative;
+    background: linear-gradient(90deg,
+            rgba(0, 0, 0, 0.4),
+            rgba(212, 165, 116, 0.1)) !important;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    box-shadow: 0 0 10px rgba(212, 165, 116, 0.5) !important;
+    transition: all 0.2s !important;
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 15px rgba(212, 165, 116, 0.7) !important;
+}
+
+/* Enhanced Stats Cards */
+.stat-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle,
+            rgba(212, 165, 116, 0.1) 0%,
+            transparent 70%);
+    animation: stat-glow 3s ease-in-out infinite;
+}
+
+@keyframes stat-glow {
+
+    0%,
+    100% {
+        opacity: 0.3;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+.stat-card.streak::before {
+    background: radial-gradient(circle,
+            rgba(255, 200, 50, 0.15) 0%,
+            transparent 70%);
+}
+
+/* Session History Premium Styling */
+.session-item {
+    position: relative;
+    background: linear-gradient(90deg,
+            rgba(212, 165, 116, 0.03),
+            rgba(0, 0, 0, 0.2)) !important;
+    transition: all 0.3s ease !important;
+}
+
+.session-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    transition: width 0.3s ease;
+}
+
+.session-item.work::before {
+    background: linear-gradient(180deg,
+            var(--kratos-gold),
+            rgba(212, 165, 116, 0.5));
+}
+
+.session-item:hover::before {
+    width: 6px;
+}
+
+.session-item:hover {
+    background: linear-gradient(90deg,
+            rgba(212, 165, 116, 0.08),
+            rgba(0, 0, 0, 0.15)) !important;
+    transform: translateX(4px) !important;
+}
+
+/* Export Buttons Enhancement */
+.export-btn,
+.clear-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.export-btn::before,
+.clear-btn::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.4s, height 0.4s;
+}
+
+.export-btn:hover::before,
+.clear-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Settings & History Panel Depth */
+.pomodoro-settings-panel,
+.session-history,
+.ambient-sound-player {
+    background: linear-gradient(135deg,
+            rgba(18, 22, 31, 0.6),
+            rgba(10, 12, 16, 0.8)) !important;
+    border: 1px solid rgba(212, 165, 116, 0.2) !important;
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(212, 165, 116, 0.05) inset !important;
+}
+
+/* Keyboard Shortcut Badges */
+.shortcut kbd {
+    background: linear-gradient(135deg,
+            rgba(212, 165, 116, 0.2),
+            rgba(212, 165, 116, 0.1)) !important;
+    border: 1px solid rgba(212, 165, 116, 0.4) !important;
+    box-shadow:
+        0 2px 5px rgba(0, 0, 0, 0.3),
+        0 0 10px rgba(212, 165, 116, 0.1) inset !important;
+    transition: all 0.2s ease !important;
+}
+
+.shortcut kbd:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.4),
+        0 0 15px rgba(212, 165, 116, 0.2) inset !important;
+}
+
+/* Header Icon Buttons */
+.settings-btn,
+.minimize-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease !important;
+}
+
+.settings-btn::after,
+.minimize-btn::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(212, 165, 116, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+}
+
+.settings-btn:hover::after,
+.minimize-btn:hover::after {
+    width: 100px;
+    height: 100px;
+}
+
+/* Smooth Transitions for All Interactive Elements */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+button {
+    -webkit-user-select: none;
+    user-select: none;
+}

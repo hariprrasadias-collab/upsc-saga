@@ -1,0 +1,71 @@
+/* ===== FINAL TIMER VISIBILITY FIX ===== */
+/* Ensures timer is ALWAYS visible with maximum contrast */
+
+/* Timer text - bright white with golden glow */
+.timer-text {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+    text-shadow:
+        0 0 20px rgba(255, 215, 0, 0.9),
+        0 0 40px rgba(255, 215, 0, 0.7),
+        0 0 60px rgba(255, 215, 0, 0.5),
+        0 2px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+/* Fullscreen timer - even brighter */
+.pomodoro-widget.fullscreen .timer-text {
+    font-size: 10rem !important;
+    font-weight: 900 !important;
+    z-index: 500 !important;
+    position: relative !important;
+}
+
+/* HIDE TIMER EDIT OVERLAY IN FULLSCREEN */
+.pomodoro-widget.fullscreen .timer-edit-overlay {
+    display: none !important;
+}
+
+.pomodoro-widget.fullscreen .edit-time-btn {
+    display: none !important;
+}
+
+/* Progress ring visibility */
+.pomodoro-widget.fullscreen .progress-ring {
+    z-index: 450 !important;
+}
+
+.pomodoro-widget.fullscreen .progress-ring circle {
+    stroke: #FFD700 !important;
+    stroke-width: 5 !important;
+}
+
+/* Z-index hierarchy for fullscreen */
+.pomodoro-widget.fullscreen .pomodoro-timer-display {
+    z-index: 500 !important;
+}
+
+.pomodoro-widget.fullscreen .timer-text-container {
+    z-index: 500 !important;
+}
+
+.pomodoro-widget.fullscreen .pomodoro-actions {
+    z-index: 400 !important;
+}
+
+.pomodoro-widget.fullscreen .pomodoro-header {
+    z-index: 300 !important;
+}
+
+.pomodoro-widget.fullscreen .pomodoro-settings-panel,
+.pomodoro-widget.fullscreen .session-history {
+    z-index: 10000 !important;
+}
+
+.pomodoro-widget.fullscreen .ambient-sound-player {
+    z-index: 50 !important;
+}
+
+/* Ensure no background boxes appear */
+.pomodoro-widget.fullscreen .timer-text-container {
+    background: none !important;
+}

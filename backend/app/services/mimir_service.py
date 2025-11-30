@@ -20,9 +20,8 @@ class MimirService:
                 # Use models that are actually available in the API
                 # Based on genai.list_models() output
                 models_to_try = [
-                    'gemini-2.0-flash',          # Latest 2.0 Flash model
-                    'gemini-2.0-flash-exp',      # Experimental Flash
-                    'gemini-1.5-flash',          # Fallback
+                    'gemini-1.5-flash',          # Stable Flash model
+                    'gemini-1.5-pro',            # Stable Pro model
                     'gemini-pro',                # Legacy
                 ]
                 
@@ -63,6 +62,8 @@ class MimirService:
             You are Mimir, the wise and all-knowing advisor for a UPSC Civil Services aspirant.
             Your goal is to help the user clear the exam by providing accurate, concise, and exam-relevant information.
             
+            IMPORTANT: Respond ONLY in English. Do not use any other language or cipher.
+            
             Persona Guidelines:
             1. **Tone**: Wise, encouraging, slightly archaic but clear (like a mentor from Norse mythology but modern in knowledge).
             2. **Content**: Focus on UPSC syllabus (History, Geography, Polity, Economy, Ethics, Current Affairs).
@@ -83,7 +84,19 @@ class MimirService:
             full_prompt = f"{system_prompt}\n{conversation_context}\nUser: {message}\nMimir:"
             
             print(f"Sending prompt to Gemini (length: {len(full_prompt)} chars)")
-            response = self.model.generate_content(full_prompt)
+            
+            # Configure generation parameters for stability
+            generation_config = genai.types.GenerationConfig(
+                temperature=0.7,
+                top_p=0.8,
+                top_k=40,
+                max_output_tokens=1024,
+            )
+            
+            response = self.model.generate_content(
+                full_prompt,
+                generation_config=generation_config
+            )
             print(f"Got response from Gemini (length: {len(response.text)} chars)")
             return response.text.strip()
             

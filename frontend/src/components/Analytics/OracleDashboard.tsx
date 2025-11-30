@@ -99,6 +99,31 @@ const OracleDashboard: React.FC<OracleDashboardProps> = ({ data }) => {
                         <p className="no-data">{data.optimal_study_time?.message || 'Not enough data'}</p>
                     )}
                 </div>
+
+                {/* Study Analytics */}
+                <div className="predictive-card study-analytics-card">
+                    <h3>⏳ Chronos Analytics</h3>
+                    <div className="analytics-content">
+                        <div className="stat-row">
+                            <span className="stat-label">Total Focus Time</span>
+                            <span className="stat-value highlight">
+                                {data.study_analytics?.total_hours || '0h 0m'}
+                            </span>
+                        </div>
+                        <div className="stat-row">
+                            <span className="stat-label">Sessions Conquered</span>
+                            <span className="stat-value">
+                                {data.study_analytics?.sessions_completed || 0}
+                            </span>
+                        </div>
+                        <div className="stat-row">
+                            <span className="stat-label">Efficiency</span>
+                            <span className="stat-value">
+                                {data.study_analytics?.efficiency || '100%'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );

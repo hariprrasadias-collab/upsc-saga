@@ -1,12 +1,11 @@
 // Sidebar with Expandable Groups
-// Sidebar with Expandable Groups
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Sidebar.css';
 import { useGlobal } from '../contexts/GlobalContext';
 
 const Sidebar: React.FC = () => {
-  const { currentTab, setCurrentTab, isSidebarOpen, toggleSidebar } = useGlobal();
+  const { currentTab, setCurrentTab, isSidebarOpen, toggleSidebar, toggleMimir } = useGlobal();
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     planning: true,
     training: false,
@@ -25,6 +24,15 @@ const Sidebar: React.FC = () => {
   };
 
   const handleTabChange = (tabId: string) => {
+    if (tabId === 'mimir') {
+      toggleMimir(true);
+      // On mobile, close sidebar after selection
+      if (window.innerWidth <= 768) {
+        toggleSidebar();
+      }
+      return;
+    }
+
     setCurrentTab(tabId);
     navigate('/');
     // On mobile, close sidebar after selection

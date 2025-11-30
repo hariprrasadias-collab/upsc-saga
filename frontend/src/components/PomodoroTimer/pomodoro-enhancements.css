@@ -1,0 +1,226 @@
+/* ===== ENHANCED FEATURES STYLING ===== */
+
+/* Settings Panel */
+.pomodoro-settings-panel {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-top: 1px solid rgba(212, 165, 116, 0.2);
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    animation: slideDown 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        margin-top: 0;
+    }
+
+    to {
+        opacity: 1;
+        max-height: 500px;
+        margin-top: 1.5rem;
+    }
+}
+
+.pomodoro-settings-panel h4 {
+    margin: 0 0 1rem 0;
+    font-family: var(--font-cinzel);
+    font-size: 0.9rem;
+    color: var(--kratos-gold);
+    letter-spacing: 1px;
+}
+
+.setting-item {
+    margin-bottom: 0.8rem;
+}
+
+.setting-item label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-family: var(--font-inter);
+}
+
+.setting-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--kratos-gold);
+    cursor: pointer;
+}
+
+.delay-input {
+    width: 50px;
+    padding: 0.3rem;
+    margin: 0 0.5rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(212, 165, 116, 0.3);
+    border-radius: 2px;
+    color: var(--kratos-gold);
+    text-align: center;
+    font-family: var(--font-mono);
+}
+
+.keyboard-shortcuts {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(212, 165, 116, 0.1);
+}
+
+.keyboard-shortcuts h5 {
+    margin: 0 0 0.5rem 0;
+    font-family: var(--font-cinzel);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+}
+
+.shortcut {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-family: var(--font-inter);
+}
+
+.shortcut kbd {
+    background: rgba(212, 165, 116, 0.1);
+    border: 1px solid rgba(212, 165, 116, 0.3);
+    padding: 0.2rem 0.5rem;
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--kratos-gold);
+    min-width: 30px;
+    text-align: center;
+}
+
+.pomodoro-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.settings-btn {
+    background: none;
+    border: 1px solid rgba(212, 165, 116, 0.2);
+    color: var(--text-secondary);
+    font-size: 1rem;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-btn:hover {
+    border-color: var(--kratos-gold);
+    color: var(--kratos-gold);
+    background: rgba(212, 165, 116, 0.1);
+}
+
+.keyboard-hint {
+    font-size: 0.9rem;
+    opacity: 0.6;
+    margin-left: 0.5rem;
+    cursor: help;
+    transition: opacity 0.3s;
+}
+
+.keyboard-hint:hover {
+    opacity: 1;
+}
+
+/* Preset Selector */
+.preset-selector {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(212, 165, 116, 0.2);
+}
+
+.preset-label {
+    display: block;
+    font-family: var(--font-cinzel);
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    margin-bottom: 0.8rem;
+}
+
+.preset-options {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.preset-btn {
+    flex: 1;
+    min-width: 90px;
+    padding: 0.6rem 0.4rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.preset-btn:hover:not(:disabled) {
+    background: rgba(212, 165, 116, 0.05);
+    border-color: rgba(212, 165, 116, 0.3);
+}
+
+.preset-btn.active {
+    background: linear-gradient(180deg, rgba(212, 165, 116, 0.2), rgba(212, 165, 116, 0.05));
+    border-color: var(--kratos-gold);
+    box-shadow: 0 0 15px rgba(212, 165, 116, 0.1);
+}
+
+.preset-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.preset-icon {
+    font-size: 1.2rem;
+}
+
+.preset-name {
+    font-family: var(--font-inter);
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.preset-btn.active .preset-name {
+    color: var(--kratos-gold);
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .keyboard-hint {
+        display: none;
+    }
+
+    .preset-btn {
+        min-width: 70px;
+    }
+
+    .preset-name {
+        font-size: 0.55rem;
+    }
+}

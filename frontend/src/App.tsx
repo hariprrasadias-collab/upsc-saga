@@ -162,7 +162,7 @@ function App() {
                 )}
                 {currentTab === 'csat' && <CSATModule />}
                 {currentTab === 'compilation' && <CompilationGenerator />}
-                {currentTab === 'mimir' && <MimirChat />}
+                {/* Mimir is now a modal, no fullpage route */}
                 {currentTab === 'flashcards' && (
                   <FlashcardsManager onTaskCompleted={refreshDashboard} />
                 )}
@@ -225,8 +225,8 @@ function App() {
 
           <SpartanRage />
 
-          {/* Floating Mimir - Always visible */}
-          <MimirChat mode="floating" />
+          {/* Floating Mimir - Modal Mode */}
+          <MimirChat mode="modal" />
 
           {/* Pomodoro Timer - Global productivity tool (Hidden on Dashboard to avoid duplication) */}
           <PomodoroTimer className="pomodoro-above-mimir" />

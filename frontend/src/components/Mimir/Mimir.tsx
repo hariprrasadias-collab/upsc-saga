@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Mimir.css';
 import ReactMarkdown from 'react-markdown';
+import { useGlobal } from '../../contexts/GlobalContext';
 
 interface ChatMessage {
     id: number;
@@ -10,20 +11,65 @@ interface ChatMessage {
 }
 
 interface MimirChatProps {
-    mode?: 'floating' | 'fullpage';
+    mode?: 'floating' | 'fullpage' | 'modal';
 }
 
+// Typewriter Component for streaming text
+const Typewriter: React.FC<{ text: string; onComplete?: () => void }> = ({ text, onComplete }) => {
+    const [displayedText, setDisplayedText] = useState('');
+    const indexRef = useRef(0);
+
+    useEffect(() => {
+        indexRef.current = 0;
+        setDisplayedText('');
+        
+        const interval = setInterval(() => {
+            setDisplayedText((prev) => {
+                if (indexRef.current < text.length) {
+                    const char = text.charAt(indexRef.current);
+                    indexRef.current++;
+                    return prev + char;
+                } else {
+                    clearInterval(interval);
+                    if (onComplete) onComplete();
+                    return prev;
+                }
+            });
+        }, 15); // Speed of typing
+
+        return () => clearInterval(interval);
+    }, [text, onComplete]);
+
+    return <ReactMarkdown>{displayedText}</ReactMarkdown>;
+};
+
 const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
-    const [isOpen, setIsOpen] = useState(mode === 'fullpage');
+    const { isMimirOpen, toggleMimir } = useGlobal();
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    
+    // Audio Refs
+    const clickSound = useRef(new Audio('/sounds/click.wav'));
+    const successSound = useRef(new Audio('/sounds/success.wav'));
+
+    // Use global state for floating/modal, local for fullpage (always open)
+    const isOpen = mode === 'fullpage' ? true : isMimirOpen;
+    // setIsOpen is not needed as we use toggleMimir directly
+
+    // Play sound on open
+    useEffect(() => {
+        if (isOpen && mode === 'modal') {
+            successSound.current.volume = 0.2;
+            successSound.current.play().catch(e => console.log("Audio play failed", e));
+        }
+    }, [isOpen, mode]);
 
     // Scroll to bottom on new message
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages, isOpen]);
+    }, [messages, isOpen, loading]);
 
     // Fetch History on Load
     useEffect(() => {
@@ -50,6 +96,10 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
         if (e) e.preventDefault();
         if (!input.trim() || loading) return;
 
+        // Play click sound
+        clickSound.current.currentTime = 0;
+        clickSound.current.play().catch(e => console.log("Audio play failed", e));
+
         const userMsg = input;
         setInput('');
         setLoading(true);
@@ -58,7 +108,6 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
         setMessages(prev => [...prev, { id: tempId, sender: 'user', message: userMsg }]);
 
         try {
-            // FIX: Use correct endpoint /api/mimir/chat
             const res = await fetch('http://localhost:5000/api/mimir/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -87,7 +136,6 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
     const handleClear = async () => {
         if (!confirm("Clear Mimir's memory?")) return;
         try {
-            // FIX: Use POST method as defined in backend
             await fetch('http://localhost:5000/api/mimir/clear', { method: 'POST' });
             setMessages([]);
         } catch (error) {
@@ -95,12 +143,12 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
         }
     };
 
-    // Floating mode - return both the button and the overlay
-    if (mode === 'floating') {
+    // Floating / Modal mode
+    if (mode === 'floating' || mode === 'modal') {
         return (
             <>
                 {/* THE FLOATING HEAD IMAGE BUTTON */}
-                <button className="mimir-head-btn" onClick={() => setIsOpen(!isOpen)} title="Consult Mimir">
+                <button className="mimir-head-btn" onClick={() => toggleMimir()} title="Consult Mimir">
                     <img
                         src="/Mimir.png"
                         alt="Mimir's Head"
@@ -110,42 +158,60 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
 
                 {/* THE CHAT WINDOW */}
                 {isOpen && (
-                    <div className="mimir-chat-window">
-                        <div className="mimir-window-header">
-                            <h3>MIMIR'S WISDOM</h3>
-                            <div className="header-actions">
-                                <button className="clear-chat-btn" onClick={handleClear}>Clear</button>
-                                <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
-                            </div>
-                        </div>
-
-                        <div className="mimir-messages">
-                            {messages.length === 0 && (
-                                <div style={{ textAlign: 'center', padding: '20px', opacity: 0.8 }}>
-                                    <p style={{ fontStyle: 'italic', color: '#5fb3e8' }}>"Ask, Brother. I know all."</p>
-                                </div>
-                            )}
-                            {messages.map((msg, index) => (
-                                <div key={msg.id || index} className={`msg ${msg.sender}`}>
-                                    <ReactMarkdown>{msg.message}</ReactMarkdown>
-                                </div>
-                            ))}
-                            {loading && <div className="msg mimir">Thinking...</div>}
-                            <div ref={messagesEndRef} />
-                        </div>
-
-                        <form className="mimir-input-area" onSubmit={handleSend}>
-                            <input
-                                type="text"
-                                placeholder="Ask a doubt..."
-                                value={input}
-                                onChange={e => setInput(e.target.value)}
+                    <>
+                        {/* Backdrop for modal mode */}
+                        {mode === 'modal' && (
+                            <div 
+                                className="mimir-modal-backdrop"
+                                onClick={() => toggleMimir(false)}
                             />
-                            <button type="submit" className="mimir-send-btn" disabled={loading}>
-                                ➤
-                            </button>
-                        </form>
-                    </div>
+                        )}
+                        
+                        <div className={`mimir-chat-window ${mode === 'modal' ? 'modal-center' : ''}`}>
+                            <div className="mimir-window-header">
+                                <h3>MIMIR'S WISDOM</h3>
+                                <div className="header-actions">
+                                    <button className="clear-chat-btn" onClick={handleClear}>Clear</button>
+                                    <button className="close-btn" onClick={() => toggleMimir(false)}>✕</button>
+                                </div>
+                            </div>
+
+                            <div className="mimir-messages">
+                                {messages.length === 0 && (
+                                    <div className="empty-state">
+                                        <p>"Ask, Brother. I know all."</p>
+                                    </div>
+                                )}
+                                {messages.map((msg, index) => (
+                                    <div key={msg.id || index} className={`msg ${msg.sender}`}>
+                                        {msg.sender === 'mimir' && index === messages.length - 1 && !loading ? (
+                                            <Typewriter text={msg.message} />
+                                        ) : (
+                                            <ReactMarkdown>{msg.message}</ReactMarkdown>
+                                        )}
+                                    </div>
+                                ))}
+                                {loading && (
+                                    <div className="msg mimir">
+                                        <div className="rune-spinner"></div>
+                                    </div>
+                                )}
+                                <div ref={messagesEndRef} />
+                            </div>
+
+                            <form className="mimir-input-area" onSubmit={handleSend}>
+                                <input
+                                    type="text"
+                                    placeholder="Ask a doubt..."
+                                    value={input}
+                                    onChange={e => setInput(e.target.value)}
+                                />
+                                <button type="submit" className="mimir-send-btn" disabled={loading}>
+                                    ➤
+                                </button>
+                            </form>
+                        </div>
+                    </>
                 )}
             </>
         );
@@ -153,95 +219,68 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
 
     // Full-page mode - return the full interface
     return (
-        <div className="mimir-full-page-container" style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            background: '#0f172a',
-            zIndex: 1
-        }}>
+        <div className="mimir-full-page-container">
             <header className="mimir-header">
                 <div className="header-content">
-                    <h1>Mimir</h1>
-                    <p>Your AI Study Companion</p>
+                    <h1>MIMIR</h1>
+                    <p>The Smartest Man Alive</p>
                 </div>
                 <div className="mimir-status">
                     <span className="status-dot"></span> Online
                 </div>
             </header>
 
-            <div className="chat-window" style={{
-                flex: 1,
-                overflowY: 'auto',
-                display: 'flex',
-                flexDirection: 'column',
-                background: '#0f172a'
-            }}>
+            <div className="chat-window">
                 {messages.length === 0 && (
                     <div className="welcome-message">
-                        <img
-                            src="/Mimir.png"
-                            alt="Mimir"
-                            style={{ width: '80px', borderRadius: '50%', marginBottom: '1rem' }}
-                        />
-                        <h2>Greetings, Aspirant!</h2>
-                        <p>I am Mimir, keeper of wisdom. How may I assist you in your journey today?</p>
+                        <div className="avatar-large">
+                            <img
+                                src="/Mimir.png"
+                                alt="Mimir"
+                            />
+                        </div>
+                        <h2>Greetings, Brother!</h2>
+                        <p>I am Mimir, keeper of wisdom. Ask, and I shall enlighten you.</p>
+                        <div className="suggestion-chips">
+                            <button onClick={() => setInput("Explain the Doctrine of Basic Structure")} className="chip-btn">Basic Structure</button>
+                            <button onClick={() => setInput("Summarize the revolt of 1857")} className="chip-btn">Revolt of 1857</button>
+                            <button onClick={() => setInput("What are the key features of the Preamble?")} className="chip-btn">Preamble Features</button>
+                        </div>
                     </div>
                 )}
 
                 {messages.map((msg, index) => (
-                    <div key={msg.id || index} className={`message-bubble ${msg.sender}`}>
-                        <div className="avatar">
-                            {msg.sender === 'user' ? '👤' : (
-                                <img
-                                    src="/Mimir.png"
-                                    alt="Mimir"
-                                    style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
-                                />
-                            )}
-                        </div>
-                        <div className="message-content">
+                    <div key={msg.id || index} className={`msg ${msg.sender}`}>
+                        {msg.sender === 'mimir' && index === messages.length - 1 && !loading ? (
+                            <Typewriter text={msg.message} />
+                        ) : (
                             <ReactMarkdown>{msg.message}</ReactMarkdown>
-                        </div>
+                        )}
                     </div>
                 ))}
 
                 {loading && (
-                    <div className="message-bubble mimir">
-                        <div className="avatar">
-                            <img
-                                src="/Mimir.png"
-                                alt="Mimir"
-                                style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
-                            />
-                        </div>
-                        <div className="message-content typing">
-                            <span>.</span><span>.</span><span>.</span>
-                        </div>
+                    <div className="msg mimir">
+                        <div className="rune-spinner"></div>
                     </div>
                 )}
                 <div ref={messagesEndRef} />
             </div>
 
-            <div className="input-area">
-                <textarea
+            <div className="mimir-input-area fullpage-input">
+                <input
+                    type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
+                        if (e.key === 'Enter') {
                             handleSend();
                         }
                     }}
                     placeholder="Ask Mimir anything..."
-                    rows={1}
                 />
                 <button
-                    className="send-btn"
+                    className="mimir-send-btn"
                     onClick={() => handleSend()}
                     disabled={loading || !input.trim()}
                 >

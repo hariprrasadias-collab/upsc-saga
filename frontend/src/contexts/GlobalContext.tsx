@@ -50,6 +50,8 @@ interface GlobalContextType {
     completeTask: (taskId: number) => Promise<void>;
     isSidebarOpen: boolean;
     toggleSidebar: () => void;
+    isMimirOpen: boolean;
+    toggleMimir: (isOpen?: boolean) => void;
 }
 
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
@@ -75,10 +77,10 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isMimirOpen, setIsMimirOpen] = useState(false);
 
     const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
-
-
+    const toggleMimir = (isOpen?: boolean) => setIsMimirOpen(prev => isOpen !== undefined ? isOpen : !prev);
 
     // Refined fetchDashboardData to avoid dependency issues
     const refreshDashboard = useCallback(async () => {
@@ -175,7 +177,9 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
         refreshDashboard,
         completeTask,
         isSidebarOpen,
-        toggleSidebar
+        toggleSidebar,
+        isMimirOpen,
+        toggleMimir
     };
 
     return (

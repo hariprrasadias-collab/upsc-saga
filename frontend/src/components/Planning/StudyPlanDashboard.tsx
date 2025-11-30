@@ -746,7 +746,7 @@ const StudyPlanDashboard: React.FC = () => {
         }));
     }, [plan, isDynamicMode, filterTopic]);
 
-    const renderContent = () => {
+    const renderContent = (viewMode: ViewMode) => {
         if (viewMode === 'flashcards') {
             return <FlashcardsManager />;
         } else if (viewMode === 'daily') {
@@ -1420,7 +1420,7 @@ const StudyPlanDashboard: React.FC = () => {
                         </div>
                     )}
 
-                    {renderContent()}
+                    {renderContent(viewMode)}
                 </div>
             ) : (
                 <div className="empty-state">
