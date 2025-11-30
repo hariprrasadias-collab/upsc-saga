@@ -1,6 +1,7 @@
 from app.db import get_db
 from datetime import datetime, date, timedelta
 import random
+from app.services.game_engine import calculate_and_apply_rewards
 
 class ChallengeService:
     """
@@ -81,11 +82,8 @@ class ChallengeService:
         
         # Award XP
         xp_reward = challenge['xp_reward']
-        conn.execute('''
-            UPDATE users
-            SET current_xp = current_xp + ?
-            WHERE id = ?
-        ''', (xp_reward, user_id))
+        # Use game engine to handle level ups
+        calculate_and_apply_rewards(user_id, xp_reward, 0, ['challenge', 'daily'])
         
         # Update streak
         self._update_streak(user_id, conn)
@@ -244,11 +242,8 @@ class ChallengeService:
             ''', (challenge['id'],))
             
             # Award XP
-            conn.execute('''
-                UPDATE users
-                SET current_xp = current_xp + ?
-                WHERE id = ?
-            ''', (challenge['xp_reward'], user_id))
+            # Use game engine to handle level ups
+            calculate_and_apply_rewards(user_id, challenge['xp_reward'], 0, ['challenge', 'daily'])
             
             # Update streak
             self._update_streak(user_id, conn)

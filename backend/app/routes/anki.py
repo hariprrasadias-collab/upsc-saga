@@ -41,8 +41,8 @@ def answer_anki_card():
     # Give XP for studying!
     user_id = 1
     xp_gain = 10 # Small consistent XP
-    conn = get_db()
-    conn.execute('UPDATE users SET current_xp = current_xp + ? WHERE id = ?', (xp_gain, user_id))
-    conn.commit()
     
-    return jsonify({"success": True, "xp_gained": xp_gain})
+    from app.services.game_engine import calculate_and_apply_rewards
+    rewards = calculate_and_apply_rewards(user_id, xp_gain, 0, ['anki', 'memory'])
+    
+    return jsonify({"success": True, "xp_gained": rewards['xp_gained'], "leveled_up": rewards['leveled_up']})
