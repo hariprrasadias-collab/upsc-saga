@@ -3596,3 +3596,37 @@
         transform: translateY(0);
     }
 }
+/* --- Socratic Arena Enhancements --- */
+.agent-thought {
+    font-size: 0.85rem;
+    color: #bdc3c7;
+    font-style: italic;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px 10px;
+    border-radius: 6px;
+    border-left: 2px solid #f1c40f;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.thought-icon {
+    font-size: 1rem;
+}
+
+.turn-score {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    font-size: 0.8rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 4px 8px;
+    border-radius: 4px;
+    width: fit-content;
+}
+
+.turn-score span {
+    color: #f1c40f;
+    font-weight: bold;
+}

@@ -3,6 +3,8 @@ import './Ravens.css';
 import { audioManager } from '../../util/AudioManager';
 import { useToast } from '../Toast';
 import IssueMappingViewer from '../IssueMapping/IssueMappingViewer';
+// import { AnkiConnect } from '../../util/AnkiConnect';
+import TriangulationDashboard from './TriangulationDashboard';
 
 type RelatedPyq = {
     year: string;
@@ -41,6 +43,9 @@ const Ravens: React.FC = () => {
     const [editingNotes, setEditingNotes] = useState<number | null>(null);
     const [mappingArticleId, setMappingArticleId] = useState<number | null>(null);
     const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+
+    // State for Triangulation
+    const [triangulationText, setTriangulationText] = useState<string | null>(null);
 
     const { addToast } = useToast();
 
@@ -224,6 +229,11 @@ const Ravens: React.FC = () => {
         }
     };
 
+    const handleTriangulate = (article: Article) => {
+        const text = article.upscSummary || article.title;
+        setTriangulationText(text);
+    };
+
     const paperColors: Record<string, string> = {
         'GS1': '#FF6B6B',
         'GS2': '#4ECDC4',
@@ -233,6 +243,13 @@ const Ravens: React.FC = () => {
 
     return (
         <div className="ravens-simple">
+            {triangulationText && (
+                <TriangulationDashboard
+                    text={triangulationText}
+                    onClose={() => setTriangulationText(null)}
+                />
+            )}
+
             <div className="header-row">
                 <h1>📰 Current Affairs for UPSC</h1>
                 <button
@@ -447,6 +464,15 @@ const Ravens: React.FC = () => {
                                             📇 Add to Anki
                                         </button>
                                     )}
+
+                                    <button
+                                        className="action-btn triangulate-btn"
+                                        onClick={() => handleTriangulate(article)}
+                                        title="Triangulate Sources"
+                                        style={{ color: '#00d2d3', borderColor: '#00d2d3' }}
+                                    >
+                                        📐 Triangulate
+                                    </button>
                                 </div>
                             </div>
                         </div>

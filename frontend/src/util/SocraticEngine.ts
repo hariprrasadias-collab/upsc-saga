@@ -14,6 +14,12 @@ export interface DebateTurn {
     text: string;
     type: 'ARGUMENT' | 'REBUTTAL' | 'QUESTION' | 'CONCLUSION';
     timestamp: number;
+    thoughts?: string;
+    score?: {
+        logic: number;
+        relevance: number;
+        impact: number;
+    };
 }
 
 export class SocraticEngine {
@@ -64,69 +70,57 @@ export class SocraticEngine {
         return turn;
     }
 
-    public nextTurn(): DebateTurn {
-        // AI vs AI simulation (Legacy)
-        return this.processUserResponse("");
-    }
 
-    public processUserResponse(userText: string): DebateTurn {
-        const lastTurn = this.history[this.history.length - 1];
-        let nextSpeaker: DebateAgent;
-        let text = "";
-        let type: DebateTurn['type'] = 'ARGUMENT';
 
-        // 1. Analyze User Input (Simple Keyword Heuristics)
-        const lowerText = userText.toLowerCase();
-        const isIdealistic = lowerText.includes('should') || lowerText.includes('must') || lowerText.includes('ideal') || lowerText.includes('vision');
-        const isFactual = lowerText.includes('data') || lowerText.includes('fact') || lowerText.includes('evidence') || lowerText.includes('history');
-        // const isUncertain = lowerText.includes('maybe') || lowerText.includes('think') || lowerText.includes('unsure');
-
-        // 2. Select Next Speaker based on User's Stance
-        // If user is Idealistic -> Realist attacks with practicality
-        // If user is Factual -> Idealist attacks with moral purpose
-        // If user is Uncertain -> Skeptic attacks with doubt
-        // Default -> Rotate
-
-        if (userText === "") {
-            // Simulation Mode (Auto-play)
-            if (lastTurn.speakerId === 'idealist') {
-                nextSpeaker = this.agents.find(a => a.id === 'skeptic')!;
-                text = `But is that truly feasible? You speak of ideals regarding "${this.topic}", but have you considered the inherent contradictions?`;
-                type = 'QUESTION';
-            } else if (lastTurn.speakerId === 'skeptic') {
-                nextSpeaker = this.agents.find(a => a.id === 'realist')!;
-                text = `While the skepticism is valid, we have empirical data. Historically, "${this.topic}" has functioned when specific practical constraints are met.`;
-                type = 'REBUTTAL';
-            } else {
-                nextSpeaker = this.agents.find(a => a.id === 'idealist')!;
-                text = `But mechanics without vision are aimless! "${this.topic}" must first serve a higher purpose.`;
-                type = 'ARGUMENT';
-            }
-        } else {
-            // Interactive Mode
-            if (isIdealistic) {
-                nextSpeaker = this.agents.find(a => a.id === 'realist')!;
-                text = `Your vision is noble, but how does it survive contact with reality? In the real world, "${this.topic}" faces logistical and economic barriers you are ignoring.`;
-                type = 'REBUTTAL';
-            } else if (isFactual) {
-                nextSpeaker = this.agents.find(a => a.id === 'idealist')!;
-                text = `Data is cold and meaningless without a moral compass. Even if the facts support you, does "${this.topic}" align with the ultimate good of society?`;
-                type = 'QUESTION';
-            } else {
-                nextSpeaker = this.agents.find(a => a.id === 'skeptic')!;
-                text = `You seem unsure. If you cannot define "${this.topic}" with certainty, how can you claim to understand it? Define your terms precisely.`;
-                type = 'QUESTION';
-            }
+    public async fetchNextTurn(userText: string): Promise<DebateTurn> {
+        // 1. Add User Turn to History (if any)
+        if (userText) {
+            this.history.push({
+                speakerId: 'user',
+                text: userText,
+                type: 'ARGUMENT',
+                timestamp: Date.now()
+            });
         }
 
-        const turn: DebateTurn = {
-            speakerId: nextSpeaker.id,
-            text,
-            type,
-            timestamp: Date.now()
-        };
-        this.history.push(turn);
-        return turn;
+        // 2. Call Backend API
+        try {
+            const response = await fetch('http://localhost:5000/api/socratic/debate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    topic: this.topic,
+                    history: this.history,
+                    user_input: userText || null
+                })
+            });
+
+            if (!response.ok) throw new Error('Failed to fetch debate turn');
+
+            const data = await response.json();
+
+            const turn: DebateTurn = {
+                speakerId: data.speakerId,
+                text: data.text,
+                type: data.type,
+                timestamp: Date.now(),
+                thoughts: data.thoughts,
+                score: data.score
+            };
+
+            this.history.push(turn);
+            return turn;
+        } catch (error) {
+            console.error("Socratic Engine Error:", error);
+            const errorTurn: DebateTurn = {
+                speakerId: 'skeptic',
+                text: "I cannot hear the other voices... (Connection Error)",
+                type: 'ARGUMENT',
+                timestamp: Date.now()
+            };
+            this.history.push(errorTurn);
+            return errorTurn;
+        }
     }
 
     public getAgents(): DebateAgent[] {

@@ -73,4 +73,10 @@ def create_app():
     from app.routes.arena import arena_bp
     app.register_blueprint(arena_bp, url_prefix='/api/arena')
 
+    from app.routes.socratic_routes import socratic_bp
+    app.register_blueprint(socratic_bp, url_prefix='/api/socratic')
+
+    from app.routes.triangulation_routes import triangulation_bp
+    app.register_blueprint(triangulation_bp, url_prefix='/api/triangulation')
+
     return app

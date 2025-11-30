@@ -14,6 +14,8 @@ import { RLAgent, type AgentState, type AgentAction } from '../../util/RLAgent';
 import { ArbitrageEngine, type ArbitrageOpportunity } from '../../util/ArbitrageEngine';
 import { KnowledgeGraphEngine, type GraphNode } from '../../util/KnowledgeGraphEngine';
 import NexusGraph from './NexusGraph';
+import SocraticArena from './SocraticArena';
+import { SocraticEngine } from '../../util/SocraticEngine';
 
 import { BayesianOracle, type SimulationResult } from '../../util/BayesianOracle';
 import { FlowAudioEngine } from '../../util/FlowAudioEngine';
@@ -58,7 +60,9 @@ const StudyPlanDashboard: React.FC = () => {
     const [nexusEngine] = useState(() => new KnowledgeGraphEngine());
 
     // Socratic Debate State
+    const [socraticEngine] = useState(() => new SocraticEngine());
     const [isDebateOpen, setIsDebateOpen] = useState(false);
+    const [debateTopic, setDebateTopic] = useState<string>("");
 
     // Market Opportunities
     const [marketOpportunities, setMarketOpportunities] = useState<ArbitrageOpportunity[]>([]);
@@ -1152,9 +1156,12 @@ const StudyPlanDashboard: React.FC = () => {
                                                 <span className="ticker-price"> {op.score}</span>
                                                 <button
                                                     className="debate-btn"
-                                                    onClick={() => console.log("Debate feature temporarily disabled")}
+                                                    onClick={() => {
+                                                        setDebateTopic(op.topic);
+                                                        setIsDebateOpen(true);
+                                                    }}
                                                 >
-                                                    ⚔️ Challenge (Coming Soon)
+                                                    ⚔️ Challenge
                                                 </button>
                                             </div>
                                         ))}
@@ -1464,8 +1471,9 @@ const StudyPlanDashboard: React.FC = () => {
                             <button
                                 className="debate-btn"
                                 onClick={() => {
+                                    setDebateTopic(selectedTask.activity);
+                                    setIsDebateOpen(true);
                                     closeModal();
-                                    console.log("Debate disabled");
                                 }}
                             >
                                 Debate This
@@ -1520,6 +1528,14 @@ const StudyPlanDashboard: React.FC = () => {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {isDebateOpen && (
+                <SocraticArena
+                    engine={socraticEngine}
+                    topic={debateTopic}
+                    onClose={() => setIsDebateOpen(false)}
+                />
             )}
         </div>
     );

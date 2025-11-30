@@ -27,10 +27,12 @@ const SocraticArena: React.FC<SocraticArenaProps> = ({ engine, topic, onClose })
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [history]);
 
-    const handleSend = () => {
-        if (!userInput.trim()) return;
+    const [isThinking, setIsThinking] = useState(false);
 
-        // 1. Add User Turn
+    const handleSend = async () => {
+        if (!userInput.trim() && !isThinking) return;
+
+        // 1. Add User Turn Optimistically (Optional, but Engine handles it)
         const userTurn: DebateTurn = {
             speakerId: 'user',
             text: userInput,
@@ -38,19 +40,24 @@ const SocraticArena: React.FC<SocraticArenaProps> = ({ engine, topic, onClose })
             timestamp: Date.now()
         };
 
-        // Manually push to history for UI (Engine doesn't store user turns in its main history array in this simple version, 
-        // but we should probably add it to the engine history too if we want full context. 
-        // For now, let's just update local state and let engine generate response)
+        // Update local history immediately for responsiveness
+        if (userInput) {
+            setHistory(prev => [...prev, userTurn]);
+        }
 
-        const newHistory = [...history, userTurn];
-        setHistory(newHistory);
+        const currentInput = userInput;
         setUserInput("");
+        setIsThinking(true);
 
         // 2. Get AI Response
-        setTimeout(() => {
-            const aiTurn = engine.processUserResponse(userInput);
+        try {
+            const aiTurn = await engine.fetchNextTurn(currentInput);
             setHistory(prev => [...prev, aiTurn]);
-        }, 1000); // Simulate thinking delay
+        } catch (error) {
+            console.error("Arena Error:", error);
+        } finally {
+            setIsThinking(false);
+        }
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -76,19 +83,44 @@ const SocraticArena: React.FC<SocraticArenaProps> = ({ engine, topic, onClose })
 
                         return (
                             <div key={index} className={`chat-message ${isUser ? 'user-message' : 'ai-message'}`}>
-                                {!isUser && agent && (
-                                    <div className="agent-avatar" style={{ backgroundColor: agent.color }}>
-                                        {agent.avatar}
+                                {!isUser && (
+                                    <div className="agent-avatar" style={{ background: agent?.color }}>
+                                        {agent?.avatar}
                                     </div>
                                 )}
                                 <div className="message-content">
-                                    {!isUser && agent && <div className="agent-name">{agent.name}</div>}
+                                    {!isUser && <div className="agent-name" style={{ color: agent?.color }}>{agent?.name}</div>}
+
+                                    {/* Inner Thought Trace */}
+                                    {turn.thoughts && (
+                                        <div className="agent-thought">
+                                            <span className="thought-icon">💭</span>
+                                            <span className="thought-text">{turn.thoughts}</span>
+                                        </div>
+                                    )}
+
                                     <div className="message-text">{turn.text}</div>
+
+                                    {/* User Score Feedback */}
+                                    {turn.score && turn.score.logic > 0 && (
+                                        <div className="turn-score">
+                                            <span title="Logic">🧠 {turn.score.logic}</span>
+                                            <span title="Relevance">🎯 {turn.score.relevance}</span>
+                                            <span title="Impact">🔥 {turn.score.impact}</span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         );
                     })}
                     <div ref={chatEndRef} />
+                    {isThinking && (
+                        <div className="chat-message ai-message">
+                            <div className="message-content">
+                                <span className="thinking-dots">The Council is deliberating...</span>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="arena-input-area">
