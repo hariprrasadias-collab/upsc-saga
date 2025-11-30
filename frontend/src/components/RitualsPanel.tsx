@@ -1,15 +1,9 @@
 // /frontend/src/components/RitualsPanel.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import './RitualsPanel.css';
-import type { Task } from '../App';
+import { useGlobal } from '../contexts/GlobalContext';
 import StudyTimer from './StudyTimer';
 import { generateCSVTaskId } from '../util/taskUtils';
-
-interface RitualsPanelProps {
-  tasks?: Task[];
-  onTaskComplete: (taskId: number) => void;
-  onPlanRituals: () => void;
-}
 
 interface Slot {
   id: string;
@@ -26,7 +20,8 @@ interface DayPlan {
   slots: Slot[];
 }
 
-const RitualsPanel: React.FC<RitualsPanelProps> = ({ tasks = [], onTaskComplete, onPlanRituals }) => {
+const RitualsPanel: React.FC = () => {
+  const { todayTasks, completeTask, setCurrentTab } = useGlobal();
   const [csvTasks, setCsvTasks] = useState<Slot[]>([]);
 
   // --- CSV Fetching Logic (Mirrors WarMapContainer) ---
@@ -46,7 +41,7 @@ const RitualsPanel: React.FC<RitualsPanelProps> = ({ tasks = [], onTaskComplete,
     const dayMap: { [key: string]: DayPlan } = {};
     const completedTasks = new Set(JSON.parse(localStorage.getItem('completedTasks') || '[]'));
 
-    dataRows.forEach((row, index) => {
+    dataRows.forEach((row) => {
       const columns = row.split(',').map(c => c.trim());
       const date = columns[0];
       const dayName = columns[1];
@@ -129,7 +124,7 @@ const RitualsPanel: React.FC<RitualsPanelProps> = ({ tasks = [], onTaskComplete,
     };
   }, [fetchCSVTasks]);
 
-  const hasTasks = tasks.length > 0 || csvTasks.length > 0;
+  const hasTasks = todayTasks.length > 0 || csvTasks.length > 0;
 
   return (
     <div className="rituals-panel">
@@ -163,13 +158,13 @@ const RitualsPanel: React.FC<RitualsPanelProps> = ({ tasks = [], onTaskComplete,
             ))}
 
             {/* Backend Tasks */}
-            {tasks.map(task => (
+            {todayTasks.map(task => (
               <li key={task.id} className={`ritual-item${task.isCompleted ? ' completed' : ''}`}>
                 <label className="checkbox-label">
                   <input
                     type="checkbox"
                     checked={task.isCompleted}
-                    onChange={() => onTaskComplete(task.id)}
+                    onChange={() => completeTask(task.id)}
                     disabled={task.isCompleted}
                   />
                   <span className="checkbox-custom"></span>
@@ -187,7 +182,7 @@ const RitualsPanel: React.FC<RitualsPanelProps> = ({ tasks = [], onTaskComplete,
       <button
         className="add-ritual-btn"
         style={{ marginTop: 'auto', alignSelf: 'center' }}
-        onClick={onPlanRituals}
+        onClick={() => setCurrentTab('war-map')}
       >
         PLAN MORE RITUALS
       </button>

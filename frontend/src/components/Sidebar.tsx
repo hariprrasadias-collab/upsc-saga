@@ -1,14 +1,12 @@
 // Sidebar with Expandable Groups
+// Sidebar with Expandable Groups
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Sidebar.css';
+import { useGlobal } from '../contexts/GlobalContext';
 
-interface SidebarProps {
-  currentTab: string;
-  setCurrentTab: (tab: string) => void;
-}
-
-const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab }) => {
+const Sidebar: React.FC = () => {
+  const { currentTab, setCurrentTab, isSidebarOpen, toggleSidebar } = useGlobal();
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     planning: true,
     training: false,
@@ -29,6 +27,10 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab }) => {
   const handleTabChange = (tabId: string) => {
     setCurrentTab(tabId);
     navigate('/');
+    // On mobile, close sidebar after selection
+    if (window.innerWidth <= 768) {
+      toggleSidebar();
+    }
   };
 
   const menuGroups = {
@@ -86,7 +88,13 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab }) => {
   };
 
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
+      <div className="sidebar-header">
+        <h2>UPSC SAGA</h2>
+        {/* Mobile Close Button */}
+        <button className="mobile-close-btn" onClick={toggleSidebar}>×</button>
+      </div>
+
       {/* Dashboard - Always Top */}
       <div
         className={`menu-item ${currentTab === 'dashboard' ? 'active' : ''}`}

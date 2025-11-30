@@ -12,12 +12,8 @@ import { GeneticScheduler } from '../../util/GeneticScheduler';
 import type { Task as GTask, TimeSlot } from '../../util/GeneticScheduler';
 import { RLAgent, type AgentState, type AgentAction } from '../../util/RLAgent';
 import { ArbitrageEngine, type ArbitrageOpportunity } from '../../util/ArbitrageEngine';
-import { SocraticEngine, type DebateTurn } from '../../util/SocraticEngine';
 import { KnowledgeGraphEngine, type GraphNode } from '../../util/KnowledgeGraphEngine';
-import SocraticArena from './SocraticArena';
 import NexusGraph from './NexusGraph';
-
-
 
 import { BayesianOracle, type SimulationResult } from '../../util/BayesianOracle';
 import { FlowAudioEngine } from '../../util/FlowAudioEngine';
@@ -62,9 +58,6 @@ const StudyPlanDashboard: React.FC = () => {
     const [nexusEngine] = useState(() => new KnowledgeGraphEngine());
 
     // Socratic Debate State
-    const [socraticEngine] = useState(() => new SocraticEngine());
-    const [debateTopic, setDebateTopic] = useState<string>("");
-    const [debateHistory, setDebateHistory] = useState<DebateTurn[]>([]);
     const [isDebateOpen, setIsDebateOpen] = useState(false);
 
     // Market Opportunities
@@ -163,24 +156,7 @@ const StudyPlanDashboard: React.FC = () => {
         });
     };
 
-    const addOpportunity = (opp: ArbitrageOpportunity) => {
-        const today = new Date().toISOString().split('T')[0];
-        const newSlot: Slot = {
-            id: `arb-${Date.now()}`,
-            time: '08:00 PM', // Evening slot
-            subject: opp.topic, // Simplified mapping
-            activity: `Arbitrage Study: ${opp.topic}`,
-            status: 'pending',
-            resource_link: 'Market Opportunity'
-        };
 
-        setPlan(prev => prev.map(d => {
-            if (d.date === today) {
-                return { ...d, slots: [...d.slots, newSlot] };
-            }
-            return d;
-        }));
-    };
 
     const fixSchedule = () => {
         // Simple heuristic: Move last task of today to tomorrow
@@ -247,25 +223,6 @@ const StudyPlanDashboard: React.FC = () => {
         }
         setIsFlowMode(!isFlowMode);
     };
-
-    const startDebate = (topic: string) => {
-        audioManager.play('click');
-        setDebateTopic(topic);
-        const initialTurn = socraticEngine.startDebate(topic);
-        setDebateHistory([initialTurn]);
-        setIsDebateOpen(true);
-    };
-
-    const nextDebateTurn = () => {
-        audioManager.play('click');
-        const turn = socraticEngine.nextTurn();
-        setDebateHistory(prev => [...prev, turn]);
-    };
-
-    const closeDebate = () => {
-        setIsDebateOpen(false);
-    };
-
 
     const parseCSV = (csvText: string): DayPlan[] => {
         const lines = csvText.split('\n').filter(line => line.trim() !== '');
@@ -1194,13 +1151,11 @@ const StudyPlanDashboard: React.FC = () => {
                                                 <span className="ticker-symbol">{op.topic.substring(0, 3).toUpperCase()}</span>
                                                 <span className="ticker-price"> {op.score}</span>
                                                 <button
-                                                    className="add-opp-btn"
-                                                    title="Add to Schedule"
-                                                    onClick={() => {
-                                                        addOpportunity(op);
-                                                        alert(`Added ${op.topic} to your schedule!`);
-                                                    }}
-                                                >+</button>
+                                                    className="debate-btn"
+                                                    onClick={() => console.log("Debate feature temporarily disabled")}
+                                                >
+                                                    ⚔️ Challenge (Coming Soon)
+                                                </button>
                                             </div>
                                         ))}
                                     </div>
@@ -1328,7 +1283,7 @@ const StudyPlanDashboard: React.FC = () => {
                         completedItems={plan.flatMap(d => d.slots)
                             .filter(s => s.status === 'completed')
                             .map(s => ({ subject: s.subject, topic: s.activity }))}
-                        onDebateClick={(topic: string) => startDebate(topic)}
+                        onDebateClick={(_topic: string) => console.log("Debate disabled")}
                         onNodeClick={(node: GraphNode) => {
                             setFilterTopic(node.label);
                             setViewMode('daily'); // Switch to daily view to see filtered tasks
@@ -1510,7 +1465,7 @@ const StudyPlanDashboard: React.FC = () => {
                                 className="debate-btn"
                                 onClick={() => {
                                     closeModal();
-                                    startDebate(selectedTask.activity);
+                                    console.log("Debate disabled");
                                 }}
                             >
                                 Debate This
@@ -1525,14 +1480,7 @@ const StudyPlanDashboard: React.FC = () => {
                     </div>
                 </div>
             )}
-            {/* Socratic Arena Modal */}
-            {isDebateOpen && (
-                <SocraticArena
-                    engine={socraticEngine}
-                    topic={debateTopic || "General Studies"}
-                    onClose={() => setIsDebateOpen(false)}
-                />
-            )}
+
 
             {ambushTopic && (
                 <div className="modal-overlay ambush-overlay">
@@ -1578,3 +1526,4 @@ const StudyPlanDashboard: React.FC = () => {
 };
 
 export default StudyPlanDashboard;
+

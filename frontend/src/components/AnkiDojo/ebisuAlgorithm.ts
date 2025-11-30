@@ -61,7 +61,7 @@ export class EbisuScheduler {
     updateAfterReview(cardId: number, ease: number): CardMemory {
         const memory = this.getCardMemory(cardId);
         const now = Date.now();
-        const elapsed = (now - memory.lastReviewTime) / (1000 * 60 * 60); // hours
+
 
         // Bayesian update based on performance
         const isSuccess = ease >= 3; // Good or Easy counts as success

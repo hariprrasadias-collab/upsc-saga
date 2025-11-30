@@ -20,7 +20,6 @@ const ModelAnswersManager: React.FC = () => {
     const [answers, setAnswers] = useState<ModelAnswer[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedAnswer, setSelectedAnswer] = useState<ModelAnswer | null>(null);
-    const [isEditing, setIsEditing] = useState(false);
     const [showEditor, setShowEditor] = useState(false);
 
     // Filters
@@ -98,13 +97,11 @@ const ModelAnswersManager: React.FC = () => {
 
     const handleEdit = (answer: ModelAnswer) => {
         setSelectedAnswer(answer);
-        setIsEditing(true);
         setShowEditor(true);
     };
 
     const handleCreate = () => {
         setSelectedAnswer(null);
-        setIsEditing(false);
         setShowEditor(true);
     };
 

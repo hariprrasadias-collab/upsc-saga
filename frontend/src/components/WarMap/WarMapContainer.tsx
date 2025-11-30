@@ -4,7 +4,7 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import './WarMap.css';
 import WarMapHeader from './WarMapHeader';
-import type { Task, RawTaskFromAPI } from '../../App';
+import type { Task, RawTaskFromAPI } from '../../contexts/GlobalContext';
 import { generateCSVTaskId } from '../../util/taskUtils';
 
 type ValuePiece = Date | null;
@@ -53,7 +53,7 @@ const WarMapContainer: React.FC<WarMapContainerProps> = ({ onTaskCompleted }) =>
     const dayMap: { [key: string]: DayPlan } = {};
     const completedTasks = new Set(JSON.parse(localStorage.getItem('completedTasks') || '[]'));
 
-    dataRows.forEach((row, index) => {
+    dataRows.forEach((row) => {
       const columns = row.split(',').map(c => c.trim());
       const date = columns[0];
       const dayName = columns[1];

@@ -157,11 +157,11 @@ const Seer: React.FC = () => {
                         <ResponsiveContainer>
                             <PieChart>
                                 <Pie
-                                    data={topWeightage}
+                                    data={topWeightage as any}
                                     cx="50%"
                                     cy="42%"
                                     labelLine={true}
-                                    label={({ subject, percent }) => `${subject}: ${((percent || 0) * 100).toFixed(0)}%`}
+                                    label={({ subject, percent }: any) => `${subject}: ${((percent || 0) * 100).toFixed(0)}%`}
                                     outerRadius={95}
                                     fill="#8884d8"
                                     dataKey="count"

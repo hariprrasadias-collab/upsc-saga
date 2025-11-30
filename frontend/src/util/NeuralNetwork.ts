@@ -82,7 +82,7 @@ export class NeuralNetwork {
         const activations: number[][] = [input];
         const zValues: number[][] = []; // Pre-activation values
 
-        let currentOutput = [...input];
+
 
         for (let i = 0; i < this.layers.length; i++) {
             const layer = this.layers[i];
@@ -104,7 +104,7 @@ export class NeuralNetwork {
             }
             zValues.push(layerZ);
             activations.push(nextOutput);
-            currentOutput = nextOutput;
+
         }
 
         // Calculate Loss (MSE)

@@ -1,18 +1,18 @@
 import React from 'react';
 import './DashboardMain.css';
-import PomodoroTimer from './PomodoroTimer/PomodoroTimer';
-import type { UserStats } from '../App';
+
 import ChallengeCard from './DashboardMain/ChallengeCard';
 import RevisionWidget from './DashboardMain/RevisionWidget';
 import { useAnalytics } from '../contexts/AnalyticsContext';
+import { useGlobal } from '../contexts/GlobalContext';
 
-interface DashboardMainProps {
-  stats: UserStats;
-}
-
-const DashboardMain: React.FC<DashboardMainProps> = ({ stats }) => {
+const DashboardMain: React.FC = () => {
+  const { userStats } = useGlobal();
   const { analytics } = useAnalytics();
 
+  if (!userStats) return null;
+
+  const stats = userStats;
   const currentLevel = analytics?.level ?? stats.level;
   const currentXP = analytics?.xp ?? stats.current_xp;
   const maxXP = analytics?.max_xp ?? stats.max_xp;

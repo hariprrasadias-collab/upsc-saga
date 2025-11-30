@@ -99,9 +99,10 @@ const PYQHeatmap: React.FC = () => {
     };
 
     const getColorIntensity = (count: number, maxCount: number): string => {
-        if (count === 0) return 'rgba(200, 200, 200, 0.1)';
+        if (count === 0) return 'rgba(255, 255, 255, 0.03)';
         const intensity = Math.min(count / maxCount, 1);
-        return `rgba(102, 126, 234, ${0.2 + intensity * 0.8})`;
+        // Gold/Orange theme: 243, 156, 18
+        return `rgba(243, 156, 18, ${0.15 + intensity * 0.85})`;
     };
 
     const filteredTopics = data?.topics.filter(topic =>

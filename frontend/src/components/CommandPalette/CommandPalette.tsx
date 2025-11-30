@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import './CommandPalette.css';
 
 import { usePomodoro } from '../../contexts/PomodoroContext';
+import { useGlobal } from '../../contexts/GlobalContext';
 
 interface CommandOption {
     id: string;
@@ -12,18 +12,14 @@ interface CommandOption {
     shortcut?: string;
 }
 
-interface CommandPaletteProps {
-    setCurrentTab: (tab: string) => void;
-    toggleRageMode: () => void;
-}
-
-const CommandPalette: React.FC<CommandPaletteProps> = ({ setCurrentTab, toggleRageMode }) => {
+const CommandPalette: React.FC = () => {
+    const { setCurrentTab, toggleRageMode } = useGlobal();
     const [isOpen, setIsOpen] = useState(false);
     const [query, setQuery] = useState('');
     const [selectedIndex, setSelectedIndex] = useState(0);
     const inputRef = useRef<HTMLInputElement>(null);
-    const navigate = useNavigate();
-    const { toggleTimer, isRunning, mode } = usePomodoro();
+
+    const { toggleTimer, isRunning } = usePomodoro();
 
     // Define available commands
     const commands: CommandOption[] = [
@@ -33,7 +29,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ setCurrentTab, toggleRa
         { id: 'nav-syllabus', label: 'Go to Syllabus Tracker', category: 'Navigation', action: () => setCurrentTab('syllabus') },
         { id: 'nav-quests', label: 'Go to Quests', category: 'Navigation', action: () => setCurrentTab('quests') },
         { id: 'nav-codex', label: 'Go to Codex (Yggdrasil)', category: 'Navigation', action: () => setCurrentTab('codex') },
-        { id: 'nav-lore', label: 'Go to Lore Tablets', category: 'Navigation', action: () => setCurrentTab('lore') },
+        { id: 'nav-lore', label: 'Go to Lore Tablets', category: 'Navigation', action: () => setCurrentTab('lore-tablets') },
         { id: 'nav-pyq', label: 'Go to PYQ Database', category: 'Navigation', action: () => setCurrentTab('pyq') },
         { id: 'nav-armory', label: 'Go to Armory', category: 'Navigation', action: () => setCurrentTab('armory') },
         { id: 'nav-dojo', label: 'Go to Anki Dojo', category: 'Navigation', action: () => setCurrentTab('dojo') },

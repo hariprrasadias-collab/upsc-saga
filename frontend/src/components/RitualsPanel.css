@@ -124,13 +124,13 @@
   box-shadow: 0 0 8px rgba(95, 179, 232, 0.2);
 }
 
-.checkbox-label input:checked ~ .checkbox-custom {
+.checkbox-label input:checked~.checkbox-custom {
   background: linear-gradient(135deg, rgba(95, 179, 232, 0.3) 0%, rgba(212, 165, 116, 0.2) 100%);
   border-color: rgba(212, 165, 116, 0.5);
   box-shadow: 0 0 10px rgba(95, 179, 232, 0.3);
 }
 
-.checkbox-label input:checked ~ .checkbox-custom::after {
+.checkbox-label input:checked~.checkbox-custom::after {
   content: '✓';
   position: absolute;
   top: -2px;

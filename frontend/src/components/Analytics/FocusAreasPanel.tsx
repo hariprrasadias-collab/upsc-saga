@@ -1,5 +1,5 @@
 import React from 'react';
-import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts';
+
 import './FocusAreasPanel.css';
 
 interface WeakArea {

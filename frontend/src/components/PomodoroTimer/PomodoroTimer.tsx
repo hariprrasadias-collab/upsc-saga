@@ -7,7 +7,7 @@ interface PomodoroTimerProps {
     className?: string; // Allow custom positioning classes
 }
 
-const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ onSessionComplete, className }) => {
+const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
     const {
         mode,
         timeLeft,

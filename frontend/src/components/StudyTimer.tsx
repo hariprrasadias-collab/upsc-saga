@@ -5,7 +5,7 @@ const StudyTimer: React.FC = () => {
     const [seconds, setSeconds] = useState(0);
     const [isActive, setIsActive] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
-    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const intervalRef = useRef<number | null>(null);
 
     useEffect(() => {
         if (isActive && !isPaused) {

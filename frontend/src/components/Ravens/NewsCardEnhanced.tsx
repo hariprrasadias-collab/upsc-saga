@@ -30,7 +30,7 @@ interface NewsCardProps {
 const NewsCardEnhanced: React.FC<NewsCardProps> = ({
     article,
     onProcess,
-    onTag,
+
     onImportance,
     onBookmark,
     onNotes,

@@ -1,41 +1,35 @@
 // /frontend/src/components/SpartanRage/SpartanRage.tsx
 import React, { useState, useEffect } from 'react';
 import './SpartanRage.css';
+import { useGlobal } from '../../contexts/GlobalContext';
 
-interface SpartanRageProps {
-    onToggleRage: (isActive: boolean) => void;
-}
-
-const SpartanRage: React.FC<SpartanRageProps> = ({ onToggleRage }) => {
-    const [isActive, setIsActive] = useState(false);
+const SpartanRage: React.FC = () => {
+    const { isRageMode, setIsRageMode } = useGlobal();
     const [timeLeft, setTimeLeft] = useState(0);
 
     // Timer countdown effect
     useEffect(() => {
-        if (!isActive || timeLeft <= 0) return;
+        if (!isRageMode || timeLeft <= 0) return;
 
         const interval = setInterval(() => {
             setTimeLeft((prev) => Math.max(0, prev - 1));
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [isActive, timeLeft]);
+    }, [isRageMode, timeLeft]);
 
-    // Timer expiration effect - setState is intentional for timer completion
+    // Timer expiration effect
     useEffect(() => {
-        if (!isActive) return;
+        if (!isRageMode) return;
 
         if (timeLeft === 0) {
-             
-            setIsActive(false);
-            onToggleRage(false);
+            setIsRageMode(false);
         }
-    }, [timeLeft, isActive, onToggleRage]);
+    }, [timeLeft, isRageMode, setIsRageMode]);
 
     const toggleRage = () => {
-        const newState = !isActive;
-        setIsActive(newState);
-        onToggleRage(newState);
+        const newState = !isRageMode;
+        setIsRageMode(newState);
         if (newState) setTimeLeft(50 * 60);
     };
 
@@ -47,12 +41,12 @@ const SpartanRage: React.FC<SpartanRageProps> = ({ onToggleRage }) => {
 
     return (
         <div className="rage-container">
-            {isActive && <div className="rage-timer-display">{formatTime(timeLeft)}</div>}
+            {isRageMode && <div className="rage-timer-display">{formatTime(timeLeft)}</div>}
             <button
-                className={`rage-button ${isActive ? 'active' : ''}`}
+                className={`rage-button ${isRageMode ? 'active' : ''}`}
                 onClick={toggleRage}
             >
-                {isActive ? "RAGE ACTIVE" : "L3 + R3 FOCUS"}
+                {isRageMode ? "RAGE ACTIVE" : "L3 + R3 FOCUS"}
             </button>
         </div>
     );

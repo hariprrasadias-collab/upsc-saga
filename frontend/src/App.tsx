@@ -1,11 +1,11 @@
 // frontend/src/App.tsx
-import { useState, useEffect, useCallback } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import './index.css';
 import './App.css';
 import './animations.css';
 import { AnalyticsProvider } from './contexts/AnalyticsContext';
 import { PomodoroProvider } from './contexts/PomodoroContext';
+import { useGlobal } from './contexts/GlobalContext';
 
 // --- COMPONENT IMPORTS ---
 import Sidebar from './components/Sidebar';
@@ -50,121 +50,34 @@ import RevisionCenter from './components/Revision/RevisionCenter';
 import MindMapCreator from './components/MindMap/MindMapCreator';
 import CompilationGenerator from './components/Ravens/CompilationGenerator';
 
-// --- UTILS ---
-import { audioManager } from './util/AudioManager';
-
-// --- TYPES ---
-export interface Task {
-  id: number;
-  title: string;
-  isCompleted: boolean;
-  xp_reward: number;
-  associated_stat: string | null;
-  due_date: string;
-}
-
-export interface RawTaskFromAPI {
-  id: number;
-  title: string;
-  isCompleted: number;
-  xp_reward: number;
-  associated_stat: string | null;
-  due_date: string;
-}
-
-export interface UserStats {
-  id: number;
-  username: string;
-  level: number;
-  current_xp: number;
-  max_xp: number;
-  hacksilver: number;
-  strength_stat: number;
-  runic_stat: number;
-  vitality_stat: number;
-  luck_stat: number;
-}
-
 function App() {
-  const [userStats, setUserStats] = useState<UserStats | null>(null);
-  const [todayTasks, setTodayTasks] = useState<Task[]>([]);
+  const {
+    userStats,
+    currentTab,
+    setCurrentTab,
+    isRageMode,
+    showLevelUp,
+    setShowLevelUp,
+    isLoading,
+    error,
+    refreshDashboard,
+    isSidebarOpen,
+    toggleSidebar
+  } = useGlobal();
+
   const location = useLocation();
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Navigation State
-  const [currentTab, setCurrentTab] = useState('dashboard');
-
-  // Feature States
-  const [isRageMode, setIsRageMode] = useState(false);
-  const [showLevelUp, setShowLevelUp] = useState(false);
-
-  const fetchDashboardData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch('http://localhost:5000/api/dashboard-data');
-      if (!response.ok) throw new Error('Failed to fetch dashboard data');
-      const data = await response.json();
-
-      // --- LEVEL UP DETECTION LOGIC ---
-      setUserStats((prev) => {
-        const newStats = data.stats;
-        if (prev && newStats.level > prev.level) {
-          audioManager.play('levelup');
-          setShowLevelUp(true);
-        }
-        return newStats;
-      });
-
-      // Process Tasks
-      const tasksWithBooleanCompletion: Task[] = data.tasks.map((task: RawTaskFromAPI) => ({
-        id: task.id,
-        title: task.title,
-        isCompleted: task.isCompleted === 1,
-        xp_reward: task.xp_reward,
-        associated_stat: task.associated_stat,
-        due_date: task.due_date,
-      }));
-
-      setTodayTasks(tasksWithBooleanCompletion);
-
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchDashboardData();
-  }, [fetchDashboardData]);
-
-  // --- AUDIO & VISUAL EFFECTS FOR RAGE MODE ---
-  useEffect(() => {
-    if (isRageMode) {
-      document.body.classList.add('rage-mode');
-      audioManager.startLoop('rage');
-    } else {
-      document.body.classList.remove('rage-mode');
-      audioManager.stopLoop('rage');
-    }
-  }, [isRageMode]);
-
-  // --- TASK COMPLETION HANDLER ---
-  const handleTaskCompleted = useCallback(async () => {
-    audioManager.play('success');
-    await fetchDashboardData();
-  }, [fetchDashboardData]);
-
+  // Handle task completion (audio + refresh) - passed to components that need simple callback
+  const handleSessionComplete = async () => {
+    await refreshDashboard();
+  };
 
   if (isLoading && !userStats) return <div className="loading-screen">Loading the Realms...</div>;
   if (error) return <div className="error-screen">Error: {error}</div>;
 
   return (
     <AnalyticsProvider>
-      <PomodoroProvider onSessionComplete={handleTaskCompleted}>
+      <PomodoroProvider onSessionComplete={handleSessionComplete}>
         <div className="app-container" style={{
           backgroundImage: `url(/assets/bg_main.jpg)`,
           backgroundSize: 'cover',
@@ -178,13 +91,19 @@ function App() {
           </div>
 
           {/* LEFT SIDEBAR */}
-          <Sidebar
-            currentTab={currentTab}
-            setCurrentTab={setCurrentTab}
-          />
+          <Sidebar />
+
+          {/* HAMBURGER BUTTON (Mobile & Desktop) */}
+          <button
+            className={`sidebar-toggle-btn ${isSidebarOpen ? 'open' : ''}`}
+            onClick={toggleSidebar}
+            aria-label="Toggle Sidebar"
+          >
+            ☰
+          </button>
 
           {/* MAIN CONTENT AREA (Middle Column - Z-Index 10) */}
-          <main className="content" style={{
+          <main className={`content ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`} style={{
             backgroundImage: currentTab === 'dashboard' ? `url(/assets/bg_sidebar.png)` : undefined,
             backgroundSize: 'cover',
             height: '100vh',
@@ -193,24 +112,23 @@ function App() {
             display: 'flex',
             flexDirection: 'column',
             zIndex: 10,
-            position: 'relative'
+            position: 'relative',
+            transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
           }}>
             {/* Only render Tab Content if we are on the root path */}
             {location.pathname === '/' && (
               <>
                 {currentTab === 'dashboard' && (
-                  <DashboardMain
-                    stats={userStats!}
-                  />
+                  <DashboardMain />
                 )}
                 {currentTab === 'war-map' && (
-                  <WarMapContainer onTaskCompleted={handleTaskCompleted} />
+                  <WarMapContainer onTaskCompleted={refreshDashboard} />
                 )}
                 {currentTab === 'syllabus' && (
-                  <SyllabusTracker onTaskCompleted={handleTaskCompleted} />
+                  <SyllabusTracker onTaskCompleted={refreshDashboard} />
                 )}
                 {currentTab === 'quests' && (
-                  <QuestsPage onTaskCompleted={handleTaskCompleted} />
+                  <QuestsPage onTaskCompleted={refreshDashboard} />
                 )}
                 {currentTab === 'codex' && (
                   <YggdrasilTree />
@@ -234,19 +152,19 @@ function App() {
                   <Ravens />
                 )}
                 {currentTab === 'answer-writing' && (
-                  <AnswerWriting onTaskCompleted={handleTaskCompleted} />
+                  <AnswerWriting onTaskCompleted={refreshDashboard} />
                 )}
                 {currentTab === 'mock-tests' && (
-                  <MockTests onTaskCompleted={handleTaskCompleted} />
+                  <MockTests onTaskCompleted={refreshDashboard} />
                 )}
                 {currentTab === 'essay' && (
-                  <EssayWorkshop onTaskCompleted={handleTaskCompleted} />
+                  <EssayWorkshop onTaskCompleted={refreshDashboard} />
                 )}
                 {currentTab === 'csat' && <CSATModule />}
                 {currentTab === 'compilation' && <CompilationGenerator />}
                 {currentTab === 'mimir' && <MimirChat />}
                 {currentTab === 'flashcards' && (
-                  <FlashcardsManager onTaskCompleted={handleTaskCompleted} />
+                  <FlashcardsManager onTaskCompleted={refreshDashboard} />
                 )}
                 {currentTab === 'analytics' && (
                   <AnalyticsDashboard onNavigate={setCurrentTab} />
@@ -261,7 +179,7 @@ function App() {
                   <AnswerWorkbench />
                 )}
                 {currentTab === 'arena' && (
-                  <BossArena onBattleComplete={handleTaskCompleted} />
+                  <BossArena onBattleComplete={refreshDashboard} />
                 )}
                 {(currentTab === 'planner' || currentTab === 'study-plan') && (
                   <StudyPlanDashboard />
@@ -291,7 +209,7 @@ function App() {
               <Route path="/pyq-quiz-results/:sessionId" element={<QuizResults />} />
               <Route path="/analytics" element={<AnalyticsDashboard />} />
               <Route path="/workbench" element={<AnswerWorkbench />} />
-              <Route path="/boss-arena" element={<BossArena onBattleComplete={handleTaskCompleted} />} />
+              <Route path="/boss-arena" element={<BossArena onBattleComplete={refreshDashboard} />} />
               <Route path="/timebox" element={<TimeBoxing />} />
               <Route path="/revision-center" element={<RevisionCenter />} />
               <Route path="/mindmap" element={<MindMapCreator />} />
@@ -300,17 +218,12 @@ function App() {
 
           {/* RITUALS PANEL (Right Column) */}
           <div style={{ zIndex: 15, position: 'relative' }}>
-            <RitualsPanel
-              tasks={todayTasks}
-              onTaskComplete={handleTaskCompleted}
-              // FIX: When clicked, switch tab to War Map
-              onPlanRituals={() => setCurrentTab('war-map')}
-            />
+            <RitualsPanel />
           </div>
 
           {/* --- OVERLAYS & FLOATING ELEMENTS --- */}
 
-          <SpartanRage onToggleRage={setIsRageMode} />
+          <SpartanRage />
 
           {/* Floating Mimir - Always visible */}
           <MimirChat mode="floating" />
@@ -320,17 +233,13 @@ function App() {
 
           {showLevelUp && userStats && (
             <LevelUpModal
-
               newLevel={userStats.level}
               onClose={() => setShowLevelUp(false)}
             />
           )}
 
           {/* Global Command Palette */}
-          <CommandPalette 
-            setCurrentTab={setCurrentTab} 
-            toggleRageMode={() => setIsRageMode(prev => !prev)}
-          />
+          <CommandPalette />
 
         </div>
       </PomodoroProvider>

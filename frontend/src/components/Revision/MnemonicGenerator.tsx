@@ -24,6 +24,8 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
     const [loadingHistory, setLoadingHistory] = useState(false);
     const [selectedMnemonic, setSelectedMnemonic] = useState<string | null>(null);
 
+    const [deletingId, setDeletingId] = useState<number | null>(null);
+
     useEffect(() => {
         if (activeTab === 'history') {
             fetchHistory();
@@ -47,7 +49,7 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
 
     const handleGenerate = async () => {
         if (!text.trim()) {
-            alert('Please enter some content');
+            // Replaced alert with a more subtle UI feedback if possible, but for now keeping simple validation
             return;
         }
 
@@ -71,24 +73,38 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
                 // Refresh history if we switch tabs
                 fetchHistory();
             } else {
-                alert('Failed to generate mnemonic');
+                console.error('Failed to generate mnemonic');
             }
         } catch (error) {
             console.error('Error generating mnemonic:', error);
-            alert('Error generating mnemonic');
         } finally {
             setGenerating(false);
         }
     };
 
-    const handleCopy = (textToCopy: string) => {
+    const handleCopy = (textToCopy: string, e?: React.MouseEvent) => {
+        if (e) e.stopPropagation();
         navigator.clipboard.writeText(textToCopy);
-        alert('Mnemonic copied to clipboard!');
+        // Could add a toast notification here
     };
 
-    const handleDelete = async (id: number) => {
-        if (!confirm('Are you sure you want to delete this mnemonic?')) return;
+    const handleClear = () => {
+        setText('');
+        setMnemonic('');
+    };
 
+    const confirmDelete = (id: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setDeletingId(id);
+    };
+
+    const cancelDelete = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setDeletingId(null);
+    };
+
+    const handleDelete = async (id: number, e: React.MouseEvent) => {
+        e.stopPropagation();
         try {
             const response = await fetch(`http://localhost:5000/api/revision/mnemonic/history/${id}`, {
                 method: 'DELETE'
@@ -96,12 +112,10 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
             const data = await response.json();
             if (data.success) {
                 setHistory(prev => prev.filter(item => item.id !== id));
-            } else {
-                alert('Failed to delete mnemonic');
+                setDeletingId(null);
             }
         } catch (error) {
             console.error('Error deleting mnemonic:', error);
-            alert('Error deleting mnemonic');
         }
     };
 
@@ -170,7 +184,7 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
                             {renderMnemonicContent(selectedMnemonic, 'full')}
                         </div>
                         <div className="modal-actions">
-                            <button className="copy-btn" onClick={() => handleCopy(selectedMnemonic)}>
+                            <button className="copy-btn" onClick={(e) => handleCopy(selectedMnemonic, e)}>
                                 📋 Copy Full Mnemonic
                             </button>
                         </div>
@@ -180,8 +194,8 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
 
             <div className="mnemonic-header">
                 <div>
-                    <h2>🧠 Mnemonic Generator</h2>
-                    <p className="mnemonic-subtitle">Create memory aids for UPSC topics</p>
+                    <h2>🧠 Neural Mnemonic Engine</h2>
+                    <p className="mnemonic-subtitle">Forge unbreakable memory links using ancient wisdom</p>
                 </div>
                 <div className="mnemonic-tabs">
                     <button
@@ -194,7 +208,7 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
                         className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`}
                         onClick={() => setActiveTab('history')}
                     >
-                        History
+                        Memory Shards
                     </button>
                 </div>
             </div>
@@ -202,41 +216,56 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
             {activeTab === 'create' ? (
                 <>
                     <div className="mnemonic-form">
-                        <label className="input-label">What do you want to remember?</label>
-                        <textarea
-                            className="mnemonic-textarea"
-                            placeholder="Enter facts, dates, list of items, or concept..."
-                            rows={5}
-                            value={text}
-                            onChange={(e) => setText(e.target.value)}
-                        />
+                        <div>
+                            <div className="label-row">
+                                <label className="input-label">Input Data</label>
+                                {text && (
+                                    <button className="clear-btn" onClick={handleClear}>
+                                        Clear
+                                    </button>
+                                )}
+                            </div>
+                            <textarea
+                                className="mnemonic-textarea"
+                                placeholder="Enter facts, dates, list of items, or concept to encode..."
+                                rows={5}
+                                value={text}
+                                onChange={(e) => setText(e.target.value)}
+                            />
+                        </div>
 
-                        <label className="input-label">Mnemonic Type</label>
-                        <div className="type-selector">
-                            <button
-                                className={`type-btn ${mnemonicType === 'facts' ? 'active' : ''}`}
-                                onClick={() => setMnemonicType('facts')}
-                            >
-                                📚 Facts
-                            </button>
-                            <button
-                                className={`type-btn ${mnemonicType === 'dates' ? 'active' : ''}`}
-                                onClick={() => setMnemonicType('dates')}
-                            >
-                                📅 Dates
-                            </button>
-                            <button
-                                className={`type-btn ${mnemonicType === 'list' ? 'active' : ''}`}
-                                onClick={() => setMnemonicType('list')}
-                            >
-                                📝 List
-                            </button>
-                            <button
-                                className={`type-btn ${mnemonicType === 'concept' ? 'active' : ''}`}
-                                onClick={() => setMnemonicType('concept')}
-                            >
-                                💡 Concept
-                            </button>
+                        <div>
+                            <label className="input-label">Encoding Pattern</label>
+                            <div className="type-selector">
+                                <button
+                                    className={`type-btn ${mnemonicType === 'facts' ? 'active' : ''}`}
+                                    onClick={() => setMnemonicType('facts')}
+                                >
+                                    <span>📚</span>
+                                    Facts
+                                </button>
+                                <button
+                                    className={`type-btn ${mnemonicType === 'dates' ? 'active' : ''}`}
+                                    onClick={() => setMnemonicType('dates')}
+                                >
+                                    <span>📅</span>
+                                    Dates
+                                </button>
+                                <button
+                                    className={`type-btn ${mnemonicType === 'list' ? 'active' : ''}`}
+                                    onClick={() => setMnemonicType('list')}
+                                >
+                                    <span>📝</span>
+                                    List
+                                </button>
+                                <button
+                                    className={`type-btn ${mnemonicType === 'concept' ? 'active' : ''}`}
+                                    onClick={() => setMnemonicType('concept')}
+                                >
+                                    <span>💡</span>
+                                    Concept
+                                </button>
+                            </div>
                         </div>
 
                         <button
@@ -244,14 +273,14 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
                             onClick={handleGenerate}
                             disabled={generating || !text.trim()}
                         >
-                            {generating ? '✨ Creating Memory Aid...' : '🎯 Generate Mnemonic'}
+                            {generating ? '✨ Forging Memory Link...' : '⚡ Generate Mnemonic'}
                         </button>
                     </div>
 
                     {mnemonic && (
                         <div className="mnemonic-result">
                             <div className="result-header">
-                                <h3>Your Mnemonic:</h3>
+                                <h3>Revealed Truth</h3>
                             </div>
                             <div className="mnemonic-box">
                                 {renderMnemonicContent(mnemonic, 'preview')}
@@ -262,13 +291,13 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
             ) : (
                 <div className="mnemonic-history">
                     {loadingHistory ? (
-                        <div className="loading-state">Loading history...</div>
+                        <div className="loading-state">Accessing Memory Archives...</div>
                     ) : history.length === 0 ? (
-                        <div className="empty-state">No mnemonics generated yet. Create one!</div>
+                        <div className="empty-state">No memory shards found. Create your first link.</div>
                     ) : (
                         <div className="history-list">
                             {history.map((item) => (
-                                <div key={item.id} className="history-card">
+                                <div key={item.id} className="history-card" onClick={() => setSelectedMnemonic(item.mnemonic_text)}>
                                     <div className="history-header">
                                         <div className="history-meta">
                                             <span className={`history-type-badge ${item.mnemonic_type}`}>
@@ -278,33 +307,48 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
                                                 {new Date(item.created_at).toLocaleDateString()}
                                             </span>
                                         </div>
-                                        <button
-                                            className="delete-btn"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDelete(item.id);
-                                            }}
-                                            title="Delete Mnemonic"
-                                        >
-                                            🗑️
-                                        </button>
+                                        <div className="history-actions">
+                                            <button
+                                                className="icon-btn copy-icon-btn"
+                                                onClick={(e) => handleCopy(item.mnemonic_text, e)}
+                                                title="Copy Mnemonic"
+                                            >
+                                                📋
+                                            </button>
+
+                                            {deletingId === item.id ? (
+                                                <div className="delete-confirm-group">
+                                                    <button
+                                                        className="confirm-delete-btn"
+                                                        onClick={(e) => handleDelete(item.id, e)}
+                                                    >
+                                                        Confirm
+                                                    </button>
+                                                    <button
+                                                        className="cancel-delete-btn"
+                                                        onClick={cancelDelete}
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <button
+                                                    className="icon-btn delete-icon-btn"
+                                                    onClick={(e) => confirmDelete(item.id, e)}
+                                                    title="Delete Mnemonic"
+                                                >
+                                                    🗑️
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
 
                                     <div className="history-content">
                                         <div className="history-section input-section">
-                                            <span className="section-label">Input:</span>
+                                            <span className="section-label">Source Data</span>
                                             <p className="section-text">
-                                                {item.original_text.length > 100
-                                                    ? item.original_text.substring(0, 100) + '...'
-                                                    : item.original_text}
+                                                {item.original_text}
                                             </p>
-                                        </div>
-
-                                        <div className="history-section result-section">
-                                            <div className="section-header">
-                                                <span className="section-label">Mnemonic:</span>
-                                            </div>
-                                            {renderMnemonicContent(item.mnemonic_text, 'preview')}
                                         </div>
                                     </div>
                                 </div>

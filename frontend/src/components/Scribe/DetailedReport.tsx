@@ -14,6 +14,7 @@ interface DetailedReportProps {
         model_answer_structure: string;
     };
     onClose: () => void;
+    embedded?: boolean;
 }
 
 const DetailedReport: React.FC<DetailedReportProps> = ({ data, onClose }) => {

@@ -2,103 +2,112 @@
 
 .pyq-container {
     display: grid;
-    grid-template-columns: 250px 1fr;
+    grid-template-columns: 280px 1fr;
     height: 100%;
-    background: #0a0e17;
-    color: #e0e0e0;
+    background: transparent;
+    color: var(--color-text-primary);
     overflow: hidden;
 }
 
 /* SIDEBAR FILTERS */
 .pyq-sidebar {
-    background: rgba(16, 20, 30, 0.95);
-    border-right: 1px solid #333;
-    padding: 20px;
+    background: rgba(13, 17, 23, 0.9);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem;
     overflow-y: auto;
+    backdrop-filter: blur(10px);
 }
 
 .filter-section {
-    margin-bottom: 25px;
+    margin-bottom: 2rem;
 }
 
 .filter-section h3 {
-    font-family: var(--font-headings);
-    color: #ffd700;
-    font-size: 1.1rem;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #333;
-    padding-bottom: 5px;
+    font-family: 'Cinzel', serif;
+    color: var(--color-accent-blue);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.5rem;
+    letter-spacing: 1px;
 }
 
 .filter-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .filter-checkbox {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     cursor: pointer;
-    font-size: 0.9rem;
-    color: #aaa;
+    font-size: 0.95rem;
+    color: var(--color-text-secondary);
     transition: color 0.2s;
 }
 
 .filter-checkbox:hover {
-    color: #fff;
+    color: var(--color-text-primary);
 }
 
 .filter-checkbox input {
-    accent-color: #ffd700;
+    accent-color: var(--color-accent-blue);
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
 }
 
 /* MAIN CONTENT */
 .pyq-main {
-    padding: 20px 40px;
+    padding: 2rem 3rem;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 2rem;
 }
 
 .pyq-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 .pyq-title {
-    font-family: var(--font-headings);
+    font-family: 'Cinzel', serif;
     font-size: 2.5rem;
-    color: #ffd700;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+    color: var(--color-accent-blue);
+    text-shadow: 0 0 20px rgba(0, 168, 255, 0.4);
+    letter-spacing: 2px;
 }
 
 .search-bar {
     position: relative;
     width: 400px;
+    max-width: 100%;
 }
 
 .search-bar input {
     width: 100%;
     padding: 12px 20px;
     padding-left: 45px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #444;
+    background: rgba(13, 17, 23, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 25px;
-    color: #fff;
+    color: var(--color-text-primary);
     font-size: 1rem;
     transition: all 0.3s;
 }
 
 .search-bar input:focus {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: #ffd700;
+    background: rgba(13, 17, 23, 0.8);
+    border-color: var(--color-accent-blue);
     outline: none;
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+    box-shadow: 0 0 15px rgba(0, 168, 255, 0.2);
 }
 
 .search-icon {
@@ -106,72 +115,83 @@
     left: 15px;
     top: 50%;
     transform: translateY(-50%);
-    color: #888;
+    color: var(--color-text-secondary);
 }
 
 /* QUESTION LIST */
 .question-list {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 1.5rem;
 }
 
 .question-card {
-    background: rgba(25, 30, 45, 0.8);
-    border: 1px solid #333;
-    border-radius: 8px;
-    padding: 20px;
-    transition: all 0.3s;
+    background: rgba(13, 17, 23, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 2rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    backdrop-filter: blur(5px);
 }
 
 .question-card:hover {
-    border-color: #555;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-color: var(--color-accent-blue);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+    background: rgba(13, 17, 23, 0.8);
 }
 
 .q-meta {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 15px;
-    font-size: 0.85rem;
-    color: #888;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 1rem;
 }
 
 .q-tags {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 .tag {
-    padding: 2px 8px;
-    border-radius: 4px;
-    background: #222;
-    border: 1px solid #444;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.85rem;
+    font-weight: 600;
 }
 
 .tag.year {
-    color: #3498db;
-    border-color: #3498db;
+    color: var(--color-accent-blue);
+    border-color: rgba(52, 152, 219, 0.3);
+    background: rgba(52, 152, 219, 0.1);
 }
 
 .tag.subject {
-    color: #e74c3c;
-    border-color: #e74c3c;
+    color: var(--color-accent-orange);
+    border-color: rgba(243, 156, 18, 0.3);
+    background: rgba(243, 156, 18, 0.1);
 }
 
 .tag.difficulty {
-    color: #2ecc71;
-    border-color: #2ecc71;
+    color: var(--color-accent-green);
+    border-color: rgba(46, 204, 113, 0.3);
+    background: rgba(46, 204, 113, 0.1);
 }
 
 .fav-btn {
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 1.2rem;
-    color: #444;
-    transition: transform 0.2s;
+    font-size: 1.4rem;
+    color: var(--color-text-secondary);
+    transition: transform 0.2s, color 0.2s;
 }
 
 .fav-btn.active {
@@ -180,76 +200,86 @@
 
 .fav-btn:hover {
     transform: scale(1.2);
+    color: #e74c3c;
 }
 
 .q-text {
-    font-size: 1.1rem;
-    line-height: 1.6;
-    margin-bottom: 20px;
+    font-size: 1.15rem;
+    line-height: 1.7;
+    margin-bottom: 2rem;
     white-space: pre-wrap;
+    font-family: 'Georgia', serif;
 }
 
 .q-options {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    margin-bottom: 20px;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 .option {
-    padding: 10px 15px;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid #333;
-    border-radius: 4px;
+    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s;
+    font-size: 1rem;
 }
 
 .option:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--color-text-secondary);
 }
 
 .option.correct {
-    background: rgba(46, 204, 113, 0.2);
+    background: rgba(46, 204, 113, 0.15);
     border-color: #2ecc71;
     color: #2ecc71;
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.2);
 }
 
 .option.wrong {
-    background: rgba(231, 76, 60, 0.2);
+    background: rgba(231, 76, 60, 0.15);
     border-color: #e74c3c;
     color: #e74c3c;
 }
 
 .reveal-btn {
-    background: #3498db;
-    color: white;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 4px;
+    background: transparent;
+    color: var(--color-accent-blue);
+    border: 1px solid var(--color-accent-blue);
+    padding: 0.6rem 1.5rem;
+    border-radius: 6px;
     cursor: pointer;
     font-weight: bold;
-    transition: background 0.2s;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .reveal-btn:hover {
-    background: #2980b9;
+    background: rgba(52, 152, 219, 0.1);
+    box-shadow: 0 0 15px rgba(52, 152, 219, 0.3);
 }
 
 .explanation {
-    margin-top: 20px;
-    padding: 15px;
-    background: rgba(255, 215, 0, 0.1);
-    border-left: 3px solid #ffd700;
-    border-radius: 0 4px 4px 0;
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: rgba(243, 156, 18, 0.1);
+    border-left: 3px solid var(--color-accent-orange);
+    border-radius: 0 8px 8px 0;
     animation: fadeIn 0.3s ease-out;
 }
 
 .explanation h4 {
-    color: #ffd700;
+    color: var(--color-accent-orange);
     margin: 0 0 10px 0;
-    font-size: 0.9rem;
+    font-size: 1rem;
     text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Cinzel', serif;
 }
 
 @keyframes fadeIn {
@@ -266,50 +296,66 @@
 
 /* ANALYTICS WIDGET */
 .analytics-widget {
-    background: rgba(0, 0, 0, 0.3);
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
+    background: rgba(13, 17, 23, 0.6);
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .chart-bar {
     height: 8px;
-    background: #333;
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 4px;
-    margin-top: 5px;
+    margin-top: 8px;
     overflow: hidden;
 }
 
 .chart-fill {
     height: 100%;
-    background: #3498db;
-}/* Start Quiz Button Styles - Append to PYQDatabase.css */
+    background: var(--color-accent-blue);
+    box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+}
 
+/* Start Quiz Button */
 .start-quiz-btn {
     background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
     color: white;
     border: none;
     padding: 12px 24px;
-    border-radius: 25px;
+    border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
-    font-family: var(--font-headings);
+    font-family: 'Cinzel', serif;
     letter-spacing: 1px;
     transition: all 0.3s;
-    box-shadow: 0 4px 10px rgba(155, 89, 182, 0.3);
+    box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
     white-space: nowrap;
     margin-left: 15px;
+    text-transform: uppercase;
 }
 
 .start-quiz-btn:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(155, 89, 182, 0.5);
+    box-shadow: 0 6px 20px rgba(155, 89, 182, 0.5);
 }
 
 .start-quiz-btn:disabled {
-    background: #555;
+    background: rgba(255, 255, 255, 0.1);
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
     opacity: 0.5;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .pyq-container {
+        grid-template-columns: 1fr;
+    }
+
+    .pyq-sidebar {
+        display: none;
+        /* Or make it collapsible */
+    }
 }

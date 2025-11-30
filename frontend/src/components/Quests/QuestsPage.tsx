@@ -1,7 +1,7 @@
 // /frontend/src/components/Quests/QuestsPage.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import './QuestsPage.css';
-import type { Task, RawTaskFromAPI } from '../../App'; // Import types from App
+import type { Task, RawTaskFromAPI } from '../../contexts/GlobalContext';
 import AddQuestForm from './AddQuestForm';
 
 interface QuestsPageProps {
@@ -21,13 +21,13 @@ const QuestsPage: React.FC<QuestsPageProps> = ({ onTaskCompleted }) => {
     try {
       // CRITICAL FIX: Use '/api/quests', NOT '/api/tasks'
       const response = await fetch('http://localhost:5000/api/quests');
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch quests');
       }
-      
+
       const rawTasks: RawTaskFromAPI[] = await response.json();
-      
+
       // Map API data to frontend Task interface
       const allQuests: Task[] = rawTasks.map(task => ({
         id: task.id,
@@ -37,7 +37,7 @@ const QuestsPage: React.FC<QuestsPageProps> = ({ onTaskCompleted }) => {
         associated_stat: task.associated_stat,
         due_date: task.due_date,
       }));
-      
+
       setQuests(allQuests);
     } catch (err) {
       if (err instanceof Error) {
