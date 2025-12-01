@@ -10,6 +10,7 @@ import './flip-board-timer.css';
 import { usePomodoro } from '../../contexts/PomodoroContext';
 import { audioManager } from '../../util/AudioManager';
 import { AmbientSoundPlayer } from './AmbientSoundPlayer';
+
 import { SessionHistory } from './SessionHistory';
 
 // Internal FlipCard Component
@@ -392,7 +393,7 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
             )}
 
             {showHistory && <SessionHistory />}
-            <AmbientSoundPlayer isTimerRunning={isRunning} />
+            <AmbientSoundPlayer />
         </div>
     );
 };

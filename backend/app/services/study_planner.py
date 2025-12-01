@@ -393,3 +393,20 @@ def check_and_reschedule_pending():
         "rescheduled_count": rescheduled_count,
         "tasks": pending_tasks[:rescheduled_count] # Return only rescheduled ones
     }
+
+def get_todays_tasks_summary():
+    """
+    Get a text summary of today's tasks for the Brain context.
+    """
+    today_iso = datetime.date.today().isoformat()
+    tasks = get_tasks_for_date(today_iso)
+    
+    if not tasks:
+        return "No tasks scheduled for today."
+        
+    summary = [f"Tasks for {today_iso}:"]
+    for t in tasks:
+        status_icon = "✅" if t['status'] == 'completed' else "⏳"
+        summary.append(f"- {status_icon} [{t['start_time']}-{t['end_time']}] {t['subject']}: {t['topic']}")
+        
+    return "\n".join(summary)

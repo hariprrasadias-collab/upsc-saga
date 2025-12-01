@@ -1,6 +1,9 @@
 # Check available Gemini models
 import google.generativeai as genai
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # os.environ['GEMINI_API_KEY'] = os.getenv('GEMINI_API_KEY')  # Use env variable
 genai.configure(api_key=os.environ['GEMINI_API_KEY'])

@@ -1,31 +1,14 @@
-// frontend/src/App.tsx
 import { Routes, Route, useLocation } from 'react-router-dom';
-import './index.css';
 import './App.css';
-import './animations.css';
-import { AnalyticsProvider } from './contexts/AnalyticsContext';
-import { PomodoroProvider } from './contexts/PomodoroContext';
-import { useGlobal } from './contexts/GlobalContext';
-
-// --- COMPONENT IMPORTS ---
 import Sidebar from './components/Sidebar';
 import DashboardMain from './components/DashboardMain';
 import WarMapContainer from './components/WarMap/WarMapContainer';
 import SyllabusTracker from './components/Syllabus/SyllabusTracker';
-import WeakAreasDashboard from './components/WeakAreas/WeakAreasDashboard';
-import AdminDashboard from './components/Admin/AdminDashboard';
 import QuestsPage from './components/Quests/QuestsPage';
-import RitualsPanel from './components/RitualsPanel';
-import AshParticles from './components/AshParticles';
-import SpartanRage from './components/SpartanRage/SpartanRage';
 import YggdrasilTree from './components/Yggdrasil/Yggdrasil';
 import LoreTablets from './components/LoreTablets/LoreTablets';
 import PYQDatabase from './components/PYQ/PYQDatabase';
-import QuizSession from './components/PYQ/QuizSession';
-import QuizResults from './components/PYQ/QuizResults';
 import Armory from './components/Armory/Armory';
-
-import LevelUpModal from './components/LevelUpModal';
 import AnkiDojo from './components/AnkiDojo/AnkiDojo';
 import Seer from './components/Seer/Seer';
 import Ravens from './components/Ravens/Ravens';
@@ -33,12 +16,23 @@ import AnswerWriting from './components/AnswerWriting/AnswerWriting';
 import MockTests from './components/MockTests/MockTests';
 import EssayWorkshop from './components/Essay/EssayWorkshop';
 import CSATModule from './components/CSAT/CSATModule';
-import MimirChat from './components/Mimir/Mimir';
 import FlashcardsManager from './components/Flashcards/FlashcardsManager';
 import AnalyticsDashboard from './components/Analytics/AnalyticsDashboard';
+import WeakAreasDashboard from './components/WeakAreas/WeakAreasDashboard';
+import AdminDashboard from './components/Admin/AdminDashboard';
 import AnswerWorkbench from './components/Scribe/AnswerWorkbench';
 import BossArena from './components/BossArena/BossArena';
+import RitualsPanel from './components/RitualsPanel';
+import SpartanRage from './components/SpartanRage/SpartanRage';
+import MimirChat from './components/Mimir/Mimir';
 import PomodoroTimer from './components/PomodoroTimer/PomodoroTimer';
+import LevelUpModal from './components/LevelUpModal';
+import AshParticles from './components/AshParticles';
+import { useGlobal } from './contexts/GlobalContext';
+import { AnalyticsProvider } from './contexts/AnalyticsContext';
+import { PomodoroProvider } from './contexts/PomodoroContext';
+import QuizSession from './components/PYQ/QuizSession';
+import QuizResults from './components/PYQ/QuizResults';
 import TimeBoxing from './components/TimeBoxing/TimeBoxing';
 import StudyPlanDashboard from './components/Planning/StudyPlanDashboard';
 import CommandPalette from './components/CommandPalette/CommandPalette';
@@ -49,6 +43,7 @@ import ModelAnswersManager from './components/ModelAnswers/ModelAnswersManager';
 import RevisionCenter from './components/Revision/RevisionCenter';
 import MindMapCreator from './components/MindMap/MindMapCreator';
 import CompilationGenerator from './components/Ravens/CompilationGenerator';
+import BrainInterface from './components/Brain/BrainInterface';
 
 function App() {
   const {
@@ -213,6 +208,12 @@ function App() {
               <Route path="/timebox" element={<TimeBoxing />} />
               <Route path="/revision-center" element={<RevisionCenter />} />
               <Route path="/mindmap" element={<MindMapCreator />} />
+              
+              {/* Brain Navigation Routes */}
+              <Route path="/mock-tests" element={<MockTests onTaskCompleted={refreshDashboard} />} />
+              <Route path="/flashcards" element={<FlashcardsManager onTaskCompleted={refreshDashboard} />} />
+              <Route path="/study-plan" element={<StudyPlanDashboard />} />
+              <Route path="/weak-areas" element={<WeakAreasDashboard />} />
             </Routes>
           </main>
 
@@ -241,6 +242,8 @@ function App() {
           {/* Global Command Palette */}
           <CommandPalette />
 
+          {/* Central Nervous System Interface */}
+          <BrainInterface />
         </div>
       </PomodoroProvider>
     </AnalyticsProvider>

@@ -11,17 +11,13 @@ export interface AmbientSound {
 // Free ambient sound URLs (using Google Actions Sound Library for reliability)
 const AMBIENT_SOUNDS: AmbientSound[] = [
     { id: 'rain', name: 'Rain', icon: '🌧️', url: 'https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg' },
-    { id: 'forest', name: 'Forest', icon: '🌲', url: 'https://actions.google.com/sounds/v1/ambiences/forest_morning.ogg' },
+    { id: 'forest', name: 'Forest', icon: '🌲', url: 'https://actions.google.com/sounds/v1/ambiences/jungle_atmosphere_night.ogg' },
     { id: 'ocean', name: 'Ocean', icon: '🌊', url: 'https://actions.google.com/sounds/v1/water/waves_crashing.ogg' },
     { id: 'fire', name: 'Fireplace', icon: '🔥', url: 'https://actions.google.com/sounds/v1/ambiences/fire.ogg' },
-    { id: 'whitenoise', name: 'Wind', icon: '�', url: 'https://actions.google.com/sounds/v1/weather/wind_strong.ogg' }
+    { id: 'whitenoise', name: 'Wind', icon: '💨', url: 'https://actions.google.com/sounds/v1/weather/wind.ogg' }
 ];
 
-interface AmbientSoundPlayerProps {
-    isTimerRunning?: boolean;
-}
-
-export const AmbientSoundPlayer: React.FC<AmbientSoundPlayerProps> = ({ isTimerRunning = false }) => {
+export const AmbientSoundPlayer: React.FC = () => {
     const [activeSounds, setActiveSounds] = useState<Set<string>>(new Set());
     const [volumes, setVolumes] = useState<Map<string, number>>(new Map());
     const [masterVolume, setMasterVolume] = useState(0.5);
@@ -156,3 +152,4 @@ export const AmbientSoundPlayer: React.FC<AmbientSoundPlayerProps> = ({ isTimerR
         </div>
     );
 };
+

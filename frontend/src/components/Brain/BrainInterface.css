@@ -1,0 +1,399 @@
+/* Kratos / God of War Theme for Brain Interface */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+    --kratos-gold: #c5a059;
+    --kratos-gold-dim: #8a703e;
+    --kratos-blue: #1a2634;
+    --kratos-blue-dark: #0f151c;
+    --kratos-text: #e0e0e0;
+    --kratos-glow: rgba(197, 160, 89, 0.3);
+}
+
+.brain-interface-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.brain-interface-container.minimized {
+    top: auto;
+    bottom: 20px;
+    right: 20px;
+}
+
+/* Toggle Button - The "Eye of Odin" */
+.brain-toggle-btn {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--kratos-blue) 0%, var(--kratos-blue-dark) 100%);
+    border: 2px solid var(--kratos-gold);
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 0 0 10px var(--kratos-glow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.brain-toggle-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px var(--kratos-glow);
+    border-color: #fff;
+}
+
+.brain-icon {
+    font-size: 32px;
+    color: var(--kratos-gold);
+    z-index: 2;
+    filter: drop-shadow(0 0 5px var(--kratos-gold-dim));
+}
+
+.brain-pulse {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, var(--kratos-glow) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: brainPulse 3s infinite;
+}
+
+@keyframes brainPulse {
+    0% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 0.2;
+    }
+
+    100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+}
+
+/* Main Window - The "Tablet" */
+.brain-window {
+    position: absolute;
+    top: 80px;
+    right: 0;
+    width: 420px;
+    height: 700px;
+    background: linear-gradient(180deg, rgba(15, 21, 28, 0.98) 0%, rgba(10, 14, 18, 0.98) 100%);
+    backdrop-filter: blur(20px);
+    border-radius: 12px;
+    border: 1px solid var(--kratos-gold-dim);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform-origin: top right;
+    animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.brain-interface-container.minimized .brain-window {
+    display: none;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Header */
+.brain-header {
+    padding: 16px 24px;
+    background: linear-gradient(90deg, rgba(197, 160, 89, 0.05) 0%, transparent 100%);
+    border-bottom: 1px solid var(--kratos-gold-dim);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brain-title {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--kratos-gold);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.brain-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.brain-control-btn {
+    background: none;
+    border: 1px solid transparent;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    padding: 6px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brain-control-btn:hover {
+    color: var(--kratos-gold);
+    border-color: var(--kratos-gold-dim);
+    background: rgba(197, 160, 89, 0.1);
+}
+
+.brain-control-btn.close:hover {
+    color: #ff5252;
+    border-color: rgba(255, 82, 82, 0.3);
+    background: rgba(255, 82, 82, 0.1);
+}
+
+/* Tabs */
+.brain-tabs {
+    display: flex;
+    padding: 0 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.brain-tab {
+    flex: 1;
+    padding: 16px 0;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.2s;
+    position: relative;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.brain-tab:hover {
+    color: var(--kratos-gold-dim);
+}
+
+.brain-tab.active {
+    color: var(--kratos-gold);
+    text-shadow: 0 0 10px var(--kratos-glow);
+}
+
+.brain-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 20%;
+    width: 60%;
+    height: 2px;
+    background: var(--kratos-gold);
+    box-shadow: 0 -2px 10px var(--kratos-gold);
+}
+
+/* Content Area */
+.brain-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    /* Subtle texture overlay could go here */
+}
+
+/* Scrollbar */
+.brain-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.brain-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.brain-content::-webkit-scrollbar-thumb {
+    background: var(--kratos-gold-dim);
+    border-radius: 3px;
+}
+
+.brain-content::-webkit-scrollbar-thumb:hover {
+    background: var(--kratos-gold);
+}
+
+/* Chat Styles */
+.chat-message {
+    padding: 14px 18px;
+    border-radius: 4px;
+    max-width: 85%;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #e0e0e0;
+    position: relative;
+}
+
+.chat-message.user {
+    align-self: flex-end;
+    background: linear-gradient(135deg, rgba(197, 160, 89, 0.15) 0%, rgba(197, 160, 89, 0.05) 100%);
+    border: 1px solid var(--kratos-gold-dim);
+    color: #fff;
+    border-bottom-right-radius: 0;
+}
+
+.chat-message.brain {
+    align-self: flex-start;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom-left-radius: 0;
+}
+
+/* Input Area - Integrated */
+.brain-input-area {
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brain-input-wrapper {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.brain-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3) !important;
+    /* Force dark background */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 14px 16px;
+    padding-right: 50px;
+    /* Space for button */
+    color: var(--kratos-gold) !important;
+    /* Force gold text */
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.brain-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.brain-input:focus {
+    border-color: var(--kratos-gold);
+    box-shadow: 0 0 10px rgba(197, 160, 89, 0.1);
+    background: rgba(0, 0, 0, 0.5) !important;
+}
+
+.brain-send-btn {
+    position: absolute;
+    right: 8px;
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    background: var(--kratos-gold);
+    border: none;
+    color: #000;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 14px;
+}
+
+.brain-send-btn:hover {
+    background: #fff;
+    transform: scale(1.05);
+}
+
+/* Status & Synapses */
+.synapse-item {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s;
+}
+
+.synapse-item:hover {
+    border-color: var(--kratos-gold-dim);
+    background: rgba(197, 160, 89, 0.05);
+}
+
+.synapse-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--kratos-gold);
+    box-shadow: 0 0 8px var(--kratos-gold);
+    border-radius: 50%;
+}
+
+.category-title {
+    font-family: 'Cinzel', serif;
+    color: var(--kratos-gold-dim);
+    letter-spacing: 1px;
+}
+
+/* Optimization Button */
+.optimize-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(90deg, rgba(197, 160, 89, 0.1) 0%, rgba(197, 160, 89, 0.2) 100%);
+    border: 1px solid var(--kratos-gold);
+    border-radius: 4px;
+    color: var(--kratos-gold);
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.optimize-btn:hover {
+    background: var(--kratos-gold);
+    color: #000;
+    box-shadow: 0 0 20px var(--kratos-glow);
+}
+
+/* Error Toast */
+.error-toast {
+    background: rgba(255, 82, 82, 0.1);
+    border: 1px solid rgba(255, 82, 82, 0.3);
+    color: #ff5252;
+    border-radius: 4px;
+}

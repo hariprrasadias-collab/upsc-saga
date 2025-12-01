@@ -32,6 +32,32 @@ class WeakAreaAnalyzer:
         ''', (user_id, cutoff_date)).fetchall()
         
         return [dict(row) for row in weak_areas]
+
+    @staticmethod
+    def analyze_strong_areas(user_id, days=30):
+        """
+        Analyze user's strong areas (high accuracy).
+        """
+        conn = get_db()
+        cutoff_date = (datetime.now() - timedelta(days=days)).isoformat()
+        
+        strong_areas = conn.execute('''
+            SELECT 
+                topic,
+                subject,
+                total_attempts,
+                correct_attempts,
+                accuracy_rate,
+                trend,
+                priority_score,
+                last_attempt_date
+            FROM weak_area_analysis
+            WHERE user_id = ? AND updated_at >= ?
+            ORDER BY accuracy_rate DESC
+            LIMIT 5
+        ''', (user_id, cutoff_date)).fetchall()
+        
+        return [dict(row) for row in strong_areas]
     
     @staticmethod
     def update_topic_performance(user_id, subject, topic, is_correct):

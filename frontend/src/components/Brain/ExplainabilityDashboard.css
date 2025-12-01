@@ -1,0 +1,214 @@
+.explainability-dashboard {
+    /* padding: 15px; Removed padding to fit container */
+    color: #e0e0e0;
+    font-family: 'Inter', sans-serif;
+}
+
+.dashboard-section {
+    margin-bottom: 30px;
+}
+
+.dashboard-section h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    color: #00bcd4;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(0, 188, 212, 0.2);
+    padding-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Opportunities */
+.opportunities-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.opportunity-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 15px;
+    transition: all 0.3s ease;
+}
+
+.opportunity-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(0, 188, 212, 0.3);
+    transform: translateY(-2px);
+}
+
+.opp-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.opp-type {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.opp-type.schedule {
+    background: rgba(76, 175, 80, 0.15);
+    color: #81c784;
+}
+
+.opp-type.resource {
+    background: rgba(255, 152, 0, 0.15);
+    color: #ffb74d;
+}
+
+.opp-type.load_balance {
+    background: rgba(244, 67, 54, 0.15);
+    color: #e57373;
+}
+
+.opp-date {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.opp-desc {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 15px;
+    color: #d0d0d0;
+}
+
+.opp-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.opp-actions button {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 0.85rem;
+    transition: background 0.2s;
+    font-weight: 500;
+}
+
+.accept-btn {
+    background: rgba(0, 188, 212, 0.15);
+    color: #00bcd4;
+    border: 1px solid rgba(0, 188, 212, 0.3) !important;
+}
+
+.accept-btn:hover {
+    background: rgba(0, 188, 212, 0.25);
+}
+
+.dismiss-btn {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.dismiss-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+/* Experiments */
+.experiment-card {
+    background: rgba(103, 58, 183, 0.1);
+    border: 1px solid rgba(103, 58, 183, 0.3);
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.exp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.exp-header h4 {
+    margin: 0;
+    color: #b39ddb;
+    font-size: 0.95rem;
+}
+
+.exp-status {
+    font-size: 0.7rem;
+    background: #673ab7;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.exp-strategies {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.strategy {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 0.85rem;
+}
+
+.strategy.active span {
+    color: #00bcd4;
+    font-weight: bold;
+}
+
+.progress-bar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    font-size: 0;
+    /* Hide text */
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: var(--width, 50%);
+    /* Fallback */
+    background: #673ab7;
+    border-radius: 3px;
+}
+
+.strategy.active .progress-bar::after {
+    background: #00bcd4;
+    box-shadow: 0 0 10px rgba(0, 188, 212, 0.4);
+}
+
+.exp-insight {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 6px;
+    line-height: 1.4;
+}

@@ -12,8 +12,10 @@ def create_app():
 
     # Initialize DB tables
     from app.db_models.study_plan import init_study_plan_tables
+    from app.db_models.autonomous_brain import init_autonomous_brain_tables
     with app.app_context():
         init_study_plan_tables()
+        init_autonomous_brain_tables()
 
     # Import blueprints
     from .routes import (
@@ -78,5 +80,11 @@ def create_app():
 
     from app.routes.triangulation_routes import triangulation_bp
     app.register_blueprint(triangulation_bp, url_prefix='/api/triangulation')
+
+    from app.routes.brain_routes import brain_bp
+    app.register_blueprint(brain_bp, url_prefix='/api/brain')
+
+    from app.routes.autonomy_routes import autonomy_bp
+    app.register_blueprint(autonomy_bp, url_prefix='/api/autonomy')
 
     return app
