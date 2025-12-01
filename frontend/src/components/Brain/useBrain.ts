@@ -86,7 +86,7 @@ export const useBrain = () => {
             const result = await response.json();
 
             addMessage({
-                text: `Action Executed: ${result.message}`,
+                text: `Action Executed: ${result.message || result.error || 'Completed'}`,
                 sender: 'brain'
             });
 

@@ -80,7 +80,7 @@ class BrainService:
         
         Available Action Types:
         - CREATE_FLASHCARDS (payload: topic, count)
-        - CREATE_MOCK_TEST (payload: subject)
+        - CREATE_MOCK_TEST (payload: subject, count)
         - SCHEDULE_REVISION (payload: subject, time)
         - START_MOCK_TEST (payload: subject)
         - ANALYZE_WEAK_AREAS (payload: subject)
@@ -126,7 +126,8 @@ class BrainService:
                 from app.services.mock_test_service import MockTestService
                 # Handle both 'subject' and 'topic' keys for robustness
                 subject = payload.get('subject') or payload.get('topic') or 'General'
-                result = MockTestService.generate_from_topic(subject, count=10)
+                count = int(payload.get('count', 10))
+                result = MockTestService.generate_from_topic(subject, count=count)
                 
             elif action_type == "START_MOCK_TEST":
                 result = {"success": True, "message": f"Starting mock test: {payload.get('subject')}"}

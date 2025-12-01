@@ -47,9 +47,14 @@ class MockTestService:
         import google.generativeai as genai
         import os
         import json
+        import re
+        import ast
+        
+        print(f"🤖 Generating Mock Test for: {topic}")
         
         api_key = os.environ.get('GEMINI_API_KEY')
         if not api_key:
+            print("❌ GEMINI_API_KEY missing")
             return {"success": False, "error": "API Key missing"}
             
         genai.configure(api_key=api_key)
@@ -58,7 +63,14 @@ class MockTestService:
         prompt = f"""
         Create a {count}-question multiple choice test for: "{topic}".
         Strict UPSC standard.
-        Return ONLY a JSON object:
+        
+        CRITICAL OUTPUT RULES:
+        1. Return ONLY a valid JSON object.
+        2. Use DOUBLE QUOTES for all keys and strings.
+        3. NO trailing commas.
+        4. NO comments.
+        
+        Structure:
         {{
             "title": "Test: {topic}",
             "questions": [
@@ -68,7 +80,7 @@ class MockTestService:
                     "option_b": "...",
                     "option_c": "...",
                     "option_d": "...",
-                    "correct_answer": "A|B|C|D",
+                    "correct_answer": "A",
                     "explanation": "..."
                 }}
             ]
@@ -77,16 +89,40 @@ class MockTestService:
         
         try:
             response = model.generate_content(prompt)
-            text = response.text.replace('```json', '').replace('```', '').strip()
-            data = json.loads(text)
+            text = response.text.strip()
+            
+            # Robust JSON extraction
+            json_match = re.search(r"```json\s*(.*?)\s*```", text, re.DOTALL)
+            if json_match:
+                text = json_match.group(1)
+            else:
+                # Try to find the outermost braces
+                start = text.find('{')
+                end = text.rfind('}')
+                if start != -1 and end != -1:
+                    text = text[start:end+1]
+            
+            # Clean up potential trailing commas (simple regex)
+            text = re.sub(r',\s*}', '}', text)
+            text = re.sub(r',\s*]', ']', text)
+
+            try:
+                data = json.loads(text)
+            except json.JSONDecodeError:
+                print("⚠️ JSON parse failed, trying ast.literal_eval...")
+                try:
+                    data = ast.literal_eval(text)
+                except Exception as e:
+                    print(f"❌ AST parse failed: {e}")
+                    raise ValueError("Could not parse AI response as JSON or Python dict")
             
             conn = get_db()
             
             # Create Test
             cursor = conn.execute('''
-                INSERT INTO mock_tests (title, subject, total_questions, duration_minutes)
-                VALUES (?, 'General', ?, ?)
-            ''', (data['title'], len(data['questions']), len(data['questions'])*2))
+                INSERT INTO mock_tests (title, subject, total_questions, duration_minutes, test_type, total_marks)
+                VALUES (?, ?, ?, ?, 'MOCK', ?)
+            ''', (data['title'], topic, len(data['questions']), len(data['questions'])*2, len(data['questions'])*2))
             test_id = cursor.lastrowid
             
             # Add Questions
@@ -98,9 +134,11 @@ class MockTestService:
                 ''', (test_id, i, q['question_text'], q['option_a'], q['option_b'], q['option_c'], q['option_d'], q['correct_answer'], q['explanation']))
                 
             conn.commit()
-            return {"success": True, "message": f"Created test '{data['title']}' with {len(data['questions'])} questions."}
+            print(f"✅ Mock Test Created: ID {test_id}")
+            return {"success": True, "message": f"Created test '{data['title']}' with {len(data['questions'])} questions.", "test_id": test_id}
             
         except Exception as e:
+            print(f"❌ Mock Test Generation Error: {e}")
             return {"success": False, "error": str(e)}
 
 # Register Synapse

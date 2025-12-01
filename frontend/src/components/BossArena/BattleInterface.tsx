@@ -156,6 +156,16 @@ const BattleInterface: React.FC<BattleInterfaceProps> = ({ boss, onBattleEnd }) 
         return <div className="loading">Loading battle arena...</div>;
     }
 
+    if (!questions || questions.length === 0) {
+        return (
+            <div className="battle-result">
+                <h2>No Questions Available</h2>
+                <p>The Oracle could not find any challenges for this battle.</p>
+                <button className="return-btn" onClick={onBattleEnd}>Return to Arena</button>
+            </div>
+        );
+    }
+
     if (battleState !== 'active') {
         return (
             <div className={`battle-result ${battleState}`}>

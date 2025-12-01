@@ -46,13 +46,30 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
     const [view, setView] = useState<'list' | 'test' | 'results'>('list');
     const { refreshAnalytics } = useAnalytics();
 
+    // Add Test Modal State
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [newTest, setNewTest] = useState({
+        title: '',
+        subject: '',
+        description: '',
+        difficulty: 'Medium',
+        questionsJson: ''
+    });
+
     // Fetch available tests
+    const fetchTests = () => {
+        fetch('http://localhost:5000/api/mock-tests')
+            .then(r => r.json())
+            .then(data => {
+                console.log('Fetched tests:', data);
+                setTests(data);
+            })
+            .catch(err => console.error(err));
+    };
+
     useEffect(() => {
         if (view === 'list') {
-            fetch('http://localhost:5000/api/mock-tests')
-                .then(r => r.json())
-                .then(data => setTests(data))
-                .catch(err => console.error(err));
+            fetchTests();
         }
     }, [view]);
 
@@ -163,6 +180,48 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
         }
     };
 
+    const handleCreateTest = async () => {
+        try {
+            let questions = [];
+            try {
+                questions = JSON.parse(newTest.questionsJson);
+            } catch (e) {
+                alert('Invalid JSON format for questions');
+                return;
+            }
+
+            if (!Array.isArray(questions) || questions.length === 0) {
+                alert('Questions must be a non-empty array');
+                return;
+            }
+
+            const res = await fetch('http://localhost:5000/api/mock-tests', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: newTest.title,
+                    subject: newTest.subject,
+                    description: newTest.description,
+                    difficulty: newTest.difficulty,
+                    questions: questions
+                })
+            });
+
+            if (res.ok) {
+                alert('Test Created Successfully!');
+                setIsAddModalOpen(false);
+                setNewTest({ title: '', subject: '', description: '', difficulty: 'Medium', questionsJson: '' });
+                fetchTests();
+            } else {
+                const err = await res.json();
+                alert(`Failed to create test: ${err.error}`);
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Error creating test');
+        }
+    };
+
     const formatTime = (seconds: number) => {
         const hrs = Math.floor(seconds / 3600);
         const mins = Math.floor((seconds % 3600) / 60);
@@ -183,15 +242,21 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
     if (view === 'list') {
         return (
             <div className="mock-tests-container">
-                <h1>📋 Mock Tests</h1>
+                <div className="mock-header">
+                    <h1>📋 Mock Tests</h1>
+                    <button className="add-test-btn" onClick={() => setIsAddModalOpen(true)}>
+                        <span>+</span> Create New Test
+                    </button>
+                </div>
+
                 <div className="tests-grid">
                     {tests.map(test => (
                         <div key={test.id} className="test-card">
                             <h3>{test.title}</h3>
                             <p>{test.description}</p>
                             <div className="test-meta">
-                                <span>📝 {test.total_questions} Questions</span>
-                                <span>⏱️ {test.duration_minutes} mins</span>
+                                <span>📝 {test.total_questions} Qs</span>
+                                <span>⏱️ {test.duration_minutes}m</span>
                                 <span className={`difficulty ${test.difficulty?.toLowerCase() || 'medium'}`}>
                                     {test.difficulty || 'Medium'}
                                 </span>
@@ -202,6 +267,75 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
                         </div>
                     ))}
                 </div>
+
+                {isAddModalOpen && (
+                    <div className="modal-overlay" onClick={(e) => {
+                        if (e.target === e.currentTarget) setIsAddModalOpen(false);
+                    }}>
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2>Create New Mock Test</h2>
+                                <button className="close-modal-btn" onClick={() => setIsAddModalOpen(false)}>×</button>
+                            </div>
+                            <div className="modal-body">
+                                <div className="form-group">
+                                    <label>Title</label>
+                                    <input
+                                        type="text"
+                                        value={newTest.title}
+                                        onChange={e => setNewTest({ ...newTest, title: e.target.value })}
+                                        placeholder="e.g., Ancient History Full Test"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Subject</label>
+                                    <input
+                                        type="text"
+                                        value={newTest.subject}
+                                        onChange={e => setNewTest({ ...newTest, subject: e.target.value })}
+                                        placeholder="e.g., History"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Description</label>
+                                    <textarea
+                                        value={newTest.description}
+                                        onChange={e => setNewTest({ ...newTest, description: e.target.value })}
+                                        placeholder="Brief description of the test..."
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Difficulty</label>
+                                    <select
+                                        value={newTest.difficulty}
+                                        onChange={e => setNewTest({ ...newTest, difficulty: e.target.value })}
+                                    >
+                                        <option value="Easy">Easy</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Hard">Hard</option>
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>Questions (JSON Format)</label>
+                                    <textarea
+                                        value={newTest.questionsJson}
+                                        onChange={e => setNewTest({ ...newTest, questionsJson: e.target.value })}
+                                        placeholder='[{"question_text": "...", "option_a": "...", "correct_answer": "A"}]'
+                                        rows={8}
+                                        style={{ fontFamily: 'monospace', fontSize: '0.9rem' }}
+                                    />
+                                    <small style={{ color: '#888' }}>
+                                        Paste a JSON array of question objects. Each object must have: question_text, option_a, option_b, option_c, option_d, correct_answer (A/B/C/D).
+                                    </small>
+                                </div>
+                                <div className="modal-actions">
+                                    <button className="cancel-btn" onClick={() => setIsAddModalOpen(false)}>Cancel</button>
+                                    <button className="create-btn" onClick={handleCreateTest}>Create Test</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
@@ -218,7 +352,7 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
                         <span>{currentTest.title}</span>
                         <span>Question {currentQ + 1}/{questions.length}</span>
                     </div>
-                    <div className="timer" style={{ color: timeLeft < 300 ? '#e74c3c' : '#fff' }}>
+                    <div className="timer" style={{ color: timeLeft < 300 ? '#e74c3c' : 'var(--color-accent-blue)' }}>
                         ⏱️ {formatTime(timeLeft)}
                     </div>
                     <button onClick={handleSubmit} className="submit-test-btn" disabled={isSubmitting}>

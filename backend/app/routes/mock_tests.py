@@ -34,6 +34,53 @@ def get_tests():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@mock_tests.route('/api/mock-tests', methods=['POST'])
+def create_test():
+    """Create a new mock test manually"""
+    try:
+        data = request.get_json()
+        title = data.get('title')
+        subject = data.get('subject', 'General')
+        description = data.get('description', '')
+        difficulty = data.get('difficulty', 'Medium')
+        questions = data.get('questions', [])
+        
+        if not title or not questions:
+            return jsonify({'error': 'Title and questions are required'}), 400
+            
+        conn = get_db()
+        
+        # Create Test
+        cursor = conn.execute('''
+            INSERT INTO mock_tests (title, subject, description, total_questions, duration_minutes, difficulty, is_active, test_type, total_marks)
+            VALUES (?, ?, ?, ?, ?, ?, 1, 'MOCK', ?)
+        ''', (title, subject, description, len(questions), len(questions)*2, difficulty, len(questions)*2)) # Approx 2 min per question, 2 marks per question
+        test_id = cursor.lastrowid
+        
+        # Add Questions
+        for i, q in enumerate(questions, 1):
+            conn.execute('''
+                INSERT INTO test_questions 
+                (test_id, question_number, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation, subject, topic, marks)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                test_id, 
+                i, 
+                q['question_text'], 
+                q['option_a'], q['option_b'], q['option_c'], q['option_d'], 
+                q['correct_answer'], 
+                q.get('explanation', ''), 
+                q.get('subject', subject), 
+                q.get('topic', ''),
+                q.get('marks', 2.0)
+            ))
+            
+        conn.commit()
+        return jsonify({'success': True, 'test_id': test_id, 'message': 'Test created successfully'})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @mock_tests.route('/api/mock-tests/<int:test_id>', methods=['GET'])
 def get_test_details(test_id):
     """Get test details without revealing answers"""
