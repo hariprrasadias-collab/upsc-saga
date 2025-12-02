@@ -6,6 +6,7 @@ import WarMapContainer from './components/WarMap/WarMapContainer';
 import SyllabusTracker from './components/Syllabus/SyllabusTracker';
 import QuestsPage from './components/Quests/QuestsPage';
 import YggdrasilTree from './components/Yggdrasil/Yggdrasil';
+import NeuralHash from './components/NeuralHash/NeuralHash';
 import LoreTablets from './components/LoreTablets/LoreTablets';
 import PYQDatabase from './components/PYQ/PYQDatabase';
 import Armory from './components/Armory/Armory';
@@ -44,6 +45,11 @@ import RevisionCenter from './components/Revision/RevisionCenter';
 import MindMapCreator from './components/MindMap/MindMapCreator';
 import CompilationGenerator from './components/Ravens/CompilationGenerator';
 import BrainInterface from './components/Brain/BrainInterface';
+import MindPalace from './components/MindPalace/MindPalace';
+import Foresight from './components/Foresight/Foresight';
+import MorningBriefing from './components/NightWatchman/MorningBriefing';
+import Panopticon from './components/Panopticon/Panopticon';
+import GoldenPath from './components/GoldenPath/GoldenPath';
 
 function App() {
   const {
@@ -113,87 +119,42 @@ function App() {
             {/* Only render Tab Content if we are on the root path */}
             {location.pathname === '/' && (
               <>
-                {currentTab === 'dashboard' && (
-                  <DashboardMain />
-                )}
-                {currentTab === 'war-map' && (
-                  <WarMapContainer onTaskCompleted={refreshDashboard} />
-                )}
-                {currentTab === 'syllabus' && (
-                  <SyllabusTracker onTaskCompleted={refreshDashboard} />
-                )}
-                {currentTab === 'quests' && (
-                  <QuestsPage onTaskCompleted={refreshDashboard} />
-                )}
-                {currentTab === 'codex' && (
-                  <YggdrasilTree />
-                )}
-                {currentTab === 'lore-tablets' && (
-                  <LoreTablets />
-                )}
-                {currentTab === 'pyq' && (
-                  <PYQDatabase />
-                )}
-                {currentTab === 'armory' && (
-                  <Armory />
-                )}
-                {currentTab === 'dojo' && (
-                  <AnkiDojo />
-                )}
-                {currentTab === 'seer' && (
-                  <Seer />
-                )}
-                {currentTab === 'ravens' && (
-                  <Ravens />
-                )}
-                {currentTab === 'answer-writing' && (
-                  <AnswerWriting onTaskCompleted={refreshDashboard} />
-                )}
-                {currentTab === 'mock-tests' && (
-                  <MockTests onTaskCompleted={refreshDashboard} />
-                )}
-                {currentTab === 'essay' && (
-                  <EssayWorkshop onTaskCompleted={refreshDashboard} />
-                )}
+                {currentTab === 'dashboard' && <DashboardMain />}
+                {currentTab === 'war-map' && <WarMapContainer onTaskCompleted={refreshDashboard} />}
+                {currentTab === 'syllabus' && <SyllabusTracker onTaskCompleted={refreshDashboard} />}
+                {currentTab === 'quests' && <QuestsPage onTaskCompleted={refreshDashboard} />}
+                {currentTab === 'codex' && <YggdrasilTree />}
+                {currentTab === 'lore-tablets' && <LoreTablets />}
+                {currentTab === 'pyq' && <PYQDatabase />}
+                {currentTab === 'armory' && <Armory />}
+                {currentTab === 'dojo' && <AnkiDojo />}
+                {currentTab === 'seer' && <Seer />}
+                {currentTab === 'ravens' && <Ravens />}
+                {currentTab === 'answer-writing' && <AnswerWriting onTaskCompleted={refreshDashboard} />}
+                {currentTab === 'mock-tests' && <MockTests onTaskCompleted={refreshDashboard} />}
+                {currentTab === 'essay' && <EssayWorkshop onTaskCompleted={refreshDashboard} />}
                 {currentTab === 'csat' && <CSATModule />}
                 {currentTab === 'compilation' && <CompilationGenerator />}
-                {/* Mimir is now a modal, no fullpage route */}
-                {currentTab === 'flashcards' && (
-                  <FlashcardsManager onTaskCompleted={refreshDashboard} />
-                )}
-                {currentTab === 'analytics' && (
-                  <AnalyticsDashboard onNavigate={setCurrentTab} />
-                )}
-                {currentTab === 'weak-areas' && (
-                  <WeakAreasDashboard />
-                )}
-                {currentTab === 'admin' && (
-                  <AdminDashboard />
-                )}
-                {currentTab === 'scribe' && (
-                  <AnswerWorkbench />
-                )}
-                {currentTab === 'arena' && (
-                  <BossArena onBattleComplete={refreshDashboard} />
-                )}
-                {(currentTab === 'planner' || currentTab === 'study-plan') && (
-                  <StudyPlanDashboard />
-                )}
-                {currentTab === 'revision-cards' && (
-                  <RevisionCards />
-                )}
-                {currentTab === 'mnemonics' && (
-                  <MnemonicGenerator />
-                )}
-                {currentTab === 'heatmap' && (
-                  <PYQHeatmap />
-                )}
-                {currentTab === 'model-answers' && (
-                  <ModelAnswersManager />
-                )}
-                {currentTab === 'mindmap' && (
-                  <MindMapCreator />
-                )}
+                {currentTab === 'flashcards' && <FlashcardsManager onTaskCompleted={refreshDashboard} />}
+                {currentTab === 'analytics' && <AnalyticsDashboard onNavigate={setCurrentTab} />}
+                {currentTab === 'weak-areas' && <WeakAreasDashboard />}
+                {currentTab === 'admin' && <AdminDashboard />}
+                {currentTab === 'scribe' && <AnswerWorkbench />}
+                {currentTab === 'arena' && <BossArena onBattleComplete={refreshDashboard} />}
+                {(currentTab === 'planner' || currentTab === 'study-plan') && <StudyPlanDashboard />}
+                {currentTab === 'revision-cards' && <RevisionCards />}
+                {currentTab === 'mnemonics' && <MnemonicGenerator />}
+                {currentTab === 'heatmap' && <PYQHeatmap />}
+                {currentTab === 'model-answers' && <ModelAnswersManager />}
+                {currentTab === 'mindmap' && <MindMapCreator />}
+                {currentTab === 'mind-palace' && <MindPalace />}
+                {currentTab === 'foresight' && <Foresight />}
+                {currentTab === 'watchman' && <MorningBriefing />}
+                {currentTab === 'panopticon' && <Panopticon />}
+                {currentTab === 'neural-hash' && <NeuralHash />}
+                {currentTab === 'golden-path' && <GoldenPath />}
+                {currentTab === 'revision-center' && <RevisionCenter />}
+                {currentTab === 'timebox' && <TimeBoxing />}
               </>
             )}
 
@@ -208,7 +169,13 @@ function App() {
               <Route path="/timebox" element={<TimeBoxing />} />
               <Route path="/revision-center" element={<RevisionCenter />} />
               <Route path="/mindmap" element={<MindMapCreator />} />
-              
+              <Route path="/mind-palace" element={<MindPalace />} />
+              <Route path="/foresight" element={<Foresight />} />
+              <Route path="/watchman" element={<MorningBriefing />} />
+              <Route path="/panopticon" element={<Panopticon />} />
+              <Route path="/neural-hash" element={<NeuralHash />} />
+              <Route path="/golden-path" element={<GoldenPath />} />
+
               {/* Brain Navigation Routes */}
               <Route path="/mock-tests" element={<MockTests onTaskCompleted={refreshDashboard} />} />
               <Route path="/flashcards" element={<FlashcardsManager onTaskCompleted={refreshDashboard} />} />

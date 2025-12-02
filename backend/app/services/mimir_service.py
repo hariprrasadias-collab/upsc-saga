@@ -20,9 +20,9 @@ class MimirService:
                 # Use models that are actually available in the API
                 # Based on genai.list_models() output
                 models_to_try = [
-                    'gemini-1.5-flash',          # Stable Flash model
-                    'gemini-1.5-pro',            # Stable Pro model
-                    'gemini-pro',                # Legacy
+                    'gemini-pro-latest',          # Stable Flash model
+                    'gemini-2.5-computer-use-preview-10-2025',            # Stable Pro model
+                    'learnlm-2.0-flash-experimental',                # Legacy
                 ]
                 
                 model_initialized = False

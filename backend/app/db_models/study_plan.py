@@ -35,6 +35,31 @@ def init_study_plan_tables():
             FOREIGN KEY (plan_id) REFERENCES study_plans (id)
         )
     ''')
+
+    # Study Sessions (Actual time tracked)
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS study_sessions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER DEFAULT 1,
+            subject TEXT NOT NULL,
+            topic TEXT,
+            start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            end_time TIMESTAMP,
+            duration_minutes INTEGER,
+            notes TEXT
+        )
+    ''')
+
+    # Time Boxes (Allocated time)
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS time_boxes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER DEFAULT 1,
+            subject TEXT NOT NULL,
+            allocated_hours REAL DEFAULT 2.0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
     conn.commit()
 
 def create_new_plan(start_date, end_date):

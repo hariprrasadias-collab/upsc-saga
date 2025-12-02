@@ -1,0 +1,196 @@
+.morning-briefing-container {
+    min-height: 100vh;
+    background: radial-gradient(circle at top right, #001a33 0%, #000d1a 50%, #000000 100%);
+    color: #e0e0e0;
+    padding: 2rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.briefing-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid rgba(0, 153, 255, 0.2);
+    padding-bottom: 2rem;
+}
+
+.briefing-header h1 {
+    font-size: 3rem;
+    background: linear-gradient(135deg, #0099ff, #66ccff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 20px rgba(0, 153, 255, 0.3);
+}
+
+.subtitle {
+    color: #66ccff;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+.loading-state,
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    text-align: center;
+}
+
+.owl-loader {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(0, 153, 255, 0.1);
+    border-top-color: #0099ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    to {
+        transform: matrix(1, 0, 0, 1, 0, 0);
+    }
+}
+
+.briefing-content {
+    max-width: 800px;
+    margin: 0 auto;
+    background: rgba(0, 26, 51, 0.6);
+    border: 1px solid rgba(0, 153, 255, 0.2);
+    border-radius: 12px;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+}
+
+.briefing-content.unread {
+    border-color: #0099ff;
+    box-shadow: 0 0 30px rgba(0, 153, 255, 0.15);
+}
+
+.briefing-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+}
+
+.date-badge,
+.source-badge {
+    background: rgba(0, 153, 255, 0.1);
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    color: #66ccff;
+    border: 1px solid rgba(0, 153, 255, 0.2);
+}
+
+.quote-section {
+    text-align: center;
+    margin: 2rem 0;
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    border-left: 4px solid #0099ff;
+}
+
+.quote-section blockquote {
+    font-size: 1.4rem;
+    font-style: italic;
+    color: #fff;
+    font-family: 'Playfair Display', serif;
+}
+
+.markdown-content {
+    line-height: 1.8;
+    font-size: 1.1rem;
+    color: #d0d0d0;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3 {
+    color: #66ccff;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.markdown-content ul {
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.markdown-content li {
+    margin-bottom: 0.5rem;
+}
+
+.markdown-content strong {
+    color: #fff;
+}
+
+.briefing-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.action-btn,
+.trigger-btn {
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.action-btn.primary,
+.trigger-btn {
+    background: linear-gradient(135deg, #0099ff, #0066cc);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 153, 255, 0.3);
+}
+
+.action-btn.primary:hover,
+.trigger-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 153, 255, 0.5);
+}
+
+.action-btn.secondary {
+    background: transparent;
+    border: 1px solid rgba(0, 153, 255, 0.5);
+    color: #66ccff;
+}
+
+.action-btn.secondary:hover {
+    background: rgba(0, 153, 255, 0.1);
+    color: #fff;
+}
+
+.owl-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}

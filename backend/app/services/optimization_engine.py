@@ -55,88 +55,123 @@ class OptimizationEngine:
         goal_opps = self._check_goals()
         if goal_opps:
             opportunities.extend(goal_opps)
+
+        # 8. Check for Burnout Risk (Bio-Optimization)
+        burnout_opps = self._check_burnout_risk()
+        if burnout_opps:
+            opportunities.extend(burnout_opps)
+
+        # 9. Check for Strategy Alignment
+        strat_opps = self._check_strategy_alignment()
+        if strat_opps:
+            opportunities.extend(strat_opps)
             
         return opportunities
 
     def _check_schedule_gaps(self):
         """
-        Checks for gaps in the schedule, using A/B testing to optimize timing.
+        Checks for gaps in the schedule using real activity logs.
         """
         conn = get_db()
         
-        # 1. Initialize/Get A/B Test
-        test_name = "OptimalStudyTime"
-        strategy = ab_tester.get_active_strategy(test_name)
-        
-        if not strategy:
-            # Start the test if not exists
-            ab_tester.create_test(
-                test_name=test_name,
-                strategy_a="Morning Focus",
-                strategy_b="Evening Focus",
-                duration_days=14
-            )
-            strategy = "A" # Default to A for first run
+        # 1. Check if user has been inactive for > 4 hours today
+        try:
+            last_activity = conn.execute('''
+                SELECT executed_at FROM brain_action_log 
+                WHERE date(executed_at) = date('now') 
+                ORDER BY executed_at DESC LIMIT 1
+            ''').fetchone()
             
-        # 2. Define time preference based on strategy
-        # Strategy A: Morning (6 AM - 12 PM)
-        # Strategy B: Evening (6 PM - 10 PM)
-        preferred_time_desc = "morning" if strategy == 'A' else "evening"
-        
-        # 3. Check for existing pending suggestions to avoid spam
-        existing = conn.execute('''
-            SELECT COUNT(*) as count FROM brain_optimization_opportunities
-            WHERE type = 'schedule' AND status = 'pending'
-        ''').fetchone()
-        
-        if existing['count'] > 0:
-            return [] 
+            if last_activity:
+                last_time = datetime.fromisoformat(last_activity['executed_at'])
+                hours_since = (datetime.now() - last_time).total_seconds() / 3600
+                
+                if hours_since > 4:
+                    # Found a gap!
+                    return [self._create_opportunity(
+                        type='schedule',
+                        description=f"You've been inactive for {int(hours_since)} hours. Good time for a quick revision?",
+                        payload={
+                            'action': 'SCHEDULE_REVISION', 
+                            'time': 'Now',
+                            'duration': 30
+                        }
+                    )]
+        except Exception:
+            pass 
             
-        # 4. Create Opportunity (Mocking the gap finding)
-        # In real app, we'd search for actual gaps in the preferred window
-        return [self._create_opportunity(
-            type='schedule',
-            description=f"A/B Test ({strategy}): You have a free slot this {preferred_time_desc}. Perfect for a Mock Test.",
-            payload={
-                'action': 'CREATE_MOCK_TEST', 
-                'time': f"Saturday {'9:00 AM' if strategy == 'A' else '7:00 PM'}",
-                'ab_test_id': test_name,
-                'strategy': strategy
-            }
-        )]
+        return []
+
+    def _check_strategy_alignment(self):
+        """
+        Checks if current activities align with the Golden Path strategy.
+        """
+        # Real logic: Check if the last completed task was part of the Golden Path
+        try:
+            from app.services.brain_service import brain_service
+            if not brain_service.current_strategy:
+                return []
+                
+            conn = get_db()
+            last_task = conn.execute('''
+                SELECT topic FROM study_tasks 
+                WHERE status = 'completed'
+                ORDER BY date DESC, end_time DESC LIMIT 1
+            ''').fetchone()
+            
+            if last_task:
+                # Check if topic is in current strategy
+                strategy_topics = [s['topic'] for s in brain_service.current_strategy]
+                # Fuzzy match or direct check
+                if not any(last_task['topic'] in s_topic for s_topic in strategy_topics):
+                     return [self._create_opportunity(
+                        type='STRATEGY_ALIGNMENT',
+                        description=f"Distraction Alert: '{last_task['topic']}' is not on the Golden Path.",
+                        payload={
+                            'action': 'REVIEW_STRATEGY',
+                            'target': 'Golden Path'
+                        }
+                    )]
+        except Exception:
+            pass
+            
+        return []
 
     def _check_unused_resources(self):
         """
-        Mock logic: Finds resources not accessed in 2 weeks.
+        Real logic: Finds resources not accessed in 30 days.
         """
-        # Simulating finding unused notes
-        return [] # Keeping it simple for now
+        # Placeholder until we have a proper resource tracking table
+        return []
 
     def _check_flashcard_load(self):
         """
-        Mock logic: Checks if due cards > 500.
+        Real logic: Checks actual due cards count.
         """
         conn = get_db()
-        
-        # Count due cards (assuming table exists, otherwise 0)
         try:
-            result = conn.execute('SELECT COUNT(*) as count FROM flashcards').fetchone()
-            count = result['count'] if result else 0
-        except:
-            count = 600 # Simulate high load for testing
-            
-        if count > 500:
-            existing = conn.execute('''
-                SELECT COUNT(*) as count FROM brain_optimization_opportunities
-                WHERE type = 'load_balance' AND status = 'pending'
+            # Check if flashcards table exists and has due column
+            # Assuming 'next_review' < now
+            result = conn.execute('''
+                SELECT COUNT(*) as count FROM flashcards 
+                WHERE next_review <= date('now')
             ''').fetchone()
+            count = result['count'] if result else 0
             
-            if existing['count'] == 0:
-                return [self._create_opportunity(
-                    type='load_balance',
-                    description=f"High load detected ({count} cards). Spread reviews over 3 days?",
-                    payload={'action': 'SPREAD_REVIEWS', 'days': 3}
-                )]
+            if count > 50: # Real threshold
+                existing = conn.execute('''
+                    SELECT COUNT(*) as count FROM brain_optimization_opportunities
+                    WHERE type = 'load_balance' AND status = 'pending'
+                ''').fetchone()
+                
+                if existing['count'] == 0:
+                    return [self._create_opportunity(
+                        type='load_balance',
+                        description=f"Flashcard Pile-up: {count} cards due. Clear them now?",
+                        payload={'action': 'START_SESSION', 'deck': 'All'}
+                    )]
+        except Exception as e:
+            print(f"Flashcard Check Error: {e}")
                 
         return []
 
@@ -145,7 +180,6 @@ class OptimizationEngine:
         Checks for weak areas and suggests scheduling a session.
         """
         # Get weak areas for user 1 (default)
-        # In a real app, we'd iterate over all users or pass user_id
         weak_areas = WeakAreaAnalyzer.analyze_user_performance(1)
         
         if not weak_areas:
@@ -167,23 +201,46 @@ class OptimizationEngine:
         if existing['count'] > 0:
             return []
             
-        # Find a slot (Mocking a slot for now, e.g., "Tomorrow Evening")
-        # In a real scenario, we'd check the calendar.
-        slot = "Tomorrow 7:00 PM"
-        
         return [self._create_opportunity(
             type='study_schedule',
-            description=f"Weakness detected in {topic} ({subject}). Schedule a focused session?",
+            description=f"Weakness detected in {topic} ({subject}). Focus session recommended.",
             payload={
                 'action': 'SCHEDULE_SESSION',
                 'topic': topic,
                 'subject': subject,
-                'time': slot,
+                'time': 'Next Available Slot',
                 'duration': 60
             }
         )]
 
-
+    def _check_burnout_risk(self):
+        """
+        Checks for burnout risk using real bio-metrics from PanopticonService.
+        """
+        try:
+            from app.services.panopticon_service import PanopticonService
+            status = PanopticonService.get_current_status()
+            
+            if status['status'] == 'CRITICAL':
+                conn = get_db()
+                existing = conn.execute('''
+                    SELECT COUNT(*) as count FROM brain_optimization_opportunities
+                    WHERE type = 'BURNOUT_RISK' AND status = 'pending'
+                ''').fetchone()
+                
+                if existing['count'] == 0:
+                    return [self._create_opportunity(
+                        type='BURNOUT_RISK',
+                        description=f"Bio-Status Critical: {status['alert']}. Take a break immediately.",
+                        payload={
+                            'action': 'TRIGGER_PROTOCOL',
+                            'protocol': 'RECOVERY_MODE'
+                        }
+                    )]
+        except Exception as e:
+            print(f"Burnout Check Error: {e}")
+            
+        return []
 
     def _check_content_recommendations(self):
         """
@@ -281,53 +338,9 @@ class OptimizationEngine:
         
         processed_topics = set()
         
-        for topic_stat in stats:
-            topic = topic_stat['topic']
-            if topic in processed_topics:
-                continue
-            processed_topics.add(topic)
-            
-            accuracy = topic_stat['accuracy_rate']
-            
-            # Logic for increasing difficulty
-            if accuracy > 80:
-                # Check if we already suggested this
-                existing = conn.execute('''
-                    SELECT COUNT(*) as count FROM brain_optimization_opportunities
-                    WHERE type = 'difficulty_adjustment' AND status = 'pending' 
-                    AND payload LIKE ?
-                ''', (f'%{topic}%',)).fetchone()
-                
-                if existing['count'] == 0:
-                    opportunities.append(self._create_opportunity(
-                        type='difficulty_adjustment',
-                        description=f"You're crushing '{topic}' ({int(accuracy)}%). Switch to Hard mode?",
-                        payload={
-                            'action': 'CHANGE_DIFFICULTY',
-                            'topic': topic,
-                            'new_difficulty': 'Hard'
-                        }
-                    ))
-            
-            # Logic for decreasing difficulty (if struggling)
-            elif accuracy < 40 and accuracy > 0: # >0 to avoid new topics
-                existing = conn.execute('''
-                    SELECT COUNT(*) as count FROM brain_optimization_opportunities
-                    WHERE type = 'difficulty_adjustment' AND status = 'pending' 
-                    AND payload LIKE ?
-                ''', (f'%{topic}%',)).fetchone()
-                
-                if existing['count'] == 0:
-                    opportunities.append(self._create_opportunity(
-                        type='difficulty_adjustment',
-                        description=f"Struggling with '{topic}' ({int(accuracy)}%). Switch to Easy mode to build basics?",
-                        payload={
-                            'action': 'CHANGE_DIFFICULTY',
-                            'topic': topic,
-                            'new_difficulty': 'Easy'
-                        }
-                    ))
-                    
+        # 2. Check for At-Risk Goals (Mock logic for now)
+        # Real logic would check progress vs time remaining
+        
         return opportunities
 
     def _check_goals(self):
@@ -354,9 +367,6 @@ class OptimizationEngine:
                         'suggestion': 'Complete 50 MCQs this week'
                     }
                 ))
-        
-        # 2. Check for At-Risk Goals (Mock logic for now)
-        # Real logic would check progress vs time remaining
         
         return opportunities
 

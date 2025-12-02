@@ -1,6 +1,27 @@
 import random
 from app.db import get_db
 
+def trigger_event(event_type: str, user_id: int):
+    """
+    Triggers a gamification event (XP award) for specific actions.
+    """
+    rewards = {
+        'STRATEGY_COMMIT': {'xp': 100, 'hs': 50, 'msg': 'Strategic Directive Committed!'},
+        'ORACLE_CONSULT': {'xp': 20, 'hs': 5, 'msg': 'Wisdom of the Oracle gained.'},
+        'MIND_PALACE_ADD': {'xp': 50, 'hs': 10, 'msg': 'Memory fortified in Mind Palace.'}
+    }
+    
+    if event_type in rewards:
+        r = rewards[event_type]
+        # Apply rewards
+        result = calculate_and_apply_rewards(user_id, r['xp'], r['hs'])
+        return {
+            'success': True,
+            'message': r['msg'],
+            'rewards': result
+        }
+    return {'success': False, 'message': 'Unknown Event'}
+
 def calculate_and_apply_rewards(user_id, base_xp, base_hs, tags=[]):
     """
     Central function to calculate XP, Hacksilver, apply Item Buffs, 
@@ -11,6 +32,17 @@ def calculate_and_apply_rewards(user_id, base_xp, base_hs, tags=[]):
     
     # 1. Fetch User & Inventory
     user = cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+    
+    if not user:
+        print(f"⚠️ GameEngine Warning: User {user_id} not found. Creating default user.")
+        # Create default user to prevent crash
+        cursor.execute('''
+            INSERT INTO users (id, username, current_xp, level, max_xp, hacksilver, strength_stat, runic_stat, vitality_stat, luck_stat)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (user_id, 'Hero', 0, 1, 100, 50, 5, 5, 5, 5))
+        conn.commit()
+        user = cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+
     inv_rows = cursor.execute('SELECT item_id FROM inventory WHERE user_id = ?', (user_id,)).fetchall()
     owned_items = {row['item_id'] for row in inv_rows}
     

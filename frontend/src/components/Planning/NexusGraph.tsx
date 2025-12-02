@@ -19,20 +19,27 @@ const NexusGraph: React.FC<NexusGraphProps> = React.memo(({ engine, completedIte
     const requestRef = useRef<number | null>(null);
 
     useEffect(() => {
-        // Update mastery based on completed tasks
-        engine.updateMastery(completedItems);
-        const data = engine.getGraphData();
+        const initGraph = async () => {
+            // Load data from backend (Golden Path Service)
+            await engine.loadData();
 
-        // Initialize random positions (preserve existing positions if possible could be better, but for now re-init is safer for data sync)
-        const initializedNodes = data.nodes.map(n => ({
-            ...n,
-            x: Math.random() * 800,
-            y: Math.random() * 600,
-            vx: 0,
-            vy: 0
-        }));
-        setNodes(initializedNodes);
-        setLinks(data.links);
+            // Update mastery based on completed tasks
+            engine.updateMastery(completedItems);
+            const data = engine.getGraphData();
+
+            // Initialize random positions (preserve existing positions if possible could be better, but for now re-init is safer for data sync)
+            const initializedNodes = data.nodes.map(n => ({
+                ...n,
+                x: Math.random() * 800,
+                y: Math.random() * 600,
+                vx: 0,
+                vy: 0
+            }));
+            setNodes(initializedNodes);
+            setLinks(data.links);
+        };
+
+        initGraph();
     }, [engine, completedItems]);
 
     // Simple Force-Directed Simulation Loop

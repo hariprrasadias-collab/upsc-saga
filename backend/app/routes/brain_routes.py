@@ -3,6 +3,22 @@ from app.services.brain_service import brain_service
 
 brain_bp = Blueprint('brain', __name__)
 
+@brain_bp.route('/directive', methods=['POST'])
+def ingest_directive():
+    """
+    Ingest a Strategic Directive (e.g., Golden Path).
+    """
+    try:
+        data = request.json
+        path_data = data.get('path', [])
+        
+        from app.services.brain_service import brain_service
+        brain_service.ingest_strategic_directive(path_data)
+        
+        return jsonify({"success": True, "message": "Strategic Directive Acknowledged."})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
 @brain_bp.route('/think', methods=['POST'])
 def think():
     """

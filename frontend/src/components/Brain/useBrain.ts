@@ -107,6 +107,17 @@ export const useBrain = () => {
                     case 'ANALYZE_WEAK_AREAS':
                         navigate('/weak-areas');
                         break;
+                    case 'ADD_TO_PALACE':
+                    case 'RETRIEVE_FROM_PALACE':
+                        navigate('/mind-palace');
+                        break;
+                    case 'PREDICT_QUESTIONS':
+                        navigate('/foresight');
+                        break;
+                    case 'TRIGGER_WATCHMAN':
+                    case 'SHOW_MORNING_BRIEFING':
+                        navigate('/watchman');
+                        break;
                 }
             }
         } catch (err) {

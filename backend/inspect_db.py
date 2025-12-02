@@ -1,33 +1,64 @@
+import sqlite3
 import os
-import sys
-from flask import Flask
-from dotenv import load_dotenv
-import datetime
 
-# Add backend directory to path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATABASE = os.path.join(BASE_DIR, 'upsc_saga.db')
 
-from app.db import get_db
+print(f"Checking database at: {DATABASE}")
 
-# Load environment variables
-load_dotenv()
-
-app = Flask(__name__)
-
-def inspect_db():
-    with app.app_context():
-        conn = get_db()
+try:
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    
+    print("\n--- Tables ---")
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tables = cursor.fetchall()
+    for t in tables:
+        print(t[0])
         
-        print("\n--- Study Plans ---")
-        plans = conn.execute('SELECT * FROM study_plans').fetchall()
-        for p in plans:
-            print(dict(p))
-            
-        print("\n--- Tasks for Today (All Plans) ---")
-        today = datetime.date.today().isoformat()
-        tasks = conn.execute('SELECT * FROM study_tasks WHERE date = ?', (today,)).fetchall()
-        for t in tasks:
-            print(dict(t))
+    print("\n--- Users Schema ---")
+    try:
+        cursor.execute("PRAGMA table_info(users)")
+        columns = cursor.fetchall()
+        for col in columns:
+            print(col)
+    except Exception as e:
+        print(f"Error checking users: {e}")
 
-if __name__ == "__main__":
-    inspect_db()
+    print("\n--- Challenges Schema ---")
+    try:
+        cursor.execute("PRAGMA table_info(challenges)")
+        columns = cursor.fetchall()
+        for col in columns:
+            print(col)
+    except Exception as e:
+        print(f"Error checking challenges: {e}")
+
+    print("\n--- User Challenges Schema ---")
+    try:
+        cursor.execute("PRAGMA table_info(user_challenges)")
+        columns = cursor.fetchall()
+        for col in columns:
+            print(col)
+    except Exception as e:
+        print(f"Error checking user_challenges: {e}")
+        
+    print("\n--- Inventory Schema ---")
+    try:
+        cursor.execute("PRAGMA table_info(inventory)")
+        columns = cursor.fetchall()
+        for col in columns:
+            print(col)
+    except Exception as e:
+        print(f"Error checking inventory: {e}")
+
+    print("\n--- User 1 Check ---")
+    try:
+        user = cursor.execute("SELECT * FROM users WHERE id=1").fetchone()
+        print(f"User 1: {user}")
+    except Exception as e:
+        print(f"Error checking user 1: {e}")
+
+    conn.close()
+except Exception as e:
+    print(f"Database error: {e}")

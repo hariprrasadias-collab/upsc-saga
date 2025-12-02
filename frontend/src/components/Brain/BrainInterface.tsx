@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import './BrainInterface.css';
-import { FaBrain, FaTimes, FaRobot, FaLightbulb, FaExclamationTriangle, FaCompressAlt } from 'react-icons/fa';
-import AutonomySettings from './AutonomySettings';
-import ExplainabilityDashboard from './ExplainabilityDashboard';
+import { FaBrain, FaTimes, FaCompressAlt, FaChessKing, FaRobot, FaLightbulb, FaExclamationTriangle } from 'react-icons/fa';
+import { useBrain } from './useBrain';
 import ChatView from './ChatView';
 import StatusView from './StatusView';
 import InsightsView from './InsightsView';
-import { useBrain } from './useBrain';
+import AutonomySettings from './AutonomySettings';
+import ExplainabilityDashboard from './ExplainabilityDashboard';
+import StrategosView from './StrategosView';
+import './BrainInterface.css';
 
-type TabType = 'chat' | 'status' | 'insights' | 'autonomy' | 'optimization';
+type TabType = 'chat' | 'strategos' | 'status' | 'insights' | 'autonomy' | 'optimization';
 
 const BrainInterface: React.FC = () => {
     // --- UI State ---
@@ -62,6 +63,7 @@ const BrainInterface: React.FC = () => {
         <div className="brain-tabs">
             {[
                 { id: 'chat', label: 'Chat', icon: null },
+                { id: 'strategos', label: 'Strategos', icon: <FaChessKing /> },
                 { id: 'status', label: 'Synapses', icon: null },
                 { id: 'insights', label: 'Insights', icon: null },
                 { id: 'autonomy', label: 'Autonomy', icon: <FaRobot /> },
@@ -69,7 +71,7 @@ const BrainInterface: React.FC = () => {
             ].map(tab => (
                 <button
                     key={tab.id}
-                    className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
+                    className={`brain-tab ${activeTab === tab.id ? 'active' : ''}`}
                     onClick={() => setActiveTab(tab.id as TabType)}
                     aria-label={`Switch to ${tab.label} tab`}
                 >
@@ -131,14 +133,36 @@ const BrainInterface: React.FC = () => {
                         )}
 
                         {activeTab === 'chat' && (
-                            <ChatView
-                                messages={messages}
-                                isThinking={isThinking}
-                                inputValue={inputValue}
-                                setInputValue={setInputValue}
-                                onSendMessage={handleSendMessage}
-                                onExecuteAction={executeAction}
-                            />
+                            <>
+                                <div className="quick-actions">
+                                    <button
+                                        className="quick-action-btn"
+                                        onClick={() => setInputValue("Save this to my Mind Palace: ")}
+                                        title="Save to Mind Palace"
+                                    >
+                                        🏰 Remember
+                                    </button>
+                                    <button
+                                        className="quick-action-btn"
+                                        onClick={() => setInputValue("Consult the Oracle about: ")}
+                                        title="Ask Foresight"
+                                    >
+                                        🔮 Oracle
+                                    </button>
+                                </div>
+                                <ChatView
+                                    messages={messages}
+                                    isThinking={isThinking}
+                                    inputValue={inputValue}
+                                    setInputValue={setInputValue}
+                                    onSendMessage={handleSendMessage}
+                                    onExecuteAction={executeAction}
+                                />
+                            </>
+                        )}
+
+                        {activeTab === 'strategos' && (
+                            <StrategosView onExecuteAction={executeAction} />
                         )}
 
                         {activeTab === 'status' && (

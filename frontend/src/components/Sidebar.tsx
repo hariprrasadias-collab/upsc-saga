@@ -51,7 +51,11 @@ const Sidebar: React.FC = () => {
         { id: 'quests', label: 'Quests', icon: '📜' },
         { id: 'revision-cards', label: 'Revision Cards', icon: '⚡' },
         { id: 'mnemonics', label: 'Mnemonics', icon: '🧠' },
-        { id: 'mindmap', label: 'Mind Map', icon: '🕸️' }
+        { id: 'mindmap', label: 'Mind Map', icon: '🕸️' },
+        { id: 'mind-palace', label: 'Mind Palace', icon: '🏰' },
+        { id: 'revision-center', label: 'Revision Center', icon: '🔄' },
+        { id: 'timebox', label: 'Time Boxing', icon: '⏳' },
+        { id: 'golden-path', label: 'The Golden Path', icon: '🌟' }
       ]
     },
     training: {
@@ -63,7 +67,8 @@ const Sidebar: React.FC = () => {
         { id: 'mock-tests', label: 'Mock Tests', icon: '📋' },
         { id: 'arena', label: 'Boss Arena', icon: '⚔️' },
         { id: 'essay', label: 'Essay Workshop', icon: '✍️' },
-        { id: 'csat', label: 'CSAT Prep', icon: '🧮' }
+        { id: 'csat', label: 'CSAT Prep', icon: '🧮' },
+        { id: 'foresight', label: 'Project Foresight', icon: '🔮' }
       ]
     },
     knowledge: {
@@ -78,13 +83,16 @@ const Sidebar: React.FC = () => {
         { id: 'heatmap', label: 'PYQ Heatmap', icon: '📊' },
         { id: 'model-answers', label: 'Model Answers', icon: '📝' },
         { id: 'codex', label: 'Yggdrasil', icon: '🌳' },
-        { id: 'lore-tablets', label: 'Lore Tablets', icon: '📖' }
+        { id: 'lore-tablets', label: 'Lore Tablets', icon: '📖' },
+        { id: 'watchman', label: 'Night Watchman', icon: '🌃' }
       ]
     },
     enhancement: {
       title: '⚡ Enhancement',
       items: [
-        { id: 'armory', label: 'Armory', icon: '🛡️' }
+        { id: 'armory', label: 'Armory', icon: '🛡️' },
+        { id: 'panopticon', label: 'The Panopticon', icon: '👁️' },
+        { id: 'neural-hash', label: 'The Neural Hash', icon: '🧬' }
       ]
     },
     admin: {

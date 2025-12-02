@@ -9,13 +9,19 @@ def create_app():
 
     from . import db
     db.init_app(app)
+    app.config['DATABASE'] = db.DATABASE
 
     # Initialize DB tables
     from app.db_models.study_plan import init_study_plan_tables
     from app.db_models.autonomous_brain import init_autonomous_brain_tables
+    from app.db_models.gamification import init_gamification_tables
+    from app.db_models.core import init_core_tables
+    
     with app.app_context():
+        init_core_tables() # Core first (users)
         init_study_plan_tables()
         init_autonomous_brain_tables()
+        init_gamification_tables()
 
     # Import blueprints
     from .routes import (
@@ -24,11 +30,12 @@ def create_app():
         syllabus, flashcards, analytics, essay, csat, badges, challenges, 
         shop_new, weak_areas, admin, predictive, pomodoro, timebox, planner, 
         templates, revision, heatmap, model_answers, issue_mapping, scheduler,
-        mindmap, study_plan
+        mindmap, study_plan, golden_path
     )
     
     # Register blueprints
     app.register_blueprint(dashboard.bp)
+    app.register_blueprint(golden_path.golden_path_bp, url_prefix='/api/golden-path')
     app.register_blueprint(tasks.bp)
     app.register_blueprint(quests.bp)
     app.register_blueprint(battles.bp)
@@ -86,5 +93,33 @@ def create_app():
 
     from app.routes.autonomy_routes import autonomy_bp
     app.register_blueprint(autonomy_bp, url_prefix='/api/autonomy')
+
+    from app.routes.mind_palace import mind_palace_bp
+    app.register_blueprint(mind_palace_bp, url_prefix='/api/mind_palace')
+
+    from app.routes.foresight import foresight_bp
+    app.register_blueprint(foresight_bp, url_prefix='/api/foresight')
+
+    from app.routes.watchman import watchman_bp
+    app.register_blueprint(watchman_bp, url_prefix='/api/watchman')
+
+    from app.routes.panopticon import panopticon_bp
+    app.register_blueprint(panopticon_bp)
+
+    from app.routes.neural_hash import neural_hash_bp
+    app.register_blueprint(neural_hash_bp, url_prefix='/api/neural_hash')
+
+
+
+    # Initialize Tables
+    from app.db_models.mind_palace import init_mind_palace_tables
+    from app.db_models.night_watchman import init_watchman_tables
+    from app.db_models.panopticon import init_panopticon_tables
+    from app.db import DATABASE
+    
+    with app.app_context():
+        init_mind_palace_tables()
+        init_watchman_tables()
+        init_panopticon_tables(DATABASE)
 
     return app

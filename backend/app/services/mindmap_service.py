@@ -14,7 +14,7 @@ class MindMapService:
             raise Exception("GEMINI_API_KEY not found")
 
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-2.0-flash')
+        model = genai.GenerativeModel('gemini-pro-latest')
 
         prompt = f"""
         Create a detailed mind map for the topic: "{topic}".

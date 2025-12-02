@@ -1,14 +1,16 @@
 // Knowledge Graph Engine - The Nexus
 
-// Knowledge Graph Engine - The Nexus
-
 export interface GraphNode {
     id: string;
     label: string;
-    group: 'History' | 'Geography' | 'Polity' | 'Economy' | 'Science' | 'Environment' | 'Core';
+    group: 'History' | 'Geography' | 'Polity' | 'Economy' | 'Science' | 'Environment' | 'Core' | 'General';
     radius: number;
     mastery: number; // 0 to 100
     isBridge?: boolean; // New: Centrality Flag
+    roi?: number;
+    yield?: number;
+    effort?: number;
+    weakness?: number;
     x?: number;
     y?: number;
     vx?: number;
@@ -27,77 +29,49 @@ export class KnowledgeGraphEngine {
     private links: GraphLink[] = [];
 
     constructor() {
-        this.initializeGraph();
+        // Initial empty state, data loaded via loadData()
     }
 
-    private initializeGraph() {
-        // Core Nodes (The Pillars)
-        this.nodes = [
-            { id: 'UPSC', label: 'UPSC CSE', group: 'Core', radius: 40, mastery: 0 },
+    public async loadData(): Promise<void> {
+        try {
+            const response = await fetch('http://localhost:5000/api/golden-path/graph');
+            const result = await response.json();
 
-            // History Cluster
-            { id: 'Hist_Ancient', label: 'Ancient History', group: 'History', radius: 25, mastery: 0 },
-            { id: 'Hist_Medieval', label: 'Medieval History', group: 'History', radius: 25, mastery: 0 },
-            { id: 'Hist_Modern', label: 'Modern History', group: 'History', radius: 30, mastery: 0 },
-            { id: 'Hist_Culture', label: 'Art & Culture', group: 'History', radius: 20, mastery: 0 },
+            if (result.success && result.data) {
+                this.nodes = result.data.nodes.map((n: any) => ({
+                    id: String(n.id),
+                    label: n.data.label,
+                    group: n.data.group || 'General',
+                    radius: this.calculateRadius(n.data),
+                    mastery: 0, // Mastery updated separately via updateMastery
+                    roi: n.data.roi,
+                    yield: n.data.yield,
+                    effort: n.data.effort,
+                    weakness: n.data.weakness
+                }));
 
-            // Polity Cluster
-            { id: 'Pol_Const', label: 'Constitution', group: 'Polity', radius: 35, mastery: 0 },
-            { id: 'Pol_Gov', label: 'Governance', group: 'Polity', radius: 25, mastery: 0 },
-            { id: 'Pol_IR', label: 'Intl Relations', group: 'Polity', radius: 25, mastery: 0 },
+                this.links = result.data.edges.map((e: any) => ({
+                    source: String(e.source),
+                    target: String(e.target),
+                    type: 'dependency',
+                    strength: 1
+                }));
+            }
+        } catch (error) {
+            console.error("Failed to load Golden Path graph:", error);
+            // Fallback to empty or hardcoded if needed
+        }
+    }
 
-            // Economy Cluster
-            { id: 'Eco_Macro', label: 'Macro Economy', group: 'Economy', radius: 30, mastery: 0 },
-            { id: 'Eco_Banking', label: 'Banking', group: 'Economy', radius: 20, mastery: 0 },
-            { id: 'Eco_Budget', label: 'Budget & Survey', group: 'Economy', radius: 25, mastery: 0 },
-
-            // Geography Cluster
-            { id: 'Geo_Physical', label: 'Physical Geo', group: 'Geography', radius: 30, mastery: 0 },
-            { id: 'Geo_Indian', label: 'Indian Geo', group: 'Geography', radius: 30, mastery: 0 },
-            { id: 'Geo_Climate', label: 'Climatology', group: 'Geography', radius: 20, mastery: 0 },
-
-            // Environment
-            { id: 'Env_Eco', label: 'Ecology', group: 'Environment', radius: 25, mastery: 0 },
-            { id: 'Env_Bio', label: 'Biodiversity', group: 'Environment', radius: 25, mastery: 0 },
-
-            // Science
-            { id: 'Sci_Tech', label: 'Sci & Tech', group: 'Science', radius: 25, mastery: 0 },
-        ];
-
-        this.links = [
-            // Core Connections
-            { source: 'UPSC', target: 'Hist_Modern', type: 'dependency', strength: 1 },
-            { source: 'UPSC', target: 'Pol_Const', type: 'dependency', strength: 1 },
-            { source: 'UPSC', target: 'Eco_Macro', type: 'dependency', strength: 1 },
-            { source: 'UPSC', target: 'Geo_Physical', type: 'dependency', strength: 1 },
-
-            // History Dependencies
-            { source: 'Hist_Ancient', target: 'Hist_Culture', type: 'related', strength: 0.8 },
-            { source: 'Hist_Medieval', target: 'Hist_Culture', type: 'related', strength: 0.8 },
-            { source: 'Hist_Modern', target: 'Pol_Const', type: 'dependency', strength: 0.5 }, // Constitution evolved from modern history
-
-            // Geography Dependencies
-            { source: 'Geo_Physical', target: 'Geo_Indian', type: 'dependency', strength: 0.9 },
-            { source: 'Geo_Physical', target: 'Geo_Climate', type: 'dependency', strength: 0.9 },
-            { source: 'Geo_Climate', target: 'Env_Eco', type: 'dependency', strength: 0.7 }, // Climate affects ecology
-            { source: 'Geo_Indian', target: 'Eco_Macro', type: 'related', strength: 0.3 }, // Resources affect economy
-
-            // Polity Dependencies
-            { source: 'Pol_Const', target: 'Pol_Gov', type: 'dependency', strength: 0.9 },
-            { source: 'Pol_Gov', target: 'Pol_IR', type: 'related', strength: 0.6 },
-
-            // Economy Dependencies
-            { source: 'Eco_Macro', target: 'Eco_Banking', type: 'dependency', strength: 0.8 },
-            { source: 'Eco_Macro', target: 'Eco_Budget', type: 'dependency', strength: 0.7 },
-            { source: 'Eco_Budget', target: 'Pol_Gov', type: 'related', strength: 0.5 }, // Budget is a political tool
-        ];
+    private calculateRadius(data: any): number {
+        // Radius based on ROI or Importance
+        // Base radius 20, max 50
+        const roi = data.roi || 1;
+        return Math.min(Math.max(20, 20 * roi), 50);
     }
 
     public getGraphData() {
-        return {
-            nodes: this.nodes,
-            links: this.links
-        };
+        return { nodes: this.nodes, links: this.links };
     }
 
     public updateMastery(completedItems: { subject: string, topic: string }[]) {

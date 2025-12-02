@@ -58,7 +58,7 @@ class MockTestService:
             return {"success": False, "error": "API Key missing"}
             
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-flash-latest')
+        model = genai.GenerativeModel('gemini-pro-latest')
         
         prompt = f"""
         Create a {count}-question multiple choice test for: "{topic}".

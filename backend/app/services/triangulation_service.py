@@ -12,7 +12,7 @@ if GEMINI_API_KEY:
 
 def get_model():
     try:
-        return genai.GenerativeModel('gemini-flash-latest')
+        return genai.GenerativeModel('gemini-pro-latest')
     except:
         return genai.GenerativeModel('gemini-pro')
 

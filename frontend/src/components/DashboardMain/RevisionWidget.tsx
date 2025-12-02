@@ -111,7 +111,7 @@ const RevisionWidget: React.FC = () => {
             </div>
 
             {revisionTasks.length === 0 ? (
-                <div className="empty-state">
+                <div className="revision-empty-state">
                     <div className="empty-icon">🛡️</div>
                     <p>No enemies remain. Rest, warrior.</p>
                 </div>

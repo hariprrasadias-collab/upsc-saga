@@ -138,11 +138,11 @@
 
 @keyframes spin {
     from {
-        transform: rotate(0deg);
+        transform: matrix(1, 0, 0, 1, 0, 0);
     }
 
     to {
-        transform: rotate(360deg);
+        transform: matrix(1, 0, 0, 1, 0, 0);
     }
 }
 

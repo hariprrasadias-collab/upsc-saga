@@ -34,7 +34,7 @@ AGENTS = {
 def get_model():
     """Returns the best available model with fallback."""
     try:
-        return genai.GenerativeModel('gemini-flash-latest')
+        return genai.GenerativeModel('gemini-pro-latest')
     except:
         try:
             return genai.GenerativeModel('gemini-pro-latest')

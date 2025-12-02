@@ -61,21 +61,6 @@
     color: #81c784;
 }
 
-.opp-type.resource {
-    background: rgba(255, 152, 0, 0.15);
-    color: #ffb74d;
-}
-
-.opp-type.load_balance {
-    background: rgba(244, 67, 54, 0.15);
-    color: #e57373;
-}
-
-.opp-date {
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.3);
-}
-
 .opp-desc {
     font-size: 0.9rem;
     line-height: 1.5;
