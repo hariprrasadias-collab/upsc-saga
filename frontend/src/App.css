@@ -1,21 +1,33 @@
-/* Main Application Container - Three Column Layout */
-
+/* Main Application Container - Dynamic Grid Layout */
 .app-container {
   display: grid;
-  grid-template-columns: auto 1fr 280px;
+  grid-template-columns: 0px 1fr 0px;
+  /* Default: Full Screen (Sidebars Hidden) */
   height: 100vh;
   overflow: hidden;
   background: linear-gradient(135deg, #0a0e27 0%, #1a2f4a 50%, #0a0e27 100%);
   position: relative;
   gap: 0;
+  transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* Sidebar Open States - Controlled by React State Classes on Body or Container? 
+   Actually, we can't easily change grid-template-columns based on child classes.
+   Wait, we can't style parent based on child class in CSS3.
+   
+   Alternative: We need to apply classes to .app-container itself.
+   Let's assume we update App.tsx to apply classes to app-container.
+*/
+
+/* We need to update App.tsx to apply classes to .app-container based on state */
 
 /* Sidebar Toggle Button */
 .sidebar-toggle-btn {
   position: fixed;
   top: 1rem;
   left: 1rem;
-  z-index: 1001;
+  z-index: 20000;
+  /* High z-index to ensure clickability */
   background: rgba(13, 17, 23, 0.8);
   border: 1px solid var(--color-accent-orange);
   color: var(--color-accent-orange);
@@ -31,6 +43,12 @@
   backdrop-filter: blur(5px);
 }
 
+.sidebar-toggle-btn.right {
+  left: auto;
+  right: 160px;
+  /* Moved left to avoid overlapping with Brain Interface (which is at right: 20px) */
+}
+
 .sidebar-toggle-btn:hover {
   background: var(--color-accent-orange);
   color: #fff;
@@ -39,13 +57,12 @@
 
 .sidebar-toggle-btn.open {
   left: 290px;
-  /* Move with sidebar */
 }
 
-@media (max-width: 768px) {
-  .sidebar-toggle-btn.open {
-    left: 250px;
-  }
+.sidebar-toggle-btn.right.open {
+  left: auto;
+  right: 440px;
+  /* 280px panel + 160px offset */
 }
 
 /* Sidebar - Left Column */
@@ -55,6 +72,10 @@
   background: linear-gradient(180deg, rgba(26, 47, 74, 0.9) 0%, rgba(10, 14, 39, 0.8) 100%);
   border-right: 2px solid rgba(212, 165, 116, 0.2);
   box-shadow: inset -10px 0 20px rgba(0, 0, 0, 0.3);
+  width: 280px;
+  /* Fixed width content */
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
 }
 
 /* Main Content Area - Center Column */
@@ -67,14 +88,37 @@
 }
 
 /* Rituals Panel - Right Column */
-.app-container>.rituals-panel {
+.rituals-panel-wrapper {
   grid-column: 3;
   overflow-y: auto;
   background: linear-gradient(180deg, rgba(26, 47, 74, 0.9) 0%, rgba(10, 14, 39, 0.8) 100%);
   border-left: 2px solid rgba(212, 165, 116, 0.2);
   box-shadow: inset 10px 0 20px rgba(0, 0, 0, 0.3);
   margin: 0;
-  padding: 25px;
+  width: 280px;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+/* OPEN STATES */
+.app-container.left-open {
+  grid-template-columns: 280px 1fr 0px;
+}
+
+.app-container.right-open {
+  grid-template-columns: 0px 1fr 280px;
+}
+
+.app-container.left-open.right-open {
+  grid-template-columns: 280px 1fr 280px;
+}
+
+.app-container.left-open>.sidebar {
+  transform: translateX(0);
+}
+
+.app-container.right-open .rituals-panel-wrapper {
+  transform: translateX(0);
 }
 
 /* Loading and Error Screens */

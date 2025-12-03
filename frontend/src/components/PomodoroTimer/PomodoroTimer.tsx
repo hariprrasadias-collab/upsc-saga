@@ -222,7 +222,12 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
             <div className="pomodoro-header">
                 <h3>{mode === 'work' ? '⚔️ BATTLE TIME' : '🛡️ RESPITE'}</h3>
                 <div className="pomodoro-controls">
-                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" title="Fullscreen">⛶</button>
+                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
+                        {isFullscreen ? '↙️' : '⛶'}
+                    </button>
+                    {isFullscreen && (
+                        <button onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close">✕</button>
+                    )}
                     <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" title="History">📊</button>
                     <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" title="Settings">⚙️</button>
                     <button onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize">−</button>

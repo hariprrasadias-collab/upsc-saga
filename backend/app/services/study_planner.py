@@ -406,7 +406,7 @@ def get_todays_tasks_summary():
         
     summary = [f"Tasks for {today_iso}:"]
     for t in tasks:
-        status_icon = "✅" if t['status'] == 'completed' else "⏳"
-        summary.append(f"- {status_icon} [{t['start_time']}-{t['end_time']}] {t['subject']}: {t['topic']}")
+        status_str = "[DONE]" if t['status'] == 'completed' else "[TODO]"
+        summary.append(f"- {status_str} [{t['start_time']}-{t['end_time']}] {t['subject']}: {t['topic']}")
         
     return "\n".join(summary)

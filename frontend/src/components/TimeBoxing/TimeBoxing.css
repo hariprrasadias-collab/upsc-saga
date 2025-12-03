@@ -317,7 +317,7 @@
     border-bottom: 2px solid var(--kratos-gold);
     color: var(--kratos-gold);
     font-size: 1.5rem;
-    ```css color: #ecf0f1;
+    color: #ecf0f1;
     font-weight: 500;
 }
 
@@ -688,5 +688,3 @@
         position: static;
     }
 }
-
-```

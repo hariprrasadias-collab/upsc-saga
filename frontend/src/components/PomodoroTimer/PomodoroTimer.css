@@ -44,7 +44,8 @@ body {
 .pomodoro-widget {
     position: fixed;
     top: 10%;
-    left: 40%;
+    left: 50%;
+    /* Centered horizontally */
     transform: translate(-50%, -50%);
     animation: fadeIn 0.6s ease-out forwards;
     background: var(--glass-bg);
@@ -76,6 +77,8 @@ body {
     justify-content: center;
     align-items: center;
     padding: 0;
+    z-index: 200000;
+    /* Extremely high to cover everything */
 }
 
 .pomodoro-header {
@@ -83,6 +86,25 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
+    z-index: 200001;
+    /* Ensure header is above the fullscreen background */
+    position: relative;
+}
+
+.pomodoro-widget.fullscreen .pomodoro-header {
+    position: fixed !important;
+    top: 2rem !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 90% !important;
+    max-width: 800px !important;
+    z-index: 2147483647 !important;
+    /* Max z-index */
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: transparent !important;
+    /* Ensure no background blocks it */
 }
 
 .pomodoro-header h3 {
@@ -116,6 +138,25 @@ body {
     background: rgba(255, 255, 255, 0.1);
     color: var(--text-color);
     box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+}
+
+.close-fullscreen {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-color);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.close-fullscreen:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
 }
 
 .pomodoro-modes {
@@ -159,6 +200,18 @@ body {
     align-items: center;
     margin: 2rem 0;
     position: relative;
+}
+
+.pomodoro-widget.fullscreen .pomodoro-timer-display {
+    transform: scale(1.5);
+    margin: 2rem 0;
+}
+
+.pomodoro-widget.fullscreen .flip-timer-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
 }
 
 .progress-ring {
@@ -390,7 +443,7 @@ body {
 }
 
 .pomodoro-minimized {
-    position: sticky;
+    position: fixed;
     bottom: 25px;
     right: 25px;
     padding: 0.8rem 1.5rem;
@@ -494,4 +547,11 @@ body {
     .stat-value {
         font-size: 1rem;
     }
+}
+
+/* Fix for overlap with Mimir */
+.pomodoro-above-mimir {
+    bottom: 130px !important;
+    right: 30px !important;
+    z-index: 10001 !important;
 }

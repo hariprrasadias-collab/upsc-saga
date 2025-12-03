@@ -41,6 +41,34 @@ class BrainService:
         # Caching
         self._system_cache = None
         self._cache_expiry = None
+        
+        # Load persisted strategy
+        self._load_strategy()
+
+    def _load_strategy(self):
+        """Load strategy from disk"""
+        try:
+            strategy_path = os.path.join(os.getcwd(), 'instance', 'current_strategy.json')
+            if os.path.exists(strategy_path):
+                with open(strategy_path, 'r') as f:
+                    self.current_strategy = json.load(f)
+                print(f"🧠 Brain: Loaded persisted strategy with {len(self.current_strategy)} steps.")
+        except Exception as e:
+            print(f"⚠️ Failed to load strategy: {e}")
+
+    def _save_strategy(self):
+        """Save strategy to disk"""
+        try:
+            instance_dir = os.path.join(os.getcwd(), 'instance')
+            if not os.path.exists(instance_dir):
+                os.makedirs(instance_dir)
+            
+            strategy_path = os.path.join(instance_dir, 'current_strategy.json')
+            with open(strategy_path, 'w') as f:
+                json.dump(self.current_strategy, f)
+            print("🧠 Brain: Strategy persisted to disk.")
+        except Exception as e:
+            print(f"⚠️ Failed to save strategy: {e}")
 
     def ingest_strategic_directive(self, path_data):
         """
@@ -57,6 +85,7 @@ class BrainService:
             print(f"Gamification Trigger Failed: {e}")
             
         print(f"🧠 Brain: Strategic Directive Received. {len(path_data)} steps adopted.")
+        self._save_strategy()
         return True
 
     def check_bio_status(self):
@@ -379,7 +408,7 @@ class BrainService:
             "time": datetime.now().isoformat(),
             "active_modules": list(synapses.keys()),
             "current_strategy": self.current_strategy,
-            # Bio status is fetched separately now for parallelism
+            "bio_status": self.check_bio_status()
         }
 
     def _parse_response(self, response_text: str) -> dict:

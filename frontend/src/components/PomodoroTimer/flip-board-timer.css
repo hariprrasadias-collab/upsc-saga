@@ -7,12 +7,10 @@
 
 /* Fullscreen Layout Refinements */
 /* Hiding non-essential elements for zero distractions */
-.pomodoro-widget.fullscreen .pomodoro-header,
 .pomodoro-widget.fullscreen .pomodoro-stats,
 .pomodoro-widget.fullscreen .preset-selector,
 .pomodoro-widget.fullscreen .current-task-display,
-.pomodoro-widget.fullscreen .pomodoro-modes,
-.pomodoro-widget.fullscreen .pomodoro-settings-panel {
+.pomodoro-widget.fullscreen .pomodoro-modes {
     display: none !important;
 }
 
@@ -270,5 +268,6 @@
     .flip-card-bottom .flip-card-digit,
     .flip-card-bottom-flip .flip-card-digit {
         top: -70px;
+        left: 0;
     }
 }

@@ -207,7 +207,11 @@
     line-height: 1.5;
     position: relative;
     animation: fadeInMsg 0.3s ease-out;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Arial', sans-serif !important;
+    /* FORCE STANDARD FONT */
+    font-variant: normal;
+    font-feature-settings: normal;
+    text-transform: none !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 

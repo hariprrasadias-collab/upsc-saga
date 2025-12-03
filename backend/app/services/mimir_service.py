@@ -20,9 +20,8 @@ class MimirService:
                 # Use models that are actually available in the API
                 # Based on genai.list_models() output
                 models_to_try = [
-                    'gemini-flash-latest',          # Stable Flash model
-                    'gemini-2.5-computer-use-preview-10-2025',            # Stable Pro model
-                    'learnlm-2.0-flash-experimental',                # Legacy
+                    'gemini-flash-latest',          # Stable Flash alias
+                    'gemini-pro-latest',            # Stable Pro alias
                 ]
                 
                 model_initialized = False
@@ -70,9 +69,14 @@ class MimirService:
             3. **Structure**: Use bullet points for clarity. If explaining a concept, give a brief definition followed by key points.
             4. **Motivation**: Occasionally offer a stoic quote or words of encouragement if the user seems stressed.
             5. **Limitations**: If you don't know something or if it's outside the scope of UPSC, politely say so.
+            6. **Schedule**: If the user asks about their plan/schedule, YOU MUST USE THE 'CURRENT CONTEXT' provided below. Do NOT invent a new plan. If the context says "No tasks", say so.
             
             Current Conversation:
             """
+            
+            # Fetch real study plan context
+            from app.services.study_planner import get_todays_tasks_summary
+            todays_plan_context = get_todays_tasks_summary()
             
             # Convert history to Gemini format if needed, or just append to prompt
             # For simplicity with 1.5 Flash, we'll append to prompt as context
@@ -81,7 +85,7 @@ class MimirService:
                 role = "User" if msg['role'] == 'user' else "Mimir"
                 conversation_context += f"{role}: {msg['content']}\n"
                 
-            full_prompt = f"{system_prompt}\n{conversation_context}\nUser: {message}\nMimir:"
+            full_prompt = f"{system_prompt}\n\nCURRENT CONTEXT (User's Real Schedule):\n{todays_plan_context}\n\n{conversation_context}\nUser: {message}\nMimir:"
             
             print(f"Sending prompt to Gemini (length: {len(full_prompt)} chars)")
             
@@ -90,7 +94,7 @@ class MimirService:
                 temperature=0.7,
                 top_p=0.8,
                 top_k=40,
-                max_output_tokens=1024,
+                max_output_tokens=8192,
             )
             
             # Retry logic for rate limits
@@ -122,6 +126,7 @@ class MimirService:
                 return "I apologize, but I cannot answer that query. It may have triggered a safety filter or hit a limit."
 
             print(f"Got response from Gemini (length: {len(response.text)} chars)")
+            print(f"RAW RESPONSE TEXT: {response.text}") # DEBUG LOG
             return response.text.strip()
             
         except Exception as e:

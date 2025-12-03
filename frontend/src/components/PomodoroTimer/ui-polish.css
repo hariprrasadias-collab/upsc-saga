@@ -37,6 +37,16 @@
     right: 0;
     padding: 0 3rem;
     z-index: 300;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.pomodoro-widget.fullscreen .pomodoro-controls {
+    display: flex !important;
+    gap: 1rem;
+    justify-content: center;
 }
 
 .pomodoro-widget.fullscreen .pomodoro-header h3 {

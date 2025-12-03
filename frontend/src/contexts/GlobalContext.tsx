@@ -50,6 +50,8 @@ interface GlobalContextType {
     completeTask: (taskId: number) => Promise<void>;
     isSidebarOpen: boolean;
     toggleSidebar: () => void;
+    isRitualsOpen: boolean;
+    toggleRituals: () => void;
     isMimirOpen: boolean;
     toggleMimir: (isOpen?: boolean) => void;
 }
@@ -76,10 +78,12 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
     const [showLevelUp, setShowLevelUp] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isRitualsOpen, setIsRitualsOpen] = useState(false);
     const [isMimirOpen, setIsMimirOpen] = useState(false);
 
     const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
+    const toggleRituals = () => setIsRitualsOpen(prev => !prev);
     const toggleMimir = (isOpen?: boolean) => setIsMimirOpen(prev => isOpen !== undefined ? isOpen : !prev);
 
     // Refined fetchDashboardData to avoid dependency issues
@@ -178,6 +182,8 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
         completeTask,
         isSidebarOpen,
         toggleSidebar,
+        isRitualsOpen,
+        toggleRituals,
         isMimirOpen,
         toggleMimir
     };

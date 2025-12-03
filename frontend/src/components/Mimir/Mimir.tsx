@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Mimir.css';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useGlobal } from '../../contexts/GlobalContext';
 
 interface ChatMessage {
@@ -14,49 +15,19 @@ interface MimirChatProps {
     mode?: 'floating' | 'fullpage' | 'modal';
 }
 
-// Typewriter Component for streaming text
-const Typewriter: React.FC<{ text: string; onComplete?: () => void }> = ({ text, onComplete }) => {
-    const [displayedText, setDisplayedText] = useState('');
-    const indexRef = useRef(0);
-
-    useEffect(() => {
-        indexRef.current = 0;
-        setDisplayedText('');
-        
-        const interval = setInterval(() => {
-            setDisplayedText((prev) => {
-                if (indexRef.current < text.length) {
-                    const char = text.charAt(indexRef.current);
-                    indexRef.current++;
-                    return prev + char;
-                } else {
-                    clearInterval(interval);
-                    if (onComplete) onComplete();
-                    return prev;
-                }
-            });
-        }, 15); // Speed of typing
-
-        return () => clearInterval(interval);
-    }, [text, onComplete]);
-
-    return <ReactMarkdown>{displayedText}</ReactMarkdown>;
-};
-
 const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
     const { isMimirOpen, toggleMimir } = useGlobal();
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    
+
     // Audio Refs
     const clickSound = useRef(new Audio('/sounds/click.wav'));
     const successSound = useRef(new Audio('/sounds/success.wav'));
 
     // Use global state for floating/modal, local for fullpage (always open)
     const isOpen = mode === 'fullpage' ? true : isMimirOpen;
-    // setIsOpen is not needed as we use toggleMimir directly
 
     // Play sound on open
     useEffect(() => {
@@ -161,12 +132,12 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
                     <>
                         {/* Backdrop for modal mode */}
                         {mode === 'modal' && (
-                            <div 
+                            <div
                                 className="mimir-modal-backdrop"
                                 onClick={() => toggleMimir(false)}
                             />
                         )}
-                        
+
                         <div className={`mimir-chat-window ${mode === 'modal' ? 'modal-center' : ''}`}>
                             <div className="mimir-window-header">
                                 <h3>MIMIR'S WISDOM</h3>
@@ -184,11 +155,7 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
                                 )}
                                 {messages.map((msg, index) => (
                                     <div key={msg.id || index} className={`msg ${msg.sender}`}>
-                                        {msg.sender === 'mimir' && index === messages.length - 1 && !loading ? (
-                                            <Typewriter text={msg.message} />
-                                        ) : (
-                                            <ReactMarkdown>{msg.message}</ReactMarkdown>
-                                        )}
+                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.message}</ReactMarkdown>
                                     </div>
                                 ))}
                                 {loading && (
@@ -251,11 +218,7 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
 
                 {messages.map((msg, index) => (
                     <div key={msg.id || index} className={`msg ${msg.sender}`}>
-                        {msg.sender === 'mimir' && index === messages.length - 1 && !loading ? (
-                            <Typewriter text={msg.message} />
-                        ) : (
-                            <ReactMarkdown>{msg.message}</ReactMarkdown>
-                        )}
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.message}</ReactMarkdown>
                     </div>
                 ))}
 

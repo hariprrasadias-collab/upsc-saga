@@ -63,7 +63,9 @@ function App() {
     error,
     refreshDashboard,
     isSidebarOpen,
-    toggleSidebar
+    toggleSidebar,
+    isRitualsOpen,
+    toggleRituals
   } = useGlobal();
 
   const location = useLocation();
@@ -79,7 +81,7 @@ function App() {
   return (
     <AnalyticsProvider>
       <PomodoroProvider onSessionComplete={handleSessionComplete}>
-        <div className="app-container" style={{
+        <div className={`app-container ${isSidebarOpen ? 'left-open' : ''} ${isRitualsOpen ? 'right-open' : ''}`} style={{
           backgroundImage: `url(/assets/bg_main.jpg)`,
           backgroundSize: 'cover',
           minHeight: '100vh',
@@ -103,8 +105,17 @@ function App() {
             ☰
           </button>
 
+          {/* RIGHT SIDEBAR TOGGLE (Rituals) */}
+          <button
+            className={`sidebar-toggle-btn right ${isRitualsOpen ? 'open' : ''}`}
+            onClick={toggleRituals}
+            aria-label="Toggle Rituals"
+          >
+            ☰
+          </button>
+
           {/* MAIN CONTENT AREA (Middle Column - Z-Index 10) */}
-          <main className={`content ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`} style={{
+          <main className={`content ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'} ${isRitualsOpen ? 'rituals-open' : 'rituals-closed'}`} style={{
             backgroundImage: currentTab === 'dashboard' ? `url(/assets/bg_sidebar.png)` : undefined,
             backgroundSize: 'cover',
             height: '100vh',
@@ -114,7 +125,7 @@ function App() {
             flexDirection: 'column',
             zIndex: 10,
             position: 'relative',
-            transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
           }}>
             {/* Only render Tab Content if we are on the root path */}
             {location.pathname === '/' && (
@@ -185,7 +196,7 @@ function App() {
           </main>
 
           {/* RITUALS PANEL (Right Column) */}
-          <div style={{ zIndex: 15, position: 'relative' }}>
+          <div className={`rituals-panel-wrapper ${isRitualsOpen ? 'open' : 'closed'}`} style={{ zIndex: 15, position: 'relative' }}>
             <RitualsPanel />
           </div>
 

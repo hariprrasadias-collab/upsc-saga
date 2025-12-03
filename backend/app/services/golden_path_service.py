@@ -185,6 +185,7 @@ class GoldenPathService:
         G = self.get_graph()
         if not G: return {"nodes": [], "edges": []}
 
+        self._calculate_potential_metrics() # Ensure metrics are ready
         nodes = []
         for n, data in G.nodes(data=True):
             nodes.append({
@@ -195,7 +196,8 @@ class GoldenPathService:
                     "effort": data["effort"],
                     "weakness": data.get("weakness", 0),
                     "roi": round(data.get("roi", 0), 2),
-                    "group": data["group"]
+                    "group": data["group"],
+                    "musk_category": data.get("musk_category", "FOCUS") # Default to FOCUS if missing
                 },
                 "position": {"x": 0, "y": 0} 
             })
