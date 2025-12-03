@@ -1,217 +1,692 @@
-/* Time Boxing Planner Styles */
+/* Time Boxing Planner - Ultra Premium Kratos Theme */
+
+:root {
+    --kratos-gold: #d4a574;
+    --kratos-gold-dim: rgba(212, 165, 116, 0.1);
+    --kratos-bg: #0b0d10;
+    --kratos-card-bg: rgba(18, 22, 31, 0.8);
+    --kratos-red: #8b0000;
+}
 
 .timebox-container {
     padding: 2rem;
     max-width: 1200px;
     margin: 0 auto;
-}
-
-.timebox-header {
-    margin-bottom: 2rem;
-}
-
-.timebox-header h1 {
     color: #ecf0f1;
-    margin: 0 0 0.5rem 0;
-    font-size: 2.5rem;
+    font-family: 'Cinzel', serif;
+    /* Assuming Cinzel is available, else fallback */
+}
+
+/* Header Section */
+.timebox-header {
+    margin-bottom: 3rem;
+    text-align: center;
 }
 
 .timebox-header p {
-    color: #95a5a6;
-    margin: 0;
+    color: #8e9aaf;
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+    font-family: 'Inter', sans-serif;
 }
 
-/* Summary values */
+/* Summary Cards */
+.timebox-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.summary-card {
+    background: linear-gradient(145deg, rgba(18, 22, 31, 0.9), rgba(10, 12, 16, 0.95));
+    border: 1px solid rgba(212, 165, 116, 0.15);
+    padding: 1.5rem;
+    border-radius: 16px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--kratos-gold), transparent);
+    opacity: 0.5;
+}
+
+.summary-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(212, 165, 116, 0.15);
+    border-color: rgba(212, 165, 116, 0.3);
+}
+
+.summary-label {
+    display: block;
+    color: #8e9aaf;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+    font-family: 'Inter', sans-serif;
+}
+
 .summary-value {
-    color: #ecf0f1;
-    font-size: 1.8rem;
+    font-size: 2.2rem;
     font-weight: bold;
+    color: var(--kratos-gold);
+    text-shadow: 0 0 10px rgba(212, 165, 116, 0.3);
 }
 
+/* Timebox List */
 .timebox-list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    gap: 1.2rem;
+}
+
+.timebox-card {
+    background: linear-gradient(90deg, rgba(212, 165, 116, 0.05), rgba(0, 0, 0, 0.4));
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: relative;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.timebox-card:hover {
+    background: linear-gradient(90deg, rgba(212, 165, 116, 0.08), rgba(0, 0, 0, 0.5));
+    border-color: rgba(212, 165, 116, 0.2);
+    transform: translateX(5px);
+}
+
+.timebox-card.overtime {
+    border-color: rgba(231, 76, 60, 0.4);
+    background: linear-gradient(90deg, rgba(231, 76, 60, 0.05), rgba(0, 0, 0, 0.4));
 }
 
 .timebox-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 1rem;
 }
 
 .timebox-info h3 {
+    margin: 0;
+    font-size: 1.3rem;
     color: #ecf0f1;
-    margin: 0 0 0.5rem 0;
+    font-weight: 500;
 }
 
 .timebox-stats {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    color: #95a5a6;
+    font-family: 'Inter', sans-serif;
+    color: #bdc3c7;
+    font-size: 0.95rem;
 }
 
 .overtime-badge {
-    background: #e74c3c;
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.85rem;
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.4);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    margin-left: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
+/* Progress Bar */
 .progress-bar-container {
-    height: 12px;
-    background: #34495e;
-    border-radius: 6px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
     overflow: hidden;
+    position: relative;
 }
 
 .progress-bar {
     height: 100%;
-    background: linear-gradient(90deg, #3498db, #2ecc71);
-    transition: width 0.3s ease;
+    background: linear-gradient(90deg, #b8860b, var(--kratos-gold));
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(212, 165, 116, 0.4);
+    position: relative;
 }
 
-.progress-bar.overtime {
-    background: linear-gradient(90deg, #e74c3c, #c0392b);
-}
-
-.delete-btn {
+.progress-bar::after {
+    content: '';
     position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: none;
-    border: none;
-    color: #e74c3c;
-    font-size: 2rem;
-    cursor: pointer;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    transition: all 0.2s;
-}
-
-.delete-btn:hover {
-    background: rgba(231, 76, 60, 0.2);
-    transform: rotate(90deg);
-}
-
-.no-timeboxes {
-    text-align: center;
-    padding: 3rem;
-    color: #7f8c8d;
-}
-
-.add-timebox-btn {
-    padding: 1rem 2rem;
-    background: #3498db;
-    border: none;
-    border-radius: 8px;
-    color: white;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
-    display: block;
-    margin: 0 auto;
-}
-
-.add-timebox-btn:hover {
-    background: #2980b9;
-    transform: scale(1.05);
-}
-
-/* Modal Styles */
-.modal-overlay {
-    position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: skewX(-20deg);
+}
+
+.progress-bar.overtime {
+    background: linear-gradient(90deg, #c0392b, #e74c3c);
+    box-shadow: 0 0 10px rgba(231, 76, 60, 0.4);
+}
+
+/* Delete Button */
+.delete-btn {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #95a5a6;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0;
+}
+
+.timebox-card:hover .delete-btn {
+    opacity: 1;
+}
+
+.delete-btn:hover {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+    border-color: rgba(231, 76, 60, 0.4);
+}
+
+/* Add Button */
+.add-timebox-btn {
+    display: block;
+    margin: 3rem auto 0;
+    padding: 1rem 3rem;
+    background: linear-gradient(135deg, rgba(212, 165, 116, 0.2), rgba(184, 134, 11, 0.2));
+    border: 1px solid rgba(212, 165, 116, 0.4);
+    color: var(--kratos-gold);
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+}
+
+.add-timebox-btn:hover {
+    background: linear-gradient(135deg, rgba(212, 165, 116, 0.3), rgba(184, 134, 11, 0.3));
+    box-shadow: 0 0 20px rgba(212, 165, 116, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Modal */
+.modal-overlay {
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
 }
 
 .modal-content {
-    background: #2c3e50;
-    padding: 2rem;
-    border-radius: 16px;
-    max-width: 500px;
-    width: 90%;
-    border: 2px solid #3498db;
+    background: #1a1d24;
+    border: 1px solid var(--kratos-gold);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(212, 165, 116, 0.2) inset;
+    padding: 2.5rem;
 }
 
 .modal-content h2 {
-    color: #ecf0f1;
-    margin: 0 0 1.5rem 0;
+    color: var(--kratos-gold);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom: 1px solid rgba(212, 165, 116, 0.2);
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
 }
 
 .modal-content label {
-    display: block;
-    color: #ecf0f1;
-    margin: 1rem 0 0.5rem 0;
+    color: #8e9aaf;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .modal-content select,
 .modal-content input {
-    width: 100%;
-    padding: 0.75rem;
-    background: #34495e;
-    border: 1px solid #4a6278;
-    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     color: #ecf0f1;
-    font-size: 1rem;
-}
-
-.modal-actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1.5rem;
-}
-
-.save-btn,
-.cancel-btn {
-    flex: 1;
-    padding: 0.75rem;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
+    padding: 1rem;
+    border-radius: 4px;
     transition: all 0.3s;
 }
 
-.save-btn {
-    background: #2ecc71;
-    color: white;
+.modal-content select:focus,
+.modal-content input:focus {
+    border-color: var(--kratos-gold);
+    box-shadow: 0 0 10px rgba(212, 165, 116, 0.1);
+    outline: none;
 }
 
-.save-btn:hover {
-    background: #27ae60;
+.modal-actions {
+    gap: 1.5rem;
+}
+
+.save-btn {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .cancel-btn {
-    background: #95a5a6;
-    color: white;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #95a5a6;
 }
 
 .cancel-btn:hover {
-    background: #7f8c8d;
+    border-color: #e74c3c;
+    color: #e74c3c;
+    background: rgba(231, 76, 60, 0.1);
+}
+
+/* Goal Input in Header */
+.goal-config {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.goal-input {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--kratos-gold);
+    color: var(--kratos-gold);
+    font-size: 1.5rem;
+    ```css color: #ecf0f1;
+    font-weight: 500;
+}
+
+.timebox-stats {
+    font-family: 'Inter', sans-serif;
+    color: #bdc3c7;
+    font-size: 0.95rem;
+}
+
+.overtime-badge {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.4);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    margin-left: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Progress Bar */
+.progress-bar-container {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #b8860b, var(--kratos-gold));
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(212, 165, 116, 0.4);
+    position: relative;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: skewX(-20deg);
+}
+
+.progress-bar.overtime {
+    background: linear-gradient(90deg, #c0392b, #e74c3c);
+    box-shadow: 0 0 10px rgba(231, 76, 60, 0.4);
+}
+
+/* Delete Button */
+.delete-btn {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #95a5a6;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0;
+}
+
+.timebox-card:hover .delete-btn {
+    opacity: 1;
+}
+
+.delete-btn:hover {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+    border-color: rgba(231, 76, 60, 0.4);
+}
+
+/* Add Button */
+.add-timebox-btn {
+    display: block;
+    margin: 3rem auto 0;
+    padding: 1rem 3rem;
+    background: linear-gradient(135deg, rgba(212, 165, 116, 0.2), rgba(184, 134, 11, 0.2));
+    border: 1px solid rgba(212, 165, 116, 0.4);
+    color: var(--kratos-gold);
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+}
+
+.add-timebox-btn:hover {
+    background: linear-gradient(135deg, rgba(212, 165, 116, 0.3), rgba(184, 134, 11, 0.3));
+    box-shadow: 0 0 20px rgba(212, 165, 116, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Modal */
+.modal-overlay {
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+}
+
+.modal-content {
+    background: #1a1d24;
+    border: 1px solid var(--kratos-gold);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(212, 165, 116, 0.2) inset;
+    padding: 2.5rem;
+}
+
+.modal-content h2 {
+    color: var(--kratos-gold);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom: 1px solid rgba(212, 165, 116, 0.2);
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+.modal-content label {
+    color: #8e9aaf;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.modal-content select,
+.modal-content input {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ecf0f1;
+    padding: 1rem;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.modal-content select:focus,
+.modal-content input:focus {
+    border-color: var(--kratos-gold);
+    box-shadow: 0 0 10px rgba(212, 165, 116, 0.1);
+    outline: none;
+}
+
+.modal-actions {
+    gap: 1.5rem;
+}
+
+.save-btn {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.cancel-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #95a5a6;
+}
+
+.cancel-btn:hover {
+    border-color: #e74c3c;
+    color: #e74c3c;
+    background: rgba(231, 76, 60, 0.1);
+}
+
+/* Goal Input in Header */
+.goal-config {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.goal-input {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--kratos-gold);
+    color: var(--kratos-gold);
+    font-size: 1.5rem;
+    width: 60px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.goal-input:focus {
+    outline: none;
+    background: rgba(212, 165, 116, 0.1);
+}
+
+.goal-label {
+    color: #8e9aaf;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+}
+
+/* New Layout */
+.timebox-content-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+.timebox-left-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.timebox-right-panel {
+    position: sticky;
+    top: 2rem;
+}
+
+/* Chart Container */
+.chart-container {
+    background: linear-gradient(145deg, rgba(18, 22, 31, 0.9), rgba(10, 12, 16, 0.95));
+    border: 1px solid rgba(212, 165, 116, 0.15);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.chart-container h3 {
+    color: var(--kratos-gold);
+    text-align: center;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1.1rem;
+}
+
+.chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #bdc3c7;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+/* Card Actions */
+.card-actions {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.timebox-card:hover .card-actions {
+    opacity: 1;
+}
+
+.focus-btn,
+.delete-btn {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #95a5a6;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: static;
+    /* Reset absolute from previous */
+    transform: none;
+}
+
+.focus-btn:hover {
+    background: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+    border-color: rgba(46, 204, 113, 0.4);
+}
+
+/* Suggestions */
+.suggestions-section {
+    margin-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1rem;
+}
+
+.suggestions-section h4 {
+    color: var(--kratos-gold);
+    margin: 0 0 1rem 0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.suggestions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.suggestion-chip {
+    background: rgba(212, 165, 116, 0.1);
+    border: 1px solid rgba(212, 165, 116, 0.2);
+    padding: 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.suggestion-chip:hover {
+    background: rgba(212, 165, 116, 0.2);
+    transform: translateX(5px);
+}
+
+.suggestion-subject {
+    display: block;
+    color: #ecf0f1;
+    font-weight: bold;
+    margin-bottom: 0.2rem;
+}
+
+.suggestion-reason {
+    display: block;
+    color: #95a5a6;
+    font-size: 0.8rem;
 }
 
 /* Responsive */
-@media (max-width: 768px) {
-    .timebox-container {
-        padding: 1rem;
-    }
-
-    .timebox-header h1 {
-        font-size: 1.8rem;
-    }
-
-    .timebox-summary {
+@media (max-width: 900px) {
+    .timebox-content-grid {
         grid-template-columns: 1fr;
     }
+
+    .timebox-right-panel {
+        order: -1;
+        /* Chart on top on mobile */
+        position: static;
+    }
 }
+
+```

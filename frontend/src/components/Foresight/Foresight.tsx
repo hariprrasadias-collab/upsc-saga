@@ -21,9 +21,14 @@ const Foresight: React.FC = () => {
     const [subjects, setSubjects] = useState<string[]>([]);
     const [expandedCard, setExpandedCard] = useState<number | null>(null);
 
+    const [activeTab, setActiveTab] = useState<'new' | 'saved'>('new');
+
     useEffect(() => {
         fetchSubjects();
-    }, []);
+        if (activeTab === 'saved') {
+            fetchSavedPredictions();
+        }
+    }, [activeTab]);
 
     const fetchSubjects = async () => {
         try {
@@ -32,6 +37,19 @@ const Foresight: React.FC = () => {
             setSubjects(data.subjects || []);
         } catch (error) {
             console.error('Failed to fetch subjects:', error);
+        }
+    };
+
+    const fetchSavedPredictions = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch('http://localhost:5000/api/foresight/saved');
+            const data = await response.json();
+            setPredictions(data.predictions || []);
+        } catch (error) {
+            console.error('Failed to fetch saved predictions:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -49,10 +67,35 @@ const Foresight: React.FC = () => {
 
             const data = await response.json();
             setPredictions(data.predictions || []);
+            setActiveTab('new');
         } catch (error) {
             console.error('Prediction failed:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const toggleFavorite = async (pred: Prediction) => {
+        if (activeTab === 'saved') {
+            // Unsave
+            try {
+                await fetch(`http://localhost:5000/api/foresight/unsave/${pred.id}`, { method: 'DELETE' });
+                setPredictions(prev => prev.filter(p => p.id !== pred.id));
+            } catch (error) {
+                console.error('Failed to unsave:', error);
+            }
+        } else {
+            // Save
+            try {
+                await fetch('http://localhost:5000/api/foresight/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(pred)
+                });
+                alert('Prediction saved to favorites!');
+            } catch (error) {
+                console.error('Failed to save:', error);
+            }
         }
     };
 
@@ -77,54 +120,70 @@ const Foresight: React.FC = () => {
                     <h1>🔮 Project Foresight</h1>
                     <p className="subtitle">The Oracle: Predicting Tomorrow's Questions Today</p>
                 </div>
-            </div>
-
-            <div className="prediction-controls">
-                <div className="control-group">
-                    <label>Subject Focus</label>
-                    <select
-                        value={selectedSubject}
-                        onChange={(e) => setSelectedSubject(e.target.value)}
+                <div className="foresight-tabs">
+                    <button
+                        className={`tab-btn ${activeTab === 'new' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('new')}
                     >
-                        {subjects.map(subject => (
-                            <option key={subject} value={subject}>{subject}</option>
-                        ))}
-                    </select>
+                        🔮 New Predictions
+                    </button>
+                    <button
+                        className={`tab-btn ${activeTab === 'saved' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('saved')}
+                    >
+                        ⭐ Saved Favorites
+                    </button>
                 </div>
-
-                <div className="control-group">
-                    <label>Timeframe (Days)</label>
-                    <input
-                        type="number"
-                        value={isNaN(timeframeDays) ? '' : timeframeDays}
-                        onChange={(e) => setTimeframeDays(parseInt(e.target.value))}
-                        min="30"
-                        max="365"
-                    />
-                </div>
-
-                <button
-                    className="predict-button"
-                    onClick={triggerPrediction}
-                    disabled={loading}
-                >
-                    {loading ? '🔮 Consulting the Oracle...' : '🔮 Generate Predictions'}
-                </button>
             </div>
+
+            {activeTab === 'new' && (
+                <div className="prediction-controls">
+                    <div className="control-group">
+                        <label>Subject Focus</label>
+                        <select
+                            value={selectedSubject}
+                            onChange={(e) => setSelectedSubject(e.target.value)}
+                        >
+                            {subjects.map(subject => (
+                                <option key={subject} value={subject}>{subject}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="control-group">
+                        <label>Timeframe (Days)</label>
+                        <input
+                            type="number"
+                            value={isNaN(timeframeDays) ? '' : timeframeDays}
+                            onChange={(e) => setTimeframeDays(parseInt(e.target.value))}
+                            min="30"
+                            max="365"
+                        />
+                    </div>
+
+                    <button
+                        className="predict-button"
+                        onClick={triggerPrediction}
+                        disabled={loading}
+                    >
+                        {loading ? '🔮 Consulting the Oracle...' : '🔮 Generate Predictions'}
+                    </button>
+                </div>
+            )}
 
             {loading && (
                 <div className="loading-oracle">
                     <div className="crystal-ball"></div>
-                    <p>Analyzing PYQs and Current Affairs...</p>
+                    <p>{activeTab === 'new' ? 'Analyzing PYQs and Current Affairs...' : 'Retrieving Ancient Prophecies...'}</p>
                 </div>
             )}
 
             <div className="predictions-grid">
-                {predictions.map((pred) => (
+                {predictions.map((pred, index) => (
                     <div
-                        key={pred.id}
-                        className={`prediction-card ${expandedCard === pred.id ? 'expanded' : ''}`}
-                        onClick={() => setExpandedCard(expandedCard === pred.id ? null : pred.id)}
+                        key={pred.id || index}
+                        className={`prediction-card ${expandedCard === (pred.id || index) ? 'expanded' : ''}`}
+                        onClick={() => setExpandedCard(expandedCard === (pred.id || index) ? null : (pred.id || index))}
                     >
                         <div className="card-header">
                             <div
@@ -141,13 +200,23 @@ const Foresight: React.FC = () => {
                                 <span className="subject-tag">{pred.subject}</span>
                                 <span className="type-tag">{pred.type}</span>
                             </div>
+                            <button
+                                className="favorite-btn"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleFavorite(pred);
+                                }}
+                                title={activeTab === 'saved' ? "Remove from Favorites" : "Save to Favorites"}
+                            >
+                                {activeTab === 'saved' ? '⭐' : '☆'}
+                            </button>
                         </div>
 
                         <div className="question-text">
                             {pred.question}
                         </div>
 
-                        {expandedCard === pred.id && (
+                        {expandedCard === (pred.id || index) && (
                             <div className="expanded-details">
                                 <div className="detail-section">
                                     <h4>📊 Reasoning</h4>
@@ -167,7 +236,6 @@ const Foresight: React.FC = () => {
                         )}
 
                         <div className="card-footer">
-                            <button className="action-btn">📌 Pin</button>
                             <button className="action-btn">📝 Create Flashcards</button>
                             <button className="action-btn">🧪 Mock Test</button>
                         </div>
@@ -178,8 +246,8 @@ const Foresight: React.FC = () => {
             {predictions.length === 0 && !loading && (
                 <div className="empty-state">
                     <div className="crystal-ball-static"></div>
-                    <h3>The Crystal Ball Awaits</h3>
-                    <p>Configure your parameters and trigger a prediction to see what the future holds.</p>
+                    <h3>{activeTab === 'new' ? 'The Crystal Ball Awaits' : 'No Saved Prophecies'}</h3>
+                    <p>{activeTab === 'new' ? 'Configure your parameters and trigger a prediction to see what the future holds.' : 'Star predictions to save them here for future reference.'}</p>
                 </div>
             )}
         </div>

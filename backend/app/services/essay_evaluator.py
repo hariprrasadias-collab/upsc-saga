@@ -10,7 +10,7 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 class EssayEvaluator:
     def __init__(self):
-        self.model = genai.GenerativeModel('gemini-pro-latest')
+        self.model = genai.GenerativeModel('gemini-flash-latest')
 
     def evaluate_essay(self, topic, content):
         """

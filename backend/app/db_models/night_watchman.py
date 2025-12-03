@@ -15,24 +15,52 @@ def init_watchman_tables():
             summary TEXT, -- The main briefing text (Markdown)
             quote TEXT, -- Motivational quote for the day
             articles_analyzed INTEGER DEFAULT 0,
+            mind_map TEXT, -- Mermaid.js syntax
+            static_linkage TEXT, -- Book reference
+            quiz_data TEXT, -- JSON string of MCQs
             generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             is_read BOOLEAN DEFAULT 0
         )
     ''')
+    
+    # Migration for existing tables (simplistic check)
+    try:
+        conn.execute('ALTER TABLE morning_briefings ADD COLUMN mind_map TEXT')
+    except Exception:
+        pass
+        
+    try:
+        conn.execute('ALTER TABLE morning_briefings ADD COLUMN static_linkage TEXT')
+    except Exception:
+        pass
+
+    try:
+        conn.execute('ALTER TABLE morning_briefings ADD COLUMN quiz_data TEXT')
+    except Exception:
+        pass # Columns likely exist
     
     conn.commit()
 
 def save_briefing(briefing_data):
     """Save a generated morning briefing"""
     conn = get_db()
+    
+    # Serialize quiz_data if it's a list/dict
+    quiz_json = briefing_data.get('quiz', [])
+    if isinstance(quiz_json, (list, dict)):
+        quiz_json = json.dumps(quiz_json)
+        
     cursor = conn.execute('''
-        INSERT INTO morning_briefings (date, summary, quote, articles_analyzed)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO morning_briefings (date, summary, quote, articles_analyzed, mind_map, static_linkage, quiz_data)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     ''', (
         briefing_data['date'],
         briefing_data['summary'],
         briefing_data.get('quote', ''),
-        briefing_data.get('articles_count', 0)
+        briefing_data.get('articles_count', 0),
+        briefing_data.get('mind_map', ''),
+        briefing_data.get('static_linkage', ''),
+        quiz_json
     ))
     conn.commit()
     return cursor.lastrowid

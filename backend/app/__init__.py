@@ -30,7 +30,7 @@ def create_app():
         syllabus, flashcards, analytics, essay, csat, badges, challenges, 
         shop_new, weak_areas, admin, predictive, pomodoro, timebox, planner, 
         templates, revision, heatmap, model_answers, issue_mapping, scheduler,
-        mindmap, study_plan, golden_path
+        mindmap, study_plan, golden_path, watchman
     )
     
     # Register blueprints
@@ -48,6 +48,11 @@ def create_app():
     app.register_blueprint(anki.bp)
     app.register_blueprint(warmap.warmap)
     app.register_blueprint(answer_writing.answer_writing)
+    
+    # Night Watchman Registration (Explicit)
+    print("🦉 Registering Night Watchman Blueprint...")
+    app.register_blueprint(watchman.watchman_bp, url_prefix='/night-watchman')
+    
     app.register_blueprint(mock_tests.mock_tests)
     app.register_blueprint(pyq.bp)
     app.register_blueprint(syllabus.bp)
@@ -100,8 +105,7 @@ def create_app():
     from app.routes.foresight import foresight_bp
     app.register_blueprint(foresight_bp, url_prefix='/api/foresight')
 
-    from app.routes.watchman import watchman_bp
-    app.register_blueprint(watchman_bp, url_prefix='/api/watchman')
+    # Removed duplicate watchman registration from here
 
     from app.routes.panopticon import panopticon_bp
     app.register_blueprint(panopticon_bp)
@@ -115,11 +119,15 @@ def create_app():
     from app.db_models.mind_palace import init_mind_palace_tables
     from app.db_models.night_watchman import init_watchman_tables
     from app.db_models.panopticon import init_panopticon_tables
+    from app.db_models.foresight import init_foresight_tables
+    from app.db_models.neural_hash import init_neural_hash_tables
     from app.db import DATABASE
     
     with app.app_context():
         init_mind_palace_tables()
         init_watchman_tables()
         init_panopticon_tables(DATABASE)
+        init_foresight_tables()
+        init_neural_hash_tables()
 
     return app

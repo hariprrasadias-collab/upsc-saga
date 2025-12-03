@@ -20,7 +20,7 @@ class MimirService:
                 # Use models that are actually available in the API
                 # Based on genai.list_models() output
                 models_to_try = [
-                    'gemini-pro-latest',          # Stable Flash model
+                    'gemini-flash-latest',          # Stable Flash model
                     'gemini-2.5-computer-use-preview-10-2025',            # Stable Pro model
                     'learnlm-2.0-flash-experimental',                # Legacy
                 ]
@@ -93,15 +93,41 @@ class MimirService:
                 max_output_tokens=1024,
             )
             
-            response = self.model.generate_content(
-                full_prompt,
-                generation_config=generation_config
-            )
+            # Retry logic for rate limits
+            max_retries = 3
+            retry_delay = 2
+            
+            for attempt in range(max_retries):
+                try:
+                    response = self.model.generate_content(
+                        full_prompt,
+                        generation_config=generation_config
+                    )
+                    break # Success, exit loop
+                except Exception as e:
+                    if "429" in str(e) or "ResourceExhausted" in str(e):
+                        if attempt < max_retries - 1:
+                            wait_time = retry_delay * (2 ** attempt)
+                            print(f"⚠️ Quota exceeded. Retrying in {wait_time}s... (Attempt {attempt + 1}/{max_retries})")
+                            import time
+                            time.sleep(wait_time)
+                            continue
+                    raise e # Re-raise if not a rate limit or retries exhausted
+            
+            # Safety check for empty response
+            if not response.parts:
+                print(f"WARNING: Gemini returned no content. Finish Reason: {response.candidates[0].finish_reason}")
+                if response.prompt_feedback:
+                    print(f"Prompt Feedback: {response.prompt_feedback}")
+                return "I apologize, but I cannot answer that query. It may have triggered a safety filter or hit a limit."
+
             print(f"Got response from Gemini (length: {len(response.text)} chars)")
             return response.text.strip()
             
         except Exception as e:
             print(f"ERROR generating Mimir response: {type(e).__name__}: {e}")
+            if "429" in str(e) or "ResourceExhausted" in str(e):
+                return "I am currently overwhelmed with requests (Rate Limit Exceeded). Please give me a moment to rest and try again in a few seconds."
             import traceback
             traceback.print_exc()
             return f"I seem to have lost my connection to the Well of Wisdom. Error: {type(e).__name__}"

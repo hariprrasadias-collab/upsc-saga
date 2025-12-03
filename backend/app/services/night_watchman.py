@@ -2,23 +2,36 @@
 The Night Watchman - Autonomous Research Service
 """
 import os
+import json
 import feedparser
 import google.generativeai as genai
 from datetime import datetime
 from app.db_models.night_watchman import save_briefing
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class NightWatchman:
     def __init__(self):
+        self.model = None # Initialize to None
         self.api_key = os.environ.get('GEMINI_API_KEY')
+        
         if self.api_key:
-            genai.configure(api_key=self.api_key)
-            self.model = genai.GenerativeModel('gemini-pro-latest')
+            try:
+                genai.configure(api_key=self.api_key)
+                self.model = genai.GenerativeModel('gemini-flash-latest')
+                print("🦉 Night Watchman: Vision Online (Model Loaded)")
+            except Exception as e:
+                print(f"⚠️ Night Watchman Vision Error: {e}")
+        else:
+            print("⚠️ Night Watchman Warning: GEMINI_API_KEY not found in environment")
         
         self.feeds = [
             'https://www.thehindu.com/news/national/feeder/default.rss',
             'https://pib.gov.in/RSS/RssFeed.aspx?ModId=2',
             'https://indianexpress.com/section/india/feed/',
-            'https://www.thehindu.com/opinion/editorial/feeder/default.rss'
+            'https://www.thehindu.com/opinion/editorial/feeder/default.rss',
+            'https://www.downtoearth.org.in/rss/feed' # Environment
         ]
 
     def perform_nightly_watch(self):
@@ -43,7 +56,10 @@ class NightWatchman:
             'date': datetime.now().strftime('%Y-%m-%d'),
             'summary': briefing.get('summary', 'Analysis failed.'),
             'quote': briefing.get('quote', 'The early bird catches the worm.'),
-            'articles_count': len(articles)
+            'articles_count': len(articles),
+            'mind_map': briefing.get('mind_map', ''),
+            'static_linkage': briefing.get('static_linkage', ''),
+            'quiz': briefing.get('quiz', [])
         })
         
         print(f"🦉 Night Watchman: Patrol complete. Briefing #{briefing_id} filed.")
@@ -126,7 +142,7 @@ class NightWatchman:
         return articles
 
     def _synthesize_briefing(self, articles):
-        """Use AI to create a cohesive morning report"""
+        """Use AI to create a cohesive morning report with Deep Analysis"""
         if not self.model:
             return {
                 "summary": "AI Offline. Raw Intelligence gathered.",
@@ -135,47 +151,107 @@ class NightWatchman:
             
         # Prepare context
         articles_text = "\n\n".join([
-            f"- {a['title']} ({a['source']}): {a['summary'][:200]}..." 
-            for a in articles[:15] # Limit to top 15 to fit context
+            f"- {a['title']} ({a['source']}): {a['summary'][:300]}..." 
+            for a in articles[:20] # Increased limit
         ])
         
         prompt = f"""
-        You are 'The Night Watchman', an autonomous research agent for a UPSC aspirant.
+        You are 'The Night Watchman', an elite autonomous research agent for a UPSC Civil Services aspirant.
         While the user slept, you gathered the following intelligence (News):
         
         {articles_text}
         
         TASK:
-        Create a "Morning Briefing" (Markdown format).
-        1. **Executive Summary**: 3-4 bullet points of the MOST important UPSC-relevant news.
-        2. **Deep Dive**: Pick ONE topic that is highly relevant to UPSC Syllabus and explain its significance (connect to Static syllabus).
-        3. **Quote of the Day**: A stoic or motivational quote for a student.
+        Create a "Morning Briefing" that is NOT just a summary, but a STRATEGIC ASSET.
+        
+        1. **Relevance Filter**: Ignore any news with < 7/10 relevance to UPSC.
+        2. **Syllabus Mapping**: Map every selected story to a specific GS Paper (GS1/GS2/GS3/GS4).
+        3. **Editorial Analysis**: For opinions/editorials, extract the Core Argument, Pros, and Cons.
+        4. **Auto-Flashcards**: Generate 3 high-yield flashcards from today's news.
+        5. **Visual Intelligence**: Create a Mermaid.js Mind Map syntax (graph TD) for the "Deep Dive" topic.
+        6. **Static Linkage**: Connect the "Deep Dive" topic to a specific standard book chapter (e.g., "Laxmikanth Ch 10").
+        7. **Daily Quiz**: Generate 5 MCQs based on the briefing to test retention.
         
         OUTPUT FORMAT (JSON):
         {{
-            "summary": "Markdown string...",
-            "quote": "Quote text..."
+            "summary": "Markdown string containing:\\n- **Executive Summary** (Top 3 stories with GS Tags)\\n- **Deep Dive** (Best Editorial Analysis)\\n- **Flashcards** (Front/Back format)",
+            "quote": "Stoic/Motivational quote...",
+            "flashcards": [
+                {{"front": "...", "back": "...", "tags": ["GS2", "Polity"]}}
+            ],
+            "mind_map": "graph TD; A[Topic] --> B[Subtopic]; ...",
+            "static_linkage": "Laxmikanth Chapter 10 (Parliament)",
+            "quiz": [
+                {{
+                    "question": "Question text...",
+                    "options": ["A", "B", "C", "D"],
+                    "correct_answer": "A",
+                    "explanation": "Brief explanation..."
+                }},
+                ... (5 questions)
+            ]
         }}
         """
         
-        try:
-            response = self.model.generate_content(prompt)
-            import json
-            import re
-            
-            text = response.text.strip()
-            # Extract JSON
-            json_match = re.search(r"\{.*\}", text, re.DOTALL)
-            if json_match:
-                return json.loads(json_match.group(0))
-            else:
-                return {"summary": text, "quote": "Carpe Diem."}
+        
+        # Retry logic for rate limits
+        max_retries = 3
+        retry_delay = 2
+        
+        for attempt in range(max_retries):
+            try:
+                response = self.model.generate_content(prompt)
+                import json
+                import re
                 
+                text = response.text.strip()
+                # Extract JSON
+                json_match = re.search(r"\{.*\}", text, re.DOTALL)
+                if json_match:
+                    data = json.loads(json_match.group(0))
+                    
+                    # If flashcards are present, we could save them to the DB here
+                    # For now, we just return them in the briefing
+                    if 'flashcards' in data:
+                        self._save_auto_flashcards(data['flashcards'])
+                        
+                    return data
+                else:
+                    print(f"⚠️ Synthesis Attempt {attempt+1} Failed: No JSON found")
+                    if attempt == max_retries - 1:
+                        return {"summary": text, "quote": "Carpe Diem."}
+            
+            except Exception as e:
+                print(f"⚠️ Synthesis Attempt {attempt+1} Error: {e}")
+                if "429" in str(e) or "ResourceExhausted" in str(e):
+                    if attempt < max_retries - 1:
+                        import time
+                        wait_time = retry_delay * (2 ** attempt)
+                        print(f"⏳ Quota exceeded. Retrying in {wait_time}s...")
+                        time.sleep(wait_time)
+                        continue
+                
+                if attempt == max_retries - 1:
+                    return {
+                        "summary": f"**Briefing Unavailable**\n\nThe Watchman encountered heavy interference (API Error: {str(e)}). Please try again later.",
+                        "quote": "Perseverance is key."
+                    }
+        
+        return None
+
+    def _save_auto_flashcards(self, cards):
+        """Save generated flashcards to the 'Current Affairs' deck"""
+        try:
+            from app.db import get_db
+            conn = get_db()
+            for card in cards:
+                conn.execute('''
+                    INSERT INTO flashcards (front, back, tags, review_status)
+                    VALUES (?, ?, ?, 'new')
+                ''', (card['front'], card['back'], json.dumps(card.get('tags', ['Current Affairs']))))
+            conn.commit()
+            print(f"⚡ Night Watchman: Created {len(cards)} auto-flashcards.")
         except Exception as e:
-            print(f"❌ Watchman Synthesis Error: {e}")
-            return {
-                "summary": "Failed to synthesize briefing due to interference.",
-                "quote": "Perseverance is key."
-            }
+            print(f"⚡ Flashcard Save Error: {e}")
 
 night_watchman = NightWatchman()

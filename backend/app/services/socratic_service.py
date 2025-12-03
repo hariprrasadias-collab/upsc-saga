@@ -34,12 +34,12 @@ AGENTS = {
 def get_model():
     """Returns the best available model with fallback."""
     try:
-        return genai.GenerativeModel('gemini-pro-latest')
+        return genai.GenerativeModel('gemini-flash-latest')
     except:
         try:
-            return genai.GenerativeModel('gemini-pro-latest')
+            return genai.GenerativeModel('gemini-flash-latest')
         except:
-            return genai.GenerativeModel('gemini-pro')
+            return genai.GenerativeModel('gemini-flash')
 
 def generate_debate_turn(topic, history, user_input=None):
     if not GEMINI_API_KEY:

@@ -26,7 +26,7 @@ class BrainService:
         else:
             try:
                 genai.configure(api_key=self.api_key)
-                self.model = genai.GenerativeModel('gemini-pro-latest') # Using flash for speed
+                self.model = genai.GenerativeModel('gemini-flash-latest') # Using flash for speed
                 print("🧠 BrainService Online: Connected to Gemini Cortex.")
             except Exception as e:
                 print(f"❌ BrainService Error: Failed to initialize Gemini: {e}")

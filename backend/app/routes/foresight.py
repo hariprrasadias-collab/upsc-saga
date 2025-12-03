@@ -64,3 +64,70 @@ def get_subjects():
         "International Relations"
     ]
     return jsonify({'subjects': subjects})
+
+@foresight_bp.route('/save', methods=['POST'])
+def save_prediction():
+    """Save a prediction to favorites"""
+    try:
+        from app.db import get_db
+        conn = get_db()
+        data = request.json
+        
+        conn.execute('''
+            INSERT INTO foresight_predictions 
+            (user_id, question, type, probability, reasoning, subject, topic, preparation_tip)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            1, # Default User ID
+            data.get('question'),
+            data.get('type'),
+            data.get('probability'),
+            data.get('reasoning'),
+            data.get('subject'),
+            data.get('topic'),
+            data.get('preparation_tip')
+        ))
+        conn.commit()
+        
+        return jsonify({'success': True, 'message': 'Prediction saved successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@foresight_bp.route('/saved', methods=['GET'])
+def get_saved_predictions():
+    """Get all saved predictions"""
+    try:
+        from app.db import get_db
+        conn = get_db()
+        
+        rows = conn.execute('SELECT * FROM foresight_predictions ORDER BY created_at DESC').fetchall()
+        predictions = []
+        for r in rows:
+            predictions.append({
+                'id': r['id'],
+                'question': r['question'],
+                'type': r['type'],
+                'probability': r['probability'],
+                'reasoning': r['reasoning'],
+                'subject': r['subject'],
+                'topic': r['topic'],
+                'preparation_tip': r['preparation_tip'],
+                'generated_at': r['created_at'],
+                'is_favorite': True
+            })
+            
+        return jsonify({'predictions': predictions})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@foresight_bp.route('/unsave/<int:pred_id>', methods=['DELETE'])
+def unsave_prediction(pred_id):
+    """Remove a prediction from favorites"""
+    try:
+        from app.db import get_db
+        conn = get_db()
+        conn.execute('DELETE FROM foresight_predictions WHERE id = ?', (pred_id,))
+        conn.commit()
+        return jsonify({'success': True, 'message': 'Prediction removed'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500

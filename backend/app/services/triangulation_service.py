@@ -12,9 +12,9 @@ if GEMINI_API_KEY:
 
 def get_model():
     try:
-        return genai.GenerativeModel('gemini-pro-latest')
+        return genai.GenerativeModel('gemini-flash-latest')
     except:
-        return genai.GenerativeModel('gemini-pro')
+        return genai.GenerativeModel('gemini-flash')
 
 def analyze_topic_triangulation(text):
     """

@@ -6,6 +6,7 @@ from app.services.night_watchman import night_watchman
 from app.db_models.night_watchman import get_latest_briefing, mark_briefing_read, init_watchman_tables
 
 watchman_bp = Blueprint('watchman', __name__)
+print("🦉 Night Watchman Routes Imported")
 
 @watchman_bp.route('/trigger', methods=['POST'])
 def trigger_watchman():
@@ -16,7 +17,7 @@ def trigger_watchman():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@watchman_bp.route('/briefing/latest', methods=['GET'])
+@watchman_bp.route('/latest', methods=['GET'])
 def get_briefing():
     """Get the latest morning briefing"""
     try:
@@ -34,5 +35,38 @@ def mark_read(id):
     try:
         mark_briefing_read(id)
         return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@watchman_bp.route('/history', methods=['GET'])
+def get_history():
+    """Get briefing history"""
+    try:
+        from app.db import get_db
+        conn = get_db()
+        rows = conn.execute('''
+            SELECT id, date, quote, articles_analyzed, is_read 
+            FROM morning_briefings 
+            ORDER BY date DESC 
+            LIMIT 30
+        ''').fetchall()
+        
+        history = [dict(row) for row in rows]
+        return jsonify({'success': True, 'history': history})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@watchman_bp.route('/briefing/<int:id>', methods=['GET'])
+def get_briefing_by_id(id):
+    """Get a specific briefing"""
+    try:
+        from app.db import get_db
+        conn = get_db()
+        row = conn.execute('SELECT * FROM morning_briefings WHERE id = ?', (id,)).fetchone()
+        
+        if row:
+            return jsonify({'success': True, 'briefing': dict(row)})
+        else:
+            return jsonify({'success': False, 'message': 'Briefing not found'}), 404
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500

@@ -13,7 +13,7 @@ genai.configure(api_key=GEMINI_API_KEY)
 
 class AnswerEvaluator:
     def __init__(self):
-        self.model = genai.GenerativeModel('gemini-pro')
+        self.model = genai.GenerativeModel('gemini-flash-latest')
     
     def evaluate_answer(self, question, answer_text, word_limit, keywords=None, model_answer=None):
         """

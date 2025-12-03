@@ -5,22 +5,20 @@ import os
 import google.generativeai as genai
 import json
 import re
+from functools import lru_cache
+from app.db_models.neural_hash import save_neural_hash_log
 
 class NeuralHashService:
     def __init__(self):
         self.api_key = os.environ.get('GEMINI_API_KEY')
         if self.api_key:
             genai.configure(api_key=self.api_key)
-            self.model = genai.GenerativeModel('gemini-pro-latest')
+            self.model = genai.GenerativeModel('gemini-flash-latest')
         self._cache = {}
 
     def decode_text(self, text: str, context_type: str = 'general'):
         """
         Decodes the input text to find hidden patterns, keywords, and themes relevant to UPSC.
-        
-        Args:
-            text: The input text (editorial, notes, PYQ, etc.)
-            context_type: 'pyq', 'syllabus', 'editorial', 'answer', 'general'
         """
         if not self.model:
             return {
@@ -28,17 +26,35 @@ class NeuralHashService:
                 "error": "Neural Hash offline. API Key missing."
             }
 
+        # Check Cache (Simple in-memory for now, could be Redis later)
+        cache_key = f"{context_type}:{hash(text)}"
+        if cache_key in self._cache:
+            print("⚡ Neural Hash: Cache Hit")
+            return {"success": True, "data": self._cache[cache_key]}
+
         prompt = self._construct_prompt(text, context_type)
         
-        try:
-            response = self.model.generate_content(prompt)
-            return self._parse_response(response.text)
-        except Exception as e:
-            print(f"❌ Neural Hash Error: {e}")
-            return {
-                "success": False,
-                "error": str(e)
-            }
+        retries = 3
+        for attempt in range(retries):
+            try:
+                response = self.model.generate_content(prompt)
+                result = self._parse_response(response.text)
+                
+                if result['success']:
+                    # Cache and Persist
+                    self._cache[cache_key] = result['data']
+                    save_neural_hash_log(text, context_type, result['data'])
+                    return result
+            except Exception as e:
+                print(f"⚠️ Neural Hash Attempt {attempt+1} failed: {e}")
+                if attempt == retries - 1:
+                    print(f"❌ Neural Hash Error after {retries} attempts: {e}")
+                    return {
+                        "success": False,
+                        "error": f"Failed after {retries} attempts. Last error: {str(e)}"
+                    }
+                import time
+                time.sleep(2 ** attempt) # Exponential backoff: 1s, 2s, 4s
 
     def _construct_prompt(self, text, context_type):
         base_prompt = """
@@ -54,11 +70,14 @@ class NeuralHashService:
         TASK:
         Analyze the text and extract the following in JSON format:
         1. "core_themes": List of 3-5 central themes (The "Soul" of the topic).
-        2. "high_yield_keywords": List of specific terms/phrases that are "fodder" for Mains answers (e.g., "Cooperative Federalism", "Strategic Autonomy").
-        3. "examiner_pattern": A brief insight into how an examiner might twist this topic (e.g., "Focuses on implementation challenges rather than policy intent").
+        2. "high_yield_keywords": List of specific terms/phrases that are "fodder" for Mains answers.
+        3. "examiner_pattern": A brief insight into how an examiner might twist this topic.
         4. "potential_questions": 2-3 questions (Prelims or Mains) derived from this text.
         5. "complexity_score": 1-10 (1=Basic, 10=Esoteric/Complex).
         6. "relevance_score": 1-10 (How important is this for UPSC?).
+        7. "cross_linkages": List of connections to other GS Papers (e.g., "Connects to GS3 Environment").
+        8. "prelims_traps": Identify potential confusing points or "traps" for Prelims.
+        9. "data_points": Extract specific data/stats if available.
 
         OUTPUT JSON FORMAT:
         {{
@@ -70,10 +89,13 @@ class NeuralHashService:
                 {{"type": "Prelims", "question": "..."}}
             ],
             "complexity_score": 5,
-            "relevance_score": 8
+            "relevance_score": 8,
+            "cross_linkages": ["GS2 - Polity", "GS3 - Economy"],
+            "prelims_traps": ["Trap 1", "Trap 2"],
+            "data_points": ["Data 1", "Data 2"]
         }}
         """
-        return base_prompt.format(text=text[:10000], context_type=context_type) # Limit input to avoid token limits
+        return base_prompt.format(text=text[:10000], context_type=context_type)
 
     def _parse_response(self, text):
         try:
@@ -87,7 +109,6 @@ class NeuralHashService:
             data = json.loads(text)
             return {"success": True, "data": data}
         except json.JSONDecodeError:
-            # Fallback if JSON parsing fails
             return {
                 "success": False, 
                 "error": "Failed to decode patterns. Raw output received.",
@@ -128,7 +149,7 @@ class NeuralHashService:
         self.api_key = os.environ.get('GEMINI_API_KEY')
         if self.api_key:
             genai.configure(api_key=self.api_key)
-            self.model = genai.GenerativeModel('gemini-pro-latest') # Optimized model
+            self.model = genai.GenerativeModel('gemini-flash-latest') # Optimized model
         self._cache = {}
 
     def find_quantum_connections(self, topic: str):

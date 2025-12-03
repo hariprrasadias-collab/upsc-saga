@@ -69,7 +69,7 @@ Provide 2-4 most relevant mappings. Be specific and exam-focused.
 """
     
     try:
-        model = genai.GenerativeModel('gemini-pro-latest')
+        model = genai.GenerativeModel('gemini-flash-latest')
         response = model.generate_content(prompt)
         
         # Parse AI response

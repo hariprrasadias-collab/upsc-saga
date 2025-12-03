@@ -88,3 +88,29 @@ def delete_timebox(subject):
         return jsonify({'success': True})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@timebox_bp.route('/api/timebox/suggestions', methods=['GET'])
+@cross_origin()
+def get_suggestions():
+    """Get smart suggestions for time boxing based on weak areas"""
+    try:
+        conn = get_db()
+        # Import here to avoid circular imports if any, or just standard practice for service usage
+        from app.services.analytics_service import identify_weak_areas
+        
+        # Get top 3 weak areas
+        weak_areas = identify_weak_areas(conn, 1, limit=3)
+        conn.close()
+        
+        suggestions = []
+        for area in weak_areas:
+            suggestions.append({
+                'subject': area['subject'],
+                'reason': f"Weakness Score: {area['weakness_score']}% - {area['action']}",
+                'recommended_hours': 2.0 # Default recommendation
+            })
+            
+        return jsonify(suggestions)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

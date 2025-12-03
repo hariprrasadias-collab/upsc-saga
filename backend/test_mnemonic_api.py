@@ -12,7 +12,7 @@ genai.configure(api_key=GEMINI_API_KEY)
 
 # Test simple generation
 try:
-    model = genai.GenerativeModel('gemini-pro')
+    model = genai.GenerativeModel('gemini-flash-latest')
     response = model.generate_content("Say hello in one word")
     print(f"\n✅ SUCCESS! Model response: {response.text}")
     print("\nMnemonic Generator should work now after Flask restart!")

@@ -2,7 +2,8 @@
 API Routes for The Neural Hash
 """
 from flask import Blueprint, jsonify, request
-from app.services.neural_hash_service import neural_hash_service
+from app.services.neural_hash_service_v2 import neural_hash_service
+from app.db_models.neural_hash import get_neural_hash_history
 
 neural_hash_bp = Blueprint('neural_hash', __name__)
 
@@ -25,3 +26,13 @@ def decode_text():
         return jsonify(result)
     else:
         return jsonify(result), 500
+
+@neural_hash_bp.route('/history', methods=['GET'])
+def get_history():
+    """Get past decodes"""
+    try:
+        from app.db_models.neural_hash import get_neural_hash_history
+        history = get_neural_hash_history()
+        return jsonify({'success': True, 'history': history})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
