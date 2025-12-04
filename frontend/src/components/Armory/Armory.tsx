@@ -1,6 +1,8 @@
 // Enhanced Armory with Badges, Shop, and Inventory tabs
 import React, { useState, useEffect } from 'react';
 import './Armory.css';
+import { brainService } from '../../services/BrainService';
+import MarkdownRenderer from '../Shared/MarkdownRenderer';
 
 // Shop catalog remains the same
 const SHOP_CATALOG = [
@@ -32,6 +34,8 @@ const Armory: React.FC = () => {
     const [ownedItems, setOwnedItems] = useState<Set<string>>(new Set());
     const [badges, setBadges] = useState<Badge[]>([]);
     const [loading, setLoading] = useState(true);
+    const [recommendation, setRecommendation] = useState<string | null>(null);
+    const [isConsulting, setIsConsulting] = useState(false);
 
     useEffect(() => {
         fetchData();
@@ -83,6 +87,24 @@ const Armory: React.FC = () => {
         }
     };
 
+    const handleAskBrok = async () => {
+        setIsConsulting(true);
+        try {
+            const payload = {
+                hacksilver: hacksilver,
+                weak_areas: ['History', 'Polity'] // In a real app, fetch this from analytics
+            };
+            const result = await brainService.executeAction('RECOMMEND_ARMORY_ITEM', payload);
+            if (result.success) {
+                setRecommendation(result.recommendation);
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsConsulting(false);
+        }
+    };
+
     const getRarityClass = (rarity: string) => {
         return `rarity-${rarity.toLowerCase()}`;
     };
@@ -131,13 +153,13 @@ const Armory: React.FC = () => {
             </div>
 
             {loading ? (
-                <div className="loading">Stoking the forge...</div>
+                <div className="loading neon-text-orange">Stoking the forge...</div>
             ) : (
                 <>
                     {/* Badges Tab */}
                     {activeTab === 'badges' && (
                         <div className="badges-container">
-                            <div className="badge-stats">
+                            <div className="badge-stats glass-panel">
                                 <span>Unlocked: {badges.filter(b => b.unlocked).length} / {badges.length}</span>
                                 <span>Total XP Earned: {badges.filter(b => b.unlocked).reduce((sum, b) => sum + b.xp_reward, 0)}</span>
                             </div>
@@ -148,14 +170,14 @@ const Armory: React.FC = () => {
 
                                 return (
                                     <div key={category} className="badge-category">
-                                        <h2 className="category-title">
+                                        <h2 className="category-title neon-text-blue">
                                             {getCategoryIcon(category)} {category.charAt(0).toUpperCase() + category.slice(1)} Badges
                                         </h2>
                                         <div className="badge-grid">
                                             {categoryBadges.map(badge => (
                                                 <div
                                                     key={badge.id}
-                                                    className={`badge-card ${badge.unlocked ? 'unlocked' : 'locked'} ${getRarityClass(badge.rarity)}`}
+                                                    className={`badge-card glass-panel ${badge.unlocked ? 'unlocked' : 'locked'} ${getRarityClass(badge.rarity)}`}
                                                 >
                                                     <div className="badge-icon">{badge.icon_url}</div>
                                                     <div className="badge-info">
@@ -188,38 +210,70 @@ const Armory: React.FC = () => {
 
                     {/* Shop Tab */}
                     {activeTab === 'shop' && (
-                        <div className="shop-grid">
-                            {SHOP_CATALOG.map(item => {
-                                const isOwned = ownedItems.has(item.id);
-                                const canAfford = hacksilver >= item.cost;
-
-                                return (
-                                    <div key={item.id} className="shop-item">
-                                        <div className="item-icon">{item.icon}</div>
-                                        <h2 className="item-name">{item.name}</h2>
-                                        <p className="item-desc">{item.description}</p>
-
-                                        {isOwned ? (
-                                            <div className="owned-badge">OWNED</div>
-                                        ) : (
-                                            <button
-                                                className="buy-btn"
-                                                onClick={() => handleBuy(item)}
-                                                disabled={!canAfford}
-                                            >
-                                                {canAfford ? `Craft (${item.cost})` : `Need ${item.cost}`}
-                                            </button>
-                                        )}
+                        <>
+                            <div className="brok-consult" style={{ marginBottom: '20px', textAlign: 'center' }}>
+                                <button
+                                    onClick={handleAskBrok}
+                                    disabled={isConsulting}
+                                    style={{
+                                        background: '#e67e22',
+                                        border: '2px solid #d35400',
+                                        color: 'white',
+                                        padding: '10px 20px',
+                                        borderRadius: '5px',
+                                        cursor: 'pointer',
+                                        fontWeight: 'bold'
+                                    }}
+                                >
+                                    {isConsulting ? 'Brok is thinking...' : '🔨 Ask Brok what to buy'}
+                                </button>
+                                {recommendation && (
+                                    <div style={{
+                                        marginTop: '10px',
+                                        background: 'rgba(0,0,0,0.5)',
+                                        padding: '10px',
+                                        borderRadius: '5px',
+                                        borderLeft: '4px solid #e67e22',
+                                        color: '#ddd',
+                                        fontStyle: 'italic'
+                                    }}>
+                                        <MarkdownRenderer content={`"${recommendation}"`} />
                                     </div>
-                                );
-                            })}
-                        </div>
+                                )}
+                            </div>
+                            <div className="shop-grid">
+                                {SHOP_CATALOG.map(item => {
+                                    const isOwned = ownedItems.has(item.id);
+                                    const canAfford = hacksilver >= item.cost;
+
+                                    return (
+                                        <div key={item.id} className="shop-item glass-panel">
+                                            <div className="item-icon">{item.icon}</div>
+                                            <h2 className="item-name neon-text-orange">{item.name}</h2>
+                                            <p className="item-desc">{item.description}</p>
+
+                                            {isOwned ? (
+                                                <div className="owned-badge">OWNED</div>
+                                            ) : (
+                                                <button
+                                                    className="buy-btn"
+                                                    onClick={() => handleBuy(item)}
+                                                    disabled={!canAfford}
+                                                >
+                                                    {canAfford ? `Craft (${item.cost})` : `Need ${item.cost}`}
+                                                </button>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </>
                     )}
 
                     {/* Inventory Tab */}
                     {activeTab === 'inventory' && (
                         <div className="inventory-container">
-                            <h2>Your Inventory</h2>
+                            <h2 className="neon-text-blue">Your Inventory</h2>
                             {Array.from(ownedItems).length === 0 ? (
                                 <p className="empty-inventory">Your inventory is empty. Visit the Shop to acquire items!</p>
                             ) : (
@@ -229,7 +283,7 @@ const Armory: React.FC = () => {
                                         if (!item) return null;
 
                                         return (
-                                            <div key={itemId} className="inventory-item">
+                                            <div key={itemId} className="inventory-item glass-panel">
                                                 <div className="item-icon">{item.icon}</div>
                                                 <h3>{item.name}</h3>
                                                 <p>{item.description}</p>

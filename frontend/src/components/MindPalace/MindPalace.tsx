@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import './MindPalace.css';
-import { FaPlus, FaMapMarkerAlt, FaBoxOpen, FaArrowLeft } from 'react-icons/fa';
+import { FaPlus, FaArrowLeft } from 'react-icons/fa';
+import { brainService } from '../../services/BrainService';
 
 interface Location {
     id: number;
@@ -37,6 +38,7 @@ const MindPalace: React.FC = () => {
     const [newName, setNewName] = useState('');
     const [newDesc, setNewDesc] = useState('');
     const [newContent, setNewContent] = useState('');
+    const [isConstructing, setIsConstructing] = useState(false);
 
     useEffect(() => {
         fetchLocations();
@@ -86,7 +88,32 @@ const MindPalace: React.FC = () => {
         }
     };
 
-    const handleCreateArtifact = async (e: React.MouseEvent) => {
+    const handleBrainConstruct = async () => {
+        if (!newName) {
+            alert("Please enter a topic name first.");
+            return;
+        }
+        setIsConstructing(true);
+        try {
+            const result = await brainService.executeAction('CONSTRUCT_PALACE', { topic: newName });
+            if (result.success) {
+                alert(result.message);
+                fetchLocations();
+                setShowLocationModal(false);
+                setNewName('');
+                setNewDesc('');
+            } else {
+                alert("Construction failed: " + result.message);
+            }
+        } catch (err) {
+            console.error("Construction error:", err);
+            alert("The Architect is unavailable.");
+        } finally {
+            setIsConstructing(false);
+        }
+    };
+
+    const handleCreateArtifact = async (_e: React.MouseEvent) => {
         // Create artifact at click position if in room view
         if (!currentLocation) return;
 
@@ -236,7 +263,15 @@ const MindPalace: React.FC = () => {
                             <textarea value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="What do you store here?" />
                         </div>
                         <div className="modal-actions">
-                            <button className="save-btn" onClick={handleCreateLocation}>Construct</button>
+                            <button className="save-btn" onClick={handleCreateLocation}>Construct Manually</button>
+                            <button
+                                className="save-btn"
+                                onClick={handleBrainConstruct}
+                                disabled={isConstructing}
+                                style={{ background: 'linear-gradient(135deg, #8e44ad, #3498db)', marginLeft: '10px' }}
+                            >
+                                {isConstructing ? 'Architecting...' : '🧠 Construct with Brain'}
+                            </button>
                         </div>
                     </div>
                 </div>

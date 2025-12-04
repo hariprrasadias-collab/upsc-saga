@@ -10,6 +10,7 @@ interface WarMapHeaderProps {
   onTaskActionComplete: () => void; // Called after task is created or form is cancelled
   onConnectGoogle?: () => void;
   isGoogleConnected?: boolean;
+  onRequestBriefing?: () => void;
 }
 
 const WarMapHeader: React.FC<WarMapHeaderProps> = ({
@@ -19,6 +20,7 @@ const WarMapHeader: React.FC<WarMapHeaderProps> = ({
   onTaskActionComplete,
   onConnectGoogle,
   isGoogleConnected,
+  onRequestBriefing
 }) => {
   return (
     <header className="war-map-header">
@@ -26,14 +28,21 @@ const WarMapHeader: React.FC<WarMapHeaderProps> = ({
         <>
           <h1>The War Map</h1>
           <p>Plan your campaigns and rituals here. Conquer the UPSC!</p>
-          <button className="create-task-btn" onClick={onToggleAddForm}>
-            Convene War Council (New Task)
-          </button>
-          {onConnectGoogle && !isGoogleConnected && (
-            <button className="connect-google-btn" onClick={onConnectGoogle}>
-              📅 Connect Google Calendar
+          <div className="header-actions">
+            <button className="create-task-btn" onClick={onToggleAddForm}>
+              Convene War Council (New Task)
             </button>
-          )}
+            {onRequestBriefing && (
+              <button className="briefing-btn" onClick={onRequestBriefing}>
+                🔮 Consult Oracles (Briefing)
+              </button>
+            )}
+            {onConnectGoogle && !isGoogleConnected && (
+              <button className="connect-google-btn" onClick={onConnectGoogle}>
+                📅 Connect Google Calendar
+              </button>
+            )}
+          </div>
         </>
       ) : (
         <AddTaskForm

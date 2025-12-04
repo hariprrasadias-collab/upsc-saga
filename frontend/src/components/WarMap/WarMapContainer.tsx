@@ -6,6 +6,7 @@ import './WarMap.css';
 import WarMapHeader from './WarMapHeader';
 import type { Task, RawTaskFromAPI } from '../../contexts/GlobalContext';
 import { generateCSVTaskId } from '../../util/taskUtils';
+import { brainService } from '../../services/BrainService';
 
 type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
@@ -35,6 +36,10 @@ const WarMapContainer: React.FC<WarMapContainerProps> = ({ onTaskCompleted }) =>
   const [csvTasks, setCsvTasks] = useState<Slot[]>([]);
   const [isLoadingTasks, setIsLoadingTasks] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+
+  // Briefing State
+  const [briefing, setBriefing] = useState<string | null>(null);
+  const [isBriefingLoading, setIsBriefingLoading] = useState(false);
 
   const getSelectedDateString = useCallback((): string => {
     const selectedDate = date instanceof Date ? date : new Date();
@@ -184,6 +189,26 @@ const WarMapContainer: React.FC<WarMapContainerProps> = ({ onTaskCompleted }) =>
     }
   };
 
+  const handleRequestBriefing = async () => {
+    setIsBriefingLoading(true);
+    try {
+      // Construct context from current tasks
+      const tasksContext = [...csvTasks, ...dayTasks].map(t =>
+        'subject' in t ? `${t.subject}: ${t.activity} (${t.status})` : `${t.title} (${t.isCompleted ? 'Done' : 'Pending'})`
+      ).join('\n');
+
+      const response = await brainService.think(
+        `Give me a strategic briefing for ${dateStr}. Here is my schedule:\n${tasksContext}`,
+        { date: dateStr }
+      );
+      setBriefing(response.response_text);
+    } catch (error) {
+      setBriefing("The Oracles are silent. Connection failed.");
+    } finally {
+      setIsBriefingLoading(false);
+    }
+  };
+
   return (
     <div className="war-map-container">
       <WarMapHeader
@@ -191,6 +216,7 @@ const WarMapContainer: React.FC<WarMapContainerProps> = ({ onTaskCompleted }) =>
         onToggleAddForm={() => setShowAddForm(prev => !prev)}
         selectedDateStr={dateStr}
         onTaskActionComplete={handleTaskAddedOrCancelled}
+        onRequestBriefing={handleRequestBriefing}
       />
 
       {!showAddForm && (
@@ -261,6 +287,25 @@ const WarMapContainer: React.FC<WarMapContainerProps> = ({ onTaskCompleted }) =>
                 <div className="empty-tasks-message">
                   No rituals planned for this day.
                 </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Briefing Modal */}
+      {(briefing || isBriefingLoading) && (
+        <div className="modal-overlay" onClick={() => !isBriefingLoading && setBriefing(null)}>
+          <div className="briefing-modal" onClick={e => e.stopPropagation()}>
+            <div className="briefing-header">
+              <h2>🔮 Oracle's Briefing</h2>
+              {!isBriefingLoading && <button onClick={() => setBriefing(null)}>×</button>}
+            </div>
+            <div className="briefing-content">
+              {isBriefingLoading ? (
+                <div className="loading-spinner">Communing with the Cortex...</div>
+              ) : (
+                <p>{briefing}</p>
               )}
             </div>
           </div>

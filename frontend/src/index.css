@@ -133,8 +133,49 @@ body {
   background: var(--color-accent-blue);
 }
 
-/* Selection Color */
 ::selection {
   background: rgba(95, 179, 232, 0.3);
   color: white;
+}
+
+/* --- GLOBAL UTILITIES --- */
+.glass-panel {
+  background: rgba(13, 17, 23, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.neon-text-blue {
+  color: var(--color-accent-blue);
+  text-shadow: 0 0 5px rgba(var(--color-accent-blue-rgb), 0.7),
+    0 0 10px rgba(var(--color-accent-blue-rgb), 0.5);
+}
+
+.neon-border-blue {
+  border: 1px solid var(--color-accent-blue);
+  box-shadow: 0 0 5px rgba(var(--color-accent-blue-rgb), 0.5),
+    inset 0 0 5px rgba(var(--color-accent-blue-rgb), 0.2);
+}
+
+.neon-text-orange {
+  color: var(--color-accent-orange);
+  text-shadow: 0 0 5px rgba(var(--color-accent-orange-rgb), 0.7),
+    0 0 10px rgba(var(--color-accent-orange-rgb), 0.5);
+}
+
+.btn-primary {
+  background: linear-gradient(45deg, var(--color-accent-blue), #2980b9);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--font-headings);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(var(--color-accent-blue-rgb), 0.6);
 }

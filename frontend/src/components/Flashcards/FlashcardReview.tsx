@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import './Flashcards.css';
 import { useAnalytics } from '../../contexts/AnalyticsContext';
+import MarkdownRenderer from '../Shared/MarkdownRenderer';
 
 interface Card {
     id: number;
@@ -128,11 +129,11 @@ const FlashcardReview: React.FC<FlashcardReviewProps> = ({ deckId, onFinish }) =
             <div className={`flashcard ${isFlipped ? 'flipped' : ''}`} onClick={() => setIsFlipped(!isFlipped)}>
                 <div className="flashcard-inner">
                     <div className="flashcard-front">
-                        <div className="card-content">{currentCard.front}</div>
+                        <div className="card-content"><MarkdownRenderer content={currentCard.front} /></div>
                         <div className="flip-hint">Click or press Space to flip</div>
                     </div>
                     <div className="flashcard-back">
-                        <div className="card-content">{currentCard.back}</div>
+                        <div className="card-content"><MarkdownRenderer content={currentCard.back} /></div>
                     </div>
                 </div>
             </div>

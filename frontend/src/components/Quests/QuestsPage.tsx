@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './QuestsPage.css';
 import type { Task, RawTaskFromAPI } from '../../contexts/GlobalContext';
 import AddQuestForm from './AddQuestForm';
+import { brainService } from '../../services/BrainService';
 
 interface QuestsPageProps {
   onTaskCompleted: () => Promise<void>;
@@ -82,14 +83,42 @@ const QuestsPage: React.FC<QuestsPageProps> = ({ onTaskCompleted }) => {
     await onTaskCompleted(); // Update dashboard stats just in case
   };
 
+  const handleGenerateQuests = async () => {
+    setIsLoading(true);
+    try {
+      const result = await brainService.executeAction('GENERATE_QUESTS', {});
+      if (result.success) {
+        alert(result.message);
+        await fetchQuests();
+      } else {
+        alert("Failed to generate quests: " + result.message);
+      }
+    } catch (err) {
+      console.error("Brain Quest Generation Error:", err);
+      alert("The Oracle is silent.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="quests-page-container">
       <div className="quests-header">
         <h1>Quests Journal</h1>
         <p>Embark on grand campaigns and achieve long-term objectives.</p>
-        <button className="add-quest-btn" onClick={() => setShowAddForm(true)}>
-          New Campaign (Add Quest)
-        </button>
+        <div className="quest-actions">
+          <button className="add-quest-btn" onClick={() => setShowAddForm(true)}>
+            New Campaign (Add Quest)
+          </button>
+          <button
+            className="add-quest-btn brain-quest-btn"
+            onClick={handleGenerateQuests}
+            style={{ marginLeft: '10px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Consulting Oracle...' : '🔮 Generate Quests (Brain)'}
+          </button>
+        </div>
       </div>
 
       {showAddForm && (

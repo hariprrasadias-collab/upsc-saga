@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import './GoldenPath.css';
+import { brainService } from '../../services/BrainService';
 
 interface Node {
     id: string;
@@ -321,21 +322,10 @@ const GoldenPath: React.FC = () => {
                         <>
                             <button className="gp-btn gp-btn-commit" onClick={async () => {
                                 if (!confirm("Are you sure you want to commit this strategy? This will become your active directive.")) return;
-                                try {
-                                    const res = await fetch('http://localhost:5000/api/brain/directive', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ path: optimalPath })
-                                    });
-                                    const data = await res.json();
-                                    if (data.success) {
-                                        // Custom Toast/Notification could go here
-                                        alert("Strategy Committed! The Brain is now aligned with this path.");
-                                        // Redirect to Strategos
-                                        // window.location.href = '/strategos'; // Or use router
-                                    }
-                                } catch (err) {
-                                    console.error("Failed to commit strategy:", err);
+                                const success = await brainService.ingestDirective(optimalPath);
+                                if (success) {
+                                    alert("Strategy Committed! The Brain is now aligned with this path.");
+                                } else {
                                     alert("Failed to commit strategy. The Brain is unreachable.");
                                 }
                             }} style={{ background: 'rgba(46, 204, 113, 0.2)', borderColor: '#2ecc71', boxShadow: '0 0 15px rgba(46, 204, 113, 0.4)' }}>

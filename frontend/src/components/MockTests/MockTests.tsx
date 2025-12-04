@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import './MockTests.css';
 import { useAnalytics } from '../../contexts/AnalyticsContext';
+import { brainService } from '../../services/BrainService';
 
 interface Test {
     id: number;
@@ -45,6 +46,7 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
     const [results, setResults] = useState<any>(null);
     const [view, setView] = useState<'list' | 'test' | 'results'>('list');
     const { refreshAnalytics } = useAnalytics();
+    const [isGenerating, setIsGenerating] = useState(false);
 
     // Add Test Modal State
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -222,6 +224,24 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
         }
     };
 
+    const handleGenerateSmartTest = async () => {
+        setIsGenerating(true);
+        try {
+            const result = await brainService.executeAction('CREATE_MOCK_TEST', { topic: 'Weak Areas', count: 10 });
+            if (result.success) {
+                alert(result.message);
+                fetchTests();
+            } else {
+                alert("Failed to generate test: " + result.message);
+            }
+        } catch (err) {
+            console.error("Smart Test Generation Error:", err);
+            alert("The Oracle is silent.");
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
     const formatTime = (seconds: number) => {
         const hrs = Math.floor(seconds / 3600);
         const mins = Math.floor((seconds % 3600) / 60);
@@ -246,6 +266,14 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
                     <h1>📋 Mock Tests</h1>
                     <button className="add-test-btn" onClick={() => setIsAddModalOpen(true)}>
                         <span>+</span> Create New Test
+                    </button>
+                    <button
+                        className="add-test-btn smart-test-btn"
+                        onClick={handleGenerateSmartTest}
+                        disabled={isGenerating}
+                        style={{ marginLeft: '10px', background: 'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)' }}
+                    >
+                        {isGenerating ? 'Forging Test...' : '🧠 Generate Smart Test'}
                     </button>
                 </div>
 

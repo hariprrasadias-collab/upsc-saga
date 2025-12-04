@@ -3,6 +3,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import type { SyllabusNode } from '../../data/syllabus';
 import { upscSyllabus } from '../../data/syllabus';
 import './Yggdrasil.css';
+import { brainService } from '../../services/BrainService';
+import MarkdownRenderer from '../Shared/MarkdownRenderer';
 
 // --- HELPER: Map Status String <-> Integer Level ---
 // 0 = Locked
@@ -49,6 +51,25 @@ interface TabletModalProps {
 }
 
 const TabletModal: React.FC<TabletModalProps> = ({ node, onClose, onUpdateStatus }) => {
+    const [explanation, setExplanation] = useState<string | null>(null);
+    const [isExplaining, setIsExplaining] = useState(false);
+
+    const handleExplain = async () => {
+        setIsExplaining(true);
+        try {
+            const result = await brainService.executeAction('EXPLAIN_SYLLABUS_NODE', { node: node.title });
+            if (result.success) {
+                setExplanation(result.explanation);
+            } else {
+                alert("Explanation failed: " + result.message);
+            }
+        } catch (err) {
+            console.error("Explanation error:", err);
+            alert("The Brain is silent.");
+        } finally {
+            setIsExplaining(false);
+        }
+    };
     const currentLevel = getLevel(node.status);
 
     return (
@@ -61,6 +82,23 @@ const TabletModal: React.FC<TabletModalProps> = ({ node, onClose, onUpdateStatus
 
                 <div className="tablet-body">
                     <p className="tablet-desc">{node.description}</p>
+
+                    {explanation && (
+                        <div className="explanation-box" style={{
+                            background: 'rgba(255, 255, 255, 0.1)',
+                            padding: '10px',
+                            borderRadius: '5px',
+                            marginBottom: '15px',
+                            fontSize: '14px',
+                            lineHeight: '1.4'
+                        }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                                <strong style={{ color: '#f1c40f' }}>🧠 Strategos Insight:</strong>
+                                <button onClick={() => setExplanation(null)} style={{ background: 'none', border: 'none', color: '#ccc', cursor: 'pointer' }}>✕</button>
+                            </div>
+                            <MarkdownRenderer content={explanation} />
+                        </div>
+                    )}
 
                     {/* REVISION TRACKER UI */}
                     <div className="revision-tracker">
@@ -88,6 +126,14 @@ const TabletModal: React.FC<TabletModalProps> = ({ node, onClose, onUpdateStatus
                     )}
 
                     <div className="tablet-actions" style={{ display: 'flex', gap: '10px' }}>
+                        <button
+                            className="mastery-btn"
+                            style={{ borderColor: '#9b59b6', color: '#9b59b6' }}
+                            onClick={handleExplain}
+                            disabled={isExplaining}
+                        >
+                            {isExplaining ? 'Thinking...' : '🧠 Explain'}
+                        </button>
                         {/* REGRESS BUTTON (Forgetting Curve) */}
                         {currentLevel > 1 && (
                             <button

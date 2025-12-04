@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './NeuralHash.css';
 import { FaBrain, FaHistory, FaBolt, FaLayerGroup, FaExclamationTriangle, FaDatabase, FaPlus } from 'react-icons/fa';
+import { brainService } from '../../services/BrainService';
+import MarkdownRenderer from '../Shared/MarkdownRenderer';
 
 interface DecodedData {
     core_themes: string[];
@@ -104,18 +106,16 @@ const NeuralHash: React.FC = () => {
 
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/api/neural_hash/decode', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: inputText, type: contextType })
-            });
-            const data = await response.json();
-            if (data.success) {
-                setResult(data.data);
-                fetchHistory(); // Refresh history
+            const payload = { text: inputText, type: contextType };
+            const result = await brainService.executeAction('DECODE_NEURAL_HASH', payload);
+
+            if (result.success) {
+                setResult(result.data);
+                // Optionally save to history backend if needed, or rely on Brain logs
+                // For now, we'll just show the result
                 showToast('Patterns Decoded Successfully');
             } else {
-                showToast('Decoding failed: ' + data.error, 'error');
+                showToast('Decoding failed: ' + result.message, 'error');
             }
         } catch (error) {
             console.error('Decode error:', error);
@@ -184,7 +184,7 @@ const NeuralHash: React.FC = () => {
                 <h1>The Neural Hash</h1>
                 <div className="subtitle">PATTERN RECOGNITION & DECODING ENGINE</div>
                 <button
-                    className="history-toggle-btn"
+                    className="history-toggle-btn neon-border-blue"
                     onClick={() => setShowHistory(!showHistory)}
                     style={{
                         position: 'absolute',
@@ -192,8 +192,7 @@ const NeuralHash: React.FC = () => {
                         top: '50%',
                         transform: 'translateY(-50%)',
                         background: 'transparent',
-                        border: '1px solid rgba(0, 242, 255, 0.3)',
-                        color: '#00f2ff',
+                        color: 'var(--color-accent-blue)',
                         padding: '0.5rem 1rem',
                         borderRadius: '8px',
                         cursor: 'pointer',
@@ -207,8 +206,8 @@ const NeuralHash: React.FC = () => {
             </div>
 
             {showHistory ? (
-                <div className="history-panel">
-                    <h2 style={{ color: '#fff', marginBottom: '1rem' }}>Decryption Logs</h2>
+                <div className="history-panel glass-panel">
+                    <h2 className="neon-text-blue" style={{ marginBottom: '1rem' }}>Decryption Logs</h2>
                     {history.map(item => (
                         <div key={item.id} className="history-item" onClick={() => loadHistoryItem(item)}>
                             <div className="history-preview">
@@ -222,7 +221,7 @@ const NeuralHash: React.FC = () => {
                 </div>
             ) : (
                 <>
-                    <div className="input-section">
+                    <div className="input-section glass-panel">
                         <div className="context-selector">
                             {['general', 'pyq', 'editorial', 'syllabus', 'answer'].map(type => (
                                 <button
@@ -243,7 +242,7 @@ const NeuralHash: React.FC = () => {
                         />
 
                         <button
-                            className="decode-btn"
+                            className="decode-btn neon-border-blue"
                             onClick={handleDecode}
                             disabled={loading || !inputText}
                         >
@@ -252,7 +251,7 @@ const NeuralHash: React.FC = () => {
                     </div>
 
                     {loading && (
-                        <div className="loading-matrix">
+                        <div className="loading-matrix neon-text-blue">
                             {loadingText}
                         </div>
                     )}
@@ -260,8 +259,8 @@ const NeuralHash: React.FC = () => {
                     {result && (
                         <div className="results-container">
                             <div className="left-panel">
-                                <div className="result-card">
-                                    <h3><FaBrain /> Core Themes (The Soul)</h3>
+                                <div className="result-card glass-panel">
+                                    <h3 className="neon-text-blue"><FaBrain /> Core Themes (The Soul)</h3>
                                     <div className="themes-list">
                                         {result.core_themes.map((theme, i) => (
                                             <span key={i} className="theme-tag">{theme}</span>
@@ -269,15 +268,15 @@ const NeuralHash: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <div className="result-card" style={{ marginTop: '2rem' }}>
+                                <div className="result-card glass-panel" style={{ marginTop: '2rem' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                        <h3 style={{ margin: 0 }}><FaBrain /> Examiner's Pattern</h3>
+                                        <h3 className="neon-text-blue" style={{ margin: 0 }}><FaBrain /> Examiner's Pattern</h3>
                                         <button
                                             onClick={() => handleCopy(result.examiner_pattern, "Pattern")}
                                             style={{
                                                 background: 'rgba(255,255,255,0.1)',
                                                 border: 'none',
-                                                color: '#fff',
+                                                color: 'var(--color-text-primary)',
                                                 cursor: 'pointer',
                                                 padding: '0.2rem 0.6rem',
                                                 borderRadius: '4px',
@@ -287,12 +286,12 @@ const NeuralHash: React.FC = () => {
                                             COPY
                                         </button>
                                     </div>
-                                    <p className="pattern-text">{result.examiner_pattern}</p>
+                                    <MarkdownRenderer content={result.examiner_pattern} className="pattern-text" />
                                 </div>
 
                                 {result.cross_linkages && (
-                                    <div className="result-card" style={{ marginTop: '2rem' }}>
-                                        <h3><FaLayerGroup /> Cross Linkages</h3>
+                                    <div className="result-card glass-panel" style={{ marginTop: '2rem' }}>
+                                        <h3 className="neon-text-blue"><FaLayerGroup /> Cross Linkages</h3>
                                         <ul className="cross-links-list" style={{ listStyle: 'none', padding: 0 }}>
                                             {result.cross_linkages.map((link, i) => (
                                                 <li key={i}>{link}</li>
@@ -301,8 +300,8 @@ const NeuralHash: React.FC = () => {
                                     </div>
                                 )}
 
-                                <div className="result-card" style={{ marginTop: '2rem' }}>
-                                    <h3>Potential Derivatives</h3>
+                                <div className="result-card glass-panel" style={{ marginTop: '2rem' }}>
+                                    <h3 className="neon-text-blue">Potential Derivatives</h3>
                                     {result.potential_questions.map((q, i) => (
                                         <div key={i} className="question-item">
                                             <span className="q-type">{q.type}</span>
@@ -320,8 +319,8 @@ const NeuralHash: React.FC = () => {
                             </div>
 
                             <div className="right-panel">
-                                <div className="result-card">
-                                    <h3>Metrics</h3>
+                                <div className="result-card glass-panel">
+                                    <h3 className="neon-text-blue">Metrics</h3>
                                     <div className="score-display">
                                         <div className={`score-circle ${result.relevance_score > 7 ? 'high' : 'low'}`}>
                                             {result.relevance_score}
@@ -336,8 +335,8 @@ const NeuralHash: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <div className="result-card" style={{ marginTop: '2rem' }}>
-                                    <h3><FaBolt /> High Yield Keywords</h3>
+                                <div className="result-card glass-panel" style={{ marginTop: '2rem' }}>
+                                    <h3 className="neon-text-blue"><FaBolt /> High Yield Keywords</h3>
                                     <div className="keywords-list">
                                         {result.high_yield_keywords.map((kw, i) => (
                                             <span
@@ -353,8 +352,8 @@ const NeuralHash: React.FC = () => {
                                 </div>
 
                                 {result.prelims_traps && (
-                                    <div className="result-card" style={{ marginTop: '2rem', borderColor: 'rgba(255, 0, 85, 0.3)' }}>
-                                        <h3><FaExclamationTriangle style={{ color: '#ff0055' }} /> Prelims Traps</h3>
+                                    <div className="result-card glass-panel" style={{ marginTop: '2rem', borderColor: 'var(--color-error)' }}>
+                                        <h3 style={{ color: 'var(--color-error)' }}><FaExclamationTriangle /> Prelims Traps</h3>
                                         <ul className="traps-list" style={{ listStyle: 'none', padding: 0 }}>
                                             {result.prelims_traps.map((trap, i) => (
                                                 <li key={i}>{trap}</li>
@@ -364,8 +363,8 @@ const NeuralHash: React.FC = () => {
                                 )}
 
                                 {result.data_points && (
-                                    <div className="result-card" style={{ marginTop: '2rem' }}>
-                                        <h3><FaDatabase /> Data Points</h3>
+                                    <div className="result-card glass-panel" style={{ marginTop: '2rem' }}>
+                                        <h3 className="neon-text-blue"><FaDatabase /> Data Points</h3>
                                         <ul style={{ listStyle: 'none', padding: 0, color: '#aaa' }}>
                                             {result.data_points.map((dp, i) => (
                                                 <li key={i} style={{ marginBottom: '0.5rem' }}>{dp}</li>

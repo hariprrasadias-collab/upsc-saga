@@ -3596,6 +3596,7 @@
         transform: translateY(0);
     }
 }
+
 /* --- Socratic Arena Enhancements --- */
 .agent-thought {
     font-size: 0.85rem;
@@ -3629,4 +3630,107 @@
 .turn-score span {
     color: #f1c40f;
     font-weight: bold;
+}
+
+/* --- Header & Toolbar Styles (Restored) --- */
+.planner-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1.5rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.header-branding {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-branding h1 {
+    margin: 0;
+    font-size: 2rem;
+    background: linear-gradient(45deg, #3498db, #2ecc71);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-family: 'Cinzel', serif;
+}
+
+.gamification-hud {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.brain-status-indicator {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brain-status-indicator.online {
+    color: #2ecc71;
+    border-color: rgba(46, 204, 113, 0.3);
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.1);
+}
+
+.brain-status-indicator.offline {
+    color: #e74c3c;
+    border-color: rgba(231, 76, 60, 0.3);
+}
+
+.header-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.toolbar-left,
+.toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.controls {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.xp-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.level-badge {
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #f1c40f;
+}
+
+.xp-bar-bg {
+    width: 60px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.xp-bar-fill {
+    height: 100%;
+    background: #f1c40f;
+    border-radius: 3px;
 }

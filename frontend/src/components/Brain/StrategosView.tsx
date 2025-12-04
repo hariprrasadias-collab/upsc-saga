@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaChessKing, FaHeartbeat, FaExclamationTriangle, FaCheckCircle, FaRocket } from 'react-icons/fa';
+import { FaChessKing, FaHeartbeat, FaExclamationTriangle, FaRocket } from 'react-icons/fa';
 import type { Action } from './types';
 
 interface StrategosViewProps {
@@ -15,7 +15,7 @@ interface BrainStatus {
     } | null;
 }
 
-const StrategosView: React.FC<StrategosViewProps> = ({ onExecuteAction }) => {
+const StrategosView: React.FC<StrategosViewProps> = ({ onExecuteAction: _onExecuteAction }) => {
     const [status, setStatus] = useState<BrainStatus | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -101,7 +101,7 @@ const StrategosView: React.FC<StrategosViewProps> = ({ onExecuteAction }) => {
                     <h4>Current Directive (Golden Path)</h4>
                     {strategy && strategy.length > 0 ? (
                         <div className="strategy-list">
-                            {strategy.slice(0, 5).map((step, idx) => (
+                            {strategy.slice(0, 5).map((_step, idx) => (
                                 <div key={idx} className="strategy-step">
                                 </div>
                             ))}

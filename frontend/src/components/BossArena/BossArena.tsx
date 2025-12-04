@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './BossArena.css';
 import BattleInterface from './BattleInterface';
+import { brainService } from '../../services/BrainService';
 
 interface Battle {
     id: string;
@@ -36,6 +37,7 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(true);
     const [activeBattleBoss, setActiveBattleBoss] = useState<Boss | null>(null);
+    const [isSummoning, setIsSummoning] = useState(false);
 
     const [bossName, setBossName] = useState('');
     const [subject, setSubject] = useState('General Studies I');
@@ -105,6 +107,25 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
         }
     };
 
+    const handleSummonNemesis = async () => {
+        setIsSummoning(true);
+        try {
+            // Ask Brain to summon a boss based on weak areas
+            const result = await brainService.executeAction('SUMMON_BOSS', {});
+            if (result.success) {
+                alert(result.message);
+                fetchBosses();
+            } else {
+                alert("Summoning failed: " + result.message);
+            }
+        } catch (err) {
+            console.error("Summoning error:", err);
+            alert("The Arena is silent.");
+        } finally {
+            setIsSummoning(false);
+        }
+    };
+
     const startBossBattle = (boss: Boss) => {
         setActiveBattleBoss(boss);
     };
@@ -124,6 +145,14 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
             <div className="arena-header">
                 <h1 className="arena-title">The Proving Grounds</h1>
                 <p className="arena-subtitle">Face mighty bosses and prove your knowledge</p>
+                <button
+                    className="summon-btn"
+                    onClick={handleSummonNemesis}
+                    disabled={isSummoning}
+                    style={{ marginTop: '15px', background: 'linear-gradient(45deg, #8e44ad, #c0392b)', border: 'none', padding: '10px 20px', color: 'white', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+                >
+                    {isSummoning ? 'Summoning...' : '👹 Summon Nemesis (Brain)'}
+                </button>
             </div>
 
             {/* Year Titans Section */}

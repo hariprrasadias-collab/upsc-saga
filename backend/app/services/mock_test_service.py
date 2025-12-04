@@ -42,6 +42,11 @@ class MockTestService:
         }
 
     @staticmethod
+    def create_smart_test(topic):
+        """Alias for generate_from_topic to fix attribute error."""
+        return MockTestService.generate_from_topic(topic)
+
+    @staticmethod
     def generate_from_topic(topic, count=10):
         """Generate a mock test for a topic using Gemini."""
         import google.generativeai as genai
@@ -59,6 +64,21 @@ class MockTestService:
             
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('gemini-flash-latest')
+        
+        # Handle "Weak Areas" special case
+        if topic.lower() == "weak areas":
+            try:
+                from app.services.analytics_service import identify_weak_areas
+                conn = get_db()
+                weak_data = identify_weak_areas(conn, 1, limit=3)
+                if weak_data:
+                    topic = ", ".join([w['subject'] for w in weak_data])
+                    print(f"📉 Resolved Weak Areas: {topic}")
+                else:
+                    topic = "General Studies"
+            except Exception as e:
+                print(f"⚠️ Failed to resolve weak areas: {e}")
+                topic = "General Studies"
         
         prompt = f"""
         Create a {count}-question multiple choice test for: "{topic}".

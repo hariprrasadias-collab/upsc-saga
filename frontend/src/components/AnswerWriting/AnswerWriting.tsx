@@ -4,6 +4,8 @@ import './AnswerWriting.css';
 import { audioManager } from '../../util/AudioManager';
 import { useAnalytics } from '../../contexts/AnalyticsContext';
 import TemplateSelector from './TemplateSelector';
+import { brainService } from '../../services/BrainService';
+import MarkdownRenderer from '../Shared/MarkdownRenderer';
 
 interface Prompt {
     id: number;
@@ -45,6 +47,8 @@ const AnswerWriting: React.FC<AnswerWritingProps> = ({ onTaskCompleted }) => {
     const [showHistory, setShowHistory] = useState(false);
     const [history, setHistory] = useState<any[]>([]);
     const [loadingHistory, setLoadingHistory] = useState(false);
+    const [analysis, setAnalysis] = useState<any>(null);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
 
     const { refreshAnalytics } = useAnalytics();
 
@@ -185,6 +189,24 @@ const AnswerWriting: React.FC<AnswerWritingProps> = ({ onTaskCompleted }) => {
         audioManager.play('click');
     };
 
+    const handleAnalyzeQuestion = async () => {
+        if (!currentPrompt) return;
+        setIsAnalyzing(true);
+        try {
+            const result = await brainService.executeAction('ANALYZE_QUESTION', { question: currentPrompt.question });
+            if (result.success) {
+                setAnalysis(result.data);
+            } else {
+                alert("Analysis failed: " + result.message);
+            }
+        } catch (err) {
+            console.error("Analysis error:", err);
+            alert("The Oracle is silent.");
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
+
     const formatTime = (seconds: number) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
@@ -264,6 +286,39 @@ const AnswerWriting: React.FC<AnswerWritingProps> = ({ onTaskCompleted }) => {
                         <h2>Question:</h2>
                         <p className="question-text">{currentPrompt.question}</p>
                         {currentPrompt.topic && <div className="topic-tag">📌 {currentPrompt.topic}</div>}
+
+                        <button
+                            className="analyze-btn"
+                            onClick={handleAnalyzeQuestion}
+                            disabled={isAnalyzing}
+                            style={{ marginTop: '10px', background: '#8e44ad', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
+                        >
+                            {isAnalyzing ? 'Consulting Oracle...' : '🔮 Analyze Question'}
+                        </button>
+
+                        {analysis && (
+                            <div className="analysis-result" style={{ marginTop: '15px', padding: '15px', background: 'rgba(142, 68, 173, 0.1)', borderRadius: '8px', borderLeft: '4px solid #8e44ad' }}>
+                                <h3>Strategos Analysis</h3>
+                                <div style={{ marginBottom: '10px' }}>
+                                    <strong>Key Demands:</strong>
+                                    <ul>{analysis.key_demands?.map((d: string, i: number) => <li key={i}>{d}</li>)}</ul>
+                                </div>
+
+
+                                <div style={{ marginBottom: '10px' }}>
+                                    <strong>Structure:</strong>
+                                    <MarkdownRenderer content={analysis.structure} />
+                                </div>
+                                <div>
+                                    <strong>Keywords:</strong>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                                        {analysis.keywords?.map((k: string, i: number) => (
+                                            <span key={i} style={{ background: '#8e44ad', color: 'white', padding: '2px 6px', borderRadius: '10px', fontSize: '0.8em' }}>{k}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Timer and Word Count */}

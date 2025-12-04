@@ -1,6 +1,8 @@
 // DeckManager - Manage decks and cards
 import React, { useState, useEffect } from 'react';
 import './Flashcards.css';
+import { brainService } from '../../services/BrainService';
+import MarkdownRenderer from '../Shared/MarkdownRenderer';
 
 interface Deck {
     id: number;
@@ -21,6 +23,7 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onStartReview }) => {
     const [showNewDeck, setShowNewDeck] = useState(false);
     const [newDeckName, setNewDeckName] = useState('');
     const [newDeckSubject, setNewDeckSubject] = useState('GS1');
+    const [isGenerating, setIsGenerating] = useState(false);
 
     useEffect(() => {
         fetchDecks();
@@ -56,6 +59,43 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onStartReview }) => {
             fetchDecks();
         } catch (err) {
             console.error('Failed to create deck:', err);
+        }
+    };
+
+    const handleBrainGenerate = async () => {
+        if (!newDeckName.trim()) {
+            alert("Please enter a deck name/topic.");
+            return;
+        }
+        setIsGenerating(true);
+        try {
+            // 1. Create Deck first
+            const deckRes = await fetch('http://localhost:5000/api/flashcards/decks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: newDeckName,
+                    subject: newDeckSubject
+                })
+            });
+
+            if (deckRes.ok) {
+                // 2. Ask Brain to populate it
+                const result = await brainService.executeAction('CREATE_FLASHCARDS', { topic: newDeckName, count: 5 });
+                if (result.success) {
+                    alert(result.message);
+                    setNewDeckName('');
+                    setShowNewDeck(false);
+                    fetchDecks();
+                } else {
+                    alert("Generation failed: " + result.message);
+                }
+            }
+        } catch (err) {
+            console.error("Generation error:", err);
+            alert("The Brain is unavailable.");
+        } finally {
+            setIsGenerating(false);
         }
     };
 
@@ -156,7 +196,15 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onStartReview }) => {
                         <option value="Optional">Optional</option>
                         <option value="Prelims">Prelims</option>
                     </select>
-                    <button onClick={handleCreateDeck} className="create-btn">Create</button>
+                    <button onClick={handleCreateDeck} className="create-btn">Create Empty</button>
+                    <button
+                        onClick={handleBrainGenerate}
+                        className="create-btn"
+                        disabled={isGenerating}
+                        style={{ background: 'linear-gradient(135deg, #8e44ad, #3498db)', marginLeft: '10px' }}
+                    >
+                        {isGenerating ? 'Generating...' : '🧠 Generate with Brain'}
+                    </button>
                     <button onClick={() => setShowNewDeck(false)} className="cancel-btn">Cancel</button>
                 </div>
             )}
@@ -334,8 +382,8 @@ const DeckCardList: React.FC<DeckCardListProps> = ({ deckId, onClose, onUpdate }
                             <tbody>
                                 {cards.map(card => (
                                     <tr key={card.id} style={{ borderBottom: '1px solid #333' }}>
-                                        <td style={{ padding: '10px' }}>{card.front}</td>
-                                        <td style={{ padding: '10px' }}>{card.back}</td>
+                                        <td style={{ padding: '10px' }}><MarkdownRenderer content={card.front} /></td>
+                                        <td style={{ padding: '10px' }}><MarkdownRenderer content={card.back} /></td>
                                         <td style={{ padding: '10px', textAlign: 'center' }}>
                                             <button
                                                 onClick={() => handleDeleteCard(card.id)}

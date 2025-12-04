@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { SocraticEngine, type DebateTurn, type DebateAgent } from '../../util/SocraticEngine';
 import './StudyPlanDashboard.css'; // Reuse existing styles for now
+import { brainService } from '../../services/BrainService';
 
 interface SocraticArenaProps {
     engine: SocraticEngine;
@@ -28,6 +29,7 @@ const SocraticArena: React.FC<SocraticArenaProps> = ({ engine, topic, onClose })
     }, [history]);
 
     const [isThinking, setIsThinking] = useState(false);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
 
     const handleSend = async () => {
         if (!userInput.trim() && !isThinking) return;
@@ -67,12 +69,44 @@ const SocraticArena: React.FC<SocraticArenaProps> = ({ engine, topic, onClose })
         }
     };
 
+    const handleAnalyzeDebate = async () => {
+        setIsAnalyzing(true);
+        try {
+            const result = await brainService.executeAction('ANALYZE_DEBATE', { history });
+            if (result.success) {
+                // Add analysis as a special system message
+                const analysisTurn: DebateTurn = {
+                    speakerId: 'system',
+                    text: `🏛️ **THE BRAIN'S VERDICT:**\n\n${result.analysis}`,
+                    type: 'REBUTTAL',
+                    timestamp: Date.now()
+                };
+                setHistory(prev => [...prev, analysisTurn]);
+            } else {
+                alert("Analysis failed: " + result.message);
+            }
+        } catch (err) {
+            console.error("Analysis error:", err);
+            alert("The Brain is silent.");
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
+
     return (
         <div className="socratic-arena-overlay">
             <div className="socratic-arena-modal">
                 <div className="arena-header">
                     <h2>🏛️ The Socratic Arena</h2>
                     <span className="topic-badge">{topic}</span>
+                    <button
+                        className="analyze-btn"
+                        onClick={handleAnalyzeDebate}
+                        disabled={isAnalyzing}
+                        style={{ marginLeft: 'auto', marginRight: '10px', background: '#e67e22', border: 'none', padding: '5px 10px', color: 'white', borderRadius: '4px', cursor: 'pointer' }}
+                    >
+                        {isAnalyzing ? 'Judging...' : '⚖️ Analyze Debate'}
+                    </button>
                     <button className="close-btn" onClick={onClose}>×</button>
                 </div>
 

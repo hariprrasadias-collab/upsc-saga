@@ -1,6 +1,8 @@
 // /frontend/src/components/Syllabus/SyllabusTracker.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import './SyllabusTracker.css';
+import { brainService } from '../../services/BrainService';
+import MarkdownRenderer from '../Shared/MarkdownRenderer';
 
 interface Topic {
     id: number;
@@ -47,6 +49,12 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
     const [showNotesModal, setShowNotesModal] = useState(false);
     const [currentTopicId, setCurrentTopicId] = useState<number | null>(null);
     const [notesText, setNotesText] = useState('');
+
+    // Brain Audit State
+    const [brainInsight, setBrainInsight] = useState<string | null>(null);
+    const [isBrainLoading, setIsBrainLoading] = useState(false);
+    const [priorityIds, setPriorityIds] = useState<number[]>([]);
+    const [isPrioritizing, setIsPrioritizing] = useState(false);
 
     const fetchData = useCallback(async () => {
         try {
@@ -135,6 +143,52 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         }
     };
 
+    const handleBrainAudit = async () => {
+        if (!analytics) return;
+        setIsBrainLoading(true);
+        setBrainInsight(null);
+
+        try {
+            // Construct context
+            const context = {
+                analytics: analytics,
+                weak_areas: analytics.breakdown.filter(b => b.status === 'Not Started' && b.count > 10).map(b => b.paper),
+                completion_rates: analytics.totals.map(t => {
+                    const completed = analytics.breakdown.find(b => b.paper === t.paper && b.status === 'Completed')?.count || 0;
+                    return `${t.paper}: ${Math.round((completed / t.total) * 100)}%`;
+                })
+            };
+
+            const response = await brainService.think(
+                "Analyze my syllabus progress and give me a strategic audit. Identify bottlenecks and suggest focus areas.",
+                context
+            );
+            setBrainInsight(response.response_text);
+        } catch (error) {
+            setBrainInsight("Strategos is currently unavailable. Please try again later.");
+        } finally {
+            setIsBrainLoading(false);
+        }
+    };
+
+    const handlePrioritize = async () => {
+        setIsPrioritizing(true);
+        try {
+            const result = await brainService.executeAction('PRIORITIZE_SYLLABUS', {});
+            if (result.success) {
+                setPriorityIds(result.priority_ids);
+                alert(`Strategos has identified ${result.priority_ids.length} high-yield topics.`);
+            } else {
+                alert("Prioritization failed: " + result.message);
+            }
+        } catch (err) {
+            console.error("Prioritization error:", err);
+            alert("Strategos is silent.");
+        } finally {
+            setIsPrioritizing(false);
+        }
+    };
+
     // Group Data
     const groupedData = React.useMemo(() => {
         const groups: Record<string, Record<string, Topic[]>> = {};
@@ -173,8 +227,25 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
     return (
         <div className="syllabus-container">
             <div className="syllabus-header">
-                <h1>Syllabus Tracker</h1>
-                <p>Track your conquest of the UPSC syllabus, topic by topic.</p>
+                <div>
+                    <h1>Syllabus Tracker</h1>
+                    <p>Track your conquest of the UPSC syllabus, topic by topic.</p>
+                </div>
+                <button
+                    className="brain-audit-btn"
+                    onClick={handlePrioritize}
+                    disabled={isPrioritizing}
+                    style={{ marginRight: '10px', background: '#e74c3c' }}
+                >
+                    {isPrioritizing ? 'Scanning...' : '🔥 Prioritize'}
+                </button>
+                <button
+                    className="brain-audit-btn"
+                    onClick={handleBrainAudit}
+                    disabled={isBrainLoading}
+                >
+                    {isBrainLoading ? 'Analyzing...' : '🧠 Strategos Audit'}
+                </button>
             </div>
 
             {/* DASHBOARD */}
@@ -218,9 +289,12 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                                             {expandedSubjects[subjectKey] && (
                                                 <div className="topic-list">
                                                     {subjectTopics.map(topic => (
-                                                        <div key={topic.id} className="topic-item">
+                                                        <div key={topic.id} className={`topic-item ${priorityIds.includes(topic.id) ? 'high-priority' : ''}`}>
                                                             <div className="topic-content">
-                                                                <div className="topic-text">{topic.topic}</div>
+                                                                <div className="topic-text">
+                                                                    {priorityIds.includes(topic.id) && <span title="High Yield Topic">🔥 </span>}
+                                                                    {topic.topic}
+                                                                </div>
                                                                 {topic.subtopic && (
                                                                     <div className="topic-meta">Subtopic: {topic.subtopic}</div>
                                                                 )}
@@ -283,6 +357,27 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                             <button className="cancel-btn" onClick={() => setShowNotesModal(false)}>Cancel</button>
                             <button className="save-btn" onClick={saveNotes}>Save Notes</button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* BRAIN INSIGHT MODAL */}
+            {(brainInsight || isBrainLoading) && (
+                <div className="notes-modal-overlay" onClick={() => !isBrainLoading && setBrainInsight(null)}>
+                    <div className="notes-modal brain-modal" onClick={e => e.stopPropagation()}>
+                        <h3>Strategos Strategic Audit</h3>
+                        {isBrainLoading ? (
+                            <div className="loading-spinner">Analyzing Syllabus Matrix...</div>
+                        ) : (
+                            <div className="brain-content">
+                                <MarkdownRenderer content={brainInsight || ''} />
+                            </div>
+                        )}
+                        {!isBrainLoading && (
+                            <div className="modal-actions">
+                                <button className="save-btn" onClick={() => setBrainInsight(null)}>Acknowledge</button>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

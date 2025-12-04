@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './Panopticon.css';
+import { brainService } from '../../services/BrainService';
+import MarkdownRenderer from '../Shared/MarkdownRenderer';
 
 interface BioMetric {
     date: string;
@@ -22,6 +24,8 @@ const Panopticon: React.FC = () => {
     const [correlations, setCorrelations] = useState<Correlation[]>([]);
     const [showLogModal, setShowLogModal] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [biohack, setBiohack] = useState<string | null>(null);
+    const [isThinking, setIsThinking] = useState(false);
 
     useEffect(() => {
         fetchDashboardData();
@@ -42,22 +46,76 @@ const Panopticon: React.FC = () => {
         }
     };
 
+    const handleGetBiohack = async () => {
+        setIsThinking(true);
+        try {
+            // Use latest metrics if available
+            const latest = metrics[0] || {};
+            const payload = {
+                metrics: {
+                    sleep: latest.sleep_hours,
+                    energy: latest.energy_level,
+                    mood: latest.mood_score
+                }
+            };
+            const result = await brainService.executeAction('SUGGEST_BIOHACK', payload);
+            if (result.success) {
+                setBiohack(result.suggestion);
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsThinking(false);
+        }
+    };
+
     return (
         <div className="panopticon-container">
             <header className="panopticon-header">
                 <h1>The Panopticon 👁️</h1>
                 <p>Bio-Rhythm Correlation Engine</p>
+                <h1>The Panopticon 👁️</h1>
+                <p>Bio-Rhythm Correlation Engine</p>
+                <button
+                    onClick={handleGetBiohack}
+                    disabled={isThinking}
+                    className="btn-primary"
+                    style={{ marginLeft: '20px', borderRadius: '20px' }}
+                >
+                    {isThinking ? 'Analyzing...' : '🧠 Strategos Analysis'}
+                </button>
             </header>
+
+            {biohack && (
+                <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="biohack-panel glass-panel"
+                    style={{
+                        borderColor: 'var(--color-accent-blue)',
+                        padding: '15px',
+                        margin: '0 20px 20px',
+                        borderRadius: '8px',
+                        color: 'var(--color-text-primary)'
+                    }}
+                >
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <h3 className="neon-text-blue">🧬 Optimization Protocol</h3>
+                        <button onClick={() => setBiohack(null)} style={{ background: 'none', border: 'none', color: 'var(--color-text-primary)', cursor: 'pointer' }}>✕</button>
+                    </div>
+                    <MarkdownRenderer content={biohack} />
+                </motion.div>
+            )}
 
             <div className="panopticon-grid">
                 {/* Correlation Cards */}
                 <section className="correlations-section">
-                    <h2>Neural Links</h2>
+                    <h2 className="neon-text-blue">Neural Links</h2>
                     <div className="cards-row">
                         {correlations.map((corr, idx) => (
                             <motion.div
                                 key={idx}
-                                className="correlation-card"
+                                className="correlation-card glass-panel"
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: idx * 0.1 }}
@@ -68,8 +126,8 @@ const Panopticon: React.FC = () => {
                                     <span className="perf-tag">{corr.performance_metric.replace('_', ' ')}</span>
                                 </div>
                                 <div className="corr-value" style={{
-                                    color: corr.correlation_coefficient > 0.5 ? '#4ade80' :
-                                        corr.correlation_coefficient < -0.5 ? '#f87171' : '#94a3b8'
+                                    color: corr.correlation_coefficient > 0.5 ? 'var(--color-accent-green)' :
+                                        corr.correlation_coefficient < -0.5 ? 'var(--color-error)' : 'var(--color-text-secondary)'
                                 }}>
                                     r = {corr.correlation_coefficient.toFixed(2)}
                                 </div>
@@ -87,14 +145,14 @@ const Panopticon: React.FC = () => {
                 {/* Recent Logs */}
                 <section className="history-section">
                     <div className="section-header">
-                        <h2>Recent Bio-Logs</h2>
-                        <button className="log-btn" onClick={() => setShowLogModal(true)}>
+                        <h2 className="neon-text-orange">Recent Bio-Logs</h2>
+                        <button className="log-btn btn-primary" onClick={() => setShowLogModal(true)}>
                             + Log Daily Stats
                         </button>
                     </div>
                     <div className="logs-list">
                         {metrics.map((m, idx) => (
-                            <div key={idx} className="log-item">
+                            <div key={idx} className="log-item glass-panel">
                                 <span className="log-date">{m.date}</span>
                                 <div className="log-stats">
                                     <span>😴 {m.sleep_hours}h</span>

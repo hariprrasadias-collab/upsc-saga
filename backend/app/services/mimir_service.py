@@ -48,91 +48,44 @@ class MimirService:
             
     def generate_response(self, message, history=[]):
         """
-        Generate a response from Mimir based on message and chat history.
-        history format: [{'role': 'user', 'content': '...'}, {'role': 'model', 'content': '...'}]
+        Generate a response from Mimir using the Central Brain (Strategos).
+        This enables Mimir to trigger actions and access full context.
         """
-        if not self.model:
-            print("ERROR: Gemini model not initialized. Check API key.")
-            return "I seem to have lost my connection to the Well of Wisdom. Please check that GEMINI_API_KEY is set."
-            
         try:
-            # Construct the prompt with persona and history
-            system_prompt = """
-            You are Mimir, the wise and all-knowing advisor for a UPSC Civil Services aspirant.
-            Your goal is to help the user clear the exam by providing accurate, concise, and exam-relevant information.
+            from app.services.brain_service import brain_service
             
-            IMPORTANT: Respond ONLY in English. Do not use any other language or cipher.
+            # 1. Think (Reasoning & Decision)
+            print(f"🧠 Mimir consulting Strategos for: '{message}'")
+            brain_response = brain_service.think(message)
             
-            Persona Guidelines:
-            1. **Tone**: Wise, encouraging, slightly archaic but clear (like a mentor from Norse mythology but modern in knowledge).
-            2. **Content**: Focus on UPSC syllabus (History, Geography, Polity, Economy, Ethics, Current Affairs).
-            3. **Structure**: Use bullet points for clarity. If explaining a concept, give a brief definition followed by key points.
-            4. **Motivation**: Occasionally offer a stoic quote or words of encouragement if the user seems stressed.
-            5. **Limitations**: If you don't know something or if it's outside the scope of UPSC, politely say so.
-            6. **Schedule**: If the user asks about their plan/schedule, YOU MUST USE THE 'CURRENT CONTEXT' provided below. Do NOT invent a new plan. If the context says "No tasks", say so.
+            response_text = brain_response.get('response_text', "I am lost in thought...")
+            actions = brain_response.get('suggested_actions', [])
             
-            Current Conversation:
-            """
+            # 2. Act (Execute suggested actions)
+            if actions:
+                response_text += "\n\n⚡ **Actions Taken:**"
+                for action in actions:
+                    action_type = action.get('type')
+                    payload = action.get('payload', {})
+                    
+                    # Execute
+                    result = brain_service.execute_action(action_type, payload)
+                    
+                    # Append result to response
+                    if result.get('success'):
+                        response_text += f"\n- ✅ {result.get('message')}"
+                        # If action returned data (like analysis), append it
+                        if result.get('analysis'):
+                            response_text += f"\n\n**Analysis:**\n{result.get('analysis')}"
+                        if result.get('explanation'):
+                            response_text += f"\n\n**Insight:**\n{result.get('explanation')}"
+                    else:
+                        response_text += f"\n- ❌ Failed to {action_type}: {result.get('message')}"
             
-            # Fetch real study plan context
-            from app.services.study_planner import get_todays_tasks_summary
-            todays_plan_context = get_todays_tasks_summary()
-            
-            # Convert history to Gemini format if needed, or just append to prompt
-            # For simplicity with 1.5 Flash, we'll append to prompt as context
-            conversation_context = ""
-            for msg in history[-10:]: # Keep last 10 messages for context window
-                role = "User" if msg['role'] == 'user' else "Mimir"
-                conversation_context += f"{role}: {msg['content']}\n"
-                
-            full_prompt = f"{system_prompt}\n\nCURRENT CONTEXT (User's Real Schedule):\n{todays_plan_context}\n\n{conversation_context}\nUser: {message}\nMimir:"
-            
-            print(f"Sending prompt to Gemini (length: {len(full_prompt)} chars)")
-            
-            # Configure generation parameters for stability
-            generation_config = genai.types.GenerationConfig(
-                temperature=0.7,
-                top_p=0.8,
-                top_k=40,
-                max_output_tokens=8192,
-            )
-            
-            # Retry logic for rate limits
-            max_retries = 3
-            retry_delay = 2
-            
-            for attempt in range(max_retries):
-                try:
-                    response = self.model.generate_content(
-                        full_prompt,
-                        generation_config=generation_config
-                    )
-                    break # Success, exit loop
-                except Exception as e:
-                    if "429" in str(e) or "ResourceExhausted" in str(e):
-                        if attempt < max_retries - 1:
-                            wait_time = retry_delay * (2 ** attempt)
-                            print(f"⚠️ Quota exceeded. Retrying in {wait_time}s... (Attempt {attempt + 1}/{max_retries})")
-                            import time
-                            time.sleep(wait_time)
-                            continue
-                    raise e # Re-raise if not a rate limit or retries exhausted
-            
-            # Safety check for empty response
-            if not response.parts:
-                print(f"WARNING: Gemini returned no content. Finish Reason: {response.candidates[0].finish_reason}")
-                if response.prompt_feedback:
-                    print(f"Prompt Feedback: {response.prompt_feedback}")
-                return "I apologize, but I cannot answer that query. It may have triggered a safety filter or hit a limit."
+            return response_text
 
-            print(f"Got response from Gemini (length: {len(response.text)} chars)")
-            print(f"RAW RESPONSE TEXT: {response.text}") # DEBUG LOG
-            return response.text.strip()
-            
         except Exception as e:
             print(f"ERROR generating Mimir response: {type(e).__name__}: {e}")
-            if "429" in str(e) or "ResourceExhausted" in str(e):
-                return "I am currently overwhelmed with requests (Rate Limit Exceeded). Please give me a moment to rest and try again in a few seconds."
             import traceback
             traceback.print_exc()
             return f"I seem to have lost my connection to the Well of Wisdom. Error: {type(e).__name__}"

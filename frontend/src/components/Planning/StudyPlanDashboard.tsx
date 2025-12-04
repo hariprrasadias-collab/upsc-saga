@@ -23,6 +23,7 @@ import { NemesisEngine } from '../../util/NemesisEngine';
 import { CausalInferenceEngine, type CausalWarning } from '../../util/CausalInferenceEngine';
 
 import { audioManager } from '../../util/AudioManager';
+import { brainService, type BrainInsight } from '../../services/BrainService';
 
 interface Slot {
     id: string;
@@ -51,9 +52,12 @@ const StudyPlanDashboard: React.FC = () => {
     const [isOptimizing, setIsOptimizing] = useState(false);
 
     // Strategos Agent State
+    // Strategos Agent State
     const [agent] = useState(() => new RLAgent());
     const [agentSuggestion, setAgentSuggestion] = useState<string>("");
     const [agentAction, setAgentAction] = useState<AgentAction>('MAINTAIN_PACE');
+    const [brainInsights, setBrainInsights] = useState<BrainInsight[]>([]);
+    const [brainStatus, setBrainStatus] = useState<string>("OFFLINE");
 
     // Syllabus Arbitrage Engine
     const [arbitrageEngine] = useState(() => new ArbitrageEngine());
@@ -406,14 +410,33 @@ const StudyPlanDashboard: React.FC = () => {
             const prediction = oracle.predict(totalPending, velocity, targetDate);
             setOraclePrediction(prediction);
 
-            // Then Run Agent
+            // Fetch Brain Insights
+            const fetchBrainData = async () => {
+                const status = await brainService.getStatus();
+                setBrainStatus(status.status || "OFFLINE");
+
+                if (status.status !== "OFFLINE") {
+                    const insights = await brainService.getProactiveInsights();
+                    setBrainInsights(insights);
+
+                    // If Brain has a high priority insight, override local agent suggestion
+                    if (insights.length > 0) {
+                        setAgentSuggestion(insights[0].message);
+                    }
+                }
+            };
+            fetchBrainData();
+
+            // Then Run Agent (Legacy Fallback)
             const state = calculateAgentState();
             // Inject the just-calculated risk manually since state update is async
             state.oracleRisk = prediction.riskFactor;
 
             const action = agent.decide(state);
             setAgentAction(action);
-            setAgentSuggestion(agent.getSuggestionText(action));
+            if (brainInsights.length === 0) {
+                setAgentSuggestion(agent.getSuggestionText(action));
+            }
         }
     }, [plan]);
 
@@ -1309,6 +1332,9 @@ const StudyPlanDashboard: React.FC = () => {
                 <div className="header-branding">
                     <h1> Mimir's Advanced Scheduler</h1>
                     <div className="gamification-hud">
+                        <div className={`brain-status-indicator ${brainStatus.toLowerCase()}`} title={`Brain Status: ${brainStatus}`}>
+                            {brainStatus === 'ONLINE' ? '🟢 Cortex Online' : '🔴 Cortex Offline'}
+                        </div>
                         <div className="xp-container" title={`XP: ${xp} / ${nextLevelXp}`}>
                             <div className="level-badge">Lvl {level}</div>
                             <div className="xp-bar-bg">
@@ -1384,23 +1410,23 @@ const StudyPlanDashboard: React.FC = () => {
             ) : activePlan.length > 0 ? (
                 <div className="plan-timeline">
                     {/* Strategos Banner */}
-                    <div className={`strategos-banner ${agentAction.toLowerCase().replace('_', '-')}`}>
-                        <div className="strategos-icon"></div>
-                        <div className="strategos-content">
-                            <span className="strategos-label">STRATEGOS AI COMMAND</span>
-                            <p>{agentSuggestion}</p>
+                        <div className={`strategos-banner ${agentAction.toLowerCase().replace('_', '-')}`}>
+                            <div className="strategos-icon"></div>
+                            <div className="strategos-content">
+                                <span className="strategos-label">STRATEGOS AI COMMAND</span>
+                                <p>{agentSuggestion}</p>
+                            </div>
+                            {agentAction !== 'MAINTAIN_PACE' && (
+                                <button
+                                    className="strategos-action-btn"
+                                    onClick={() => executeAgentAction(agentAction)}
+                                >
+                                    {agentAction === 'SUGGEST_BREAK' ? ' Take Break' :
+                                        agentAction === 'SCHEDULE_MOCK' ? ' Schedule Mock' :
+                                            ' Acknowledge'}
+                                </button>
+                            )}
                         </div>
-                        {agentAction !== 'MAINTAIN_PACE' && (
-                            <button
-                                className="strategos-action-btn"
-                                onClick={() => executeAgentAction(agentAction)}
-                            >
-                                {agentAction === 'SUGGEST_BREAK' ? ' Take Break' :
-                                    agentAction === 'SCHEDULE_MOCK' ? ' Schedule Mock' :
-                                        ' Acknowledge'}
-                            </button>
-                        )}
-                    </div>
 
                     {/* God Mode Debug Panel */}
                     {godMode && (

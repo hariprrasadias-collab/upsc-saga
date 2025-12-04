@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './PYQDatabase.css';
+import { brainService } from '../../services/BrainService';
+import MarkdownRenderer from '../Shared/MarkdownRenderer';
 
 interface Question {
     id: number;
@@ -39,6 +41,8 @@ const PYQDatabase: React.FC = () => {
     const [loadingTopics, setLoadingTopics] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [trendAnalysis, setTrendAnalysis] = useState<string | null>(null);
 
     // Expanded state for answers
     const [revealedAnswers, setRevealedAnswers] = useState<Record<number, boolean>>({});
@@ -216,6 +220,27 @@ const PYQDatabase: React.FC = () => {
         }
     };
 
+    const handleAnalyzeTrends = async () => {
+        setIsAnalyzing(true);
+        try {
+            const filters = {
+                year: selectedYears[0],
+                subject: selectedSubjects[0],
+            };
+            const result = await brainService.executeAction('ANALYZE_PYQ_TRENDS', { filters });
+            if (result.success) {
+                setTrendAnalysis(result.analysis);
+            } else {
+                alert("Analysis failed: " + result.message);
+            }
+        } catch (err) {
+            console.error("Analysis error:", err);
+            alert("The Brain is silent.");
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
+
     return (
         <div className="pyq-container">
             {/* SIDEBAR FILTERS */}
@@ -332,6 +357,15 @@ const PYQDatabase: React.FC = () => {
                         </button>
                         <button
                             className="start-quiz-btn"
+                            onClick={handleAnalyzeTrends}
+                            disabled={isAnalyzing}
+                            title="Analyze trends for selected filters"
+                            style={{ marginRight: '10px', background: '#8e44ad' }}
+                        >
+                            {isAnalyzing ? 'Analyzing...' : '🧠 Analyze Trends'}
+                        </button>
+                        <button
+                            className="start-quiz-btn"
                             onClick={startQuiz}
                             disabled={startingQuiz || questions.length === 0}
                             title="Start an interactive quiz with current filters"
@@ -340,6 +374,23 @@ const PYQDatabase: React.FC = () => {
                         </button>
                     </div>
                 </div>
+
+                {trendAnalysis && (
+                    <div className="trend-analysis-panel" style={{
+                        background: 'rgba(142, 68, 173, 0.1)',
+                        border: '1px solid #8e44ad',
+                        borderRadius: '8px',
+                        padding: '15px',
+                        marginBottom: '20px',
+                        color: '#ecf0f1'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                            <h3 style={{ margin: 0, color: '#9b59b6' }}>🧠 Strategos Trend Analysis</h3>
+                            <button onClick={() => setTrendAnalysis(null)} style={{ background: 'none', border: 'none', color: '#bdc3c7', cursor: 'pointer' }}>✕</button>
+                        </div>
+                        <MarkdownRenderer content={trendAnalysis} />
+                    </div>
+                )}
 
                 {/* Active Filters Display */}
                 {(selectedYears.length > 0 || selectedSubjects.length > 0 || selectedTopics.length > 0) && (

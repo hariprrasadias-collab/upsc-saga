@@ -10,6 +10,21 @@ def handle_quests():
     conn = get_db()
     if request.method == 'GET':
         quests = conn.execute('SELECT * FROM tasks WHERE user_id=? AND is_quest=1 ORDER BY isCompleted ASC', (user_id,)).fetchall()
+        
+        # If no quests, generate daily quests
+        if not quests:
+            try:
+                from app.services.quest_service import quest_service
+                new_quests = quest_service.generate_daily_quests(user_id)
+                for q in new_quests:
+                    conn.execute('INSERT INTO tasks (user_id, title, xp_reward, associated_stat, isCompleted, is_quest) VALUES (?, ?, ?, ?, 0, 1)',
+                                 (user_id, q['title'], q['xp_reward'], q['type']))
+                conn.commit()
+                # Fetch again
+                quests = conn.execute('SELECT * FROM tasks WHERE user_id=? AND is_quest=1 ORDER BY isCompleted ASC', (user_id,)).fetchall()
+            except Exception as e:
+                print(f"Failed to generate quests: {e}")
+
         return jsonify([dict(q) for q in quests])
     elif request.method == 'POST':
         data = request.get_json()

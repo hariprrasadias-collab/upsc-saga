@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 import { useNavigate } from 'react-router-dom';
 import './TimeBoxing.css';
+import { brainService } from '../../services/BrainService';
 
 interface TimeBox {
     subject: string;
@@ -22,6 +23,7 @@ const TimeBoxing: React.FC = () => {
     const [showModal, setShowModal] = useState(false);
     const [newSubject, setNewSubject] = useState('General Studies I');
     const [newHours, setNewHours] = useState(2);
+    const [isOptimizing, setIsOptimizing] = useState(false);
     const navigate = useNavigate();
 
     // Persist daily goal in localStorage
@@ -96,8 +98,39 @@ const TimeBoxing: React.FC = () => {
         }
     };
 
-    const handleStartFocus = (subject: string) => {
+    const handleStartFocus = (_subject: string) => {
         navigate('/pomodoro');
+    };
+
+    const handleOptimize = async () => {
+        setIsOptimizing(true);
+        try {
+            const context = {
+                current_allocations: timeBoxes,
+                daily_goal: dailyGoal
+            };
+
+            const response = await brainService.think(
+                "Review my time boxing allocations. If they are unbalanced or missing key areas, suggest a better distribution using the UPDATE_TIMEBOXES action.",
+                context
+            );
+
+            // Check if Brain suggested an update
+            const updateAction = response.suggested_actions.find(a => a.type === 'UPDATE_TIMEBOXES');
+            if (updateAction) {
+                if (window.confirm(`Strategos suggests: ${response.response_text}\n\nApply these changes?`)) {
+                    await brainService.executeAction('UPDATE_TIMEBOXES', updateAction.payload);
+                    await fetchTimeBoxes();
+                }
+            } else {
+                alert(`Strategos Analysis: ${response.response_text}`);
+            }
+        } catch (err) {
+            console.error("Optimization failed:", err);
+            alert("Strategos is currently offline.");
+        } finally {
+            setIsOptimizing(false);
+        }
     };
 
     const totalAllocated = timeBoxes.reduce((sum, tb) => sum + tb.allocated_hours, 0);
@@ -145,6 +178,14 @@ const TimeBoxing: React.FC = () => {
                     />
                     <span className="goal-label">Hours</span>
                 </div>
+                <button
+                    className="optimize-btn"
+                    onClick={handleOptimize}
+                    disabled={isOptimizing}
+                    style={{ marginLeft: '20px', padding: '8px 16px', background: 'linear-gradient(45deg, #f1c40f, #f39c12)', border: 'none', borderRadius: '4px', color: '#000', fontWeight: 'bold', cursor: 'pointer' }}
+                >
+                    {isOptimizing ? 'Optimizing...' : '⚡ Optimize Schedule'}
+                </button>
             </div>
 
             <div className="timebox-content-grid">

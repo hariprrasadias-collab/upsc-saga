@@ -20,10 +20,6 @@ const DashboardMain: React.FC = () => {
 
   return (
     <div className="dashboard-main">
-      <div className="dashboard-header">
-        <h1 className="header-title">CHARACTER</h1>
-        <div className="runes-decoration" />
-      </div>
 
       <div className="dashboard-content">
         <div className="dashboard-column-left">
