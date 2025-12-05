@@ -177,6 +177,349 @@ class BrainService:
             print(f"Brain Think Error: {e}")
             return {"response_text": f"I had a headache thinking about that. Error: {str(e)}", "actions": []}
 
+    def _add_flashcard(self, user_id, topic, subject, front, back, source):
+        """Helper to create a deck if needed and add a flashcard."""
+        try:
+            from app.db import get_db
+            conn = get_db()
+            deck_name = f"Auto-Gen: {topic}"
+
+            # Check for deck, if not exists create it.
+            cursor = conn.execute("SELECT id FROM decks WHERE name = ? AND user_id = ?", (deck_name, user_id))
+            row = cursor.fetchone()
+            if row:
+                deck_id = row[0]
+            else:
+                cursor = conn.execute("INSERT INTO decks (user_id, name, subject) VALUES (?, ?, ?)", (user_id, deck_name, subject))
+                deck_id = cursor.lastrowid
+                conn.commit()
+
+            conn.execute('''
+                INSERT INTO flashcards (deck_id, front, back, source)
+                VALUES (?, ?, ?, ?)
+            ''', (deck_id, front, back, source))
+            conn.commit()
+        except Exception as e:
+            print(f"Brain: Flashcard creation failed: {e}")
+
+    def process_task_completion(self, task_data: dict):
+        """
+        Proactively triggers Brain actions when a study task is completed.
+        """
+        topic = task_data.get('topic')
+        subject = task_data.get('subject')
+        user_id = task_data.get('user_id', 1) # Default to 1 if missing
+
+        print(f"Brain: Processing completion for {subject} - {topic} (User {user_id})")
+
+        if not topic:
+            return
+
+        try:
+            # 1. Create Flashcards
+            self.execute_action("CREATE_FLASHCARDS", {"topic": topic, "count": 5, "reasoning": "Task Completion Automation"})
+
+            # 2. Create Revision Notes
+            explanation_res = self.execute_action("EXPLAIN_SYLLABUS_NODE", {"node": topic, "reasoning": "Task Completion Automation"})
+            if explanation_res.get('success'):
+                self._add_flashcard(
+                    user_id, topic, subject,
+                    f"Revision Note: {topic}",
+                    explanation_res.get('explanation'),
+                    'ai_generated_summary'
+                )
+
+            # 3. Generate Mind Map
+            try:
+                from app.services.mindmap_service import MindMapService
+                mindmap_data = MindMapService.generate_mindmap(topic)
+                MindMapService.save_mindmap(f"{topic} Mind Map", mindmap_data)
+                print(f"Brain: Mind Map generated for {topic}")
+            except Exception as mm_e:
+                print(f"Brain: Mind Map Generation Failed: {mm_e}")
+
+            # 4. Update Syllabus Tracker
+            try:
+                from app.services.syllabus_tracker import SyllabusTracker
+                SyllabusTracker.update_topic_progress(topic, 'Completed')
+                print(f"Brain: Syllabus status updated for {topic}")
+            except Exception as st_e:
+                print(f"Brain: Syllabus Update Failed: {st_e}")
+
+            # 5. Create Mock Test (UPSC Style)
+            self.execute_action("CREATE_MOCK_TEST", {
+                "topic": topic,
+                "reasoning": "Task Completion Automation",
+                "style": "UPSC"
+            })
+
+            # 6. Award Bonus XP
+            try:
+                from app.services.game_engine import trigger_event
+                trigger_event('TASK_COMPLETE_BONUS', user_id)
+            except Exception as ge_e:
+                print(f"Brain: XP Bonus Failed: {ge_e}")
+
+            # 7. PYQ Trend Analysis
+            pyq_res = self.execute_action("ANALYZE_PYQ_TRENDS", {"filters": {"topic": topic, "subject": subject}, "reasoning": "Task Completion Automation"})
+            if pyq_res.get('success'):
+                self._add_flashcard(
+                    user_id, topic, subject,
+                    f"PYQ Analysis: {topic}",
+                    pyq_res.get('analysis'),
+                    'ai_generated_pyq_analysis'
+                )
+
+            # 8. Foresight Predictions
+            foresight_res = self.execute_action("PREDICT_QUESTIONS", {"subject": subject, "topic": topic, "timeframe_days": 90, "reasoning": "Task Completion Automation"})
+            if foresight_res.get('success'):
+                preds = foresight_res.get('data', [])
+                if preds:
+                    pred_text = "\n".join([f"- {p.get('question')} ({p.get('type')})" for p in preds])
+                    self._add_flashcard(
+                        user_id, topic, subject,
+                        f"Predicted Questions: {topic}",
+                        pred_text,
+                        'ai_generated_foresight'
+                    )
+
+            # 9. Current Affairs Linkage
+            try:
+                from app.services.ravens_service import RavensService
+                articles = RavensService.search_articles(topic)
+                if articles:
+                    for article in articles[:3]:
+                        front = f"Linkage: {topic} <-> {article['title']}"
+                        back = f"Summary: {article.get('summary', 'No summary available.')}\nSource: {article.get('source', 'Unknown')}"
+                        self._add_flashcard(user_id, topic, subject, front, back, 'ravens_linkage')
+                    print(f"Brain: Linked {len(articles[:3])} articles to {topic}")
+            except Exception as ravens_e:
+                print(f"Brain: Current Affairs Linkage Failed: {ravens_e}")
+
+            # 10. Schedule Retention Check (3 days later)
+            try:
+                from app.db import get_db
+                conn = get_db()
+                from datetime import timedelta
+
+                check_date = (datetime.now() + timedelta(days=3)).strftime('%Y-%m-%d')
+                check_title = f"Recall Quiz: {topic}"
+
+                exists = conn.execute('SELECT id FROM tasks WHERE title = ? AND due_date = ? AND user_id = ?', (check_title, check_date, user_id)).fetchone()
+                if not exists:
+                    conn.execute('''
+                        INSERT INTO tasks (user_id, title, due_date, xp_reward, associated_stat, isCompleted, is_quest)
+                        VALUES (?, ?, ?, ?, ?, 0, 0)
+                    ''', (user_id, check_title, check_date, 50, 'Retention'))
+                    conn.commit()
+                    print(f"Brain: Scheduled retention check for {check_date}")
+            except Exception as sched_e:
+                print(f"Brain: Retention Scheduling Failed: {sched_e}")
+
+            # 11. Socratic Debate Simulation
+            socratic_res = self.execute_action("GENERATE_SOCRATIC_DIALOGUE", {"topic": topic, "reasoning": "Task Completion Automation"})
+            if socratic_res.get('success'):
+                self._add_flashcard(
+                    user_id, topic, subject,
+                    f"Socratic Debate: {topic}",
+                    socratic_res.get('dialogue'),
+                    'ai_generated_socratic'
+                )
+
+            # 12. Triangulation Analysis
+            triangulation_res = self.execute_action("TRIANGULATE_TOPIC", {"topic": topic, "reasoning": "Task Completion Automation"})
+            if triangulation_res.get('success'):
+                data = triangulation_res.get('data', {})
+                synthesis = data.get('synthesis', '')
+                way_forward = json.dumps(data.get('way_forward', {}), indent=2)
+                content = f"Synthesis:\n{synthesis}\n\nWay Forward:\n{way_forward}"
+
+                self._add_flashcard(
+                    user_id, topic, subject,
+                    f"Mains Strategy: {topic}",
+                    content,
+                    'ai_generated_triangulation'
+                )
+
+            # 13. Neural Hash Decoding
+            synthesis_text = ""
+            if triangulation_res.get('success'):
+                synthesis_text = triangulation_res.get('data', {}).get('synthesis', '')
+            nh_text = f"{topic} ({subject})\n{synthesis_text}"
+
+            nh_res = self.execute_action("DECODE_NEURAL_HASH", {"text": nh_text, "type": "upsc_topic", "reasoning": "Task Completion Automation"})
+            if nh_res.get('success'):
+                data = nh_res.get('data', {})
+                themes = ", ".join(data.get('core_themes', []))
+                pattern = data.get('examiner_pattern', '')
+                content = f"Core Themes: {themes}\n\nExaminer Pattern: {pattern}\n\nCross Linkages: {', '.join(data.get('cross_linkages', []))}"
+
+                self._add_flashcard(
+                    user_id, topic, subject,
+                    f"Examiner's Lens: {topic}",
+                    content,
+                    'ai_generated_neural_hash'
+                )
+
+            # 14. Mistake Pattern Detection
+            pitfall_res = self.execute_action("FIND_COMMON_PITFALLS", {"topic": topic, "subject": subject, "reasoning": "Task Completion Automation"})
+            if pitfall_res.get('success'):
+                pitfalls = pitfall_res.get('pitfalls', [])
+                if pitfalls:
+                    content = "\n".join([f"⚠️ {p}" for p in pitfalls])
+                    self._add_flashcard(
+                        user_id, topic, subject,
+                        f"Common Pitfalls: {topic}",
+                        content,
+                        'ai_generated_pitfalls'
+                    )
+
+            # 15. Podcast Script Generation
+            podcast_res = self.execute_action("GENERATE_PODCAST_SCRIPT", {"topic": topic, "reasoning": "Task Completion Automation"})
+            if podcast_res.get('success'):
+                self._add_flashcard(
+                    user_id, topic, subject,
+                    f"Podcast Script: {topic}",
+                    podcast_res.get('script'),
+                    'ai_generated_podcast'
+                )
+
+            # 16. Feynman Challenge
+            try:
+                from app.db import get_db
+                conn = get_db()
+                from datetime import timedelta
+                check_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+                check_title = f"Feynman Challenge: Teach '{topic}' to AI"
+
+                exists = conn.execute('SELECT id FROM tasks WHERE title = ? AND due_date = ? AND user_id = ?', (check_title, check_date, user_id)).fetchone()
+                if not exists:
+                    conn.execute('''
+                        INSERT INTO tasks (user_id, title, due_date, xp_reward, associated_stat, isCompleted, is_quest)
+                        VALUES (?, ?, ?, ?, ?, 0, 0)
+                    ''', (user_id, check_title, check_date, 75, 'Communication'))
+                    conn.commit()
+            except Exception as feyn_e:
+                print(f"Brain: Feynman Scheduling Failed: {feyn_e}")
+
+            # 17. Essay Prompt Generation
+            essay_res = self.execute_action("GENERATE_ESSAY_PROMPT", {"topic": topic, "subject": subject, "reasoning": "Task Completion Automation"})
+            if essay_res.get('success'):
+                prompt_text = essay_res.get('prompt', '')
+                if prompt_text:
+                    self._add_flashcard(
+                        user_id, topic, subject,
+                        f"Essay Prompt: {topic}",
+                        prompt_text,
+                        'ai_generated_essay'
+                    )
+
+            # 18. Visual Mnemonic Prompt
+            visual_res = self.execute_action("GENERATE_VISUAL_PROMPT", {"topic": topic, "reasoning": "Task Completion Automation"})
+            if visual_res.get('success'):
+                prompt_text = visual_res.get('prompt', '')
+                if prompt_text:
+                    self._add_flashcard(
+                        user_id, topic, subject,
+                        f"Visual Mnemonic Prompt: {topic}",
+                        prompt_text,
+                        'ai_generated_visual'
+                    )
+
+            # 19. Roleplay Scenario
+            roleplay_res = self.execute_action("GENERATE_ROLEPLAY_SCENARIO", {"topic": topic, "reasoning": "Task Completion Automation"})
+            if roleplay_res.get('success'):
+                scenario_text = roleplay_res.get('scenario', '')
+                if scenario_text:
+                    self._add_flashcard(
+                        user_id, topic, subject,
+                        f"Roleplay Scenario: {topic}",
+                        scenario_text,
+                        'ai_generated_roleplay'
+                    )
+
+            # 20. Map Work
+            if subject in ["Geography", "Environment", "International Relations"]:
+                map_res = self.execute_action("GENERATE_MAP_WORK", {"topic": topic, "reasoning": "Task Completion Automation"})
+                if map_res.get('success'):
+                    locations = map_res.get('locations', [])
+                    if locations:
+                        content = "\n".join([f"- {l['name']} ({l.get('lat',0)}, {l.get('lon',0)}): {l['reason']}" for l in locations])
+                        self._add_flashcard(
+                            user_id, topic, subject,
+                            f"Map Work: {topic}",
+                            content,
+                            'ai_generated_mapwork'
+                        )
+
+            # 21. Badge Unlocking
+            try:
+                from app.services.badge_service import badge_service
+                unlocked_badges = badge_service.check_and_unlock_badges(user_id)
+                if unlocked_badges:
+                    print(f"Brain: Unlocked {len(unlocked_badges)} badges for user {user_id}!")
+            except Exception as badge_e:
+                print(f"Brain: Badge Check Failed: {badge_e}")
+
+            # 22. Check for Book Completion -> Trigger Boss Fight
+            # Load books data to identify if a book is completed
+            book_title = self._identify_book_for_topic(subject, topic)
+            if book_title:
+                print(f"Brain: identified book '{book_title}' for topic '{topic}'")
+                # Logic: Check if all other chapters in this book are completed in syllabus_topics or study_tasks
+                # For simplicity, we stick to the study_plan pending check but refined by subject
+                # Ideally we should check if all chapters of 'book_title' are marked completed in syllabus.
+
+                # For now, we'll stick to the previous robust method: Subject-based "Unit" completion
+                # But we can customize the Boss Name
+                boss_name = f"The Guardian of {book_title}"
+            else:
+                boss_name = f"The {subject} Final Boss"
+
+            from app.db_models.study_plan import get_pending_task_count
+            plan_id = task_data.get('plan_id')
+            if plan_id:
+                pending_count = get_pending_task_count(plan_id, subject, exclude_task_id=task_data.get('id'))
+
+                if pending_count == 0:
+                    print(f"Brain: All tasks for {subject} completed. Summoning Boss: {boss_name}")
+                    self.execute_action("SUMMON_BOSS", {
+                        "filters": {"subject": subject},
+                        "name": boss_name,
+                        "reasoning": "Subject/Book Completion Event"
+                    })
+
+        except Exception as e:
+            print(f"Brain: Task Completion Automation Failed: {e}")
+            import traceback
+            traceback.print_exc()
+
+    def _identify_book_for_topic(self, subject, topic):
+        """Helper to find which book a topic belongs to."""
+        try:
+            books_path = os.path.join(os.getcwd(), 'app', 'data', 'books.json')
+            if os.path.exists(books_path):
+                with open(books_path, 'r') as f:
+                    books = json.load(f)
+
+                # Normalize string for comparison
+                def normalize(s): return s.lower().replace(':', '').replace('-', ' ').strip()
+
+                norm_topic = normalize(topic)
+
+                for book in books:
+                    if book.get('subject') == subject:
+                        for chapter in book.get('chapters', []):
+                            if normalize(chapter) in norm_topic or norm_topic in normalize(chapter):
+                                return book.get('title')
+
+                        # Also check if topic title matches book title (whole book review task)
+                        if normalize(book.get('title')) in norm_topic:
+                            return book.get('title')
+        except Exception as e:
+            print(f"Brain: Book identification error: {e}")
+        return None
+
     def execute_action(self, action_type: str, payload: dict) -> dict:
         """
         Executes a specific action triggered by the Brain.
@@ -220,8 +563,9 @@ class BrainService:
                 try:
                     from app.services.foresight_engine import foresight_engine
                     subject = payload.get('subject', 'General')
+                    topic = payload.get('topic', None)
                     timeframe = payload.get('timeframe_days', 90)
-                    predictions = foresight_engine.predict_questions(subject, timeframe)
+                    predictions = foresight_engine.predict_questions(subject, timeframe, topic=topic)
                     
                     from app.services.game_engine import trigger_event
                     trigger_event('ORACLE_CONSULT', 1)
@@ -422,6 +766,10 @@ class BrainService:
                     if filters.get('year'):
                         query += " AND year = ?"
                         params.append(filters['year'])
+
+                    if filters.get('topic'):
+                        query += " AND topic LIKE ?"
+                        params.append(f"%{filters['topic']}%")
                         
                     query += " ORDER BY year DESC LIMIT 50" # Analyze last 50 questions matching criteria
                     
@@ -574,6 +922,185 @@ class BrainService:
                     }
                 except Exception as e:
                     result = {"success": False, "message": f"Recommendation Failed: {str(e)}"}
+
+            elif action_type == "GENERATE_SOCRATIC_DIALOGUE":
+                try:
+                    from app.services.socratic_service import AGENTS, get_model
+                    topic = payload.get('topic', 'Philosophy')
+
+                    # Simulate a 3-turn debate
+                    model = get_model()
+                    turns = []
+
+                    # 1. User Statement (Simulated)
+                    prompt1 = f"Generate a provocative student opinion about '{topic}' that is slightly flawed."
+                    response1 = model.generate_content(prompt1)
+                    user_statement = response1.text.strip()
+                    turns.append(f"Student: {user_statement}")
+
+                    # 2. Socrates Responds
+                    agent = AGENTS['skeptic']
+                    prompt2 = f"You are {agent['name']}. The student says: '{user_statement}'. Respond with a short, deep question."
+                    response2 = model.generate_content(prompt2)
+                    socrates_response = response2.text.strip()
+                    turns.append(f"Socrates: {socrates_response}")
+
+                    # 3. Student Rethinks
+                    prompt3 = f"The student reflects on '{socrates_response}'. Generate their realization."
+                    response3 = model.generate_content(prompt3)
+                    student_realization = response3.text.strip()
+                    turns.append(f"Student (Reflecting): {student_realization}")
+
+                    dialogue = "\n\n".join(turns)
+
+                    result = {
+                        "success": True,
+                        "message": "Socratic Dialogue Generated.",
+                        "dialogue": dialogue
+                    }
+                except Exception as e:
+                    result = {"success": False, "message": f"Socratic Gen Failed: {str(e)}"}
+
+            elif action_type == "TRIANGULATE_TOPIC":
+                try:
+                    from app.services.triangulation_service import analyze_topic_triangulation
+                    topic = payload.get('topic', '')
+                    data = analyze_topic_triangulation(topic)
+
+                    if data.get('error'):
+                        result = {"success": False, "message": data['error']}
+                    else:
+                        result = {
+                            "success": True,
+                            "message": "Triangulation Complete.",
+                            "data": data
+                        }
+                except Exception as e:
+                    result = {"success": False, "message": f"Triangulation Failed: {str(e)}"}
+
+            elif action_type == "FIND_COMMON_PITFALLS":
+                try:
+                    topic = payload.get('topic', '')
+                    subject = payload.get('subject', '')
+                    prompt = f"""
+                    Identify 3-5 common mistakes, misconceptions, or traps students fall into when studying '{topic}' in {subject} for UPSC.
+                    Return as a JSON list of strings.
+                    Example: ["Confusing Article 32 with 226", "Ignoring the proviso..."]
+                    """
+                    response = self.model.generate_content(prompt)
+                    data = self._parse_response(response.text)
+
+                    # Handle if data is list directly or dict
+                    pitfalls = []
+                    if isinstance(data, list):
+                        pitfalls = data
+                    elif isinstance(data, dict):
+                        # try to find a list value
+                        for k, v in data.items():
+                            if isinstance(v, list):
+                                pitfalls = v
+                                break
+
+                    result = {
+                        "success": True,
+                        "message": "Pitfalls Identified.",
+                        "pitfalls": pitfalls
+                    }
+                except Exception as e:
+                    result = {"success": False, "message": f"Pitfall Detection Failed: {str(e)}"}
+
+            elif action_type == "GENERATE_PODCAST_SCRIPT":
+                try:
+                    topic = payload.get('topic', '')
+                    prompt = f"""
+                    Write a short, engaging podcast script (2 hosts: 'Expert' and 'Curious Student') explaining '{topic}'.
+                    Keep it conversational, simple, and use analogies. Duration: 2 minutes reading time.
+                    """
+                    response = self.model.generate_content(prompt)
+                    result = {
+                        "success": True,
+                        "message": "Podcast Script Generated.",
+                        "script": response.text
+                    }
+                except Exception as e:
+                    result = {"success": False, "message": f"Podcast Gen Failed: {str(e)}"}
+
+            elif action_type == "GENERATE_ESSAY_PROMPT":
+                try:
+                    topic = payload.get('topic', '')
+                    subject = payload.get('subject', '')
+                    prompt = f"""
+                    Create a philosophical or analytical UPSC Mains Essay Prompt based on '{topic}' ({subject}).
+                    Connect it to a broader theme (e.g., Democracy, Justice, Environment).
+                    Provide the prompt statement and a 1-line 'Thesis' hint.
+                    """
+                    response = self.model.generate_content(prompt)
+                    result = {
+                        "success": True,
+                        "message": "Essay Prompt Generated.",
+                        "prompt": response.text
+                    }
+                except Exception as e:
+                    result = {"success": False, "message": f"Essay Gen Failed: {str(e)}"}
+
+            elif action_type == "GENERATE_VISUAL_PROMPT":
+                try:
+                    topic = payload.get('topic', '')
+                    prompt = f"""
+                    Create a detailed text-to-image prompt (for Stable Diffusion/Midjourney) that visually represents the concept of '{topic}'.
+                    Describe the scene, style, lighting, and symbolic elements.
+                    Example: "A hyper-realistic marble statue of Justice wearing a blindfold, holding a constitution, dramatic lighting..."
+                    """
+                    response = self.model.generate_content(prompt)
+                    result = {
+                        "success": True,
+                        "message": "Visual Prompt Generated.",
+                        "prompt": response.text
+                    }
+                except Exception as e:
+                    result = {"success": False, "message": f"Visual Gen Failed: {str(e)}"}
+
+            elif action_type == "GENERATE_ROLEPLAY_SCENARIO":
+                try:
+                    topic = payload.get('topic', '')
+                    prompt = f"""
+                    Create a short roleplay scenario for a District Collector (IAS Officer) dealing with a situation related to '{topic}'.
+                    Structure:
+                    1. The Situation (Emergency/Policy decision)
+                    2. The Stakeholders
+                    3. The Dilemma
+                    4. Decision Points (Options A, B, C)
+                    """
+                    response = self.model.generate_content(prompt)
+                    result = {
+                        "success": True,
+                        "message": "Roleplay Scenario Generated.",
+                        "scenario": response.text
+                    }
+                except Exception as e:
+                    result = {"success": False, "message": f"Roleplay Gen Failed: {str(e)}"}
+
+            elif action_type == "GENERATE_MAP_WORK":
+                try:
+                    topic = payload.get('topic', '')
+                    prompt = f"""
+                    Identify 3-5 key geographical locations related to '{topic}' for map pointing.
+                    Return JSON list: [{{ "name": "...", "lat": 0.0, "lon": 0.0, "reason": "..." }}]
+                    """
+                    response = self.model.generate_content(prompt)
+                    data = self._parse_response(response.text)
+
+                    locations = []
+                    if isinstance(data, list):
+                        locations = data
+
+                    result = {
+                        "success": True,
+                        "message": "Map Work Generated.",
+                        "locations": locations
+                    }
+                except Exception as e:
+                    result = {"success": False, "message": f"Map Work Gen Failed: {str(e)}"}
 
             return result
 
