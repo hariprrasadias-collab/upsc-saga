@@ -29,27 +29,35 @@ def complete_pomodoro():
         
         # Update user XP
         c.execute('''
-            UPDATE user_profile 
+            UPDATE users
             SET current_xp = current_xp + ?
-            WHERE user_id = 1
+            WHERE id = 1
         ''', (xp_awarded,))
         
         # Check if level up needed
-        c.execute('SELECT current_xp, level FROM user_profile WHERE user_id = 1')
+        c.execute('SELECT current_xp, level FROM users WHERE id = 1')
         user = c.fetchone()
         current_xp = user['current_xp']
         current_level = user['level']
         
         # Simple level formula: 100 XP per level
-        max_xp = current_level * 100
+        level_up_occurred = False
         
-        if current_xp >= max_xp:
-            new_level = current_level + 1
+        while True:
+            max_xp = current_level * 100
+            if current_xp >= max_xp:
+                current_level += 1
+                current_xp -= max_xp
+                level_up_occurred = True
+            else:
+                break
+
+        if level_up_occurred:
             c.execute('''
-                UPDATE user_profile 
+                UPDATE users
                 SET level = ?, current_xp = ?
-                WHERE user_id = 1
-            ''', (new_level, current_xp - max_xp))
+                WHERE id = 1
+            ''', (current_level, current_xp))
             
             conn.commit()
             conn.close()
@@ -58,7 +66,7 @@ def complete_pomodoro():
                 'success': True,
                 'xp_awarded': xp_awarded,
                 'level_up': True,
-                'new_level': new_level
+                'new_level': current_level
             })
         
         conn.commit()
