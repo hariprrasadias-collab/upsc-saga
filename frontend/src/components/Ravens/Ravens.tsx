@@ -79,12 +79,7 @@ const Ravens: React.FC = () => {
         fetchArticles();
     }, [selectedPaper, selectedSubject, selectedSource, showBookmarked, searchQuery]);
 
-    useEffect(() => {
-        // Auto-fetch on mount if no articles
-        if (articles.length === 0 && !loading && !processing) {
-            fetchAndProcessLatest();
-        }
-    }, []); // Run once on mount
+    // Removed auto-fetch on mount as it is now handled by the background task in App.tsx
 
     const updateChallengeProgress = async (type: string, increment: number = 1) => {
         try {

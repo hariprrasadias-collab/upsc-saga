@@ -248,23 +248,64 @@ def fetch_article_content(url):
         return ""
 
 def find_related_pyqs(subjects, papers):
-    """Placeholder for fetching related previous year questions.
-    Returns up to three mock PYQs based on subject.
+    """Fetch related previous year questions from the database.
+    Returns up to three real PYQs based on subject.
     """
-    pyq_database = {
-        'Polity & Governance': [
-            {'year': 2023, 'paper': 'GS2', 'question': 'Discuss the role of Governor in state administration.'},
-            {'year': 2022, 'paper': 'GS2', 'question': 'What is the significance of 73rd and 74th amendments?'}
-        ],
-        'Economics': [
-            {'year': 2023, 'paper': 'GS3', 'question': 'Analyze the impact of GST on Indian economy.'},
-            {'year': 2022, 'paper': 'GS3', 'question': 'Discuss the challenges in agricultural marketing.'}
-        ]
-    }
+    import sqlite3
+    
+    # Determine DB path
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    db_path = os.path.join(base_dir, 'upsc_saga.db')
+    
     related_pyqs = []
-    for subject in subjects:
-        if subject in pyq_database:
-            related_pyqs.extend(pyq_database[subject][:2])
+    
+    # Map AI subjects to DB subjects
+    subject_mapping = {
+        'Economics': 'Economy',
+        'Internal Security': 'Polity & Governance', # Fallback
+        'Disaster Management': 'Geography', # Fallback
+        'Ethics': 'Polity & Governance' # Fallback or maybe empty
+    }
+    
+    db_subjects = []
+    for s in subjects:
+        db_subjects.append(subject_mapping.get(s, s))
+        
+    # Remove duplicates
+    db_subjects = list(set(db_subjects))
+    
+    if not db_subjects:
+        return []
+
+    try:
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        placeholders = ','.join(['?'] * len(db_subjects))
+        query = f"""
+            SELECT year, subject, question_text as question, topic
+            FROM pyq_questions
+            WHERE subject IN ({placeholders})
+            ORDER BY year DESC
+            LIMIT 5
+        """
+        
+        rows = cursor.execute(query, db_subjects).fetchall()
+        
+        for row in rows:
+            related_pyqs.append({
+                'year': row['year'],
+                'question': row['question'],
+                'subject': row['subject'],
+                'topic': row['topic']
+            })
+            
+        conn.close()
+        
+    except Exception as e:
+        print(f"Error fetching PYQs: {e}")
+        
     return related_pyqs[:3]
 
 def generate_one_liner(title: str, content: str) -> str:

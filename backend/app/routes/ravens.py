@@ -1,6 +1,8 @@
 # backend/app/routes/ravens.py
 from flask import Blueprint, request, jsonify
 import feedparser
+import threading
+import time
 from app.db_models.current_affairs import (
     init_current_affairs_table, 
     save_article, 
@@ -25,6 +27,92 @@ bp = Blueprint('ravens', __name__, url_prefix='/api/ravens')
 
 # Database table will be initialized when app starts
 
+def run_background_fetch():
+    """Background task to fetch and process news"""
+    print("🦅 Raven: Starting background fetch mission...")
+    
+    feeds = [
+        'https://www.thehindu.com/news/national/feeder/default.rss',
+        'https://pib.gov.in/RSS/RssFeed.aspx?ModId=2',
+        'https://indianexpress.com/section/india/feed/',
+        'https://www.thehindu.com/opinion/editorial/feeder/default.rss',
+        'https://indianexpress.com/section/opinion/editorials/feed/'
+    ]
+    
+    processed_count = 0
+    
+    for url in feeds:
+        try:
+            print(f"🦅 Raven: Scouting {url}...")
+            feed = feedparser.parse(url)
+            
+            # Process only the latest 5 entries from each feed to avoid overload
+            for entry in feed.entries[:5]:
+                link = entry.link
+                
+                # Skip if already exists
+                if article_exists(link):
+                    continue
+                    
+                print(f"🦅 Raven: Found new artifact - {entry.title}")
+                
+                try:
+                    # 1. Fetch Content
+                    full_content = fetch_article_content(link)
+                    if not full_content or len(full_content) < 100:
+                        full_content = entry.get('summary', '')
+                    
+                    # 2. AI Summarization
+                    ai_result = summarize_for_upsc(entry.title, full_content, link)
+                    
+                    # 3. Extract Image
+                    image_url = extract_image_from_article(link)
+                    
+                    # 4. Find PYQs
+                    related_pyqs = find_related_pyqs(
+                        ai_result['subjects'],
+                        ai_result['papers']
+                    )
+                    
+                    # 5. Save to DB
+                    article_data = {
+                        'title': entry.title,
+                        'link': link,
+                        'source': feed.feed.get('title', 'Unknown Source'),
+                        'published': entry.get('published', 'Today'),
+                        'original_summary': entry.get('summary', ''),
+                        'upsc_summary': ai_result['upsc_summary'],
+                        'key_points': ai_result['key_points'],
+                        'papers': ai_result['papers'],
+                        'subjects': ai_result['subjects'],
+                        'importance': ai_result['importance'],
+                        'image_url': image_url,
+                        'related_pyqs': related_pyqs
+                    }
+                    
+                    save_article(article_data)
+                    processed_count += 1
+                    print(f"🦅 Raven: Successfully archived - {entry.title}")
+                    
+                    # Be gentle with the API
+                    time.sleep(2)
+                    
+                except Exception as inner_e:
+                    print(f"🦅 Raven: Failed to process {entry.title}: {inner_e}")
+                    
+        except Exception as e:
+            print(f"🦅 Raven: Failed to fly to {url}: {e}")
+            
+    print(f"🦅 Raven: Mission complete. Archived {processed_count} new artifacts.")
+
+@bp.route('/background-fetch', methods=['POST'])
+def trigger_background_fetch():
+    """Trigger the background fetch process"""
+    thread = threading.Thread(target=run_background_fetch)
+    thread.daemon = True
+    thread.start()
+    return jsonify({'success': True, 'message': 'Ravens dispatched in background'})
+
 @bp.route('', methods=['GET'])
 def call_the_ravens():
     """Fetch live news from RSS feeds"""
@@ -38,7 +126,6 @@ def call_the_ravens():
         ],
         'hugin': [
             'https://www.thehindu.com/opinion/editorial/feeder/default.rss',
-            'https://www.project-syndicate.org/rss',
             'https://indianexpress.com/section/opinion/editorials/feed/'
         ]
     }
