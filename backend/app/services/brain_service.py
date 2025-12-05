@@ -177,6 +177,265 @@ class BrainService:
             print(f"Brain Think Error: {e}")
             return {"response_text": f"I had a headache thinking about that. Error: {str(e)}", "actions": []}
 
+    def process_task_completion(self, task_data: dict):
+        """
+        Proactively triggers Brain actions when a study task is completed.
+        Logic:
+        1. Create Flashcards for the topic.
+        2. Create Revision Notes (stored as Flashcards or Summary).
+        3. Generate Mind Map for the topic.
+        4. Update Syllabus Tracker status.
+        5. Create Mock Test (UPSC style).
+        6. Award Bonus XP.
+        7. Check for Book Completion -> Trigger Boss Fight.
+        """
+        topic = task_data.get('topic')
+        subject = task_data.get('subject')
+        print(f"Brain: Processing completion for {subject} - {topic}")
+
+        if not topic:
+            return
+
+        try:
+            # 1. Create Flashcards
+            self.execute_action("CREATE_FLASHCARDS", {"topic": topic, "count": 5, "reasoning": "Task Completion Automation"})
+
+            # 2. Create Revision Notes
+            explanation_res = self.execute_action("EXPLAIN_SYLLABUS_NODE", {"node": topic, "reasoning": "Task Completion Automation"})
+            if explanation_res.get('success'):
+                from app.db import get_db
+                conn = get_db()
+                deck_name = f"Auto-Gen: {topic}"
+
+                # Check for deck, if not exists (maybe CREATE_FLASHCARDS failed or naming changed), create it.
+                cursor = conn.execute("SELECT id FROM decks WHERE name = ?", (deck_name,))
+                row = cursor.fetchone()
+                if row:
+                    deck_id = row[0]
+                else:
+                    cursor = conn.execute("INSERT INTO decks (user_id, name, subject) VALUES (1, ?, ?)", (deck_name, subject))
+                    deck_id = cursor.lastrowid
+                    conn.commit()
+
+                conn.execute('''
+                    INSERT INTO flashcards (deck_id, front, back, source)
+                    VALUES (?, ?, ?, 'ai_generated_summary')
+                ''', (deck_id, f"Revision Note: {topic}", explanation_res.get('explanation'),))
+                conn.commit()
+
+            # 3. Generate Mind Map
+            try:
+                from app.services.mindmap_service import MindMapService
+                mindmap_data = MindMapService.generate_mindmap(topic)
+                MindMapService.save_mindmap(f"{topic} Mind Map", mindmap_data)
+                print(f"Brain: Mind Map generated for {topic}")
+            except Exception as mm_e:
+                print(f"Brain: Mind Map Generation Failed: {mm_e}")
+
+            # 4. Update Syllabus Tracker
+            try:
+                from app.services.syllabus_tracker import SyllabusTracker
+                SyllabusTracker.update_topic_progress(topic, 'Completed')
+                print(f"Brain: Syllabus status updated for {topic}")
+            except Exception as st_e:
+                print(f"Brain: Syllabus Update Failed: {st_e}")
+
+            # 5. Create Mock Test (UPSC Style)
+            self.execute_action("CREATE_MOCK_TEST", {
+                "topic": topic,
+                "reasoning": "Task Completion Automation",
+                "style": "UPSC"
+            })
+
+            # 6. Award Bonus XP
+            try:
+                from app.services.game_engine import trigger_event
+                # Assuming user_id is 1 for now (or fetch from task_data if available, defaulting to 1)
+                user_id = task_data.get('user_id', 1)
+                trigger_event('TASK_COMPLETE_BONUS', user_id)
+            except Exception as ge_e:
+                print(f"Brain: XP Bonus Failed: {ge_e}")
+
+            # 7. PYQ Trend Analysis
+            pyq_res = self.execute_action("ANALYZE_PYQ_TRENDS", {"filters": {"topic": topic, "subject": subject}, "reasoning": "Task Completion Automation"})
+            if pyq_res.get('success'):
+                from app.db import get_db
+                conn = get_db()
+                # Use same deck as Revision Notes
+                deck_name = f"Auto-Gen: {topic}"
+                deck_row = conn.execute("SELECT id FROM decks WHERE name = ?", (deck_name,)).fetchone()
+                if deck_row:
+                    deck_id = deck_row[0]
+                    conn.execute('''
+                        INSERT INTO flashcards (deck_id, front, back, source)
+                        VALUES (?, ?, ?, 'ai_generated_pyq_analysis')
+                    ''', (deck_id, f"PYQ Analysis: {topic}", pyq_res.get('analysis'),))
+                    conn.commit()
+
+            # 8. Foresight Predictions
+            foresight_res = self.execute_action("PREDICT_QUESTIONS", {"subject": subject, "topic": topic, "timeframe_days": 90, "reasoning": "Task Completion Automation"})
+            if foresight_res.get('success'):
+                # Format predictions into a list string
+                preds = foresight_res.get('data', [])
+                if preds:
+                    pred_text = "\n".join([f"- {p.get('question')} ({p.get('type')})" for p in preds])
+
+                    from app.db import get_db
+                    conn = get_db()
+                    deck_name = f"Auto-Gen: {topic}"
+                    deck_row = conn.execute("SELECT id FROM decks WHERE name = ?", (deck_name,)).fetchone()
+                    if deck_row:
+                        deck_id = deck_row[0]
+                        conn.execute('''
+                            INSERT INTO flashcards (deck_id, front, back, source)
+                            VALUES (?, ?, ?, 'ai_generated_foresight')
+                        ''', (deck_id, f"Predicted Questions: {topic}", pred_text,))
+                        conn.commit()
+
+            # 9. Current Affairs Linkage
+            try:
+                from app.services.ravens_service import RavensService
+                articles = RavensService.search_articles(topic)
+                if articles:
+                    from app.db import get_db
+                    conn = get_db()
+                    deck_name = f"Auto-Gen: {topic}"
+                    deck_row = conn.execute("SELECT id FROM decks WHERE name = ?", (deck_name,)).fetchone()
+
+                    if deck_row:
+                        deck_id = deck_row[0]
+                        # Take top 3 articles
+                        for article in articles[:3]:
+                            front = f"Linkage: {topic} <-> {article['title']}"
+                            back = f"Summary: {article.get('summary', 'No summary available.')}\nSource: {article.get('source', 'Unknown')}"
+
+                            conn.execute('''
+                                INSERT INTO flashcards (deck_id, front, back, source)
+                                VALUES (?, ?, ?, 'ravens_linkage')
+                            ''', (deck_id, front, back))
+                        conn.commit()
+                        print(f"Brain: Linked {len(articles[:3])} articles to {topic}")
+            except Exception as ravens_e:
+                print(f"Brain: Current Affairs Linkage Failed: {ravens_e}")
+
+            # 10. Schedule Retention Check (3 days later)
+            try:
+                from app.db import get_db
+                conn = get_db()
+                from datetime import timedelta
+
+                check_date = (datetime.now() + timedelta(days=3)).strftime('%Y-%m-%d')
+                check_title = f"Recall Quiz: {topic}"
+
+                # Check if already scheduled
+                exists = conn.execute('SELECT id FROM tasks WHERE title = ? AND due_date = ?', (check_title, check_date)).fetchone()
+                if not exists:
+                    conn.execute('''
+                        INSERT INTO tasks (user_id, title, due_date, xp_reward, associated_stat, isCompleted, is_quest)
+                        VALUES (?, ?, ?, ?, ?, 0, 0)
+                    ''', (1, check_title, check_date, 50, 'Retention'))
+                    conn.commit()
+                    print(f"Brain: Scheduled retention check for {check_date}")
+            except Exception as sched_e:
+                print(f"Brain: Retention Scheduling Failed: {sched_e}")
+
+            # 11. Socratic Debate Simulation
+            socratic_res = self.execute_action("GENERATE_SOCRATIC_DIALOGUE", {"topic": topic, "reasoning": "Task Completion Automation"})
+            if socratic_res.get('success'):
+                # Save the dialogue as a flashcard
+                from app.db import get_db
+                conn = get_db()
+                deck_name = f"Auto-Gen: {topic}"
+                deck_row = conn.execute("SELECT id FROM decks WHERE name = ?", (deck_name,)).fetchone()
+                if deck_row:
+                    deck_id = deck_row[0]
+                    conn.execute('''
+                        INSERT INTO flashcards (deck_id, front, back, source)
+                        VALUES (?, ?, ?, 'ai_generated_socratic')
+                    ''', (deck_id, f"Socratic Debate: {topic}", socratic_res.get('dialogue'),))
+                    conn.commit()
+
+            # 12. Triangulation Analysis
+            triangulation_res = self.execute_action("TRIANGULATE_TOPIC", {"topic": topic, "reasoning": "Task Completion Automation"})
+            if triangulation_res.get('success'):
+                # Save Synthesis and Way Forward
+                data = triangulation_res.get('data', {})
+                synthesis = data.get('synthesis', '')
+                way_forward = json.dumps(data.get('way_forward', {}), indent=2)
+
+                content = f"Synthesis:\n{synthesis}\n\nWay Forward:\n{way_forward}"
+
+                from app.db import get_db
+                conn = get_db()
+                deck_name = f"Auto-Gen: {topic}"
+                deck_row = conn.execute("SELECT id FROM decks WHERE name = ?", (deck_name,)).fetchone()
+                if deck_row:
+                    deck_id = deck_row[0]
+                    conn.execute('''
+                        INSERT INTO flashcards (deck_id, front, back, source)
+                        VALUES (?, ?, ?, 'ai_generated_triangulation')
+                    ''', (deck_id, f"Mains Strategy: {topic}", content,))
+                    conn.commit()
+
+            # 13. Check for Book Completion -> Trigger Boss Fight
+            # Load books data to identify if a book is completed
+            book_title = self._identify_book_for_topic(subject, topic)
+            if book_title:
+                print(f"Brain: identified book '{book_title}' for topic '{topic}'")
+                # Logic: Check if all other chapters in this book are completed in syllabus_topics or study_tasks
+                # For simplicity, we stick to the study_plan pending check but refined by subject
+                # Ideally we should check if all chapters of 'book_title' are marked completed in syllabus.
+
+                # For now, we'll stick to the previous robust method: Subject-based "Unit" completion
+                # But we can customize the Boss Name
+                boss_name = f"The Guardian of {book_title}"
+            else:
+                boss_name = f"The {subject} Final Boss"
+
+            from app.db_models.study_plan import get_pending_task_count
+            plan_id = task_data.get('plan_id')
+            if plan_id:
+                pending_count = get_pending_task_count(plan_id, subject, exclude_task_id=task_data.get('id'))
+
+                if pending_count == 0:
+                    print(f"Brain: All tasks for {subject} completed. Summoning Boss: {boss_name}")
+                    self.execute_action("SUMMON_BOSS", {
+                        "filters": {"subject": subject},
+                        "name": boss_name,
+                        "reasoning": "Subject/Book Completion Event"
+                    })
+
+        except Exception as e:
+            print(f"Brain: Task Completion Automation Failed: {e}")
+            import traceback
+            traceback.print_exc()
+
+    def _identify_book_for_topic(self, subject, topic):
+        """Helper to find which book a topic belongs to."""
+        try:
+            books_path = os.path.join(os.getcwd(), 'app', 'data', 'books.json')
+            if os.path.exists(books_path):
+                with open(books_path, 'r') as f:
+                    books = json.load(f)
+
+                # Normalize string for comparison
+                def normalize(s): return s.lower().replace(':', '').replace('-', ' ').strip()
+
+                norm_topic = normalize(topic)
+
+                for book in books:
+                    if book.get('subject') == subject:
+                        for chapter in book.get('chapters', []):
+                            if normalize(chapter) in norm_topic or norm_topic in normalize(chapter):
+                                return book.get('title')
+
+                        # Also check if topic title matches book title (whole book review task)
+                        if normalize(book.get('title')) in norm_topic:
+                            return book.get('title')
+        except Exception as e:
+            print(f"Brain: Book identification error: {e}")
+        return None
+
     def execute_action(self, action_type: str, payload: dict) -> dict:
         """
         Executes a specific action triggered by the Brain.
@@ -220,8 +479,9 @@ class BrainService:
                 try:
                     from app.services.foresight_engine import foresight_engine
                     subject = payload.get('subject', 'General')
+                    topic = payload.get('topic', None)
                     timeframe = payload.get('timeframe_days', 90)
-                    predictions = foresight_engine.predict_questions(subject, timeframe)
+                    predictions = foresight_engine.predict_questions(subject, timeframe, topic=topic)
                     
                     from app.services.game_engine import trigger_event
                     trigger_event('ORACLE_CONSULT', 1)
@@ -422,6 +682,10 @@ class BrainService:
                     if filters.get('year'):
                         query += " AND year = ?"
                         params.append(filters['year'])
+
+                    if filters.get('topic'):
+                        query += " AND topic LIKE ?"
+                        params.append(f"%{filters['topic']}%")
                         
                     query += " ORDER BY year DESC LIMIT 50" # Analyze last 50 questions matching criteria
                     
@@ -574,6 +838,61 @@ class BrainService:
                     }
                 except Exception as e:
                     result = {"success": False, "message": f"Recommendation Failed: {str(e)}"}
+
+            elif action_type == "GENERATE_SOCRATIC_DIALOGUE":
+                try:
+                    from app.services.socratic_service import AGENTS, get_model
+                    topic = payload.get('topic', 'Philosophy')
+
+                    # Simulate a 3-turn debate
+                    model = get_model()
+                    turns = []
+
+                    # 1. User Statement (Simulated)
+                    prompt1 = f"Generate a provocative student opinion about '{topic}' that is slightly flawed."
+                    response1 = model.generate_content(prompt1)
+                    user_statement = response1.text.strip()
+                    turns.append(f"Student: {user_statement}")
+
+                    # 2. Socrates Responds
+                    agent = AGENTS['skeptic']
+                    prompt2 = f"You are {agent['name']}. The student says: '{user_statement}'. Respond with a short, deep question."
+                    response2 = model.generate_content(prompt2)
+                    socrates_response = response2.text.strip()
+                    turns.append(f"Socrates: {socrates_response}")
+
+                    # 3. Student Rethinks
+                    prompt3 = f"The student reflects on '{socrates_response}'. Generate their realization."
+                    response3 = model.generate_content(prompt3)
+                    student_realization = response3.text.strip()
+                    turns.append(f"Student (Reflecting): {student_realization}")
+
+                    dialogue = "\n\n".join(turns)
+
+                    result = {
+                        "success": True,
+                        "message": "Socratic Dialogue Generated.",
+                        "dialogue": dialogue
+                    }
+                except Exception as e:
+                    result = {"success": False, "message": f"Socratic Gen Failed: {str(e)}"}
+
+            elif action_type == "TRIANGULATE_TOPIC":
+                try:
+                    from app.services.triangulation_service import analyze_topic_triangulation
+                    topic = payload.get('topic', '')
+                    data = analyze_topic_triangulation(topic)
+
+                    if data.get('error'):
+                        result = {"success": False, "message": data['error']}
+                    else:
+                        result = {
+                            "success": True,
+                            "message": "Triangulation Complete.",
+                            "data": data
+                        }
+                except Exception as e:
+                    result = {"success": False, "message": f"Triangulation Failed: {str(e)}"}
 
             return result
 
