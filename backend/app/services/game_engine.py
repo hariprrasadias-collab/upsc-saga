@@ -8,7 +8,8 @@ def trigger_event(event_type: str, user_id: int):
     rewards = {
         'STRATEGY_COMMIT': {'xp': 100, 'hs': 50, 'msg': 'Strategic Directive Committed!'},
         'ORACLE_CONSULT': {'xp': 20, 'hs': 5, 'msg': 'Wisdom of the Oracle gained.'},
-        'MIND_PALACE_ADD': {'xp': 50, 'hs': 10, 'msg': 'Memory fortified in Mind Palace.'}
+        'MIND_PALACE_ADD': {'xp': 50, 'hs': 10, 'msg': 'Memory fortified in Mind Palace.'},
+        'TASK_COMPLETE_BONUS': {'xp': 30, 'hs': 15, 'msg': 'Brain Automation Bonus!'}
     }
     
     if event_type in rewards:
