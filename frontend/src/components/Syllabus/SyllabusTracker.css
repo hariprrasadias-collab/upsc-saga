@@ -459,3 +459,71 @@
     border-color: var(--color-text-primary);
     color: var(--color-text-primary);
 }
+
+/* NEW TREE VIEW STYLES */
+.tree-item {
+    padding-left: 1rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tree-item.level-0 {
+    padding-left: 0;
+    border-left: none;
+    margin-bottom: 1rem;
+    background: rgba(13, 17, 23, 0.6);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.tree-item-header {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tree-item.level-0 > .tree-item-header {
+    background: rgba(30, 41, 59, 0.4);
+    font-size: 1.3rem;
+}
+
+.tree-item-header:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.expand-icon {
+    margin-right: 0.8rem;
+    font-size: 0.8em;
+    width: 1em; /* Ensure alignment */
+    text-align: center;
+    color: var(--color-text-secondary);
+}
+
+.item-title {
+    flex-grow: 1;
+    font-weight: 500;
+}
+
+.tree-item.level-0 > .tree-item-header .item-title {
+    font-family: 'Cinzel', serif;
+    color: var(--color-accent-blue);
+    font-weight: 700;
+}
+
+.tree-item.level-1 > .tree-item-header .item-title {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.tree-item-children {
+    padding-left: 1.5rem;
+}
+
+/* LEAF NODE SPECIFIC STYLES */
+.tree-item.level-2 .tree-item-header,
+.tree-item.level-3 .tree-item-header {
+    padding-top: 12px;
+    padding-bottom: 12px;
+}

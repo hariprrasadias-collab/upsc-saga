@@ -8,15 +8,66 @@ CORS(bp)
 
 @bp.route('/', methods=['GET'])
 def get_syllabus():
-    """Get all syllabus topics with revision info"""
+    """Get all syllabus topics in a nested structure"""
     conn = get_db()
-    topics = conn.execute('''
-        SELECT t.*, r.revision_count, r.next_revision_date, r.last_revised_at
-        FROM syllabus_topics t
-        LEFT JOIN topic_revisions r ON t.id = r.topic_id
-        ORDER BY t.paper, t.subject, t.id
+    rows = conn.execute('''
+        SELECT id, paper, subject, topic, subtopic, status, notes
+        FROM syllabus_topics
+        ORDER BY paper, subject, topic, id
     ''').fetchall()
-    return jsonify([dict(row) for row in topics])
+
+    # Create a nested dictionary from the flat list
+    syllabus_tree = {}
+    for row in rows:
+        paper = row['paper']
+        subject = row['subject']
+        topic = row['topic']
+
+        if paper not in syllabus_tree:
+            syllabus_tree[paper] = {}
+
+        if subject not in syllabus_tree[paper]:
+            syllabus_tree[paper][subject] = {}
+
+        if topic not in syllabus_tree[paper][subject]:
+            syllabus_tree[paper][subject][topic] = []
+
+        # If there's a subtopic, add it as a child
+        if row['subtopic']:
+            syllabus_tree[paper][subject][topic].append({
+                'id': row['id'],
+                'title': row['subtopic'],
+                'status': row['status'],
+                'notes': row['notes']
+            })
+
+    # The frontend expects a list of papers, so convert the dict
+    restructured_syllabus = []
+    for paper_name, subjects in syllabus_tree.items():
+        paper_node = {'title': paper_name, 'children': []}
+        for subject_name, topics in subjects.items():
+            subject_node = {'title': subject_name, 'children': []}
+            for topic_name, subtopics in topics.items():
+                # If there are no subtopics, the topic itself is a leaf
+                if not subtopics:
+                    # Find the original row for this topic to get its ID and status
+                    original_topic_row = next(r for r in rows if r['paper'] == paper_name and r['subject'] == subject_name and r['topic'] == topic_name and r['subtopic'] is None)
+                    subject_node['children'].append({
+                        'id': original_topic_row['id'],
+                        'title': topic_name,
+                        'status': original_topic_row['status'],
+                        'notes': original_topic_row['notes'],
+                        'children': [] # A leaf has no children
+                    })
+                else:
+                     subject_node['children'].append({
+                        'title': topic_name,
+                        'children': subtopics
+                    })
+            paper_node['children'].append(subject_node)
+        restructured_syllabus.append(paper_node)
+
+    return jsonify(restructured_syllabus)
 
 @bp.route('/<int:id>/status', methods=['POST'])
 def update_status(id):
