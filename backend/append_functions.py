@@ -23,7 +23,7 @@ Requirements:
 ONE-LINER:"""
 
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-pro')
         response = model.generate_content(prompt)
         one_liner = response.text.strip()
         return one_liner
@@ -56,7 +56,7 @@ Requirements:
 MNEMONIC:"""
 
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-pro')
         response = model.generate_content(prompt)
         mnemonic = response.text.strip()
         return mnemonic

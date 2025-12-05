@@ -110,6 +110,40 @@ def get_test_details(test_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@mock_tests.route('/api/mock-tests/<int:test_id>', methods=['DELETE'])
+def delete_test(test_id):
+    """Delete a mock test and all related data"""
+    try:
+        user_id = 1 # TODO: Session
+        conn = get_db()
+        
+        # Check if test exists
+        test = conn.execute('SELECT id FROM mock_tests WHERE id = ?', (test_id,)).fetchone()
+        if not test:
+            return jsonify({'error': 'Test not found'}), 404
+            
+        # Delete related data (Manual Cascade)
+        # 1. Delete answers for all attempts of this test
+        conn.execute('''
+            DELETE FROM test_answers 
+            WHERE attempt_id IN (SELECT id FROM test_attempts WHERE test_id = ?)
+        ''', (test_id,))
+        
+        # 2. Delete attempts
+        conn.execute('DELETE FROM test_attempts WHERE test_id = ?', (test_id,))
+        
+        # 3. Delete questions
+        conn.execute('DELETE FROM test_questions WHERE test_id = ?', (test_id,))
+        
+        # 4. Delete test
+        conn.execute('DELETE FROM mock_tests WHERE id = ?', (test_id,))
+        
+        conn.commit()
+        return jsonify({'success': True, 'message': 'Test deleted successfully'})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @mock_tests.route('/api/mock-tests/<int:test_id>/start', methods=['POST'])
 def start_test(test_id):
     """Start a new test attempt"""

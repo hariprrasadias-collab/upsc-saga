@@ -26,7 +26,7 @@ class BrainService:
         else:
             try:
                 genai.configure(api_key=self.api_key)
-                self.model = genai.GenerativeModel('gemini-flash-latest') # Using flash for speed
+                self.model = genai.GenerativeModel('gemini-latest-flash') # Using flash for speed
                 print("BrainService Online: Connected to Gemini Cortex.")
             except Exception as e:
                 print(f"BrainService Error: Failed to initialize Gemini: {e}")
@@ -97,6 +97,7 @@ class BrainService:
         try:
             from app.services.panopticon_service import PanopticonService
             panopticon = PanopticonService()
+            print(f"DEBUG: Panopticon Type: {type(panopticon)}")
             return panopticon.get_current_status()
         except Exception as e:
             print(f"Bio-Check Failed: {e}")

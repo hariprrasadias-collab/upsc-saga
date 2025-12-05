@@ -343,6 +343,26 @@ const StudyPlanDashboard: React.FC = () => {
         }
         localStorage.setItem('completedTasks', JSON.stringify(Array.from(completedTasks)));
 
+        // --- BACKEND SYNC ---
+        // If the task ID is numeric, it comes from the backend DB. Sync the status.
+        // This triggers the "Brain" automation (Flashcards, Boss Fights, etc.) on the server.
+        if (!isNaN(Number(task.id))) {
+            try {
+                // Convert 'completed'/'pending' to 'Completed'/'Pending' for backend consistency
+                const apiStatus = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+                fetch(`/api/planner/task/${task.id}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: apiStatus })
+                }).then(res => {
+                    if (!res.ok) console.error("Failed to sync task status with backend");
+                    else console.log("Task status synced with Brain");
+                });
+            } catch (err) {
+                console.error("Error syncing task status:", err);
+            }
+        }
+
         // Dispatch event for other components
         window.dispatchEvent(new Event('taskUpdate'));
 
