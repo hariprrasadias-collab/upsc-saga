@@ -170,3 +170,24 @@ def delete_task(task_id):
     conn = get_db()
     conn.execute('DELETE FROM study_tasks WHERE id = ?', (task_id,))
     conn.commit()
+
+def get_task_by_id(task_id):
+    """Retrieve a single task by its ID."""
+    conn = get_db()
+    task = conn.execute('SELECT * FROM study_tasks WHERE id = ?', (task_id,)).fetchone()
+    return dict(task) if task else None
+
+def get_pending_task_count(plan_id, subject, exclude_task_id=None):
+    """Get count of pending tasks for a subject in a plan."""
+    conn = get_db()
+    if exclude_task_id:
+        count = conn.execute('''
+            SELECT COUNT(*) FROM study_tasks
+            WHERE plan_id = ? AND subject = ? AND status = 'pending' AND id != ?
+        ''', (plan_id, subject, exclude_task_id)).fetchone()[0]
+    else:
+        count = conn.execute('''
+            SELECT COUNT(*) FROM study_tasks
+            WHERE plan_id = ? AND subject = ? AND status = 'pending'
+        ''', (plan_id, subject)).fetchone()[0]
+    return count

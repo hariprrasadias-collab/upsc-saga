@@ -177,6 +177,144 @@ class BrainService:
             print(f"Brain Think Error: {e}")
             return {"response_text": f"I had a headache thinking about that. Error: {str(e)}", "actions": []}
 
+    def process_task_completion(self, task_data: dict):
+        """
+        Proactively triggers Brain actions when a study task is completed.
+        Logic:
+        1. Create Flashcards for the topic.
+        2. Create Revision Notes (stored as Flashcards or Summary).
+        3. Generate Mind Map for the topic.
+        4. Update Syllabus Tracker status.
+        5. Create Mock Test (UPSC style).
+        6. Award Bonus XP.
+        7. Check for Book Completion -> Trigger Boss Fight.
+        """
+        topic = task_data.get('topic')
+        subject = task_data.get('subject')
+        print(f"Brain: Processing completion for {subject} - {topic}")
+
+        if not topic:
+            return
+
+        try:
+            # 1. Create Flashcards
+            self.execute_action("CREATE_FLASHCARDS", {"topic": topic, "count": 5, "reasoning": "Task Completion Automation"})
+
+            # 2. Create Revision Notes
+            explanation_res = self.execute_action("EXPLAIN_SYLLABUS_NODE", {"node": topic, "reasoning": "Task Completion Automation"})
+            if explanation_res.get('success'):
+                from app.db import get_db
+                conn = get_db()
+                deck_name = f"Auto-Gen: {topic}"
+
+                # Check for deck, if not exists (maybe CREATE_FLASHCARDS failed or naming changed), create it.
+                cursor = conn.execute("SELECT id FROM decks WHERE name = ?", (deck_name,))
+                row = cursor.fetchone()
+                if row:
+                    deck_id = row[0]
+                else:
+                    cursor = conn.execute("INSERT INTO decks (user_id, name, subject) VALUES (1, ?, ?)", (deck_name, subject))
+                    deck_id = cursor.lastrowid
+                    conn.commit()
+
+                conn.execute('''
+                    INSERT INTO flashcards (deck_id, front, back, source)
+                    VALUES (?, ?, ?, 'ai_generated_summary')
+                ''', (deck_id, f"Revision Note: {topic}", explanation_res.get('explanation'),))
+                conn.commit()
+
+            # 3. Generate Mind Map
+            try:
+                from app.services.mindmap_service import MindMapService
+                mindmap_data = MindMapService.generate_mindmap(topic)
+                MindMapService.save_mindmap(f"{topic} Mind Map", mindmap_data)
+                print(f"Brain: Mind Map generated for {topic}")
+            except Exception as mm_e:
+                print(f"Brain: Mind Map Generation Failed: {mm_e}")
+
+            # 4. Update Syllabus Tracker
+            try:
+                from app.services.syllabus_tracker import SyllabusTracker
+                SyllabusTracker.update_topic_progress(topic, 'Completed')
+                print(f"Brain: Syllabus status updated for {topic}")
+            except Exception as st_e:
+                print(f"Brain: Syllabus Update Failed: {st_e}")
+
+            # 5. Create Mock Test (UPSC Style)
+            self.execute_action("CREATE_MOCK_TEST", {
+                "topic": topic,
+                "reasoning": "Task Completion Automation",
+                "style": "UPSC"
+            })
+
+            # 6. Award Bonus XP
+            try:
+                from app.services.game_engine import trigger_event
+                # Assuming user_id is 1 for now (or fetch from task_data if available, defaulting to 1)
+                user_id = task_data.get('user_id', 1)
+                trigger_event('TASK_COMPLETE_BONUS', user_id)
+            except Exception as ge_e:
+                print(f"Brain: XP Bonus Failed: {ge_e}")
+
+            # 7. Check for Book Completion -> Trigger Boss Fight
+            # Load books data to identify if a book is completed
+            book_title = self._identify_book_for_topic(subject, topic)
+            if book_title:
+                print(f"Brain: identified book '{book_title}' for topic '{topic}'")
+                # Logic: Check if all other chapters in this book are completed in syllabus_topics or study_tasks
+                # For simplicity, we stick to the study_plan pending check but refined by subject
+                # Ideally we should check if all chapters of 'book_title' are marked completed in syllabus.
+
+                # For now, we'll stick to the previous robust method: Subject-based "Unit" completion
+                # But we can customize the Boss Name
+                boss_name = f"The Guardian of {book_title}"
+            else:
+                boss_name = f"The {subject} Final Boss"
+
+            from app.db_models.study_plan import get_pending_task_count
+            plan_id = task_data.get('plan_id')
+            if plan_id:
+                pending_count = get_pending_task_count(plan_id, subject, exclude_task_id=task_data.get('id'))
+
+                if pending_count == 0:
+                    print(f"Brain: All tasks for {subject} completed. Summoning Boss: {boss_name}")
+                    self.execute_action("SUMMON_BOSS", {
+                        "filters": {"subject": subject},
+                        "name": boss_name,
+                        "reasoning": "Subject/Book Completion Event"
+                    })
+
+        except Exception as e:
+            print(f"Brain: Task Completion Automation Failed: {e}")
+            import traceback
+            traceback.print_exc()
+
+    def _identify_book_for_topic(self, subject, topic):
+        """Helper to find which book a topic belongs to."""
+        try:
+            books_path = os.path.join(os.getcwd(), 'app', 'data', 'books.json')
+            if os.path.exists(books_path):
+                with open(books_path, 'r') as f:
+                    books = json.load(f)
+
+                # Normalize string for comparison
+                def normalize(s): return s.lower().replace(':', '').replace('-', ' ').strip()
+
+                norm_topic = normalize(topic)
+
+                for book in books:
+                    if book.get('subject') == subject:
+                        for chapter in book.get('chapters', []):
+                            if normalize(chapter) in norm_topic or norm_topic in normalize(chapter):
+                                return book.get('title')
+
+                        # Also check if topic title matches book title (whole book review task)
+                        if normalize(book.get('title')) in norm_topic:
+                            return book.get('title')
+        except Exception as e:
+            print(f"Brain: Book identification error: {e}")
+        return None
+
     def execute_action(self, action_type: str, payload: dict) -> dict:
         """
         Executes a specific action triggered by the Brain.
