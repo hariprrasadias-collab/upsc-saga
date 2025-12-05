@@ -20,7 +20,8 @@ def optimize_path():
         "time_budget": 100,
         "energy_level": 50,
         "subject": "History",
-        "topic": "All"
+        "topic": "All",
+        "mode": "STANDARD" | "REVISION"
     }
     """
     try:
@@ -29,12 +30,14 @@ def optimize_path():
         energy_level = data.get('energy_level', 50)
         subject = data.get('subject', 'All')
         topic = data.get('topic', 'All')
+        mode = data.get('mode', 'STANDARD')
         
         result = golden_path.calculate_optimal_path(
             time_budget_hours=time_budget,
             energy_level=energy_level,
             filter_subject=subject,
-            filter_topic=topic
+            filter_topic=topic,
+            mode=mode
         )
         return jsonify({"success": True, "data": result})
     except Exception as e:

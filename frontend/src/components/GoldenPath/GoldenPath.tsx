@@ -11,6 +11,9 @@ interface Node {
     roi: number;
     group: string;
     musk_category?: string; // DELETE, ACCELERATE, FOCUS
+    is_trending?: boolean;
+    has_mnemonic?: boolean;
+    days_since_revision?: number;
     x?: number;
     y?: number;
 }
@@ -43,6 +46,7 @@ const GoldenPath: React.FC = () => {
     const [selectedSubject, setSelectedSubject] = useState<string>('All');
     const [selectedTopic, setSelectedTopic] = useState<string>('All');
     const [energyLevel, setEnergyLevel] = useState<number>(50);
+    const [optimizationMode, setOptimizationMode] = useState<string>('STANDARD');
 
     // Fetch Graph Data
     useEffect(() => {
@@ -142,17 +146,41 @@ const GoldenPath: React.FC = () => {
 
         node.append("circle")
             .attr("r", (d: any) => 10 + (d.yield / 1.5)) // Slightly larger base size
-            .attr("fill", (d: any) => colorScale(d.effort))
+            .attr("fill", (d: any) => {
+                const baseColor = colorScale(d.effort);
+                // If Revision mode, desaturate/darken fresh items, highlight old ones?
+                // Or just use border for status.
+                return baseColor;
+            })
             .attr("fill-opacity", 0.8)
             .attr("stroke", (d: any) => {
+                if (d.is_trending) return '#ff5722'; // Orange/Red for Trending
                 if (d.musk_category === 'DELETE') return '#e74c3c';
                 if (d.musk_category === 'ACCELERATE') return '#f1c40f';
                 if (d.musk_category === 'FOCUS') return '#2ecc71';
                 return '#fff';
             })
-            .attr("stroke-width", (d: any) => d.musk_category ? 3 : 1);
+            .attr("stroke-width", (d: any) => d.is_trending ? 4 : (d.musk_category ? 3 : 1))
+            .attr("stroke-dasharray", (d: any) => d.is_trending ? "3,3" : "none");
 
-        // Labels - Only show for high yield or zoomed in (simple version: always show but styled better)
+        // Icons / Badges
+        const icons = node.append("g").attr("transform", "translate(-8, -8)");
+
+        // Trending Icon
+        icons.filter((d:any) => d.is_trending).append("text")
+            .text("🔥")
+            .attr("x", -10)
+            .attr("y", -5)
+            .style("font-size", "12px");
+
+        // Mnemonic Icon
+        icons.filter((d:any) => d.has_mnemonic).append("text")
+            .text("🧠")
+            .attr("x", 10)
+            .attr("y", -5)
+            .style("font-size", "12px");
+
+        // Labels
         node.append("text")
             .attr("dx", 15)
             .attr("dy", ".35em")
@@ -225,7 +253,8 @@ const GoldenPath: React.FC = () => {
                     time_budget: timeBudget,
                     energy_level: energyLevel,
                     subject: selectedSubject,
-                    topic: selectedTopic
+                    topic: selectedTopic,
+                    mode: optimizationMode
                 })
             });
             const data = await res.json();
@@ -309,6 +338,28 @@ const GoldenPath: React.FC = () => {
                         />
                         <div style={{ fontSize: '0.75rem', color: '#888', marginTop: '2px', textAlign: 'center' }}>
                             {energyLevel < 30 ? "Drain Mode: Quick Wins" : energyLevel > 80 ? "Flow State: Deep Work" : "Normal"}
+                        </div>
+                    </div>
+
+                    <div className="gp-input-group">
+                        <label>Optimization Strategy</label>
+                        <div style={{ display: 'flex', gap: '5px' }}>
+                            <button
+                                className={`gp-btn ${optimizationMode === 'STANDARD' ? 'active' : ''}`}
+                                onClick={() => setOptimizationMode('STANDARD')}
+                                style={{ flex: 1, fontSize: '0.8rem', opacity: optimizationMode === 'STANDARD' ? 1 : 0.5 }}
+                                title="Maximize Marks Gained per Hour"
+                            >
+                                Standard
+                            </button>
+                            <button
+                                className={`gp-btn ${optimizationMode === 'REVISION' ? 'active' : ''}`}
+                                onClick={() => setOptimizationMode('REVISION')}
+                                style={{ flex: 1, fontSize: '0.8rem', opacity: optimizationMode === 'REVISION' ? 1 : 0.5, borderColor: '#3498db', color: '#3498db' }}
+                                title="Prioritize Forgotten Topics (Retention)"
+                            >
+                                Revision
+                            </button>
                         </div>
                     </div>
 
@@ -411,6 +462,22 @@ const GoldenPath: React.FC = () => {
                             <span>ROI:</span>
                             <span className="tooltip-val">{tooltip.data.roi?.toFixed(2)}</span>
                         </div>
+                        {tooltip.data.is_trending && (
+                             <div className="tooltip-row" style={{ color: '#ff5722' }}>
+                                <span>🔥 Trending Topic</span>
+                             </div>
+                        )}
+                        {tooltip.data.has_mnemonic && (
+                             <div className="tooltip-row" style={{ color: '#9b59b6' }}>
+                                <span>🧠 Mnemonic Available</span>
+                             </div>
+                        )}
+                        {tooltip.data.days_since_revision !== undefined && tooltip.data.days_since_revision < 900 && (
+                            <div className="tooltip-row">
+                                <span>Last Rev:</span>
+                                <span className="tooltip-val">{tooltip.data.days_since_revision}d ago</span>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

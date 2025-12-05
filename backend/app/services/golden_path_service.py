@@ -1,6 +1,7 @@
 import networkx as nx
 import json
 import time
+from datetime import datetime
 
 class GoldenPathService:
     def __init__(self):
@@ -19,7 +20,7 @@ class GoldenPathService:
     def build_graph(self, user_id=1):
         """
         Constructs the Syllabus Graph dynamically.
-        Optimized to use bulk aggregation and integrate Weak Areas.
+        Optimized to use bulk aggregation and integrate Weak Areas, Trending Topics, and Retention.
         """
         G = nx.DiGraph()
         
@@ -50,11 +51,59 @@ class GoldenPathService:
             wa_rows = conn.execute('SELECT topic, priority_score FROM weak_area_analysis WHERE user_id = ?', (user_id,)).fetchall()
             for r in wa_rows: weak_areas[r['topic']] = r['priority_score']
 
+            # Fetch Recent Current Affairs (Trending Topics)
+            trending_topics = set()
+            ca_rows = conn.execute('SELECT title, content FROM current_affairs WHERE date_published > date("now", "-60 days")').fetchall()
+
+            # Create a simple keyword set from CA titles for matching
+            ca_keywords = set()
+            for r in ca_rows:
+                if r['title']:
+                    ca_keywords.update(r['title'].lower().split())
+
+            # Fetch Last Revision Date (Retention)
+            last_revised = {}
+            rev_rows = conn.execute('''
+                SELECT topic, MAX(date) as last_date
+                FROM (
+                    SELECT topic, date FROM topic_revisions
+                    UNION
+                    SELECT tags as topic, date_reviewed as date FROM flashcard_reviews
+                ) GROUP BY topic
+            ''').fetchall()
+            for r in rev_rows:
+                last_revised[r['topic']] = r['last_date']
+
+            # Fetch Mnemonics Availability
+            mnemonics_available = set()
+            mn_rows = conn.execute('SELECT DISTINCT topic FROM mnemonics_history').fetchall()
+            for r in mn_rows: mnemonics_available.add(r['topic'])
+
             # 2. Build Nodes with Dynamic Weights
             for row in topics_data:
                 topic_name = row['topic']
                 subject = row['subject'] or "General"
                 
+                # Check Trending Status (Simple substring match)
+                is_trending = False
+                topic_words = topic_name.lower().split()
+                if any(w in ca_keywords for w in topic_words if len(w) > 4): # Basic heuristic
+                    is_trending = True
+                    trending_topics.add(topic_name)
+
+                # Check Retention
+                last_date_str = last_revised.get(topic_name)
+                days_since_revision = 999
+                if last_date_str:
+                    try:
+                        last_date = datetime.strptime(last_date_str.split(' ')[0], '%Y-%m-%d')
+                        days_since_revision = (datetime.now() - last_date).days
+                    except:
+                        pass
+
+                # Check Mnemonic
+                has_mnemonic = topic_name in mnemonics_available
+
                 # Metrics
                 raw_yield = pyq_counts.get(topic_name, 0)
                 raw_effort = fc_counts.get(topic_name, 0)
@@ -64,9 +113,13 @@ class GoldenPathService:
                 yield_score = min(raw_yield * 5, 100)
                 effort_score = min(max(raw_effort * 2, 10), 100)
                 
-                # Dynamic Adjustment: Weak areas boost "Effective Yield" (High priority to fix)
+                # Dynamic Adjustment: Weak areas boost "Effective Yield"
                 weakness_multiplier = 1.0 + (weakness_score / 50.0) 
-                effective_yield = yield_score * weakness_multiplier
+
+                # Trending Boost
+                trending_multiplier = 1.2 if is_trending else 1.0
+
+                effective_yield = yield_score * weakness_multiplier * trending_multiplier
                 
                 # ROI Calculation
                 roi = effective_yield / effort_score if effort_score > 0 else 0
@@ -80,7 +133,10 @@ class GoldenPathService:
                     weakness=weakness_score,
                     roi=roi,
                     group=subject,
-                    status=row['status']
+                    status=row['status'],
+                    is_trending=is_trending,
+                    days_since_revision=days_since_revision,
+                    has_mnemonic=has_mnemonic
                 )
                 
             # 3. Define Dependencies (Edges)
@@ -249,10 +305,13 @@ class GoldenPathService:
                 
             G.nodes[node]["musk_category"] = category
 
-    def calculate_optimal_path(self, time_budget_hours, energy_level=50, filter_subject=None, filter_topic=None):
+    def calculate_optimal_path(self, time_budget_hours, energy_level=50, filter_subject=None, filter_topic=None, mode="STANDARD"):
         """
         Finds the 'Golden Path' using a Smart Greedy approach.
-        Integrates Energy Levels and Context Filters.
+        Integrates Energy Levels, Context Filters, and Optimization Modes.
+        Modes:
+         - STANDARD: Maximize Yield/Effort (ROI).
+         - REVISION: Maximize (Yield * DaysSinceRevision) / Effort. Prioritize old but important topics.
         """
         self._calculate_potential_metrics()
         G = self.get_graph()
@@ -341,9 +400,27 @@ class GoldenPathService:
                     break
                 
 
+            def calculate_score(n):
+                node_data = G.nodes[n]
+                eff_yield = node_data.get("effective_yield", 0)
+                adj_effort = get_energy_adjusted_effort(node_data.get("effort", 1))
+                base_roi = eff_yield / adj_effort
+
+                if mode == "REVISION":
+                    # In Revision Mode, we boost items that haven't been revised in a long time.
+                    # Formula: ROI * log(days_since_revision + 1)
+                    # Simple linear boost for now: ROI * (1 + days/30)
+                    days = node_data.get("days_since_revision", 0)
+                    if days > 900: days = 30 # Cap for never revised items to avoid skewing too much
+
+                    # Logarithmic decay urgency curve
+                    urgency_multiplier = 1.0 + (days / 14.0) # Boost doubles every 2 weeks
+                    return base_roi * urgency_multiplier
+                else:
+                    return base_roi
+
             best_node = max(candidates, key=lambda n: (
-                # Use Energy-Adjusted ROI
-                (G.nodes[n].get("effective_yield", 0) / get_energy_adjusted_effort(G.nodes[n].get("effort", 1))),
+                calculate_score(n),
                 G.nodes[n].get("potential_roi", 0)
             ))
             
