@@ -108,6 +108,21 @@ def get_tasks_for_date(date_str):
     
     return [dict(t) for t in tasks]
 
+def get_tasks_for_date_range(start_date, end_date):
+    """Get tasks for a date range efficiently"""
+    conn = get_db()
+    plan = get_active_plan()
+    if not plan:
+        return []
+
+    tasks = conn.execute('''
+        SELECT * FROM study_tasks
+        WHERE plan_id = ? AND date >= ? AND date <= ?
+        ORDER BY date ASC, start_time ASC
+    ''', (plan['id'], start_date, end_date)).fetchall()
+
+    return [dict(t) for t in tasks]
+
 def get_pending_tasks_before_date(date_str):
     """Get all pending tasks before a certain date (for rescheduling)"""
     conn = get_db()

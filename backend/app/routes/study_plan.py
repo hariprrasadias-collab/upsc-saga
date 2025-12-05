@@ -9,11 +9,12 @@ def generate():
     data = request.get_json()
     start_date = data.get('start_date')
     force_new = data.get('force_new', False)
+    preferences = data.get('preferences') # Optional preferences
     
     if not start_date:
         return jsonify({"error": "Start date required"}), 400
         
-    result = generate_study_plan(start_date, force_new=force_new)
+    result = generate_study_plan(start_date, force_new=force_new, preferences=preferences)
     return jsonify(result)
 
 @study_plan_bp.route('/api/planner/current', methods=['GET'])
@@ -22,10 +23,12 @@ def get_current_plan():
     days = int(request.args.get('days', 30))
     
     if not start_date:
-        return jsonify({"error": "Start date required"}), 400
+        # Default to today if not provided
+        import datetime
+        start_date = datetime.date.today().isoformat()
         
     plan = get_plan_for_range(start_date, days)
-    return jsonify({"success": True, "plan": plan})
+    return jsonify(plan) # Direct list return for frontend compatibility
 
 @study_plan_bp.route('/api/planner/reschedule-check', methods=['POST'])
 def reschedule_check():
