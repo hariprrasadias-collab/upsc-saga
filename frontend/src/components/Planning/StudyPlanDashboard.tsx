@@ -223,7 +223,7 @@ const StudyPlanDashboard: React.FC = () => {
             window.removeEventListener('keydown', handleActivity);
             flowEngine.stop();
         };
-    }, [isFlowMode, nemesis, demon, flowEngine]);
+    }, [isFlowMode]); // Removed unnecessary dependencies to prevent re-renders
 
     const toggleFlowMode = () => {
         if (isFlowMode) {
@@ -232,73 +232,57 @@ const StudyPlanDashboard: React.FC = () => {
         setIsFlowMode(!isFlowMode);
     };
 
-    const parseCSV = (csvText: string): DayPlan[] => {
-        const lines = csvText.split('\n').filter(line => line.trim() !== '');
-        // Skip headers
-        const dataRows = lines.slice(1);
-
-        const dayMap: { [key: string]: DayPlan } = {};
-        const completedTasks = new Set(JSON.parse(localStorage.getItem('completedTasks') || '[]'));
-
-        dataRows.forEach((row) => {
-            // Simple split for now as data seems simple and doesn't contain quoted commas in our generation script
-            const columns = row.split(',').map(c => c.trim());
-
-            // Date,Day,Slot_Type,Time,Subject,Topic,Activity_Type,Resources
-            const date = columns[0];
-            const dayName = columns[1];
-            const time = columns[3];
-            const subject = columns[4];
-            const topic = columns[5];
-            const activityType = columns[6];
-            const resources = columns[7];
-
-            if (!date || columns.length < 5) return;
-
-            if (!dayMap[date]) {
-                dayMap[date] = {
-                    date: date,
-                    day: dayName,
-                    slots: []
-                };
-            }
-
-            // Use content-based ID to prevent collisions on CSV regeneration
-            const taskId = generateCSVTaskId(date, time, subject, topic);
-            const isCompleted = completedTasks.has(taskId);
-
-            dayMap[date].slots.push({
-                id: taskId, // Now a string
-                time: time,
-                subject: subject,
-                activity: `${topic} (${activityType})`,
-                status: isCompleted ? 'completed' : 'pending',
-                resource_link: resources !== 'N/A' ? resources : undefined
-            });
-        });
-
-        return Object.values(dayMap).sort((a, b) => a.date.localeCompare(b.date));
-    };
-
-    const fetchCSVPlan = async () => {
+    const fetchPlan = async () => {
         setLoading(true);
         try {
-            const response = await fetch('/UPSC_Scheduler.csv');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            // Try fetching from the new API first
+            const response = await fetch('/api/planner/current?days=365'); // Fetch 1 year
+            if (response.ok) {
+                const data = await response.json();
+                setPlan(data);
+            } else {
+                 // Fallback to CSV if API fails (Backward Compatibility)
+                console.warn("API Plan fetch failed, falling back to CSV");
+                const csvResponse = await fetch('/UPSC_Scheduler.csv');
+                 if (!csvResponse.ok) {
+                    throw new Error(`HTTP error! status: ${csvResponse.status}`);
+                }
+                const csvText = await csvResponse.text();
+                // Simple CSV parser implementation maintained
+                const lines = csvText.split('\n').filter(line => line.trim() !== '');
+                const dataRows = lines.slice(1);
+                const dayMap: { [key: string]: DayPlan } = {};
+                const completedTasks = new Set(JSON.parse(localStorage.getItem('completedTasks') || '[]'));
+
+                dataRows.forEach((row) => {
+                    const columns = row.split(',').map(c => c.trim());
+                    const date = columns[0];
+                    if (!date || columns.length < 5) return;
+
+                    if (!dayMap[date]) {
+                        dayMap[date] = { date: date, day: columns[1], slots: [] };
+                    }
+                    const taskId = generateCSVTaskId(date, columns[3], columns[4], columns[5]);
+                    dayMap[date].slots.push({
+                        id: taskId,
+                        time: columns[3],
+                        subject: columns[4],
+                        activity: `${columns[5]} (${columns[6]})`,
+                        status: completedTasks.has(taskId) ? 'completed' : 'pending',
+                        resource_link: columns[7] !== 'N/A' ? columns[7] : undefined
+                    });
+                });
+                setPlan(Object.values(dayMap).sort((a, b) => a.date.localeCompare(b.date)));
             }
-            const csvText = await response.text();
-            const parsedPlan = parseCSV(csvText);
-            setPlan(parsedPlan);
         } catch (err) {
-            console.error("Failed to fetch CSV plan:", err);
+            console.error("Failed to fetch plan:", err);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchCSVPlan();
+        fetchPlan();
     }, []);
 
     // Global Shortcut for ESC
@@ -1394,7 +1378,7 @@ const StudyPlanDashboard: React.FC = () => {
                             >
                                 {isFlowMode ? ' Flow ON' : ' Flow OFF'}
                             </button>
-                            <button onClick={fetchCSVPlan} disabled={loading}>
+                            <button onClick={fetchPlan} disabled={loading}>
                                 Refresh Plan
                             </button>
                         </div>
