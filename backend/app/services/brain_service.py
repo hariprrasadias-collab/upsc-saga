@@ -177,6 +177,86 @@ class BrainService:
             print(f"Brain Think Error: {e}")
             return {"response_text": f"I had a headache thinking about that. Error: {str(e)}", "actions": []}
 
+    def process_task_completion(self, task_data: dict):
+        """
+        Proactively triggers Brain actions when a study task is completed.
+        Logic:
+        1. Create Flashcards for the topic.
+        2. Create Revision Notes (stored as Flashcards or Summary).
+        3. Create Mock Test (UPSC style).
+        4. Check for Book Completion -> Trigger Boss Fight.
+        """
+        topic = task_data.get('topic')
+        subject = task_data.get('subject')
+        print(f"Brain: Processing completion for {subject} - {topic}")
+
+        if not topic:
+            return
+
+        try:
+            # 1. Create Flashcards
+            # We assume execute_action for CREATE_FLASHCARDS returns success and potentially the deck_name or we can deduce it.
+            # Ideally, FlashcardService should return deck_id, but we are sticking to current architecture.
+            self.execute_action("CREATE_FLASHCARDS", {"topic": topic, "count": 5, "reasoning": "Task Completion Automation"})
+
+            # 2. Create Revision Notes
+            explanation_res = self.execute_action("EXPLAIN_SYLLABUS_NODE", {"node": topic, "reasoning": "Task Completion Automation"})
+            if explanation_res.get('success'):
+                # Store this explanation as a special "Revision Note" flashcard
+                from app.services.flashcard_service import FlashcardService
+                # Use a cleaner way to add the note, if possible, or direct DB access via service helper
+                # Since FlashcardService doesn't have 'add_card', we do it here but maybe we should refactor later.
+                # For now, let's fix the deck finding logic to be robust or fallback to creating one.
+
+                from app.db import get_db
+                conn = get_db()
+                deck_name = f"Auto-Gen: {topic}"
+
+                # Check for deck, if not exists (maybe CREATE_FLASHCARDS failed or naming changed), create it.
+                cursor = conn.execute("SELECT id FROM decks WHERE name = ?", (deck_name,))
+                row = cursor.fetchone()
+                if row:
+                    deck_id = row[0]
+                else:
+                    # Fallback create
+                    cursor = conn.execute("INSERT INTO decks (user_id, name, subject) VALUES (1, ?, ?)", (deck_name, subject))
+                    deck_id = cursor.lastrowid
+                    conn.commit()
+
+                conn.execute('''
+                    INSERT INTO flashcards (deck_id, front, back, source)
+                    VALUES (?, ?, ?, 'ai_generated_summary')
+                ''', (deck_id, f"Revision Note: {topic}", explanation_res.get('explanation'),))
+                conn.commit()
+
+            # 3. Create Mock Test
+            # Added "style": "UPSC" to payload as requested
+            self.execute_action("CREATE_MOCK_TEST", {
+                "topic": topic,
+                "reasoning": "Task Completion Automation",
+                "style": "UPSC"
+            })
+
+            # 4. Check for Boss Fight (Book Completion)
+            from app.db_models.study_plan import get_pending_task_count
+
+            plan_id = task_data.get('plan_id')
+            if plan_id:
+                pending_count = get_pending_task_count(plan_id, subject, exclude_task_id=task_data.get('id'))
+
+                if pending_count == 0:
+                    print(f"Brain: All tasks for {subject} completed. Summoning Boss.")
+                    self.execute_action("SUMMON_BOSS", {
+                        "filters": {"subject": subject},
+                        "name": f"The {subject} Final Boss",
+                        "reasoning": "Subject Completion Event"
+                    })
+
+        except Exception as e:
+            print(f"Brain: Task Completion Automation Failed: {e}")
+            import traceback
+            traceback.print_exc()
+
     def execute_action(self, action_type: str, payload: dict) -> dict:
         """
         Executes a specific action triggered by the Brain.
