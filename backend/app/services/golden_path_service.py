@@ -1,42 +1,71 @@
 import networkx as nx
 import json
 import time
+import sqlite3
 
 class GoldenPathService:
     def __init__(self):
         self.graph = None
         self.last_build_time = None
         self.cache_duration = 300 # 5 minutes
+        self.unmatched_topics_cache = None
 
-    def get_graph(self):
+    def get_graph(self, debug=False):
         """Returns cached graph or rebuilds if expired."""
         now = time.time()
-        if self.graph is None or (self.last_build_time and now - self.last_build_time > self.cache_duration):
-            self.graph = self.build_graph()
+        # Always rebuild in debug mode to get fresh unmatched topics
+        if self.graph is None or (self.last_build_time and now - self.last_build_time > self.cache_duration) or debug:
+            self.graph, self.unmatched_topics_cache = self.build_graph()
             self.last_build_time = now
         return self.graph
 
     def build_graph(self, user_id=1):
         """
-        Constructs the Syllabus Graph dynamically.
-        Optimized to use bulk aggregation and integrate Weak Areas.
+        Constructs the Syllabus Graph dynamically using topic_id for accurate PYQ linking.
+        Includes fallback logic for topics with no PYQs and identifies unmatched PYQs.
         """
         G = nx.DiGraph()
+        unmatched_pyq_topics = []
         
         try:
             from app.db import get_db
             conn = get_db()
-            
-            # 1. Bulk Fetch Data (Avoid N+1 Queries)
+            conn.row_factory = sqlite3.Row # Ensure we can access columns by name
+
+            # 1. Bulk Fetch Data
             topics_data = conn.execute('SELECT id, topic, subject, status FROM syllabus_topics').fetchall()
-            if not topics_data: return G
-            
-            # Aggregate PYQ Counts
+            if not topics_data: return G, unmatched_pyq_topics
+
+            # 2. Aggregate PYQ Counts by syllabus_topic_id (Correct approach)
             pyq_counts = {}
-            rows = conn.execute('SELECT topic, COUNT(*) as c FROM pyq_questions GROUP BY topic').fetchall()
-            for r in rows: pyq_counts[r['topic']] = r['c']
+            rows = conn.execute('''
+                SELECT st.id, COUNT(pq.id) as c
+                FROM syllabus_topics st
+                JOIN pyq_questions pq ON st.id = pq.topic_id
+                GROUP BY st.id
+            ''').fetchall()
+            for r in rows: pyq_counts[r['id']] = r['c']
+
+            # 3. Calculate Subject-level Average Yield (Fallback mechanism)
+            subject_yields = {}
+            subject_topic_counts = {}
+            for topic in topics_data:
+                subject = topic['subject']
+                yield_val = pyq_counts.get(topic['id'], 0)
+
+                if subject not in subject_yields:
+                    subject_yields[subject] = 0
+                    subject_topic_counts[subject] = 0
+
+                subject_yields[subject] += yield_val
+                subject_topic_counts[subject] += 1
             
-            # Aggregate Flashcard Counts (Approximate matching for tags)
+            subject_avg_yields = {
+                s: subject_yields[s] / subject_topic_counts[s]
+                for s in subject_yields if subject_topic_counts[s] > 0
+            }
+
+            # 4. Aggregate Flashcard Counts (Approximate matching for tags)
             fc_rows = conn.execute('SELECT tags FROM flashcards').fetchall()
             fc_counts = {}
             for r in fc_rows:
@@ -45,26 +74,32 @@ class GoldenPathService:
                         t = tag.strip()
                         fc_counts[t] = fc_counts.get(t, 0) + 1
             
-            # Fetch Weak Areas
+            # 5. Fetch Weak Areas
             weak_areas = {}
             wa_rows = conn.execute('SELECT topic, priority_score FROM weak_area_analysis WHERE user_id = ?', (user_id,)).fetchall()
             for r in wa_rows: weak_areas[r['topic']] = r['priority_score']
 
-            # 2. Build Nodes with Dynamic Weights
+            # 6. Build Nodes with Dynamic Weights & Fallback
             for row in topics_data:
+                topic_id = row['id']
                 topic_name = row['topic']
                 subject = row['subject'] or "General"
                 
                 # Metrics
-                raw_yield = pyq_counts.get(topic_name, 0)
-                raw_effort = fc_counts.get(topic_name, 0)
-                weakness_score = weak_areas.get(topic_name, 0) # 0-100
+                raw_yield = pyq_counts.get(topic_id, 0)
+                using_fallback = False
+                if raw_yield == 0:
+                    raw_yield = subject_avg_yields.get(subject, 0)
+                    using_fallback = True
+
+                raw_effort = fc_counts.get(topic_name, 0) # Flashcard matching can remain fuzzy
+                weakness_score = weak_areas.get(topic_name, 0) # Weak area matching can remain fuzzy
                 
                 # Normalization
                 yield_score = min(raw_yield * 5, 100)
                 effort_score = min(max(raw_effort * 2, 10), 100)
                 
-                # Dynamic Adjustment: Weak areas boost "Effective Yield" (High priority to fix)
+                # Dynamic Adjustment
                 weakness_multiplier = 1.0 + (weakness_score / 50.0) 
                 effective_yield = yield_score * weakness_multiplier
                 
@@ -72,7 +107,7 @@ class GoldenPathService:
                 roi = effective_yield / effort_score if effort_score > 0 else 0
                 
                 G.add_node(
-                    row['id'], 
+                    topic_id,
                     label=topic_name, 
                     yield_val=yield_score,
                     effective_yield=effective_yield,
@@ -80,11 +115,11 @@ class GoldenPathService:
                     weakness=weakness_score,
                     roi=roi,
                     group=subject,
-                    status=row['status']
+                    status=row['status'],
+                    using_fallback=using_fallback
                 )
                 
-            # 3. Define Dependencies (Edges)
-            # Link topics within the same subject sequentially
+            # 7. Define Dependencies (Edges)
             subjects = {}
             for row in topics_data:
                 sub = row['subject'] or "General"
@@ -95,12 +130,16 @@ class GoldenPathService:
                 for i in range(len(topic_ids) - 1):
                     G.add_edge(topic_ids[i], topic_ids[i+1])
 
+            # 8. Find unmatched topics for debugging
+            unmatched_rows = conn.execute('SELECT DISTINCT topic FROM pyq_questions WHERE topic_id IS NULL').fetchall()
+            unmatched_pyq_topics = [r['topic'] for r in unmatched_rows]
+
         except Exception as e:
             print(f"Golden Path Build Error: {e}")
             import traceback
             traceback.print_exc()
             
-        return G
+        return G, unmatched_pyq_topics
 
     def apply_bio_weights(self, bio_status):
         """
@@ -180,10 +219,13 @@ class GoldenPathService:
             print(f"Pathfinding Error: {e}")
             return []
 
-    def get_graph_data(self):
-        """Returns graph data in a format suitable for frontend visualization."""
-        G = self.get_graph()
-        if not G: return {"nodes": [], "edges": []}
+    def get_graph_data(self, debug=False):
+        """
+        Returns graph data in a format suitable for frontend visualization.
+        Includes a list of unmatched PYQ topics if debug=True.
+        """
+        G = self.get_graph(debug=debug)
+        if not G: return {"nodes": [], "edges": [], "unmatched_topics": []}
 
         self._calculate_potential_metrics() # Ensure metrics are ready
         nodes = []
@@ -197,7 +239,8 @@ class GoldenPathService:
                     "weakness": data.get("weakness", 0),
                     "roi": round(data.get("roi", 0), 2),
                     "group": data["group"],
-                    "musk_category": data.get("musk_category", "FOCUS") # Default to FOCUS if missing
+                    "musk_category": data.get("musk_category", "FOCUS"), # Default to FOCUS
+                    "using_fallback": data.get("using_fallback", False)
                 },
                 "position": {"x": 0, "y": 0} 
             })
@@ -211,7 +254,11 @@ class GoldenPathService:
                 "animated": True
             })
 
-        return {"nodes": nodes, "edges": edges}
+        response = {"nodes": nodes, "edges": edges}
+        if debug:
+            response["unmatched_topics"] = self.unmatched_topics_cache
+
+        return response
 
     def _calculate_potential_metrics(self):
         """
