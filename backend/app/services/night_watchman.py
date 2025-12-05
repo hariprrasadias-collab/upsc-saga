@@ -22,7 +22,7 @@ class NightWatchman:
                 self.model = genai.GenerativeModel('gemini-latest-flash')
                 print("🦉 Night Watchman: Vision Online (Model Loaded)")
             except Exception as e:
-                print(f"⚠️ Night Watchman Vision Error: {e}")
+                print(f"Night Watchman Vision Error: {e}")
         else:
             print("⚠️ Night Watchman Warning: GEMINI_API_KEY not found in environment")
         
