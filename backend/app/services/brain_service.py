@@ -19,6 +19,7 @@ class BrainService:
     """
     
     def __init__(self):
+        # Initialize Brain Service
         self.api_key = os.environ.get('GEMINI_API_KEY')
         self.is_lobotomized = False
 
