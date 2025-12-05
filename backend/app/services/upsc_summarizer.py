@@ -249,7 +249,7 @@ def fetch_article_content(url):
 
 def find_related_pyqs(subjects, papers):
     """Fetch related previous year questions from the database.
-    Returns up to three real PYQs based on subject.
+    Returns up to three real PYQs (Prelims & Mains) based on subject.
     """
     import sqlite3
     
@@ -264,7 +264,7 @@ def find_related_pyqs(subjects, papers):
         'Economics': 'Economy',
         'Internal Security': 'Polity & Governance', # Fallback
         'Disaster Management': 'Geography', # Fallback
-        'Ethics': 'Polity & Governance' # Fallback or maybe empty
+        'Ethics': 'Polity & Governance' # Fallback
     }
     
     db_subjects = []
@@ -283,22 +283,45 @@ def find_related_pyqs(subjects, papers):
         cursor = conn.cursor()
         
         placeholders = ','.join(['?'] * len(db_subjects))
-        query = f"""
-            SELECT year, subject, question_text as question, topic
+        
+        # 1. Fetch Prelims Questions (MCQ)
+        query_prelims = f"""
+            SELECT year, subject, question_text as question, topic, 'Prelims' as type
             FROM pyq_questions
             WHERE subject IN ({placeholders})
             ORDER BY year DESC
-            LIMIT 5
+            LIMIT 3
         """
+        rows_prelims = cursor.execute(query_prelims, db_subjects).fetchall()
         
-        rows = cursor.execute(query, db_subjects).fetchall()
+        # 2. Fetch Mains Questions (Answer Writing Prompts)
+        # Note: answer_writing_prompts might not have 'year', so we omit it or use a placeholder
+        query_mains = f"""
+            SELECT id, subject, question, topic, 'Mains' as type
+            FROM answer_writing_prompts
+            WHERE subject IN ({placeholders})
+            ORDER BY id DESC
+            LIMIT 3
+        """
+        rows_mains = cursor.execute(query_mains, db_subjects).fetchall()
         
-        for row in rows:
+        # Combine results
+        for row in rows_prelims:
             related_pyqs.append({
                 'year': row['year'],
                 'question': row['question'],
                 'subject': row['subject'],
-                'topic': row['topic']
+                'topic': row['topic'],
+                'type': 'Prelims'
+            })
+            
+        for row in rows_mains:
+            related_pyqs.append({
+                'year': 'Mains', # No year column in prompts table usually
+                'question': row['question'],
+                'subject': row['subject'],
+                'topic': row['topic'],
+                'type': 'Mains'
             })
             
         conn.close()
@@ -306,7 +329,8 @@ def find_related_pyqs(subjects, papers):
     except Exception as e:
         print(f"Error fetching PYQs: {e}")
         
-    return related_pyqs[:3]
+    # Return a mix, limited to 5 total
+    return related_pyqs[:5]
 
 def generate_one_liner(title: str, content: str) -> str:
     """Generate a concise one-liner summary for quick revision."""
