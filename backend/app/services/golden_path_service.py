@@ -249,50 +249,127 @@ class GoldenPathService:
                 
             G.nodes[node]["musk_category"] = category
 
-    def calculate_optimal_path(self, time_budget_hours):
+    def calculate_optimal_path(self, time_budget_hours, energy_level=50, filter_subject=None, filter_topic=None):
         """
         Finds the 'Golden Path' using a Smart Greedy approach.
+        Integrates Energy Levels and Context Filters.
         """
         self._calculate_potential_metrics()
         G = self.get_graph()
         if not G: return {"path": [], "total_yield": 0, "total_effort": 0, "time_budget": time_budget_hours}
 
+        # Apply Bio-Weights Logic to temporary calculations
+        def get_energy_adjusted_effort(base_effort):
+            if energy_level < 30:
+                # Low Energy: High effort tasks are more expensive
+                return base_effort * 2.0 if base_effort > 50 else base_effort
+            elif energy_level > 80:
+                # High Energy: High effort tasks are cheaper (flow state)
+                # Apply discount mainly to high-effort tasks to encourage tackling them now
+                if base_effort > 50:
+                    return base_effort * 0.5
+                return base_effort
+            return base_effort
+
+        def is_node_allowed(node_id):
+            node_data = G.nodes[node_id]
+            if filter_subject and filter_subject != 'All' and node_data.get('group') != filter_subject:
+                return False
+            if filter_topic and filter_topic != 'All' and node_data.get('label') != filter_topic:
+                return False
+            return True
+
+        # Find initial available nodes
+        # If filters are active, available nodes are those matching filter with in-degree 0 within the subgraph
+        # For simplicity, we stick to global dependencies but only pick allowed nodes.
         available_nodes = [n for n, d in G.in_degree() if d == 0]
+
+        # If filtering, we might need to include nodes that are not global roots but are "roots" in the filtered context
+        # But for dependency consistency, we should only suggest nodes whose prerequisites are met.
+        # If a filter is applied (e.g., 'History'), we should likely ignore dependencies outside of 'History'
+        # OR assume outside dependencies are irrelevant/done.
+        # Decision: If filtering by subject, we treat it as an isolated graph for now.
+        if filter_subject and filter_subject != 'All':
+             available_nodes = [n for n in G.nodes if G.nodes[n].get('group') == filter_subject]
+             # Filter out those that have parents strictly within the same subject that are not done
+             # This is a bit complex. Let's stick to the standard greedy walk but skip disallowed nodes.
+             available_nodes = [n for n, d in G.in_degree() if d == 0] # Reset to global roots
+
         completed_nodes = set()
         path = []
         current_time = 0
         
         while current_time < time_budget_hours:
             candidates = []
+
+            # Identify valid candidates from available_nodes
             for node in available_nodes:
-                effort = G.nodes[node]["effort"]
-                # Convert effort (0-100 scale) to hours? Let's assume 100 effort = 10 hours for now
-                effort_hours = effort / 10.0
+                # Check Filter
+                if not is_node_allowed(node):
+                    continue
+
+                raw_effort = G.nodes[node]["effort"]
+                adjusted_effort = get_energy_adjusted_effort(raw_effort)
+
+                # Convert effort (0-100 scale) to hours? Let's assume 100 effort = 10 hours
+                effort_hours = adjusted_effort / 10.0
+
                 if current_time + effort_hours <= time_budget_hours:
                     candidates.append(node)
             
             if not candidates:
-                break
+                # If no candidates found (maybe due to filters blocking everything available),
+                # we need to advance the graph simulation to find nested nodes that might match.
+                # In a real greedy walk, if we skip a node, we can't access its children.
+                # However, if the user only wants 'History', and 'History' nodes depend on 'Math',
+                # we are stuck.
+                # Optimization: If filter is active, we just pick from ALL nodes matching filter, ignoring dependencies?
+                # That breaks the "Golden Path" logic.
+                # Compromise: We search for *any* node matching the filter that hasn't been done.
+                if (filter_subject and filter_subject != 'All') or (filter_topic and filter_topic != 'All'):
+                     # Fallback to non-dependency search if stuck
+                     remaining_nodes = [n for n in G.nodes if n not in completed_nodes and n not in path and is_node_allowed(n)]
+                     candidates = []
+                     for node in remaining_nodes:
+                        raw_effort = G.nodes[node]["effort"]
+                        adjusted_effort = get_energy_adjusted_effort(raw_effort)
+                        effort_hours = adjusted_effort / 10.0
+                        if current_time + effort_hours <= time_budget_hours:
+                            candidates.append(node)
+
+                if not candidates:
+                    break
                 
+
             best_node = max(candidates, key=lambda n: (
-                G.nodes[n].get("potential_roi", 0),
-                G.nodes[n].get("roi", 0)
+                # Use Energy-Adjusted ROI
+                (G.nodes[n].get("effective_yield", 0) / get_energy_adjusted_effort(G.nodes[n].get("effort", 1))),
+                G.nodes[n].get("potential_roi", 0)
             ))
             
-            path.append(G.nodes[best_node])
+            # Enrich node data with ID for the return value
+            node_data = G.nodes[best_node].copy()
+            node_data['id'] = best_node
+
+            path.append(node_data)
             completed_nodes.add(best_node)
-            current_time += (G.nodes[best_node]["effort"] / 10.0)
             
-            available_nodes.remove(best_node)
+            raw_effort = G.nodes[best_node]["effort"]
+            adjusted_effort = get_energy_adjusted_effort(raw_effort)
+            current_time += (adjusted_effort / 10.0)
+
+            if best_node in available_nodes:
+                available_nodes.remove(best_node)
             
             for successor in G.successors(best_node):
-                if all(pred in completed_nodes for pred in G.predecessors(successor)):
-                    available_nodes.append(successor)
+                if successor not in completed_nodes and all(pred in completed_nodes for pred in G.predecessors(successor)):
+                    if successor not in available_nodes:
+                        available_nodes.append(successor)
                     
         return {
             "path": path,
             "total_yield": sum(item["yield_val"] for item in path),
-            "total_effort": sum(item["effort"] for item in path),
+            "total_effort": sum(item["effort"] for item in path), # Reporting Raw Effort
             "time_budget": time_budget_hours
         }
 
