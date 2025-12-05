@@ -42,6 +42,7 @@ const GoldenPath: React.FC = () => {
     const [topics, setTopics] = useState<string[]>([]);
     const [selectedSubject, setSelectedSubject] = useState<string>('All');
     const [selectedTopic, setSelectedTopic] = useState<string>('All');
+    const [energyLevel, setEnergyLevel] = useState<number>(50);
 
     // Fetch Graph Data
     useEffect(() => {
@@ -101,10 +102,10 @@ const GoldenPath: React.FC = () => {
 
         // Simulation - OPTIMIZED FOR VISIBILITY
         const simulation = d3.forceSimulation(activeNodes as any)
-            .force("link", d3.forceLink(activeEdges).id((d: any) => d.id).distance(150)) // Increased distance
-            .force("charge", d3.forceManyBody().strength(-800)) // Stronger repulsion to spread nodes
+            .force("link", d3.forceLink(activeEdges).id((d: any) => d.id).distance(100))
+            .force("charge", d3.forceManyBody().strength(-300))
             .force("center", d3.forceCenter(width / 2, height / 2))
-            .force("collide", d3.forceCollide().radius((d: any) => (10 + (d.yield || 0)) * 1.5).iterations(2)); // Prevent overlap with buffer
+            .force("collide", d3.forceCollide().radius((d: any) => (10 + (d.yield || 0)) * 1.5).iterations(2));
 
         // Links
         const link = g.append("g")
@@ -114,7 +115,7 @@ const GoldenPath: React.FC = () => {
             .join("line")
             .attr("class", "link")
             .attr("stroke", "#555")
-            .attr("stroke-opacity", 0.6);
+            .attr("stroke-opacity", 0.3);
 
         // Nodes
         const node = g.append("g")
@@ -195,15 +196,18 @@ const GoldenPath: React.FC = () => {
 
             // Highlight Nodes
             svg.selectAll(".node circle")
+                .transition().duration(500)
                 .style("stroke", (d: any) => pathIds.has(d.id) ? "#ffd700" : null)
-                .style("stroke-width", (d: any) => pathIds.has(d.id) ? 4 : null)
-                .style("filter", (d: any) => pathIds.has(d.id) ? "drop-shadow(0 0 5px #ffd700)" : null);
+                .style("stroke-width", (d: any) => pathIds.has(d.id) ? 5 : null)
+                .style("filter", (d: any) => pathIds.has(d.id) ? "drop-shadow(0 0 10px #ffd700)" : null)
+                .attr("r", (d: any) => pathIds.has(d.id) ? (10 + (d.yield / 1.5)) * 1.2 : (10 + (d.yield / 1.5)));
 
             // Highlight Edges
             svg.selectAll(".link")
+                .transition().duration(500)
                 .style("stroke", (d: any) => pathIds.has(d.source.id) && pathIds.has(d.target.id) ? "#ffd700" : "#555")
                 .style("stroke-width", (d: any) => pathIds.has(d.source.id) && pathIds.has(d.target.id) ? 3 : 1)
-                .style("stroke-opacity", (d: any) => pathIds.has(d.source.id) && pathIds.has(d.target.id) ? 1 : 0.2);
+                .style("stroke-opacity", (d: any) => pathIds.has(d.source.id) && pathIds.has(d.target.id) ? 1 : 0.1);
         }
 
         return () => {
@@ -217,7 +221,12 @@ const GoldenPath: React.FC = () => {
             const res = await fetch('http://localhost:5000/api/golden-path/optimize', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ time_budget: timeBudget })
+                body: JSON.stringify({
+                    time_budget: timeBudget,
+                    energy_level: energyLevel,
+                    subject: selectedSubject,
+                    topic: selectedTopic
+                })
             });
             const data = await res.json();
             if (data.success) {
@@ -285,6 +294,22 @@ const GoldenPath: React.FC = () => {
                             onChange={(e) => setTimeBudget(parseFloat(e.target.value))}
                             placeholder="e.g. 100"
                         />
+                    </div>
+
+                    <div className="gp-input-group">
+                        <label>Energy Level ({energyLevel}%)</label>
+                        <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={energyLevel}
+                            onChange={(e) => setEnergyLevel(parseInt(e.target.value))}
+                            style={{ width: '100%', cursor: 'pointer' }}
+                            title="Low Energy: Prioritize quick wins. High Energy: Tackle hard topics."
+                        />
+                        <div style={{ fontSize: '0.75rem', color: '#888', marginTop: '2px', textAlign: 'center' }}>
+                            {energyLevel < 30 ? "Drain Mode: Quick Wins" : energyLevel > 80 ? "Flow State: Deep Work" : "Normal"}
+                        </div>
                     </div>
 
                     <div className="gp-filters" style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>

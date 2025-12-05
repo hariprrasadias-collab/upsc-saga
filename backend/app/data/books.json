@@ -1,0 +1,76 @@
+[
+    {
+        "subject": "History",
+        "title": "Class 6: Our Pasts I",
+        "chapters": [
+            "Ch 1: What, Where, How and When?", "Ch 2: From Hunting–Gathering to Growing Food",
+            "Ch 3: In the Earliest Cities", "Ch 4: What Books and Burials Tell Us",
+            "Ch 5: Kingdoms, Kings and an Early Republic", "Ch 6: New Questions and Ideas",
+            "Ch 7: Ashoka, The Emperor Who Gave Up War", "Ch 8: Vital Villages, Thriving Towns",
+            "Ch 9: Traders, Kings and Pilgrims", "Ch 10: New Empires and Kingdoms",
+            "Ch 11: Buildings, Paintings and Books"
+        ]
+    },
+    {
+        "subject": "History",
+        "title": "Class 7: Our Pasts II",
+        "chapters": [
+            "Ch 1: Tracing Changes Through A Thousand Years", "Ch 2: New Kings And Kingdoms",
+            "Ch 3: The Delhi Sultans", "Ch 4: The Mughal Empire",
+            "Ch 5: Rulers And Buildings", "Ch 6: Towns, Traders And Craftspersons",
+            "Ch 7: Tribes, Nomads And Settled Communities", "Ch 8: Devotional Paths To The Divine",
+            "Ch 9: The Making Of Regional Cultures", "Ch 10: Eighteenth-Century Political Formations"
+        ]
+    },
+    {
+        "subject": "Geography",
+        "title": "Class 6: The Earth Our Habitat",
+        "chapters": [
+            "Ch 1: The Earth in the Solar System", "Ch 2: Globe : Latitudes and Longitudes",
+            "Ch 3: Motions of the Earth", "Ch 4: Maps",
+            "Ch 5: Major Domains of the Earth", "Ch 6: Major Landforms of the Earth",
+            "Ch 7: Our Country - India", "Ch 8: India : Climate, Vegetation and Wildlife"
+        ]
+    },
+    {
+        "subject": "Polity",
+        "title": "Class 6: Social and Political Life I",
+        "chapters": [
+            "Ch 1: Understanding Diversity", "Ch 2: Diversity and Discrimination",
+            "Ch 3: What is Government?", "Ch 4: Key Elements of a Democratic Government",
+            "Ch 5: Panchayati Raj", "Ch 6: Rural Administration",
+            "Ch 7: Urban Administration", "Ch 8: Rural Livelihoods",
+            "Ch 9: Urban Livelihoods"
+        ]
+    },
+     {
+        "subject": "Economy",
+        "title": "Class 9: Economics",
+        "chapters": [
+            "Ch 1: The Story of Village Palampur", "Ch 2: People as Resource",
+            "Ch 3: Poverty as a Challenge", "Ch 4: Food Security in India"
+        ]
+    },
+    {
+        "subject": "Polity",
+        "title": "Laxmikanth: Indian Polity",
+        "chapters": [
+            "Ch 1: Historical Background", "Ch 2: Making of the Constitution",
+            "Ch 3: Salient Features of the Constitution", "Ch 4: Preamble of the Constitution",
+            "Ch 5: Union and its Territory", "Ch 6: Citizenship",
+            "Ch 7: Fundamental Rights (Part 1)", "Ch 7: Fundamental Rights (Part 2)",
+            "Ch 8: Directive Principles of State Policy", "Ch 9: Fundamental Duties",
+            "Ch 10: Amendment of the Constitution", "Ch 11: Basic Structure of the Constitution"
+        ]
+    },
+    {
+        "subject": "History",
+        "title": "Spectrum: Modern History",
+        "chapters": [
+            "Unit 1: Sources and Approaches", "Unit 2: Advent of Europeans",
+            "Unit 3: Rising Resentment against Company Rule", "Unit 4: Reform Movements",
+            "Unit 5: The Struggle Begins", "Unit 6: National Movement 1905-1918",
+            "Unit 7: Era of Mass Nationalism 1919-1939", "Unit 8: Towards Freedom and Partition"
+        ]
+    }
+]
