@@ -1,5 +1,5 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import './App.css';
 import Sidebar from './components/Sidebar';
 import DashboardMain from './components/DashboardMain';
@@ -72,6 +72,18 @@ function App() {
   } = useGlobal();
 
   const location = useLocation();
+
+  useEffect(() => {
+    fetch('/api/ravens/background-fetch', { method: 'POST' })
+      .then(response => {
+        if (!response.ok) {
+          console.error('Failed to start background fetch');
+        } else {
+          console.log('Background fetch for Ravens initiated.');
+        }
+      })
+      .catch(error => console.error('Error starting background fetch:', error));
+  }, []);
 
   // Handle task completion (audio + refresh) - passed to components that need simple callback
   const handleSessionComplete = async () => {
