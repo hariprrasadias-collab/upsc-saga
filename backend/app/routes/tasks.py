@@ -105,10 +105,6 @@ def log_study_session():
         conn.commit()
         
         return jsonify({'success': True, 'xp_earned': xp_earned, 'rewards': rewards})
-        
-        conn.commit()
-        
-        return jsonify({'success': True, 'xp_earned': xp_earned})
     except Exception as e:
         print(f"Error logging study: {e}")
         return jsonify({'error': str(e)}), 500

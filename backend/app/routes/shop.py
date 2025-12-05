@@ -20,6 +20,9 @@ def buy_item():
     data = request.get_json()
     cost = data.get('cost')
     
+    if cost < 0:
+        return jsonify({"error": "Invalid cost"}), 400
+
     conn = get_db()
     user = conn.execute('SELECT hacksilver FROM users WHERE id = ?', (user_id,)).fetchone()
     
