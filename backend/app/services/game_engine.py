@@ -63,8 +63,11 @@ def calculate_and_apply_rewards(user_id, base_xp, base_hs, tags=[]):
     
     # 3. Calculate Hacksilver (Random Variation)
     # e.g., if base_hs is 100, gives between 90 and 110.
-    variance = int(base_hs * 0.1) if base_hs > 0 else 0
-    final_hs = random.randint(max(1, base_hs - variance), base_hs + variance)
+    if base_hs > 0:
+        variance = int(base_hs * 0.1)
+        final_hs = random.randint(max(1, base_hs - variance), base_hs + variance)
+    else:
+        final_hs = 0
 
     # 4. Check Luck Stat (Critical Hit)
     # 2% Chance per Luck point. Cap at 50%.
