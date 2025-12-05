@@ -30,7 +30,7 @@ class BrainService:
         else:
             try:
                 genai.configure(api_key=self.api_key)
-                self.model = genai.GenerativeModel('gemini-flash-latest') # Using flash for speed
+                self.model = genai.GenerativeModel('gemini-pro') # Fallback to pro
                 print("BrainService Online: Connected to Gemini Cortex.")
             except Exception as e:
                 print(f"BrainService Error: Failed to initialize Gemini: {e}")
@@ -101,8 +101,7 @@ class BrainService:
         # Real Panopticon Integration
         try:
             from app.services.panopticon_service import PanopticonService
-            panopticon = PanopticonService()
-            return panopticon.get_current_status()
+            return PanopticonService().get_current_status()
         except Exception as e:
             print(f"Bio-Check Failed: {e}")
             return {"status": "OFFLINE", "energy": 0, "alert": "Panopticon Unreachable"}
@@ -1216,10 +1215,28 @@ class BrainService:
                     topic = payload.get('topic', '')
                     prompt = f"""
                     Identify 3-5 key geographical locations related to '{topic}' for map pointing.
-                    Return JSON list: [{{ "name": "...", "lat": 0.0, "lon": 0.0, "reason": "..." }}]
+                    Return ONLY a valid JSON list. Do not use markdown formatting.
+                    Example: [{{ "name": "...", "lat": 0.0, "lon": 0.0, "reason": "..." }}]
                     """
                     response = self.model.generate_content(prompt)
-                    data = self._parse_response(response.text)
+                    text = response.text.strip()
+                    # Strip markdown code blocks if present
+                    if text.startswith("```"):
+                        text = text.split("```")[1]
+                        if text.startswith("json"):
+                            text = text[4:]
+                    text = text.strip()
+                    
+                    try:
+                        data = json.loads(text)
+                    except json.JSONDecodeError:
+                        # Fallback: Try to find list bracket
+                        start = text.find('[')
+                        end = text.rfind(']') + 1
+                        if start != -1 and end != -1:
+                            data = json.loads(text[start:end])
+                        else:
+                            data = []
 
                     locations = []
                     if isinstance(data, list):
