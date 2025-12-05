@@ -37,7 +37,8 @@ class ForesightEngine:
     def predict_questions(
         self, 
         subject: str = "All", 
-        timeframe_days: int = 90
+        timeframe_days: int = 90,
+        topic: str = None
     ) -> List[Dict]:
         """
         Generate predicted questions based on recent trends.
@@ -45,6 +46,7 @@ class ForesightEngine:
         Args:
             subject: Target subject (e.g., "Polity", "Geography")
             timeframe_days: Look back period for current affairs
+            topic: Specific topic to focus on (optional)
             
         Returns:
             List of predictions with probability scores
@@ -62,7 +64,8 @@ class ForesightEngine:
         predictions = self._generate_predictions(
             subject, 
             pyq_patterns, 
-            current_affairs
+            current_affairs,
+            topic=topic
         )
         
         return predictions
@@ -241,7 +244,8 @@ class ForesightEngine:
         self, 
         subject: str, 
         pyq_patterns: str, 
-        current_affairs: str
+        current_affairs: str,
+        topic: str = None
     ) -> List[Dict]:
         """Use AI to generate question predictions with Critic Loop"""
         
@@ -260,11 +264,14 @@ class ForesightEngine:
             for fav in favorites:
                 examples_text += f"- Q: {fav['question']}\n  Type: {fav['type']}\n  Reasoning: {fav['reasoning']}\n"
 
+        topic_directive = f"TOPIC FOCUS: {topic}" if topic else ""
+
         # Phase 1: Generator (High Creativity)
         prompt = f"""
         You are Project Foresight - a predictive oracle for UPSC exam questions.
         
         SUBJECT FOCUS: {subject}
+        {topic_directive}
         
         HISTORICAL PATTERNS (PYQs):
         {pyq_patterns}
@@ -279,6 +286,7 @@ class ForesightEngine:
         Generate 20 CANDIDATE questions for UPSC Prelims/Mains.
         Focus on "Interdisciplinary" questions (e.g., Economy + Environment).
         Prioritize topics listed in USER WEAK AREAS.
+        If a specific TOPIC FOCUS is provided, ensure at least 50% of questions relate to it.
         
         OUTPUT FORMAT (JSON Array):
         [

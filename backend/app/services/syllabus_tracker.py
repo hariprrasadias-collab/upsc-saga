@@ -54,6 +54,29 @@ class SyllabusTracker:
         }
 
     @staticmethod
+    def get_recently_completed(limit=5):
+        """
+        Get recently completed topics for linking context.
+        """
+        conn = get_db()
+        # Assumes single user for now or handled via context elsewhere if needed.
+        # Ideally should take user_id, but current schema for syllabus_topics might be global or implicit.
+        # If syllabus_topics doesn't have user_id, we just fetch globally or from last_updated.
+
+        # Check if user_id exists in syllabus_topics, if not, just use time.
+        # Based on previous context, syllabus_topics might be a global reference or per user.
+        # Let's assume it's per user or we just take the latest modified ones.
+
+        rows = conn.execute('''
+            SELECT topic, subject FROM syllabus_topics
+            WHERE status IN ('Completed', 'Mastered')
+            ORDER BY last_updated DESC
+            LIMIT ?
+        ''', (limit,)).fetchall()
+
+        return [dict(row) for row in rows]
+
+    @staticmethod
     def auto_update_from_action(action_type, payload):
         """
         Automatically update syllabus based on an action.
