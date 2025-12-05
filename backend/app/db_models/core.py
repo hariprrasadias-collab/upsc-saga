@@ -38,6 +38,19 @@ def init_core_tables():
         )
     ''')
     
+    # Activity Log Table
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS activity_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER DEFAULT 1,
+            activity_type TEXT NOT NULL,
+            description TEXT,
+            xp_awarded INTEGER DEFAULT 0,
+            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    ''')
+
     # Seed default user if not exists
     existing = conn.execute('SELECT count(*) FROM users').fetchone()[0]
     if existing == 0:
