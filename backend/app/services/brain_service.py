@@ -19,7 +19,7 @@ class BrainService:
     """
     
     def __init__(self):
-        # Initialize Brain Service
+        # Initialize Brain Service - Core Logic
         self.api_key = os.environ.get('GEMINI_API_KEY')
         self.is_lobotomized = False
 
