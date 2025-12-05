@@ -29,34 +29,6 @@ SUBJECTS = [
     'Geography', 'Ethics', 'Current Affairs'
 ]
 
-def retry_with_backoff(func, *args, **kwargs):
-    """Retry a function with exponential backoff for rate limits."""
-    max_retries = 3
-    base_delay = 10  # Start with 10 seconds (since limit is 10 RPM)
-    
-    for attempt in range(max_retries):
-        try:
-            return func(*args, **kwargs)
-        except google_exceptions.ResourceExhausted:
-            if attempt == max_retries - 1:
-                raise  # Re-raise if last attempt fails
-            
-            delay = base_delay * (2 ** attempt)
-            print(f"⚠️ Quota exceeded. Retrying in {delay} seconds...")
-            time.sleep(delay)
-        except Exception as e:
-            raise e  # Re-raise other exceptions immediately
-
-def get_gemini_text(response):
-    """Safely extract text from Gemini response, handling safety blocks."""
-    try:
-        return response.text.strip()
-    except ValueError:
-        # This happens if the response was blocked by safety filters
-        if hasattr(response, 'prompt_feedback'):
-            print(f"⚠️ Gemini Safety Block: {response.prompt_feedback}")
-        return ""
-
 def _infer_tags(title: str, content: str):
     """Keyword‑based inference for UPSC papers and subjects.
     Returns a tuple (papers, subjects). Used as a lightweight fallback when Gemini
@@ -121,7 +93,7 @@ def summarize_for_upsc(title, content, link):
     if not GEMINI_API_KEY:
         return _simple_extraction(title, content)
     try:
-        model = genai.GenerativeModel('gemini-pro')
+        model = genai.GenerativeModel('gemini-flash-latest')
         # Send FULL content to AI (no truncation)
         prompt = f"""You are a UPSC expert analyzer. Tag articles accurately based on content.
 
@@ -162,13 +134,8 @@ Content: {content}
 
 Return ONLY this JSON (no markdown, no explanation):
 {{"upsc_summary": "...", "key_points": ["...", "..."], "papers": ["GS_"], "subjects": ["..."], "importance": 1-3, "exam_questions": ["..."], "related_topics": ["..."]}}"""
-        # response = model.generate_content(prompt)
-        response = retry_with_backoff(model.generate_content, prompt)
-        text = get_gemini_text(response)
-        if not text:
-            print(f"Empty or blocked response for: {title}")
-            return _simple_extraction(title, content)
-            
+        response = model.generate_content(prompt)
+        text = response.text.strip()
         # Clean possible code fences
         text = text.replace('```json', '').replace('```', '').strip()
         start = text.find('{')
@@ -313,8 +280,7 @@ def find_related_pyqs(subjects, papers):
         return []
 
     try:
-        conn = sqlite3.connect(db_path, timeout=30.0)
-        conn.execute('PRAGMA journal_mode=WAL')
+        conn = sqlite3.connect(db_path)
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
@@ -365,13 +331,9 @@ SUMMARY:"""
             print("ERROR: GEMINI_API_KEY not configured in environment")
             return f"⚠️ AI service not configured. Please add GEMINI_API_KEY to backend/.env file."
         
-        model = genai.GenerativeModel('gemini-pro')  # Using stable latest version
-        # response = model.generate_content(prompt)
-        response = retry_with_backoff(model.generate_content, prompt)
-        one_liner = get_gemini_text(response)
-        if not one_liner:
-             return "Summary unavailable (Safety Block)"
-             
+        model = genai.GenerativeModel('gemini-flash-latest')  # Using stable latest version
+        response = model.generate_content(prompt)
+        one_liner = response.text.strip()
         print(f"Successfully generated one-liner for: {title}")
         return one_liner
     except Exception as e:
@@ -410,13 +372,9 @@ Requirements:
 MNEMONIC:"""
 
     try:
-        model = genai.GenerativeModel('gemini-pro')
-        # response = model.generate_content(prompt)
-        response = retry_with_backoff(model.generate_content, prompt)
-        mnemonic = get_gemini_text(response)
-        if not mnemonic:
-            return "Mnemonic unavailable (Safety Block)"
-            
+        model = genai.GenerativeModel('gemini-flash-latest')
+        response = model.generate_content(prompt)
+        mnemonic = response.text.strip()
         return mnemonic
     except Exception as e:
         print(f"Error generating mnemonic: {e}")

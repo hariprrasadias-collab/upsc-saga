@@ -28,7 +28,7 @@ class ForesightEngine:
         else:
             try:
                 genai.configure(api_key=self.api_key)
-                self.model = genai.GenerativeModel('gemini-pro')
+                self.model = genai.GenerativeModel('gemini-flash-latest')
                 print("🔮 ForesightEngine Online: Oracle Activated")
             except Exception as e:
                 print(f"❌ ForesightEngine Error: {e}")

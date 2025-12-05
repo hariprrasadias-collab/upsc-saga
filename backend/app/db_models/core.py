@@ -58,6 +58,6 @@ def init_core_tables():
             INSERT INTO users (username, current_xp, level, max_xp, hacksilver, strength_stat, runic_stat, vitality_stat, luck_stat)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', ('Hero', 0, 1, 100, 50, 5, 5, 5, 5))
-        print("Seeded default user 'Hero'.")
+        print("👤 Seeded default user 'Hero'.")
         
     conn.commit()
