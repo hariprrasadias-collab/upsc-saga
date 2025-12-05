@@ -4,8 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import './Sidebar.css';
 import { useGlobal } from '../contexts/GlobalContext';
 
+const StatBadge: React.FC<{ count: number }> = ({ count }) => {
+  if (count === 0) return null;
+  return <span className="sidebar-badge">{count}</span>;
+};
+
 const Sidebar: React.FC = () => {
-  const { currentTab, setCurrentTab, isSidebarOpen, toggleSidebar, toggleMimir } = useGlobal();
+  const { currentTab, setCurrentTab, isSidebarOpen, toggleSidebar, toggleMimir, sidebarStats } = useGlobal();
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     planning: true,
     training: false,
@@ -47,8 +52,8 @@ const Sidebar: React.FC = () => {
       items: [
         { id: 'study-plan', label: 'Study Plan', icon: '📅' },
         { id: 'war-map', label: 'War Map', icon: '🗓️' },
-        { id: 'syllabus', label: 'Syllabus', icon: '🧭' },
-        { id: 'quests', label: 'Quests', icon: '📜' },
+        { id: 'syllabus', label: 'Syllabus', icon: '🧭', progress: sidebarStats.syllabus_progress },
+        { id: 'quests', label: 'Quests', icon: '📜', badge: sidebarStats.active_quests },
         { id: 'revision-cards', label: 'Revision Cards', icon: '⚡' },
         { id: 'mnemonics', label: 'Mnemonics', icon: '🧠' },
         { id: 'mindmap', label: 'Mind Map', icon: '🕸️' },
@@ -61,10 +66,10 @@ const Sidebar: React.FC = () => {
     training: {
       title: '💪 Training',
       items: [
-        { id: 'dojo', label: 'Anki Dojo', icon: '🥋' },
+        { id: 'dojo', label: 'Anki Dojo', icon: '🥋', badge: sidebarStats.anki_due },
         { id: 'answer-writing', label: 'Answer Writing', icon: '✍️' },
         { id: 'scribe', label: 'The Scribe (AI)', icon: '📜' },
-        { id: 'mock-tests', label: 'Mock Tests', icon: '📋' },
+        { id: 'mock-tests', label: 'Mock Tests', icon: '📋', badge: sidebarStats.active_mocks },
         { id: 'arena', label: 'Boss Arena', icon: '⚔️' },
         { id: 'essay', label: 'Essay Workshop', icon: '✍️' },
         { id: 'csat', label: 'CSAT Prep', icon: '🧮' },
@@ -154,8 +159,19 @@ const Sidebar: React.FC = () => {
                   className={`menu-item sub-item ${currentTab === item.id ? 'active' : ''}`}
                   onClick={() => handleTabChange(item.id)}
                 >
-                  <span className="icon">{item.icon}</span>
-                  <span className="label">{item.label}</span>
+                  <div className="sidebar-item-label">
+                    <span className="icon">{item.icon}</span>
+                    <span className="label">{item.label}</span>
+                    {item.badge !== undefined && <StatBadge count={item.badge} />}
+                  </div>
+                  {item.progress !== undefined && (
+                    <div className="sidebar-progress-bar-container">
+                      <div
+                        className="sidebar-progress-bar"
+                        style={{ width: `${item.progress}%` }}
+                      ></div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -166,4 +182,4 @@ const Sidebar: React.FC = () => {
   );
 };
 
-export default Sidebar;
+export default React.memo(Sidebar);

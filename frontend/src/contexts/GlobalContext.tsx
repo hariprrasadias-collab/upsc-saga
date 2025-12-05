@@ -33,8 +33,16 @@ export interface UserStats {
     luck_stat: number;
 }
 
+export interface SidebarStats {
+    syllabus_progress: number;
+    active_quests: number;
+    active_mocks: number;
+    anki_due: number;
+}
+
 interface GlobalContextType {
     userStats: UserStats | null;
+    sidebarStats: SidebarStats;
     todayTasks: Task[];
     currentTab: string;
     isRageMode: boolean;
@@ -72,6 +80,12 @@ interface GlobalProviderProps {
 
 export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
     const [userStats, setUserStats] = useState<UserStats | null>(null);
+    const [sidebarStats, setSidebarStats] = useState<SidebarStats>({
+        syllabus_progress: 0,
+        active_quests: 0,
+        active_mocks: 0,
+        anki_due: 0,
+    });
     const [todayTasks, setTodayTasks] = useState<Task[]>([]);
     const [currentTab, setCurrentTab] = useState('dashboard');
     const [isRageMode, setIsRageMode] = useState(false);
@@ -98,6 +112,7 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
             if (!response.ok) throw new Error('Failed to fetch dashboard data');
             const data = await response.json();
 
+            // --- Update User Stats (and check for level up) ---
             setUserStats((prev) => {
                 const newStats = data.stats;
                 if (prev && newStats.level > prev.level) {
@@ -107,7 +122,13 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
                 return newStats;
             });
 
-            const tasksWithBooleanCompletion: Task[] = data.tasks.map((task: RawTaskFromAPI) => ({
+            // --- Update Sidebar Stats ---
+            if (data.sidebar_stats) {
+                setSidebarStats(data.sidebar_stats);
+            }
+
+            // --- Update Today's Tasks ---
+            const tasksWithBooleanCompletion: Task[] = (data.tasks || []).map((task: RawTaskFromAPI) => ({
                 id: task.id,
                 title: task.title,
                 isCompleted: task.isCompleted === 1,
@@ -168,6 +189,7 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
 
     const value: GlobalContextType = {
         userStats,
+        sidebarStats,
         todayTasks,
         currentTab,
         isRageMode,
