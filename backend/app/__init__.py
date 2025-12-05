@@ -16,14 +16,14 @@ def create_app():
     from app.db_models.autonomous_brain import init_autonomous_brain_tables
     from app.db_models.gamification import init_gamification_tables
     from app.db_models.core import init_core_tables
-    from app.db_models.indexes import create_indexes
+    from app.db_models.indexes import init_indexes
     
     with app.app_context():
         init_core_tables() # Core first (users)
         init_study_plan_tables()
         init_autonomous_brain_tables()
         init_gamification_tables()
-        create_indexes()
+        init_indexes() # Ensure performance indexes
 
     # Import blueprints
     from .routes import (

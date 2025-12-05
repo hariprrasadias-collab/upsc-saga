@@ -1,14 +1,27 @@
+
 from app.db import get_db
 
-def create_indexes():
-    """Create indexes for performance optimization"""
+def init_indexes():
+    """Create performance indexes for frequent queries"""
     conn = get_db()
+    cursor = conn.cursor()
 
-    # Indexes for study_tasks
-    conn.execute('CREATE INDEX IF NOT EXISTS idx_study_tasks_plan_date ON study_tasks (plan_id, date)')
-    conn.execute('CREATE INDEX IF NOT EXISTS idx_study_tasks_status ON study_tasks (status)')
+    indexes = [
+        # Dashboard: Tasks due today
+        'CREATE INDEX IF NOT EXISTS idx_tasks_user_due ON tasks (user_id, due_date)',
 
-    # Indexes for study_plans
-    conn.execute('CREATE INDEX IF NOT EXISTS idx_study_plans_active ON study_plans (is_active)')
+        # Analytics: Activity between dates
+        'CREATE INDEX IF NOT EXISTS idx_test_attempts_user_date ON test_attempts (user_id, submitted_at)',
+        'CREATE INDEX IF NOT EXISTS idx_user_answers_user_date ON user_answers (user_id, submitted_at)',
+        'CREATE INDEX IF NOT EXISTS idx_review_sessions_user_date ON review_sessions (user_id, reviewed_at)',
+        'CREATE INDEX IF NOT EXISTS idx_pomodoro_sessions_user_date ON pomodoro_sessions (user_id, timestamp)'
+    ]
+
+    print("Optimization: Checking indexes...")
+    for idx_sql in indexes:
+        try:
+            cursor.execute(idx_sql)
+        except Exception as e:
+            print(f"Warning creating index: {e}")
 
     conn.commit()
