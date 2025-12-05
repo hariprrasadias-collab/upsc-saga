@@ -153,8 +153,8 @@ class OptimizationEngine:
             # Check if flashcards table exists and has due column
             # Assuming 'next_review' < now
             result = conn.execute('''
-                SELECT COUNT(*) as count FROM flashcards 
-                WHERE next_review <= date('now')
+                SELECT COUNT(*) as count FROM revision_schedules 
+                WHERE item_type = 'flashcard' AND next_review <= date('now')
             ''').fetchone()
             count = result['count'] if result else 0
             

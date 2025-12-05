@@ -27,9 +27,9 @@ class BrainService:
             try:
                 genai.configure(api_key=self.api_key)
                 self.model = genai.GenerativeModel('gemini-flash-latest') # Using flash for speed
-                print("🧠 BrainService Online: Connected to Gemini Cortex.")
+                print("BrainService Online: Connected to Gemini Cortex.")
             except Exception as e:
-                print(f"❌ BrainService Error: Failed to initialize Gemini: {e}")
+                print(f"BrainService Error: Failed to initialize Gemini: {e}")
                 self.model = None
             
         self.registry = SynapseRegistry.get_instance()
@@ -52,9 +52,9 @@ class BrainService:
             if os.path.exists(strategy_path):
                 with open(strategy_path, 'r') as f:
                     self.current_strategy = json.load(f)
-                print(f"🧠 Brain: Loaded persisted strategy with {len(self.current_strategy)} steps.")
+                print(f"Brain: Loaded persisted strategy with {len(self.current_strategy)} steps.")
         except Exception as e:
-            print(f"⚠️ Failed to load strategy: {e}")
+            print(f"Failed to load strategy: {e}")
 
     def _save_strategy(self):
         """Save strategy to disk"""
@@ -66,9 +66,9 @@ class BrainService:
             strategy_path = os.path.join(instance_dir, 'current_strategy.json')
             with open(strategy_path, 'w') as f:
                 json.dump(self.current_strategy, f)
-            print("🧠 Brain: Strategy persisted to disk.")
+            print("Brain: Strategy persisted to disk.")
         except Exception as e:
-            print(f"⚠️ Failed to save strategy: {e}")
+            print(f"Failed to save strategy: {e}")
 
     def ingest_strategic_directive(self, path_data):
         """
@@ -84,7 +84,7 @@ class BrainService:
         except Exception as e:
             print(f"Gamification Trigger Failed: {e}")
             
-        print(f"🧠 Brain: Strategic Directive Received. {len(path_data)} steps adopted.")
+        print(f"Brain: Strategic Directive Received. {len(path_data)} steps adopted.")
         self._save_strategy()
         return True
 
@@ -182,7 +182,7 @@ class BrainService:
         Executes a specific action triggered by the Brain.
         Now integrated with AutonomyManager for logging and permission checks.
         """
-        print(f"🧠 Brain Executing Action: {action_type}")
+        print(f"Brain Executing Action: {action_type}")
         
         # 1. Log the action intent
         action_id = self.autonomy.log_action(
@@ -578,7 +578,7 @@ class BrainService:
             return result
 
         except Exception as e:
-            print(f"❌ Brain Action Failed: {e}")
+            print(f"Brain Action Failed: {e}")
             try:
                 from app.services.hephaestus_service import hephaestus_service
                 hephaestus_service.attempt_repair(e)

@@ -53,7 +53,7 @@ class GoldenPathService:
 
             # Fetch Recent Current Affairs (Trending Topics)
             trending_topics = set()
-            ca_rows = conn.execute('SELECT title, content FROM current_affairs WHERE date_published > date("now", "-60 days")').fetchall()
+            ca_rows = conn.execute('SELECT title, upsc_summary as content FROM current_affairs WHERE published_date > date("now", "-60 days")').fetchall()
 
             # Create a simple keyword set from CA titles for matching
             ca_keywords = set()
@@ -66,18 +66,25 @@ class GoldenPathService:
             rev_rows = conn.execute('''
                 SELECT topic, MAX(date) as last_date
                 FROM (
-                    SELECT topic, date FROM topic_revisions
-                    UNION
-                    SELECT tags as topic, date_reviewed as date FROM flashcard_reviews
+                    SELECT st.topic, tr.last_revised_at as date
+                    FROM topic_revisions tr
+                    JOIN syllabus_topics st ON tr.topic_id = st.id
+                    UNION ALL
+                    SELECT f.tags as topic, fr.created_at as date
+                    FROM flashcard_reviews fr
+                    JOIN flashcards f ON fr.flashcard_id = f.id
                 ) GROUP BY topic
             ''').fetchall()
             for r in rev_rows:
                 last_revised[r['topic']] = r['last_date']
 
-            # Fetch Mnemonics Availability
+            # Fetch Mnemonics Availability (from Flashcards)
             mnemonics_available = set()
-            mn_rows = conn.execute('SELECT DISTINCT topic FROM mnemonics_history').fetchall()
-            for r in mn_rows: mnemonics_available.add(r['topic'])
+            mn_rows = conn.execute("SELECT tags FROM flashcards WHERE mnemonic IS NOT NULL AND mnemonic != ''").fetchall()
+            for r in mn_rows:
+                if r['tags']:
+                    for tag in r['tags'].split(','):
+                        mnemonics_available.add(tag.strip())
 
             # 2. Build Nodes with Dynamic Weights
             for row in topics_data:

@@ -1,6 +1,6 @@
 # backend/app/routes/ravens.py
 import threading
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 import feedparser
 import threading
 import time
@@ -28,88 +28,90 @@ bp = Blueprint('ravens', __name__, url_prefix='/api/ravens')
 
 # Database table will be initialized when app starts
 
-def run_background_fetch():
+def run_background_fetch(app):
     """Background task to fetch and process news"""
-    print("🦅 Raven: Starting background fetch mission...")
-    
-    feeds = [
-        'https://www.thehindu.com/news/national/feeder/default.rss',
-        'https://pib.gov.in/RSS/RssFeed.aspx?ModId=2',
-        'https://indianexpress.com/section/india/feed/',
-        'https://www.thehindu.com/opinion/editorial/feeder/default.rss',
-        'https://indianexpress.com/section/opinion/editorials/feed/'
-    ]
-    
-    processed_count = 0
-    
-    for url in feeds:
-        try:
-            print(f"🦅 Raven: Scouting {url}...")
-            feed = feedparser.parse(url)
-            
-            # Process only the latest 5 entries from each feed to avoid overload
-            for entry in feed.entries[:5]:
-                link = entry.link
+    with app.app_context():
+        print("🦅 Raven: Starting background fetch mission...")
+        
+        feeds = [
+            'https://www.thehindu.com/news/national/feeder/default.rss',
+            'https://pib.gov.in/RSS/RssFeed.aspx?ModId=2',
+            'https://indianexpress.com/section/india/feed/',
+            'https://www.thehindu.com/opinion/editorial/feeder/default.rss',
+            'https://indianexpress.com/section/opinion/editorials/feed/'
+        ]
+        
+        processed_count = 0
+        
+        for url in feeds:
+            try:
+                print(f"🦅 Raven: Scouting {url}...")
+                feed = feedparser.parse(url)
                 
-                # Skip if already exists
-                if article_exists(link):
-                    continue
+                # Process only the latest 5 entries from each feed to avoid overload
+                for entry in feed.entries[:5]:
+                    link = entry.link
                     
-                print(f"🦅 Raven: Found new artifact - {entry.title}")
+                    # Skip if already exists
+                    if article_exists(link):
+                        continue
+                        
+                    print(f"🦅 Raven: Found new artifact - {entry.title}")
+                    
+                    try:
+                        # 1. Fetch Content
+                        full_content = fetch_article_content(link)
+                        if not full_content or len(full_content) < 100:
+                            full_content = entry.get('summary', '')
+                        
+                        # 2. AI Summarization
+                        ai_result = summarize_for_upsc(entry.title, full_content, link)
+                        
+                        # 3. Extract Image
+                        image_url = extract_image_from_article(link)
+                        
+                        # 4. Find PYQs
+                        related_pyqs = find_related_pyqs(
+                            ai_result['subjects'],
+                            ai_result['papers']
+                        )
+                        
+                        # 5. Save to DB
+                        article_data = {
+                            'title': entry.title,
+                            'link': link,
+                            'source': feed.feed.get('title', 'Unknown Source'),
+                            'published': entry.get('published', 'Today'),
+                            'original_summary': entry.get('summary', ''),
+                            'upsc_summary': ai_result['upsc_summary'],
+                            'key_points': ai_result['key_points'],
+                            'papers': ai_result['papers'],
+                            'subjects': ai_result['subjects'],
+                            'importance': ai_result['importance'],
+                            'image_url': image_url,
+                            'related_pyqs': related_pyqs
+                        }
+                        
+                        save_article(article_data)
+                        processed_count += 1
+                        print(f"🦅 Raven: Successfully archived - {entry.title}")
+                        
+                        # Be gentle with the API
+                        time.sleep(2)
+                        
+                    except Exception as inner_e:
+                        print(f"🦅 Raven: Failed to process {entry.title}: {inner_e}")
+                        
+            except Exception as e:
+                print(f"🦅 Raven: Failed to fly to {url}: {e}")
                 
-                try:
-                    # 1. Fetch Content
-                    full_content = fetch_article_content(link)
-                    if not full_content or len(full_content) < 100:
-                        full_content = entry.get('summary', '')
-                    
-                    # 2. AI Summarization
-                    ai_result = summarize_for_upsc(entry.title, full_content, link)
-                    
-                    # 3. Extract Image
-                    image_url = extract_image_from_article(link)
-                    
-                    # 4. Find PYQs
-                    related_pyqs = find_related_pyqs(
-                        ai_result['subjects'],
-                        ai_result['papers']
-                    )
-                    
-                    # 5. Save to DB
-                    article_data = {
-                        'title': entry.title,
-                        'link': link,
-                        'source': feed.feed.get('title', 'Unknown Source'),
-                        'published': entry.get('published', 'Today'),
-                        'original_summary': entry.get('summary', ''),
-                        'upsc_summary': ai_result['upsc_summary'],
-                        'key_points': ai_result['key_points'],
-                        'papers': ai_result['papers'],
-                        'subjects': ai_result['subjects'],
-                        'importance': ai_result['importance'],
-                        'image_url': image_url,
-                        'related_pyqs': related_pyqs
-                    }
-                    
-                    save_article(article_data)
-                    processed_count += 1
-                    print(f"🦅 Raven: Successfully archived - {entry.title}")
-                    
-                    # Be gentle with the API
-                    time.sleep(2)
-                    
-                except Exception as inner_e:
-                    print(f"🦅 Raven: Failed to process {entry.title}: {inner_e}")
-                    
-        except Exception as e:
-            print(f"🦅 Raven: Failed to fly to {url}: {e}")
-            
-    print(f"🦅 Raven: Mission complete. Archived {processed_count} new artifacts.")
+        print(f"🦅 Raven: Mission complete. Archived {processed_count} new artifacts.")
 
 @bp.route('/background-fetch', methods=['POST'])
 def trigger_background_fetch():
     """Trigger the background fetch process"""
-    thread = threading.Thread(target=run_background_fetch)
+    app = current_app._get_current_object()
+    thread = threading.Thread(target=run_background_fetch, args=(app,))
     thread.daemon = True
     thread.start()
     return jsonify({'success': True, 'message': 'Ravens dispatched in background'})
@@ -326,89 +328,4 @@ def add_to_anki(article_id):
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
-def run_background_fetch():
-    """Fetches and processes news articles in the background."""
-    print("Background fetch started...")
-    feeds = {
-        'munin': [
-            'https://www.thehindu.com/news/national/feeder/default.rss',
-            'https://pib.gov.in/RSS/RssFeed.aspx?ModId=2',
-            'https://indianexpress.com/section/india/feed/'
-        ],
-        'hugin': [
-            'https://www.thehindu.com/opinion/editorial/feeder/default.rss',
-            'https://www.project-syndicate.org/rss',
-            'https://indianexpress.com/section/opinion/editorials/feed/'
-        ]
-    }
 
-    all_feeds = feeds['munin'] + feeds['hugin']
-
-    for url in all_feeds:
-        try:
-            feed = feedparser.parse(url)
-            for entry in feed.entries[:10]: # Limit to 10 most recent
-                link = entry.link
-                if not article_exists(link):
-                    print(f"Processing new article: {entry.title}")
-                    try:
-                        title = entry.title
-                        source = feed.feed.get('title', 'Unknown Source')
-                        published = entry.get('published', 'Today')
-                        rss_summary = entry.get('summary', '')
-
-                        # Fetch full content
-                        full_content = fetch_article_content(link)
-                        if not full_content or len(full_content) < 100:
-                            full_content = rss_summary # Fallback
-
-                        # Get AI summary and tags
-                        ai_result = summarize_for_upsc(title, full_content, link)
-
-                        # Extract image
-                        image_url = extract_image_from_article(link)
-
-                        # Find related PYQs
-                        related_pyqs = find_related_pyqs(
-                            ai_result['subjects'],
-                            ai_result['papers']
-                        )
-
-                        # Prepare article data
-                        article_data = {
-                            'title': title,
-                            'link': link,
-                            'source': source,
-                            'published': published,
-                            'original_summary': rss_summary,
-                            'upsc_summary': ai_result['upsc_summary'],
-                            'key_points': ai_result['key_points'],
-                            'papers': ai_result['papers'],
-                            'subjects': ai_result['subjects'],
-                            'importance': ai_result['importance'],
-                            'image_url': image_url,
-                            'related_pyqs': related_pyqs
-                        }
-
-                        # Save article
-                        save_article(article_data)
-                        print(f"Successfully processed and saved: {title}")
-
-                    except Exception as e:
-                        print(f"Error processing article {link}: {e}")
-                else:
-                    print(f"Article already exists, skipping: {entry.title}")
-
-        except Exception as e:
-            print(f"Failed to fetch or parse feed {url}: {e}")
-
-    print("Background fetch finished.")
-
-
-@bp.route('/background-fetch', methods=['POST'])
-def background_fetch():
-    """Starts a background thread to fetch news."""
-    thread = threading.Thread(target=run_background_fetch)
-    thread.daemon = True
-    thread.start()
-    return jsonify({'success': True, 'message': 'Background fetch started.'})

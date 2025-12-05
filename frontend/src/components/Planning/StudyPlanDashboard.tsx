@@ -236,15 +236,21 @@ const StudyPlanDashboard: React.FC = () => {
         setLoading(true);
         try {
             // Try fetching from the new API first
-            const response = await fetch('/api/planner/current?days=365'); // Fetch 1 year
+            const today = new Date().toISOString().split('T')[0];
+            const response = await fetch(`/api/planner/current?start_date=${today}&days=365`); // Fetch 1 year
             if (response.ok) {
                 const data = await response.json();
-                setPlan(data);
+                if (data.success && Array.isArray(data.plan)) {
+                    setPlan(data.plan);
+                } else {
+                    console.error("Invalid API response format:", data);
+                    throw new Error("Invalid API response");
+                }
             } else {
-                 // Fallback to CSV if API fails (Backward Compatibility)
+                // Fallback to CSV if API fails (Backward Compatibility)
                 console.warn("API Plan fetch failed, falling back to CSV");
                 const csvResponse = await fetch('/UPSC_Scheduler.csv');
-                 if (!csvResponse.ok) {
+                if (!csvResponse.ok) {
                     throw new Error(`HTTP error! status: ${csvResponse.status}`);
                 }
                 const csvText = await csvResponse.text();
@@ -1394,23 +1400,23 @@ const StudyPlanDashboard: React.FC = () => {
             ) : activePlan.length > 0 ? (
                 <div className="plan-timeline">
                     {/* Strategos Banner */}
-                        <div className={`strategos-banner ${agentAction.toLowerCase().replace('_', '-')}`}>
-                            <div className="strategos-icon"></div>
-                            <div className="strategos-content">
-                                <span className="strategos-label">STRATEGOS AI COMMAND</span>
-                                <p>{agentSuggestion}</p>
-                            </div>
-                            {agentAction !== 'MAINTAIN_PACE' && (
-                                <button
-                                    className="strategos-action-btn"
-                                    onClick={() => executeAgentAction(agentAction)}
-                                >
-                                    {agentAction === 'SUGGEST_BREAK' ? ' Take Break' :
-                                        agentAction === 'SCHEDULE_MOCK' ? ' Schedule Mock' :
-                                            ' Acknowledge'}
-                                </button>
-                            )}
+                    <div className={`strategos-banner ${agentAction.toLowerCase().replace('_', '-')}`}>
+                        <div className="strategos-icon"></div>
+                        <div className="strategos-content">
+                            <span className="strategos-label">STRATEGOS AI COMMAND</span>
+                            <p>{agentSuggestion}</p>
                         </div>
+                        {agentAction !== 'MAINTAIN_PACE' && (
+                            <button
+                                className="strategos-action-btn"
+                                onClick={() => executeAgentAction(agentAction)}
+                            >
+                                {agentAction === 'SUGGEST_BREAK' ? ' Take Break' :
+                                    agentAction === 'SCHEDULE_MOCK' ? ' Schedule Mock' :
+                                        ' Acknowledge'}
+                            </button>
+                        )}
+                    </div>
 
                     {/* God Mode Debug Panel */}
                     {godMode && (

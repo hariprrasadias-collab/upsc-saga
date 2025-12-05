@@ -3,6 +3,7 @@
 Database operations for UPSC Current Affairs
 """
 from app.db import get_db
+import sqlite3
 import json
 from datetime import datetime
 
@@ -41,28 +42,32 @@ def article_exists(link):
 def save_article(article_data):
     """Save a new article to database"""
     conn = get_db()
-    cursor = conn.execute('''
-        INSERT INTO current_affairs (
-            title, original_link, source, published_date,
-            original_summary, upsc_summary, key_points,
-            papers, subjects, importance, image_url, related_pyqs
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (
-        article_data['title'],
-        article_data['link'],
-        article_data['source'],
-        article_data['published'],
-        article_data.get('original_summary', ''),
-        article_data.get('upsc_summary', ''),
-        json.dumps(article_data.get('key_points', [])),
-        json.dumps(article_data.get('papers', [])),
-        json.dumps(article_data.get('subjects', [])),
-        article_data.get('importance', 2),
-        article_data.get('image_url', ''),
-        json.dumps(article_data.get('related_pyqs', []))
-    ))
-    conn.commit()
-    return cursor.lastrowid
+    try:
+        cursor = conn.execute('''
+            INSERT INTO current_affairs (
+                title, original_link, source, published_date,
+                original_summary, upsc_summary, key_points,
+                papers, subjects, importance, image_url, related_pyqs
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            article_data['title'],
+            article_data['link'],
+            article_data['source'],
+            article_data['published'],
+            article_data.get('original_summary', ''),
+            article_data.get('upsc_summary', ''),
+            json.dumps(article_data.get('key_points', [])),
+            json.dumps(article_data.get('papers', [])),
+            json.dumps(article_data.get('subjects', [])),
+            article_data.get('importance', 2),
+            article_data.get('image_url', ''),
+            json.dumps(article_data.get('related_pyqs', []))
+        ))
+        conn.commit()
+        return cursor.lastrowid
+    except sqlite3.IntegrityError:
+        # Article already exists (caught by UNIQUE index)
+        return None
 
 def get_saved_articles(filters=None):
     """Get saved articles with optional filters"""

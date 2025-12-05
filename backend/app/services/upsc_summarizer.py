@@ -7,7 +7,9 @@ If Gemini fails or returns generic tags, a keyword‑based fallback is applied.
 import os
 import json
 import re
+import time
 import google.generativeai as genai
+from google.api_core import exceptions as google_exceptions
 from dotenv import load_dotenv
 
 # Load environment variables

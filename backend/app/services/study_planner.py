@@ -3,6 +3,7 @@ from datetime import timedelta
 import heapq
 import json
 import os
+from app.db import get_db
 from app.db_models.study_plan import create_new_plan, add_tasks_bulk, get_active_plan, get_tasks_for_date, get_pending_tasks_before_date, reschedule_task, init_study_plan_tables, get_future_buffer_slots, delete_task
 
 def load_books_data():
@@ -300,14 +301,37 @@ def generate_study_plan(start_date_str, force_new=False):
     return {"success": True, "plan_id": plan_id}
 
 def get_plan_for_range(start_date_str, days=30):
-    """Get plan for a date range"""
+    """Get plan for a date range (Optimized)"""
     start = datetime.datetime.strptime(start_date_str, "%Y-%m-%d").date()
-    result = []
+    end = start + timedelta(days=days)
+    end_date_str = end.isoformat()
     
+    conn = get_db()
+    plan = get_active_plan()
+    if not plan:
+        return []
+        
+    # Bulk fetch all tasks for the range
+    tasks = conn.execute('''
+        SELECT * FROM study_tasks 
+        WHERE plan_id = ? AND date >= ? AND date < ? 
+        ORDER BY date ASC, start_time ASC
+    ''', (plan['id'], start_date_str, end_date_str)).fetchall()
+    
+    # Group by date
+    tasks_by_date = {}
+    for t in tasks:
+        d = t['date']
+        if d not in tasks_by_date:
+            tasks_by_date[d] = []
+        tasks_by_date[d].append(t)
+        
+    result = []
     for i in range(days):
         date = start + timedelta(days=i)
         date_str = date.isoformat()
-        tasks = get_tasks_for_date(date_str)
+        
+        day_tasks = tasks_by_date.get(date_str, [])
         
         day_plan = {
             "date": date_str,
@@ -315,7 +339,7 @@ def get_plan_for_range(start_date_str, days=30):
             "slots": []
         }
         
-        for t in tasks:
+        for t in day_tasks:
             day_plan["slots"].append({
                 "id": t['id'],
                 "time": f"{t['start_time']} - {t['end_time']}",
