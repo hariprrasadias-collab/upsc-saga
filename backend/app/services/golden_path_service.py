@@ -1,6 +1,7 @@
 import networkx as nx
 import json
 import time
+from datetime import datetime
 
 class GoldenPathService:
     def __init__(self):
@@ -19,7 +20,7 @@ class GoldenPathService:
     def build_graph(self, user_id=1):
         """
         Constructs the Syllabus Graph dynamically.
-        Optimized to use bulk aggregation and integrate Weak Areas.
+        Optimized to use bulk aggregation and integrate Weak Areas, Trending Topics, and Retention.
         """
         G = nx.DiGraph()
         
@@ -50,11 +51,59 @@ class GoldenPathService:
             wa_rows = conn.execute('SELECT topic, priority_score FROM weak_area_analysis WHERE user_id = ?', (user_id,)).fetchall()
             for r in wa_rows: weak_areas[r['topic']] = r['priority_score']
 
+            # Fetch Recent Current Affairs (Trending Topics)
+            trending_topics = set()
+            ca_rows = conn.execute('SELECT title, content FROM current_affairs WHERE date_published > date("now", "-60 days")').fetchall()
+
+            # Create a simple keyword set from CA titles for matching
+            ca_keywords = set()
+            for r in ca_rows:
+                if r['title']:
+                    ca_keywords.update(r['title'].lower().split())
+
+            # Fetch Last Revision Date (Retention)
+            last_revised = {}
+            rev_rows = conn.execute('''
+                SELECT topic, MAX(date) as last_date
+                FROM (
+                    SELECT topic, date FROM topic_revisions
+                    UNION
+                    SELECT tags as topic, date_reviewed as date FROM flashcard_reviews
+                ) GROUP BY topic
+            ''').fetchall()
+            for r in rev_rows:
+                last_revised[r['topic']] = r['last_date']
+
+            # Fetch Mnemonics Availability
+            mnemonics_available = set()
+            mn_rows = conn.execute('SELECT DISTINCT topic FROM mnemonics_history').fetchall()
+            for r in mn_rows: mnemonics_available.add(r['topic'])
+
             # 2. Build Nodes with Dynamic Weights
             for row in topics_data:
                 topic_name = row['topic']
                 subject = row['subject'] or "General"
                 
+                # Check Trending Status (Simple substring match)
+                is_trending = False
+                topic_words = topic_name.lower().split()
+                if any(w in ca_keywords for w in topic_words if len(w) > 4): # Basic heuristic
+                    is_trending = True
+                    trending_topics.add(topic_name)
+
+                # Check Retention
+                last_date_str = last_revised.get(topic_name)
+                days_since_revision = 999
+                if last_date_str:
+                    try:
+                        last_date = datetime.strptime(last_date_str.split(' ')[0], '%Y-%m-%d')
+                        days_since_revision = (datetime.now() - last_date).days
+                    except:
+                        pass
+
+                # Check Mnemonic
+                has_mnemonic = topic_name in mnemonics_available
+
                 # Metrics
                 raw_yield = pyq_counts.get(topic_name, 0)
                 raw_effort = fc_counts.get(topic_name, 0)
@@ -64,9 +113,13 @@ class GoldenPathService:
                 yield_score = min(raw_yield * 5, 100)
                 effort_score = min(max(raw_effort * 2, 10), 100)
                 
-                # Dynamic Adjustment: Weak areas boost "Effective Yield" (High priority to fix)
+                # Dynamic Adjustment: Weak areas boost "Effective Yield"
                 weakness_multiplier = 1.0 + (weakness_score / 50.0) 
-                effective_yield = yield_score * weakness_multiplier
+
+                # Trending Boost
+                trending_multiplier = 1.2 if is_trending else 1.0
+
+                effective_yield = yield_score * weakness_multiplier * trending_multiplier
                 
                 # ROI Calculation
                 roi = effective_yield / effort_score if effort_score > 0 else 0
@@ -80,7 +133,10 @@ class GoldenPathService:
                     weakness=weakness_score,
                     roi=roi,
                     group=subject,
-                    status=row['status']
+                    status=row['status'],
+                    is_trending=is_trending,
+                    days_since_revision=days_since_revision,
+                    has_mnemonic=has_mnemonic
                 )
                 
             # 3. Define Dependencies (Edges)
@@ -249,50 +305,148 @@ class GoldenPathService:
                 
             G.nodes[node]["musk_category"] = category
 
-    def calculate_optimal_path(self, time_budget_hours):
+    def calculate_optimal_path(self, time_budget_hours, energy_level=50, filter_subject=None, filter_topic=None, mode="STANDARD"):
         """
         Finds the 'Golden Path' using a Smart Greedy approach.
+        Integrates Energy Levels, Context Filters, and Optimization Modes.
+        Modes:
+         - STANDARD: Maximize Yield/Effort (ROI).
+         - REVISION: Maximize (Yield * DaysSinceRevision) / Effort. Prioritize old but important topics.
         """
         self._calculate_potential_metrics()
         G = self.get_graph()
         if not G: return {"path": [], "total_yield": 0, "total_effort": 0, "time_budget": time_budget_hours}
 
+        # Apply Bio-Weights Logic to temporary calculations
+        def get_energy_adjusted_effort(base_effort):
+            if energy_level < 30:
+                # Low Energy: High effort tasks are more expensive
+                return base_effort * 2.0 if base_effort > 50 else base_effort
+            elif energy_level > 80:
+                # High Energy: High effort tasks are cheaper (flow state)
+                # Apply discount mainly to high-effort tasks to encourage tackling them now
+                if base_effort > 50:
+                    return base_effort * 0.5
+                return base_effort
+            return base_effort
+
+        def is_node_allowed(node_id):
+            node_data = G.nodes[node_id]
+            if filter_subject and filter_subject != 'All' and node_data.get('group') != filter_subject:
+                return False
+            if filter_topic and filter_topic != 'All' and node_data.get('label') != filter_topic:
+                return False
+            return True
+
+        # Find initial available nodes
+        # If filters are active, available nodes are those matching filter with in-degree 0 within the subgraph
+        # For simplicity, we stick to global dependencies but only pick allowed nodes.
         available_nodes = [n for n, d in G.in_degree() if d == 0]
+
+        # If filtering, we might need to include nodes that are not global roots but are "roots" in the filtered context
+        # But for dependency consistency, we should only suggest nodes whose prerequisites are met.
+        # If a filter is applied (e.g., 'History'), we should likely ignore dependencies outside of 'History'
+        # OR assume outside dependencies are irrelevant/done.
+        # Decision: If filtering by subject, we treat it as an isolated graph for now.
+        if filter_subject and filter_subject != 'All':
+             available_nodes = [n for n in G.nodes if G.nodes[n].get('group') == filter_subject]
+             # Filter out those that have parents strictly within the same subject that are not done
+             # This is a bit complex. Let's stick to the standard greedy walk but skip disallowed nodes.
+             available_nodes = [n for n, d in G.in_degree() if d == 0] # Reset to global roots
+
         completed_nodes = set()
         path = []
         current_time = 0
         
         while current_time < time_budget_hours:
             candidates = []
+
+            # Identify valid candidates from available_nodes
             for node in available_nodes:
-                effort = G.nodes[node]["effort"]
-                # Convert effort (0-100 scale) to hours? Let's assume 100 effort = 10 hours for now
-                effort_hours = effort / 10.0
+                # Check Filter
+                if not is_node_allowed(node):
+                    continue
+
+                raw_effort = G.nodes[node]["effort"]
+                adjusted_effort = get_energy_adjusted_effort(raw_effort)
+
+                # Convert effort (0-100 scale) to hours? Let's assume 100 effort = 10 hours
+                effort_hours = adjusted_effort / 10.0
+
                 if current_time + effort_hours <= time_budget_hours:
                     candidates.append(node)
             
             if not candidates:
-                break
+                # If no candidates found (maybe due to filters blocking everything available),
+                # we need to advance the graph simulation to find nested nodes that might match.
+                # In a real greedy walk, if we skip a node, we can't access its children.
+                # However, if the user only wants 'History', and 'History' nodes depend on 'Math',
+                # we are stuck.
+                # Optimization: If filter is active, we just pick from ALL nodes matching filter, ignoring dependencies?
+                # That breaks the "Golden Path" logic.
+                # Compromise: We search for *any* node matching the filter that hasn't been done.
+                if (filter_subject and filter_subject != 'All') or (filter_topic and filter_topic != 'All'):
+                     # Fallback to non-dependency search if stuck
+                     remaining_nodes = [n for n in G.nodes if n not in completed_nodes and n not in path and is_node_allowed(n)]
+                     candidates = []
+                     for node in remaining_nodes:
+                        raw_effort = G.nodes[node]["effort"]
+                        adjusted_effort = get_energy_adjusted_effort(raw_effort)
+                        effort_hours = adjusted_effort / 10.0
+                        if current_time + effort_hours <= time_budget_hours:
+                            candidates.append(node)
+
+                if not candidates:
+                    break
                 
+
+            def calculate_score(n):
+                node_data = G.nodes[n]
+                eff_yield = node_data.get("effective_yield", 0)
+                adj_effort = get_energy_adjusted_effort(node_data.get("effort", 1))
+                base_roi = eff_yield / adj_effort
+
+                if mode == "REVISION":
+                    # In Revision Mode, we boost items that haven't been revised in a long time.
+                    # Formula: ROI * log(days_since_revision + 1)
+                    # Simple linear boost for now: ROI * (1 + days/30)
+                    days = node_data.get("days_since_revision", 0)
+                    if days > 900: days = 30 # Cap for never revised items to avoid skewing too much
+
+                    # Logarithmic decay urgency curve
+                    urgency_multiplier = 1.0 + (days / 14.0) # Boost doubles every 2 weeks
+                    return base_roi * urgency_multiplier
+                else:
+                    return base_roi
+
             best_node = max(candidates, key=lambda n: (
-                G.nodes[n].get("potential_roi", 0),
-                G.nodes[n].get("roi", 0)
+                calculate_score(n),
+                G.nodes[n].get("potential_roi", 0)
             ))
             
-            path.append(G.nodes[best_node])
+            # Enrich node data with ID for the return value
+            node_data = G.nodes[best_node].copy()
+            node_data['id'] = best_node
+
+            path.append(node_data)
             completed_nodes.add(best_node)
-            current_time += (G.nodes[best_node]["effort"] / 10.0)
             
-            available_nodes.remove(best_node)
+            raw_effort = G.nodes[best_node]["effort"]
+            adjusted_effort = get_energy_adjusted_effort(raw_effort)
+            current_time += (adjusted_effort / 10.0)
+
+            if best_node in available_nodes:
+                available_nodes.remove(best_node)
             
             for successor in G.successors(best_node):
-                if all(pred in completed_nodes for pred in G.predecessors(successor)):
-                    available_nodes.append(successor)
+                if successor not in completed_nodes and all(pred in completed_nodes for pred in G.predecessors(successor)):
+                    if successor not in available_nodes:
+                        available_nodes.append(successor)
                     
         return {
             "path": path,
             "total_yield": sum(item["yield_val"] for item in path),
-            "total_effort": sum(item["effort"] for item in path),
+            "total_effort": sum(item["effort"] for item in path), # Reporting Raw Effort
             "time_budget": time_budget_hours
         }
 
