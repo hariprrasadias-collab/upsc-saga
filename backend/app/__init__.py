@@ -18,6 +18,12 @@ def create_app():
     from app.db_models.core import init_core_tables
     from app.db_models.indexes import init_indexes
     
+    # Extra modules
+    from app.db_models.flashcards import init_flashcard_tables
+    from app.db_models.answer_writing import init_answer_writing_tables
+    from app.db_models.revision import init_revision_tables
+    from app.db_models.syllabus import init_syllabus_tables
+
     with app.app_context():
         init_core_tables() # Core first (users)
         init_study_plan_tables()
