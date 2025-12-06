@@ -121,7 +121,7 @@ def summarize_for_upsc(title, content, link):
     if not GEMINI_API_KEY:
         return _simple_extraction(title, content)
     try:
-        model = genai.GenerativeModel('gemini-latest-flash')
+        model = genai.GenerativeModel('gemini-pro')
         # Send FULL content to AI (no truncation)
         prompt = f"""You are a UPSC expert analyzer. Tag articles accurately based on content.
 
