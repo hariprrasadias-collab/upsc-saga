@@ -20,12 +20,16 @@ class BrainService:
     
     def __init__(self):
         # Initialize Brain Service - Core Logic
+        # Initialize Brain Service - Core Logic
         self.api_key = os.environ.get('GEMINI_API_KEY')
+        self.is_lobotomized = False
+
         self.is_lobotomized = False
 
         if not self.api_key:
             print("⚠️ BrainService Warning: GEMINI_API_KEY not found. The Brain will be lobotomized (Mock Mode).")
             self.model = None
+            self.is_lobotomized = True
             self.is_lobotomized = True
         else:
             try:
@@ -35,6 +39,7 @@ class BrainService:
             except Exception as e:
                 print(f"BrainService Error: Failed to initialize Gemini: {e}")
                 self.model = None
+                self.is_lobotomized = True
                 self.is_lobotomized = True
             
         self.registry = SynapseRegistry.get_instance()
@@ -208,6 +213,87 @@ class BrainService:
         except Exception as e:
             print(f"Brain: Flashcard creation failed: {e}")
 
+    def _get_topic_id(self, topic_name):
+        """Helper to find topic_id from syllabus_topics."""
+        try:
+            from app.db import get_db
+            conn = get_db()
+            # Try exact match
+            row = conn.execute("SELECT id FROM syllabus_topics WHERE topic = ?", (topic_name,)).fetchone()
+            if not row:
+                # Try LIKE match
+                row = conn.execute("SELECT id FROM syllabus_topics WHERE topic LIKE ?", (f"%{topic_name}%",)).fetchone()
+            return row[0] if row else None
+        except:
+            return None
+
+    def _save_revision_note(self, topic, title, content):
+        """Save revision note to revision_cards table."""
+        try:
+            from app.db import get_db
+            topic_id = self._get_topic_id(topic)
+            if not topic_id:
+                topic_id = 0 # Default/Orphaned
+
+            conn = get_db()
+            # Generate a one-liner (first sentence)
+            one_liner = content.split('.')[0] + "." if content else "Summary"
+            conn.execute('''
+                INSERT INTO revision_cards (topic_id, title, one_liner, full_content, created_at)
+                VALUES (?, ?, ?, ?, datetime('now'))
+            ''', (topic_id, title, one_liner, content))
+            conn.commit()
+            print(f"Brain: Saved Revision Note for {topic}")
+        except Exception as e:
+            print(f"Brain: Failed to save revision note: {e}")
+
+    def _save_essay_prompt(self, topic, subject, prompt):
+        """Save essay prompt to answer_writing_prompts table."""
+        try:
+            from app.db import get_db
+            conn = get_db()
+            conn.execute('''
+                INSERT INTO answer_writing_prompts (question, subject, topic, difficulty, created_at)
+                VALUES (?, ?, ?, 'Hard', datetime('now'))
+            ''', (prompt, subject, topic))
+            conn.commit()
+            print(f"Brain: Saved Essay Prompt for {topic}")
+        except Exception as e:
+            print(f"Brain: Failed to save essay prompt: {e}")
+
+    def _save_prediction(self, topic, subject, predictions):
+        """Save predictions to foresight_predictions table."""
+        try:
+            from app.db import get_db
+            conn = get_db()
+
+            if isinstance(predictions, list):
+                for p in predictions:
+                    question = p.get('question', 'Unknown Question')
+                    p_type = p.get('type', 'MCQ')
+                    conn.execute('''
+                        INSERT INTO foresight_predictions (question, subject, topic, type, probability, created_at)
+                        VALUES (?, ?, ?, ?, 0.85, datetime('now'))
+                    ''', (question, subject, topic, p_type))
+                conn.commit()
+                print(f"Brain: Saved {len(predictions)} predictions for {topic}")
+        except Exception as e:
+            print(f"Brain: Failed to save predictions: {e}")
+
+    def _save_mnemonic(self, topic, mnemonic_text, m_type='visual'):
+        """Save mnemonic to mnemonics_history table."""
+        try:
+            from app.db import get_db
+            conn = get_db()
+            conn.execute('''
+                INSERT INTO mnemonics_history (mnemonic_text, original_text, mnemonic_type)
+                VALUES (?, ?, ?)
+            ''', (mnemonic_text, topic, m_type))
+            conn.commit()
+            print(f"Brain: Saved Mnemonic for {topic}")
+        except Exception as e:
+            print(f"Brain: Failed to save mnemonic: {e}")
+
     def process_task_completion(self, task_data: dict):
         """
         Proactively triggers Brain actions when a study task is completed.
@@ -228,10 +314,12 @@ class BrainService:
             # 2. Create Revision Notes
             explanation_res = self.execute_action("EXPLAIN_SYLLABUS_NODE", {"node": topic, "reasoning": "Task Completion Automation"})
             if explanation_res.get('success'):
+                content = explanation_res.get('explanation')
+                self._save_revision_note(topic, f"Revision Note: {topic}", content)
                 self._add_flashcard(
                     user_id, topic, subject,
                     f"Revision Note: {topic}",
-                    explanation_res.get('explanation'),
+                    content,
                     'ai_generated_summary'
                 )
 
@@ -281,6 +369,7 @@ class BrainService:
             if foresight_res.get('success'):
                 preds = foresight_res.get('data', [])
                 if preds:
+                    self._save_prediction(topic, subject, preds)
                     pred_text = "\n".join([f"- {p.get('question')} ({p.get('type')})" for p in preds])
                     self._add_flashcard(
                         user_id, topic, subject,
@@ -413,6 +502,7 @@ class BrainService:
             if essay_res.get('success'):
                 prompt_text = essay_res.get('prompt', '')
                 if prompt_text:
+                    self._save_essay_prompt(topic, subject, prompt_text)
                     self._add_flashcard(
                         user_id, topic, subject,
                         f"Essay Prompt: {topic}",
@@ -425,6 +515,7 @@ class BrainService:
             if visual_res.get('success'):
                 prompt_text = visual_res.get('prompt', '')
                 if prompt_text:
+                    self._save_mnemonic(topic, prompt_text, 'visual')
                     self._add_flashcard(
                         user_id, topic, subject,
                         f"Visual Mnemonic Prompt: {topic}",
@@ -1217,28 +1308,10 @@ class BrainService:
                     topic = payload.get('topic', '')
                     prompt = f"""
                     Identify 3-5 key geographical locations related to '{topic}' for map pointing.
-                    Return ONLY a valid JSON list. Do not use markdown formatting.
-                    Example: [{{ "name": "...", "lat": 0.0, "lon": 0.0, "reason": "..." }}]
+                    Return JSON list: [{{ "name": "...", "lat": 0.0, "lon": 0.0, "reason": "..." }}]
                     """
                     response = self.model.generate_content(prompt)
-                    text = response.text.strip()
-                    # Strip markdown code blocks if present
-                    if text.startswith("```"):
-                        text = text.split("```")[1]
-                        if text.startswith("json"):
-                            text = text[4:]
-                    text = text.strip()
-                    
-                    try:
-                        data = json.loads(text)
-                    except json.JSONDecodeError:
-                        # Fallback: Try to find list bracket
-                        start = text.find('[')
-                        end = text.rfind(']') + 1
-                        if start != -1 and end != -1:
-                            data = json.loads(text[start:end])
-                        else:
-                            data = []
+                    data = self._parse_response(response.text)
 
                     locations = []
                     if isinstance(data, list):
