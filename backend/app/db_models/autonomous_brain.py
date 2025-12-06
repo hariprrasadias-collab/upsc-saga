@@ -124,4 +124,4 @@ def init_autonomous_brain_tables():
     ''')
     
     conn.commit()
-    print("✅ Autonomous Brain tables initialized")
+    print("Autonomous Brain tables initialized")

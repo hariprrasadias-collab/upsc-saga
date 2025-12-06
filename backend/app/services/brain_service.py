@@ -20,21 +20,26 @@ class BrainService:
     
     def __init__(self):
         # Initialize Brain Service - Core Logic
+        # Initialize Brain Service - Core Logic
         self.api_key = os.environ.get('GEMINI_API_KEY')
+        self.is_lobotomized = False
+
         self.is_lobotomized = False
 
         if not self.api_key:
             print("⚠️ BrainService Warning: GEMINI_API_KEY not found. The Brain will be lobotomized (Mock Mode).")
             self.model = None
             self.is_lobotomized = True
+            self.is_lobotomized = True
         else:
             try:
                 genai.configure(api_key=self.api_key)
-                self.model = genai.GenerativeModel('gemini-flash-latest') # Using flash for speed
+                self.model = genai.GenerativeModel('gemini-pro') # Fallback to pro
                 print("BrainService Online: Connected to Gemini Cortex.")
             except Exception as e:
                 print(f"BrainService Error: Failed to initialize Gemini: {e}")
                 self.model = None
+                self.is_lobotomized = True
                 self.is_lobotomized = True
             
         self.registry = SynapseRegistry.get_instance()
@@ -102,6 +107,7 @@ class BrainService:
         try:
             from app.services.panopticon_service import PanopticonService
             panopticon = PanopticonService()
+            print(f"DEBUG: Panopticon Type: {type(panopticon)}")
             return panopticon.get_current_status()
         except Exception as e:
             print(f"Bio-Check Failed: {e}")

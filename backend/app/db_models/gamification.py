@@ -58,6 +58,6 @@ def init_gamification_tables():
             INSERT INTO challenges (title, description, type, target_metric, target_value, xp_reward, hacksilver_reward, icon)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ''', challenges)
-        print("🌱 Seeded initial challenges.")
+        print("Seeded initial challenges.")
         
     conn.commit()

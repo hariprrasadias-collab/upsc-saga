@@ -242,6 +242,29 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
         }
     };
 
+    const deleteTest = async (testId: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!window.confirm('Are you sure you want to delete this test? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            const res = await fetch(`http://localhost:5000/api/mock-tests/${testId}`, {
+                method: 'DELETE'
+            });
+
+            if (res.ok) {
+                setTests(tests.filter(t => t.id !== testId));
+            } else {
+                const err = await res.json();
+                alert(`Failed to delete test: ${err.error}`);
+            }
+        } catch (err) {
+            console.error('Error deleting test:', err);
+            alert('Error deleting test');
+        }
+    };
+
     const formatTime = (seconds: number) => {
         const hrs = Math.floor(seconds / 3600);
         const mins = Math.floor((seconds % 3600) / 60);
@@ -289,9 +312,26 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
                                     {test.difficulty || 'Medium'}
                                 </span>
                             </div>
-                            <button onClick={() => startTest(test)} className="start-btn">
-                                Start Test
-                            </button>
+                            <div className="card-actions" style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+                                <button onClick={() => startTest(test)} className="start-btn" style={{ flex: 1 }}>
+                                    Start Test
+                                </button>
+                                <button
+                                    onClick={(e) => deleteTest(test.id, e)}
+                                    className="delete-btn"
+                                    style={{
+                                        padding: '10px',
+                                        background: '#ff4757',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '8px',
+                                        cursor: 'pointer'
+                                    }}
+                                    title="Delete Test"
+                                >
+                                    🗑️
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>
