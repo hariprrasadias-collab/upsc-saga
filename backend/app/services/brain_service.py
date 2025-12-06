@@ -188,7 +188,7 @@ class BrainService:
             print(f"Brain Think Error: {e}")
             return {"response_text": f"I had a headache thinking about that. Error: {str(e)}", "actions": []}
 
-    def _add_flashcard(self, user_id, topic, subject, front, back, source):
+    def _add_flashcard(self, user_id, topic, subject, front, back, source, card_type='basic'):
         """Helper to create a deck if needed and add a flashcard."""
         try:
             from app.db import get_db
@@ -206,9 +206,9 @@ class BrainService:
                 conn.commit()
 
             conn.execute('''
-                INSERT INTO flashcards (deck_id, front, back, source)
-                VALUES (?, ?, ?, ?)
-            ''', (deck_id, front, back, source))
+                INSERT INTO flashcards (deck_id, front, back, source, card_type)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (deck_id, front, back, source, card_type))
             conn.commit()
         except Exception as e:
             print(f"Brain: Flashcard creation failed: {e}")
@@ -536,17 +536,20 @@ class BrainService:
                     )
 
             # 20. Map Work
-            if subject in ["Geography", "Environment", "International Relations"]:
+            if subject in ["Geography", "Environment", "International Relations", "History", "Ancient History", "Medieval History", "Modern History"]:
                 map_res = self.execute_action("GENERATE_MAP_WORK", {"topic": topic, "reasoning": "Task Completion Automation"})
                 if map_res.get('success'):
                     locations = map_res.get('locations', [])
                     if locations:
-                        content = "\n".join([f"- {l['name']} ({l.get('lat',0)}, {l.get('lon',0)}): {l['reason']}" for l in locations])
+                        # Serialize the locations list to JSON for the 'back' content
+                        # Front card will instruct the user to check map work
+                        content = json.dumps(locations)
                         self._add_flashcard(
                             user_id, topic, subject,
-                            f"Map Work: {topic}",
+                            f"Map Work Challenge: {topic}",
                             content,
-                            'ai_generated_mapwork'
+                            'ai_generated_mapwork',
+                            card_type='map_work'
                         )
 
             # 21. Badge Unlocking
@@ -744,7 +747,25 @@ class BrainService:
             elif action_type == "GENERATE_ROLEPLAY_SCENARIO":
                 return {"success": True, "scenario": "Mock Roleplay Scenario"}
             elif action_type == "GENERATE_MAP_WORK":
-                return {"success": True, "locations": []}
+                return {
+                    "success": True,
+                    "locations": [
+                        {
+                            "name": "Pataliputra",
+                            "lat": 25.61,
+                            "lon": 85.14,
+                            "reason": "Capital of Mauryan Empire (Mock)",
+                            "question": "Locate the capital of the Mauryan Empire."
+                        },
+                        {
+                            "name": "Taxila",
+                            "lat": 33.74,
+                            "lon": 72.78,
+                            "reason": "Ancient centre of learning (Mock)",
+                            "question": "Locate the ancient university town of Taxila."
+                        }
+                    ]
+                }
             elif action_type == "GENERATE_TOPIC_LINKAGES":
                 return {"success": True, "linkages": ["Mock Linkage 1"]}
             elif action_type == "GENERATE_CHEAT_SHEET":
@@ -1308,7 +1329,14 @@ class BrainService:
                     topic = payload.get('topic', '')
                     prompt = f"""
                     Identify 3-5 key geographical locations related to '{topic}' for map pointing.
-                    Return JSON list: [{{ "name": "...", "lat": 0.0, "lon": 0.0, "reason": "..." }}]
+                    Return JSON list: [{{
+                        "name": "Name of Place",
+                        "lat": 0.0,
+                        "lon": 0.0,
+                        "reason": "Historical/Geographical significance",
+                        "question": "Question to ask user to find this place (e.g. 'Locate the capital of...')"
+                    }}]
+                    Ensure coordinates are accurate.
                     """
                     response = self.model.generate_content(prompt)
                     data = self._parse_response(response.text)
