@@ -47,6 +47,7 @@ const Sidebar: React.FC = () => {
       items: [
         { id: 'study-plan', label: 'Study Plan', icon: '📅' },
         { id: 'war-map', label: 'War Map', icon: '🗓️' },
+        { id: 'triangulation-history', label: 'War Room Archives', icon: '⚔️' },
         { id: 'syllabus', label: 'Syllabus', icon: '🧭' },
         { id: 'quests', label: 'Quests', icon: '📜' },
         { id: 'revision-cards', label: 'Revision Cards', icon: '⚡' },
@@ -64,6 +65,7 @@ const Sidebar: React.FC = () => {
         { id: 'dojo', label: 'Anki Dojo', icon: '🥋' },
         { id: 'answer-writing', label: 'Answer Writing', icon: '✍️' },
         { id: 'scribe', label: 'The Scribe (AI)', icon: '📜' },
+        { id: 'socratic-history', label: 'Socratic Archives', icon: '🏛️' },
         { id: 'mock-tests', label: 'Mock Tests', icon: '📋' },
         { id: 'arena', label: 'Boss Arena', icon: '⚔️' },
         { id: 'essay', label: 'Essay Workshop', icon: '✍️' },
@@ -75,6 +77,7 @@ const Sidebar: React.FC = () => {
       title: '📚 Knowledge',
       items: [
         { id: 'mimir', label: 'Mimir (AI)', icon: '🧙‍♂️' },
+        { id: 'brain-vault', label: 'Brain Vault', icon: '🧠' },
         { id: 'flashcards', label: 'Flashcards', icon: '🎴' },
         { id: 'seer', label: 'The Seer', icon: '🔮' },
         { id: 'ravens', label: 'The Ravens', icon: '🐦' },

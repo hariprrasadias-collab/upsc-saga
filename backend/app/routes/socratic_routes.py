@@ -19,3 +19,14 @@ def debate_turn():
     except Exception as e:
         print(f"Route Error: {e}")
         return jsonify({'error': str(e)}), 500
+
+@socratic_bp.route('/history', methods=['GET'])
+def get_history():
+    try:
+        from app.db import get_db
+        conn = get_db()
+        limit = request.args.get('limit', 20)
+        rows = conn.execute('SELECT * FROM socratic_conversations ORDER BY created_at DESC LIMIT ?', (limit,)).fetchall()
+        return jsonify({'success': True, 'data': [dict(row) for row in rows]})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

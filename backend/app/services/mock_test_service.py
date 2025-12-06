@@ -63,7 +63,7 @@ class MockTestService:
             return {"success": False, "error": "API Key missing"}
             
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-flash-latest')
+        model = genai.GenerativeModel('gemini-2.0-flash-001')
         
         # Handle "Weak Areas" special case
         if topic.lower() == "weak areas":
@@ -109,6 +109,12 @@ class MockTestService:
         
         try:
             response = model.generate_content(prompt)
+            
+            # Safety Check
+            if not response.parts:
+                print("❌ Mock Test Error: Gemini returned an empty response (Safety Filter triggered?)")
+                return {"success": False, "error": "AI Safety Filter triggered. Please try a different topic."}
+                
             text = response.text.strip()
             
             # Robust JSON extraction

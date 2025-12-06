@@ -53,6 +53,9 @@ const Foresight = lazy(() => import('./components/Foresight/Foresight'));
 const MorningBriefing = lazy(() => import('./components/NightWatchman/MorningBriefing'));
 const Panopticon = lazy(() => import('./components/Panopticon/Panopticon'));
 const GoldenPath = lazy(() => import('./components/GoldenPath/GoldenPath'));
+const SocraticHistory = lazy(() => import('./components/Socratic/SocraticHistory'));
+const BrainVault = lazy(() => import('./components/Brain/BrainVault'));
+const TriangulationHistory = lazy(() => import('./components/WarMap/TriangulationHistory'));
 
 function App() {
   const {
@@ -170,6 +173,9 @@ function App() {
                   {currentTab === 'golden-path' && <GoldenPath />}
                   {currentTab === 'revision-center' && <RevisionCenter />}
                   {currentTab === 'timebox' && <TimeBoxing />}
+                  {currentTab === 'socratic-history' && <SocraticHistory />}
+                  {currentTab === 'brain-vault' && <BrainVault />}
+                  {currentTab === 'triangulation-history' && <TriangulationHistory />}
                 </>
               )}
 
@@ -190,6 +196,9 @@ function App() {
                 <Route path="/panopticon" element={<Panopticon />} />
                 <Route path="/neural-hash" element={<NeuralHash />} />
                 <Route path="/golden-path" element={<GoldenPath />} />
+                <Route path="/socratic-history" element={<SocraticHistory />} />
+                <Route path="/brain-vault" element={<BrainVault />} />
+                <Route path="/triangulation-history" element={<TriangulationHistory />} />
 
                 {/* Brain Navigation Routes */}
                 <Route path="/mock-tests" element={<MockTests onTaskCompleted={refreshDashboard} />} />

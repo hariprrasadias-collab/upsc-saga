@@ -121,7 +121,7 @@ def summarize_for_upsc(title, content, link):
     if not GEMINI_API_KEY:
         return _simple_extraction(title, content)
     try:
-        model = genai.GenerativeModel('gemini-pro')
+        model = genai.GenerativeModel('gemini-2.0-flash-001')
         # Send FULL content to AI (no truncation)
         prompt = f"""You are a UPSC expert analyzer. Tag articles accurately based on content.
 
@@ -365,7 +365,7 @@ SUMMARY:"""
             print("ERROR: GEMINI_API_KEY not configured in environment")
             return f"⚠️ AI service not configured. Please add GEMINI_API_KEY to backend/.env file."
         
-        model = genai.GenerativeModel('gemini-pro')  # Using stable latest version
+        model = genai.GenerativeModel('gemini-2.0-flash-001')  # Using stable latest version
         # response = model.generate_content(prompt)
         response = retry_with_backoff(model.generate_content, prompt)
         one_liner = get_gemini_text(response)
@@ -410,7 +410,7 @@ Requirements:
 MNEMONIC:"""
 
     try:
-        model = genai.GenerativeModel('gemini-pro')
+        model = genai.GenerativeModel('gemini-2.0-flash-001')
         # response = model.generate_content(prompt)
         response = retry_with_backoff(model.generate_content, prompt)
         mnemonic = get_gemini_text(response)

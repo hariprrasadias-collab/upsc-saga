@@ -23,6 +23,11 @@ def create_app():
         init_study_plan_tables()
         init_autonomous_brain_tables()
         init_gamification_tables()
+        
+        # Initialize Automation Tables (Socratic, Triangulation, etc.)
+        from app.db_models.automation_storage import init_automation_tables
+        init_automation_tables()
+        
         init_indexes() # Ensure performance indexes
 
     # Import blueprints
@@ -100,6 +105,9 @@ def create_app():
 
     from app.routes.autonomy_routes import autonomy_bp
     app.register_blueprint(autonomy_bp, url_prefix='/api/autonomy')
+
+    from app.routes.automation_routes import automation_bp
+    app.register_blueprint(automation_bp, url_prefix='/api/automation')
 
     from app.routes.mind_palace import mind_palace_bp
     app.register_blueprint(mind_palace_bp, url_prefix='/api/mind_palace')

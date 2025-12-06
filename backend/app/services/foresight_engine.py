@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import json
 import re
+from app.db_models.automation_storage import save_foresight_prediction
 
 load_dotenv()
 
@@ -28,7 +29,7 @@ class ForesightEngine:
         else:
             try:
                 genai.configure(api_key=self.api_key)
-                self.model = genai.GenerativeModel('gemini-latest-flash')
+                self.model = genai.GenerativeModel('gemini-2.0-flash-001')
                 print("🔮 ForesightEngine Online: Oracle Activated")
             except Exception as e:
                 print(f"❌ ForesightEngine Error: {e}")
@@ -68,6 +69,13 @@ class ForesightEngine:
             topic=topic
         )
         
+        # 4. Save predictions to DB
+        for pred in predictions:
+            try:
+                save_foresight_prediction(pred)
+            except Exception as e:
+                print(f"Failed to save prediction: {e}")
+
         return predictions
     
     def _analyze_pyq_patterns(self, subject: str) -> str:

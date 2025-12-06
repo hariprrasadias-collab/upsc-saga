@@ -8,6 +8,11 @@ from app.services.synapse_registry import SynapseRegistry
 from app.services.autonomy_manager import autonomy_manager
 from app.services.syllabus_tracker import SyllabusTracker
 from app.services.ab_tester import ab_tester
+from app.db_models.automation_storage import (
+    save_socratic_dialogue, save_triangulation, 
+    save_foresight_prediction, save_ai_content
+)
+from app.db_models.neural_hash import save_neural_hash_log
 
 load_dotenv()
 
@@ -30,7 +35,7 @@ class BrainService:
         else:
             try:
                 genai.configure(api_key=self.api_key)
-                self.model = genai.GenerativeModel('gemini-pro') # Fallback to pro
+                self.model = genai.GenerativeModel('gemini-2.0-flash-001') # Fallback to pro
                 print("BrainService Online: Connected to Gemini Cortex.")
             except Exception as e:
                 print(f"BrainService Error: Failed to initialize Gemini: {e}")
@@ -100,9 +105,7 @@ class BrainService:
         """
         # Real Panopticon Integration
         try:
-            from app.services.panopticon_service import PanopticonService
-            panopticon = PanopticonService()
-            print(f"DEBUG: Panopticon Type: {type(panopticon)}")
+            from app.services.panopticon_service import panopticon
             return panopticon.get_current_status()
         except Exception as e:
             print(f"Bio-Check Failed: {e}")
@@ -331,6 +334,7 @@ class BrainService:
                     socratic_res.get('dialogue'),
                     'ai_generated_socratic'
                 )
+                save_socratic_dialogue(user_id, topic, socratic_res.get('dialogue'))
 
             # 12. Triangulation Analysis
             triangulation_res = self.execute_action("TRIANGULATE_TOPIC", {"topic": topic, "reasoning": "Task Completion Automation"})
@@ -346,6 +350,7 @@ class BrainService:
                     content,
                     'ai_generated_triangulation'
                 )
+                save_triangulation(topic, synthesis, data.get('way_forward', {}))
 
             # 13. Neural Hash Decoding
             synthesis_text = ""
@@ -366,6 +371,7 @@ class BrainService:
                     content,
                     'ai_generated_neural_hash'
                 )
+                save_neural_hash_log(nh_text, "upsc_topic", data)
 
             # 14. Mistake Pattern Detection
             pitfall_res = self.execute_action("FIND_COMMON_PITFALLS", {"topic": topic, "subject": subject, "reasoning": "Task Completion Automation"})
@@ -379,6 +385,7 @@ class BrainService:
                         content,
                         'ai_generated_pitfalls'
                     )
+                    save_ai_content('pitfalls', topic, content, {'subject': subject})
 
             # 15. Podcast Script Generation
             podcast_res = self.execute_action("GENERATE_PODCAST_SCRIPT", {"topic": topic, "reasoning": "Task Completion Automation"})
@@ -389,6 +396,7 @@ class BrainService:
                     podcast_res.get('script'),
                     'ai_generated_podcast'
                 )
+                save_ai_content('podcast', topic, podcast_res.get('script'))
 
             # 16. Feynman Challenge
             try:
@@ -419,6 +427,7 @@ class BrainService:
                         prompt_text,
                         'ai_generated_essay'
                     )
+                    save_ai_content('essay', topic, prompt_text, {'subject': subject})
 
             # 18. Visual Mnemonic Prompt
             visual_res = self.execute_action("GENERATE_VISUAL_PROMPT", {"topic": topic, "reasoning": "Task Completion Automation"})
@@ -431,6 +440,7 @@ class BrainService:
                         prompt_text,
                         'ai_generated_visual'
                     )
+                    save_ai_content('visual_prompt', topic, prompt_text)
 
             # 19. Roleplay Scenario
             roleplay_res = self.execute_action("GENERATE_ROLEPLAY_SCENARIO", {"topic": topic, "reasoning": "Task Completion Automation"})
@@ -443,6 +453,7 @@ class BrainService:
                         scenario_text,
                         'ai_generated_roleplay'
                     )
+                    save_ai_content('roleplay', topic, scenario_text)
 
             # 20. Map Work
             if subject in ["Geography", "Environment", "International Relations"]:
@@ -457,6 +468,7 @@ class BrainService:
                             content,
                             'ai_generated_mapwork'
                         )
+                        save_ai_content('map_work', topic, content, {'locations': locations})
 
             # 21. Badge Unlocking
             try:
@@ -485,6 +497,7 @@ class BrainService:
                                 content,
                                 'ai_generated_linkages'
                             )
+                            save_ai_content('topic_linkages', topic, content, {'linkages': linkages})
             except Exception as link_e:
                 print(f"Brain: Linkage Generation Failed: {link_e}")
 
@@ -497,6 +510,7 @@ class BrainService:
                     cheat_res.get('content'),
                     'ai_generated_cheatsheet'
                 )
+                save_ai_content('cheat_sheet', topic, cheat_res.get('content'))
 
             # 25. Quote & Data Bank (Mains Fodder)
             fodder_res = self.execute_action("GENERATE_QUOTE_BANK", {"topic": topic, "reasoning": "Task Completion Automation"})
@@ -508,6 +522,7 @@ class BrainService:
                     content,
                     'ai_generated_fodder'
                 )
+                save_ai_content('quote_bank', topic, content)
 
             # 26. Timeline Generation (History)
             if subject == 'History':
@@ -519,6 +534,7 @@ class BrainService:
                         timeline_res.get('timeline'),
                         'ai_generated_timeline'
                     )
+                    save_ai_content('timeline', topic, timeline_res.get('timeline'))
 
             # 27. Ethics Dilemma (Ethics/Polity)
             if subject in ['Ethics', 'Polity', 'Governance', 'Internal Security']:
@@ -530,6 +546,7 @@ class BrainService:
                         dilemma_res.get('dilemma'),
                         'ai_generated_dilemma'
                     )
+                    save_ai_content('ethics_dilemma', topic, dilemma_res.get('dilemma'))
 
             # 28. ELI5 (Simplification)
             eli5_res = self.execute_action("GENERATE_ELI5", {"topic": topic, "reasoning": "Task Completion Automation"})
@@ -540,6 +557,7 @@ class BrainService:
                     eli5_res.get('explanation'),
                     'ai_generated_eli5'
                 )
+                save_ai_content('eli5', topic, eli5_res.get('explanation'))
 
             # 29. Check for Book Completion -> Trigger Boss Fight
             # Load books data to identify if a book is completed
@@ -1147,6 +1165,7 @@ class BrainService:
                     prompt = f"""
                     Write a short, engaging podcast script (2 hosts: 'Expert' and 'Curious Student') explaining '{topic}'.
                     Keep it conversational, simple, and use analogies. Duration: 2 minutes reading time.
+                    Start directly with the script. Do NOT say "Here is a script".
                     """
                     response = self.model.generate_content(prompt)
                     result = {
@@ -1165,6 +1184,7 @@ class BrainService:
                     Create a philosophical or analytical UPSC Mains Essay Prompt based on '{topic}' ({subject}).
                     Connect it to a broader theme (e.g., Democracy, Justice, Environment).
                     Provide the prompt statement and a 1-line 'Thesis' hint.
+                    Return ONLY the prompt and thesis. Do not include "Here is a prompt...".
                     """
                     response = self.model.generate_content(prompt)
                     result = {
@@ -1182,6 +1202,7 @@ class BrainService:
                     Create a detailed text-to-image prompt (for Stable Diffusion/Midjourney) that visually represents the concept of '{topic}'.
                     Describe the scene, style, lighting, and symbolic elements.
                     Example: "A hyper-realistic marble statue of Justice wearing a blindfold, holding a constitution, dramatic lighting..."
+                    Return ONLY the raw prompt text. Do NOT include any intro/outro.
                     """
                     response = self.model.generate_content(prompt)
                     result = {
@@ -1202,6 +1223,7 @@ class BrainService:
                     2. The Stakeholders
                     3. The Dilemma
                     4. Decision Points (Options A, B, C)
+                    Start directly with "Situation:". Do NOT include "Here is a scenario".
                     """
                     response = self.model.generate_content(prompt)
                     result = {
@@ -1334,6 +1356,7 @@ class BrainService:
                     prompt = f"""
                     Create a chronological timeline of key events related to '{topic}'.
                     Format: Year - Event. Keep it concise.
+                    Start directly with the first event. No intro text.
                     """
                     response = self.model.generate_content(prompt)
                     result = {
@@ -1350,6 +1373,7 @@ class BrainService:
                     prompt = f"""
                     Create a realistic ethical dilemma or case study related to '{topic}' for a civil servant.
                     End with a question: "What would you do?"
+                    Start directly with the Case Study. No intro text.
                     """
                     response = self.model.generate_content(prompt)
                     result = {
@@ -1366,6 +1390,7 @@ class BrainService:
                     prompt = f"""
                     Explain the concept of '{topic}' as if I were a 5-year-old (ELI5).
                     Use simple analogies and simple language.
+                    Start directly with the explanation. Do NOT say "Okay" or "Here is".
                     """
                     response = self.model.generate_content(prompt)
                     result = {

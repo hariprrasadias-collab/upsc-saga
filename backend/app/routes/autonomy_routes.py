@@ -6,7 +6,7 @@ import json
 from app.services.autonomy_manager import autonomy_manager
 from app.services.outcome_tracker import outcome_tracker
 
-autonomy_bp = Blueprint('autonomy', __name__)
+autonomy_bp = Blueprint('autonomy_core', __name__)
 
 @autonomy_bp.route('/settings', methods=['GET'])
 def get_autonomy_settings():

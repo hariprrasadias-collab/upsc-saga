@@ -19,7 +19,7 @@ class NightWatchman:
         if self.api_key:
             try:
                 genai.configure(api_key=self.api_key)
-                self.model = genai.GenerativeModel('gemini-pro')
+                self.model = genai.GenerativeModel('gemini-2.0-flash-001')
                 print("🦉 Night Watchman: Vision Online (Model Loaded)")
             except Exception as e:
                 print(f"Night Watchman Vision Error: {e}")
