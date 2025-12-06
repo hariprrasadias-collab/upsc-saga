@@ -31,13 +31,8 @@ def import_csv():
     with open(CSV_PATH, 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for row in reader:
-            if row['Date'] and row['Date'] != 'Date':
-                try:
-                    # Validate format
-                    datetime.strptime(row['Date'], '%Y-%m-%d')
-                    dates.append(row['Date'])
-                except ValueError:
-                    pass
+            if row['Date']:
+                dates.append(row['Date'])
     
     if not dates:
         print("Error: No data found in CSV.")

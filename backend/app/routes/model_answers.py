@@ -262,7 +262,7 @@ def search_model_answers():
     
     # AI-powered search
     try:
-        model = genai.GenerativeModel('gemini-pro')
+        model = genai.GenerativeModel('gemini-1.5-flash')
         
         # Get all model answers
         conn = get_db()

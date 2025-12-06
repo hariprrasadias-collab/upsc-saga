@@ -96,8 +96,8 @@ def run_background_fetch(app):
                         processed_count += 1
                         print(f"🦅 Raven: Successfully archived - {entry.title}")
                         
-                        # Be gentle with the API (10 RPM limit = 6s delay minimum, using 10s to be safe)
-                        time.sleep(10)
+                        # Be gentle with the API
+                        time.sleep(2)
                         
                     except Exception as inner_e:
                         print(f"🦅 Raven: Failed to process {entry.title}: {inner_e}")
