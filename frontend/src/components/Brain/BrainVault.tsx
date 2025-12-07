@@ -96,7 +96,7 @@ const BrainVault: React.FC = () => {
                 return <PodcastPlayer content={item.content} title={item.topic} />;
             case 'roleplay':
             case 'socratic':
-                return <ChatInterface content={item.content} />;
+                return <ChatInterface content={item.content} topic={item.topic} />;
             case 'visual_prompt':
                 return <VisualPromptRenderer content={item.content} />;
             case 'essay':
