@@ -2,7 +2,14 @@ Flask==3.0.0
 Flask-CORS==4.0.0
 feedparser==6.0.10
 requests==2.31.0
-google-auth
+google-auth==2.15.0
 google-auth-oauthlib
 google-auth-httplib2
 google-api-python-client
+google-generativeai==0.8.5
+python-dotenv==1.0.0
+cachetools==5.3.3
+networkx
+scipy
+numpy
+thefuzz

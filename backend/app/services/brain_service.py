@@ -1,9 +1,9 @@
-import google.generativeai as genai
 import os
 import json
 import traceback
 from datetime import datetime
 from dotenv import load_dotenv
+from app.services.model_manager import model_manager
 from app.services.synapse_registry import SynapseRegistry
 from app.services.autonomy_manager import autonomy_manager
 from app.services.syllabus_tracker import SyllabusTracker
@@ -30,16 +30,12 @@ class BrainService:
 
         if not self.api_key:
             print("⚠️ BrainService Warning: GEMINI_API_KEY not found. The Brain will be lobotomized (Mock Mode).")
-            self.model = None
             self.is_lobotomized = True
         else:
-            try:
-                genai.configure(api_key=self.api_key)
-                self.model = genai.GenerativeModel('gemini-2.0-flash-001') # Fallback to pro
-                print("BrainService Online: Connected to Gemini Cortex.")
-            except Exception as e:
-                print(f"BrainService Error: Failed to initialize Gemini: {e}")
-                self.model = None
+            if model_manager.is_configured:
+                print("BrainService Online: Connected to Gemini Cortex via ModelManager.")
+            else:
+                print("BrainService Warning: ModelManager not configured.")
                 self.is_lobotomized = True
             
         self.registry = SynapseRegistry.get_instance()
@@ -115,8 +111,8 @@ class BrainService:
         """
         Core reasoning loop. Optimized for speed using parallel processing and caching.
         """
-        if not self.model:
-            return {"response_text": "I am offline. Please check my API key.", "actions": []}
+        if self.is_lobotomized:
+            return {"response_text": "I am offline (Lobotomized). Please check my API key.", "actions": []}
 
         # 0. Fast Path (Reflexes)
         reflex_response = self._check_reflexes(user_input)
@@ -180,7 +176,7 @@ class BrainService:
         """
         
         try:
-            response = self.model.generate_content(prompt)
+            response = model_manager.generate_content(prompt)
             return self._parse_response(response.text)
         except Exception as e:
             print(f"Brain Think Error: {e}")
@@ -920,7 +916,7 @@ class BrainService:
                 try:
                     question_text = payload.get('question', '')
                     analysis_prompt = f"Analyze this UPSC Question: '{question_text}'. Break it down into Key Demand, Structure, and Keywords."
-                    response = self.model.generate_content(analysis_prompt)
+                    response = model_manager.generate_content(analysis_prompt)
                     result = {"success": True, "message": "Analysis Complete", "analysis": response.text}
                 except Exception as e:
                     result = {"success": False, "message": f"Analysis Failed: {str(e)}"}
@@ -973,7 +969,7 @@ class BrainService:
                         transcript += f"{speaker}: {text}\n"
                         
                     analysis_prompt = f"Analyze this Socratic Debate:\n{transcript}\nProvide: 1. Summary 2. Winner 3. Missing points."
-                    response = self.model.generate_content(analysis_prompt)
+                    response = model_manager.generate_content(analysis_prompt)
                     result = {"success": True, "message": "Debate Analysis Complete.", "analysis": response.text}
                 except Exception as e:
                     result = {"success": False, "message": f"Analysis Failed: {str(e)}"}
@@ -989,7 +985,7 @@ class BrainService:
                     location_id = cursor.lastrowid
                     
                     brainstorm_prompt = f"Generate 5 key concepts for '{topic}' to store in a Mind Palace. Return JSON: [{{'title': '...', 'content': '...', 'icon': '...'}}]"
-                    response = self.model.generate_content(brainstorm_prompt)
+                    response = model_manager.generate_content(brainstorm_prompt)
                     artifacts_data = self._parse_response(response.text)
                     
                     if isinstance(artifacts_data, list):
@@ -1014,7 +1010,7 @@ class BrainService:
                     topics_list = [{"id": t['id'], "topic": t['topic'], "subject": t['subject']} for t in topics]
                     
                     prioritize_prompt = f"From this list: {json.dumps(topics_list[:50])}, identify Top 5 High Yield topics. Return JSON: {{ 'priority_ids': [1, 2...] }}"
-                    response = self.model.generate_content(prioritize_prompt)
+                    response = model_manager.generate_content(prioritize_prompt)
                     data = self._parse_response(response.text)
                     priority_ids = data.get('priority_ids', [])
                     
@@ -1073,7 +1069,7 @@ class BrainService:
                     
                     Format as a concise strategic briefing.
                     """
-                    response = self.model.generate_content(analysis_prompt)
+                    response = model_manager.generate_content(analysis_prompt)
                     result = {
                         "success": True, 
                         "message": "Trend Analysis Complete.",
@@ -1095,7 +1091,7 @@ class BrainService:
                     
                     Keep it concise (under 200 words).
                     """
-                    response = self.model.generate_content(explanation_prompt)
+                    response = model_manager.generate_content(explanation_prompt)
                     result = {
                         "success": True, 
                         "message": "Explanation Generated.",
@@ -1116,7 +1112,7 @@ class BrainService:
                     Suggest 1 specific, actionable biohack or protocol to improve performance right now.
                     Keep it scientific but concise.
                     """
-                    response = self.model.generate_content(bio_prompt)
+                    response = model_manager.generate_content(bio_prompt)
                     result = {
                         "success": True, 
                         "message": "Biohack Generated.",
@@ -1142,7 +1138,7 @@ class BrainService:
                     - complexity_score (1-10)
                     - relevance_score (1-10)
                     """
-                    response = self.model.generate_content(decode_prompt)
+                    response = model_manager.generate_content(decode_prompt)
                     decoded_data = self._parse_response(response.text)
                     
                     result = {
@@ -1200,7 +1196,7 @@ class BrainService:
                     
                     Recommend 1 item to buy and explain why in character as Brok (the dwarf blacksmith).
                     """
-                    response = self.model.generate_content(recommend_prompt)
+                    response = model_manager.generate_content(recommend_prompt)
                     result = {
                         "success": True,
                         "message": "Brok has spoken.",
@@ -1231,7 +1227,7 @@ class BrainService:
                     
                     **Goal:** Make it feel like I'm eavesdropping on two smart friends at a cafe.
                     """
-                    response = self.model.generate_content(prompt)
+                    response = model_manager.generate_content(prompt)
                     result = {
                         "success": True,
                         "message": "Podcast Script Generated.",
@@ -1267,7 +1263,7 @@ class BrainService:
                     Provide the prompt statement and a 1-line 'Thesis' hint.
                     Return ONLY the prompt and thesis. Do not include "Here is a prompt...".
                     """
-                    response = self.model.generate_content(prompt)
+                    response = model_manager.generate_content(prompt)
                     result = {
                         "success": True,
                         "message": "Essay Prompt Generated.",
@@ -1285,7 +1281,7 @@ class BrainService:
                     Example: "A hyper-realistic marble statue of Justice wearing a blindfold, holding a constitution, dramatic lighting..."
                     Return ONLY the raw prompt text. Do NOT include any intro/outro.
                     """
-                    response = self.model.generate_content(prompt)
+                    response = model_manager.generate_content(prompt)
                     result = {
                         "success": True,
                         "message": "Visual Prompt Generated.",
@@ -1306,7 +1302,7 @@ class BrainService:
                     4. Decision Points (Options A, B, C)
                     Start directly with "Situation:". Do NOT include "Here is a scenario".
                     """
-                    response = self.model.generate_content(prompt)
+                    response = model_manager.generate_content(prompt)
                     result = {
                         "success": True,
                         "message": "Roleplay Scenario Generated.",
@@ -1329,7 +1325,7 @@ class BrainService:
                     }}]
                     Ensure coordinates are accurate.
                     """
-                    response = self.model.generate_content(prompt)
+                    response = model_manager.generate_content(prompt)
                     data = self._parse_response(response.text)
 
                     locations = []
@@ -1353,7 +1349,7 @@ class BrainService:
                     Explain the connection in 1 sentence per topic.
                     Example: "Monsoon impacts Inflation via food prices."
                     """
-                    response = self.model.generate_content(prompt)
+                    response = model_manager.generate_content(prompt)
                     # Simple text split by newline
                     linkages = [line.strip() for line in response.text.strip().split('\n') if line.strip()]
 
@@ -1386,7 +1382,7 @@ class BrainService:
                     }}
                     Ensure content is concise Markdown. For the concept_map, provide ONLY the valid Mermaid code string. For quiz, ensure valid JSON string in content field.
                     """
-                    response = self.model.generate_content(prompt)
+                    response = model_manager.generate_content(prompt)
                     # Use _parse_response to handle JSON extraction safely
                     json_content = self._parse_response(response.text)
 
@@ -1408,7 +1404,7 @@ class BrainService:
                     Quotes: ...
                     Data: ...
                     """
-                    response = self.model.generate_content(prompt)
+                    response = model_manager.generate_content(prompt)
                     # Simple splitting to separate quotes and data is hard without structured output
                     # Just return full text
                     text = response.text
@@ -1441,7 +1437,7 @@ class BrainService:
                     Format: Year - Event. Keep it concise.
                     Start directly with the first event. No intro text.
                     """
-                    response = self.model.generate_content(prompt)
+                    response = model_manager.generate_content(prompt)
                     result = {
                         "success": True,
                         "message": "Timeline Generated.",
@@ -1458,7 +1454,7 @@ class BrainService:
                     End with a question: "What would you do?"
                     Start directly with the Case Study. No intro text.
                     """
-                    response = self.model.generate_content(prompt)
+                    response = model_manager.generate_content(prompt)
                     result = {
                         "success": True,
                         "message": "Dilemma Generated.",
@@ -1487,22 +1483,7 @@ class BrainService:
                     }}
                     Do NOT include markdown formatting like ```json ... ```, just the raw JSON.
                     """
-                    response = self.model.generate_content(prompt)
-                    data = self._parse_response(response.text)
-
-                    # Validation: Ensure it is a dict
-                    if not isinstance(data, dict):
-                        # Fallback
-                        data = {
-                            "eli5": response.text,
-                            "eli15": "",
-                            "eli_expert": "",
-                            "analogy": "",
-                            "real_world_example": "",
-                            "visual_analogy_prompt": "",
-                            "quiz": []
-                        }
-
+                    response = model_manager.generate_content(prompt)
                     result = {
                         "success": True,
                         "message": "ELI5 Generated.",

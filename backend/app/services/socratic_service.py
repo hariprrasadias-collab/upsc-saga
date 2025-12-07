@@ -4,12 +4,11 @@ import json
 import random
 import time
 from dotenv import load_dotenv
+from app.services.model_manager import model_manager
 
 load_dotenv()
 
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
 
 AGENTS = {
     'skeptic': {
@@ -50,13 +49,6 @@ AGENTS = {
     }
 }
 
-def get_model():
-    """Returns the best available model with fallback."""
-    try:
-        return genai.GenerativeModel('gemini-2.0-flash-001')
-    except:
-        return genai.GenerativeModel('gemini-2.0-flash-001')
-
 def generate_debate_turn(topic, history, user_input=None):
     if not GEMINI_API_KEY:
         return {
@@ -67,7 +59,7 @@ def generate_debate_turn(topic, history, user_input=None):
             "fallacies": []
         }
 
-    model = get_model()
+    # model = get_model() # Removed in favor of model_manager
     
     # 1. Context Construction
     context_str = ""
@@ -108,7 +100,7 @@ def generate_debate_turn(topic, history, user_input=None):
     """
     
     try:
-        mod_response = model.generate_content(moderator_prompt)
+        mod_response = model_manager.generate_content(moderator_prompt)
         text = mod_response.text.replace('```json', '').replace('```', '').strip()
         start = text.find('{')
         end = text.rfind('}')
@@ -160,7 +152,7 @@ def generate_debate_turn(topic, history, user_input=None):
     """
 
     try:
-        response = model.generate_content(agent_prompt)
+        response = model_manager.generate_content(agent_prompt)
         text = response.text.strip()
         try:
             start_idx = text.find('{')
@@ -207,13 +199,13 @@ def generate_autonomous_debate(topic, turns=6):
     history = []
 
     try:
-        model = get_model()
+        # model = get_model()
         starters = ['idealist', 'iconoclast', 'strategist', 'sage']
         starter_id = random.choice(starters)
         starter_agent = AGENTS[starter_id]
 
         # Initial turn
-        resp = model.generate_content(f"You are {starter_agent['name']}. Make a provocative opening statement about '{topic}' using a specific rhetorical technique.")
+        resp = model_manager.generate_content(f"You are {starter_agent['name']}. Make a provocative opening statement about '{topic}' using a specific rhetorical technique.")
         history.append({
             "speakerId": starter_id,
             "text": resp.text.strip(),
@@ -277,7 +269,7 @@ def generate_debate_verdict(topic, history):
     if not GEMINI_API_KEY:
         return {}
 
-    model = get_model()
+    # model = get_model()
 
     transcript = ""
     for turn in history:
@@ -311,7 +303,7 @@ def generate_debate_verdict(topic, history):
     """
 
     try:
-        response = model.generate_content(judge_prompt)
+        response = model_manager.generate_content(judge_prompt)
         text = response.text.replace('```json', '').replace('```', '').strip()
 
         start = text.find('{')
