@@ -817,49 +817,207 @@
     color: #c9d1d9;
 }
 
-/* ELI5 */
+/* ELI5 - Enhanced */
 .eli5-container {
-    background: linear-gradient(180deg, #e3f2fd, #ffffff);
+    background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
     color: #333;
-    padding: 40px;
+    padding: 30px;
     border-radius: 20px;
-    font-family: 'Comic Neue', 'Verdana', sans-serif;
-    /* Friendly font */
-    border: 4px solid #90caf9;
+    font-family: 'Nunito', 'Segoe UI', sans-serif;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    max-width: 900px;
+    margin: 0 auto;
 }
 
-.eli5-header {
+.dark-mode .eli5-container {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #e0e0e0;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+.eli5-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(0,0,0,0.05);
+}
+
+.eli5-title-group {
     display: flex;
     align-items: center;
     gap: 15px;
-    margin-bottom: 30px;
-    border-bottom: 2px dashed #90caf9;
-    padding-bottom: 20px;
 }
 
-.eli5-icon {
-    font-size: 3rem;
+.eli5-icon-large {
+    font-size: 2.5rem;
+    background: #fff;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
 }
 
-.eli5-content {
-    font-size: 1.3rem;
-    line-height: 1.8;
+.eli5-container h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #2196F3, #21CBF3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-.eli5-footer {
-    margin-top: 30px;
+.eli5-controls {
     display: flex;
     gap: 10px;
 }
 
+.tts-btn {
+    background: rgba(33, 150, 243, 0.1);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    color: #2196F3;
+}
+
+.tts-btn:hover {
+    background: #2196F3;
+    color: white;
+    transform: scale(1.1);
+}
+
+/* Tabs */
+.eli5-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    background: rgba(0,0,0,0.03);
+    padding: 5px;
+    border-radius: 12px;
+}
+
+.tab-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    color: #666;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.tab-btn.active {
+    background: #fff;
+    color: #2196F3;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.dark-mode .tab-btn.active {
+    background: #2196F3;
+    color: #fff;
+}
+
+/* Content */
+.eli5-content {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: #444;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 12px;
+}
+
+.dark-mode .eli5-content {
+    color: #d1d1d1;
+    background: rgba(0,0,0,0.2);
+}
+
+/* Fade In Animation */
+.fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* Extras: Analogy & Example */
+.eli5-extras {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 768px) {
+    .eli5-extras {
+        grid-template-columns: 1fr;
+    }
+}
+
+.extra-card {
+    padding: 20px;
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    opacity: 0.8;
+}
+
+.analogy-card {
+    background: linear-gradient(135deg, #fff8e1 0%, #fff3e0 100%);
+    border: 1px solid #ffe0b2;
+    color: #bf360c;
+}
+
+.example-card {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border: 1px solid #a5d6a7;
+    color: #1b5e20;
+}
+
+.analogy-card p, .example-card p {
+    margin: 0;
+    font-weight: 600;
+}
+
+/* Footer Tags */
+.eli5-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
 .eli5-footer .tag {
-    background: #ffeb3b;
-    color: #333;
-    padding: 5px 15px;
-    border-radius: 15px;
-    font-weight: bold;
-    font-size: 0.9rem;
-    box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+    background: rgba(0,0,0,0.05);
+    color: #777;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
 }
 
 /* Pitfalls */
