@@ -4,6 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import './PYQDatabase.css';
 import { brainService } from '../../services/BrainService';
 import MarkdownRenderer from '../Shared/MarkdownRenderer';
+import { Virtuoso } from 'react-virtuoso';
+import PYQHeatmap from '../Analytics/PYQHeatmap';
+import DifficultyTrendChart from '../Analytics/DifficultyTrendChart';
+import Modal from '../Shared/Modal';
+import { generateCombatSheet } from '../../util/exportUtils';
+
 
 interface Question {
     id: number;
@@ -24,6 +30,7 @@ interface Question {
 interface Analytics {
     by_subject: { subject: string; count: number }[];
     by_year: { year: number; count: number }[];
+    difficulty_trend?: any[];
 }
 
 const PYQDatabase: React.FC = () => {
@@ -32,6 +39,8 @@ const PYQDatabase: React.FC = () => {
     const [analytics, setAnalytics] = useState<Analytics | null>(null);
     const [loading, setLoading] = useState(true);
     const [startingQuiz, setStartingQuiz] = useState(false);
+    const [strategosAnalysis, setStrategosAnalysis] = useState<string | null>(null);
+    const [analyzingId, setAnalyzingId] = useState<number | null>(null);
 
     // Filters
     const [selectedYears, setSelectedYears] = useState<number[]>([]);
@@ -43,6 +52,10 @@ const PYQDatabase: React.FC = () => {
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [trendAnalysis, setTrendAnalysis] = useState<string | null>(null);
+    const [showHeatmap, setShowHeatmap] = useState(false);
+    const [showSimilar, setShowSimilar] = useState<number | null>(null);
+    const [similarQuestions, setSimilarQuestions] = useState<Question[]>([]);
+    const [loadingSimilar, setLoadingSimilar] = useState(false);
 
     // Expanded state for answers
     const [revealedAnswers, setRevealedAnswers] = useState<Record<number, boolean>>({});
@@ -55,7 +68,7 @@ const PYQDatabase: React.FC = () => {
                 try {
                     const params = new URLSearchParams();
                     selectedSubjects.forEach(subject => params.append('subjects', subject));
-                    const res = await fetch(`http://localhost:5000/api/pyq/topics?${params.toString()}`);
+                    const res = await fetch(`/api/pyq/topics?${params.toString()}`);
                     const data = await res.json();
                     setAvailableTopics(data);
                 } catch (err) {
@@ -92,22 +105,25 @@ const PYQDatabase: React.FC = () => {
             if (searchQuery) params.append('search', searchQuery);
             if (showFavoritesOnly) params.append('is_favorite', 'true');
 
-            const res = await fetch(`http://localhost:5000/api/pyq/questions?${params.toString()}`);
+            const res = await fetch(`/api/pyq/questions?${params.toString()}`);
             const data = await res.json();
             setQuestions(data);
 
-            // Fetch Analytics only once
-            if (!analytics) {
-                const analyticsRes = await fetch('http://localhost:5000/api/pyq/analytics');
-                const analyticsData = await analyticsRes.json();
-                setAnalytics(analyticsData);
-            }
+            // Fetch Analytics (Dynamic based on filters)
+            const analyticsParams = new URLSearchParams();
+            selectedSubjects.forEach(s => analyticsParams.append('subjects', s));
+            selectedYears.forEach(y => analyticsParams.append('years', y.toString()));
+
+            const analyticsRes = await fetch(`/api/pyq/analytics?${analyticsParams.toString()}`);
+            const analyticsData = await analyticsRes.json();
+            setAnalytics(analyticsData);
+
         } catch (err) {
             console.error("Failed to fetch PYQ data", err);
         } finally {
             setLoading(false);
         }
-    }, [searchQuery, showFavoritesOnly, selectedYears, selectedSubjects, selectedTopics, analytics]);
+    }, [searchQuery, showFavoritesOnly, selectedYears, selectedSubjects, selectedTopics]);
 
     useEffect(() => {
         fetchData();
@@ -122,7 +138,7 @@ const PYQDatabase: React.FC = () => {
 
     const toggleFavorite = async (id: number) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/pyq/${id}/favorite`, { method: 'POST' });
+            const res = await fetch(`/api/pyq/${id}/favorite`, { method: 'POST' });
             if (res.ok) {
                 setQuestions(prev => prev.map(q =>
                     q.id === id ? { ...q, is_favorite: !q.is_favorite } : q
@@ -172,7 +188,7 @@ const PYQDatabase: React.FC = () => {
                 limit: 25
             };
 
-            const res = await fetch('http://localhost:5000/api/pyq/start-quiz', {
+            const res = await fetch('/api/pyq/start-quiz', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ filters, title: 'PYQ Quiz' })
@@ -203,7 +219,7 @@ const PYQDatabase: React.FC = () => {
                 search: searchQuery
             };
 
-            const res = await fetch('http://localhost:5000/api/arena/create-custom-boss', {
+            const res = await fetch('/api/arena/create-custom-boss', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, filters })
@@ -241,11 +257,136 @@ const PYQDatabase: React.FC = () => {
         }
     };
 
+    const askStrategos = async (id: number) => {
+        setAnalyzingId(id);
+        try {
+            const res = await fetch(`/api/pyq/strategos/${id}`, { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                setStrategosAnalysis(data.analysis);
+            } else {
+                alert("Strategos is offline.");
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setAnalyzingId(null);
+        }
+    };
+
+    const findSimilar = async (id: number) => {
+        if (showSimilar === id) {
+            setShowSimilar(null);
+            return;
+        }
+        setShowSimilar(id);
+        setLoadingSimilar(true);
+        try {
+            const res = await fetch(`/api/pyq/similar/${id}`);
+            const data = await res.json();
+            setSimilarQuestions(data);
+        } catch (err) {
+            console.error("Failed to fetch similar questions", err);
+        } finally {
+            setLoadingSimilar(false);
+        }
+    };
+
+    // Virtualized List Row Renderer
+    const Row = (index: number) => {
+        const q = questions[index];
+        const isRevealed = revealedAnswers[q.id];
+
+        return (
+            <div style={{ padding: '0 10px 10px 0' }}>
+                <div className="question-card">
+                    <div className="q-meta">
+                        <div className="q-tags">
+                            <span className="tag year">{q.year}</span>
+                            <span className="tag subject">{q.subject}</span>
+                            <span className="tag difficulty">{q.difficulty}</span>
+                        </div>
+                        <button
+                            className={`fav-btn ${q.is_favorite ? 'active' : ''}`}
+                            onClick={() => toggleFavorite(q.id)}
+                            title="Mark as Favorite"
+                        >
+                            {q.is_favorite ? '★' : '☆'}
+                        </button>
+                    </div>
+
+                    <div className="q-text">{q.question_text}</div>
+
+                    <div className="q-options">
+                        {['A', 'B', 'C', 'D'].map(opt => {
+                            const optionText = q[`option_${opt.toLowerCase()}` as keyof Question];
+                            const isCorrect = q.correct_option === opt;
+                            let className = 'option';
+                            if (isRevealed) {
+                                if (isCorrect) className += ' correct';
+                                else className += ' wrong';
+                            }
+                            return (
+                                <div key={opt} className={className}>
+                                    <strong>{opt}.</strong> {optionText}
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    <div className="q-actions-footer">
+                        <button className="reveal-btn" onClick={() => toggleReveal(q.id)}>
+                            {isRevealed ? 'Hide Answer' : 'Show Answer'}
+                        </button>
+                        <button className="similar-btn" onClick={() => findSimilar(q.id)}>
+                             🔍 Find Similar
+                        </button>
+                        <button
+                            className="strategos-btn"
+                            onClick={() => askStrategos(q.id)}
+                            disabled={analyzingId === q.id}
+                            style={{ background: '#8e44ad', marginLeft: '10px' }}
+                        >
+                             {analyzingId === q.id ? 'Thinking...' : '🧠 Ask Strategos'}
+                        </button>
+                    </div>
+
+                    {isRevealed && (
+                        <div className="explanation">
+                            <h4>Explanation</h4>
+                            {q.explanation}
+                        </div>
+                    )}
+
+                    {showSimilar === q.id && (
+                        <div className="similar-panel">
+                            <h4>Similar Questions</h4>
+                            {loadingSimilar ? <div>Scanning Archives...</div> :
+                                similarQuestions.length === 0 ? <div>No similar questions found.</div> : (
+                                <div className="similar-list">
+                                    {similarQuestions.map(sq => (
+                                        <div key={sq.id} className="similar-item" onClick={() => {
+                                            // Maybe navigate or open modal? For now just show snippet
+                                            alert(sq.question_text);
+                                        }}>
+                                            <span className="tag">{sq.year}</span> {sq.question_text.substring(0, 80)}...
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div className="pyq-container">
             {/* SIDEBAR FILTERS */}
             <div className="pyq-sidebar">
                 <div className="filter-section">
+                    {analytics?.difficulty_trend && <DifficultyTrendChart data={analytics.difficulty_trend} />}
                     <h3>Years</h3>
                     <div className="filter-group">
                         {analytics?.by_year.map(item => (
@@ -335,7 +476,7 @@ const PYQDatabase: React.FC = () => {
             {/* MAIN CONTENT */}
             <div className="pyq-main">
                 <div className="pyq-header">
-                    <div className="pyq-title">The Archives</div>
+                    <div className="pyq-title">The Grand Archives</div>
                     <div className="search-bar">
                         <span className="search-icon">🔍</span>
                         <input
@@ -348,12 +489,29 @@ const PYQDatabase: React.FC = () => {
                     <div className="header-actions">
                         <button
                             className="create-boss-btn"
+                            onClick={() => setShowHeatmap(!showHeatmap)}
+                            title="Toggle Heatmap View"
+                            style={{ marginRight: '10px', background: '#2980b9', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
+                        >
+                           {showHeatmap ? '📋 List View' : '🔥 Heatmap'}
+                        </button>
+                        <button
+                            className="create-boss-btn"
                             onClick={createBossBattle}
                             disabled={questions.length === 0}
                             title="Create a Boss Battle from current filters"
                             style={{ marginRight: '10px', background: '#e74c3c', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
                         >
                             ⚔️ Create Boss Battle
+                        </button>
+                        <button
+                            className="export-btn"
+                            onClick={() => generateCombatSheet(questions)}
+                            disabled={questions.length === 0}
+                            title="Print Combat Sheet"
+                            style={{ marginRight: '10px', background: '#7f8c8d', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
+                        >
+                            📄 Export Combat Sheet
                         </button>
                         <button
                             className="start-quiz-btn"
@@ -375,22 +533,23 @@ const PYQDatabase: React.FC = () => {
                     </div>
                 </div>
 
-                {trendAnalysis && (
-                    <div className="trend-analysis-panel" style={{
-                        background: 'rgba(142, 68, 173, 0.1)',
-                        border: '1px solid #8e44ad',
-                        borderRadius: '8px',
-                        padding: '15px',
-                        marginBottom: '20px',
-                        color: '#ecf0f1'
-                    }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                            <h3 style={{ margin: 0, color: '#9b59b6' }}>🧠 Strategos Trend Analysis</h3>
-                            <button onClick={() => setTrendAnalysis(null)} style={{ background: 'none', border: 'none', color: '#bdc3c7', cursor: 'pointer' }}>✕</button>
-                        </div>
-                        <MarkdownRenderer content={trendAnalysis} />
-                    </div>
-                )}
+                {/* Trend Analysis Modal */}
+                <Modal
+                    isOpen={!!trendAnalysis}
+                    onClose={() => setTrendAnalysis(null)}
+                    title="🧠 Strategos Trend Analysis"
+                >
+                    <MarkdownRenderer content={trendAnalysis || ''} />
+                </Modal>
+
+                {/* Strategos Analysis Modal */}
+                <Modal
+                    isOpen={!!strategosAnalysis}
+                    onClose={() => setStrategosAnalysis(null)}
+                    title="🧠 Tactical Breakdown"
+                >
+                    <MarkdownRenderer content={strategosAnalysis || ''} />
+                </Modal>
 
                 {/* Active Filters Display */}
                 {(selectedYears.length > 0 || selectedSubjects.length > 0 || selectedTopics.length > 0) && (
@@ -451,65 +610,21 @@ const PYQDatabase: React.FC = () => {
                     </div>
                 )}
 
-                <div className="question-list">
-                    {loading ? (
+                <div className="question-list-container" style={{ flex: 1, minHeight: 0 }}>
+                    {showHeatmap ? (
+                        <div style={{ height: '100%', overflowY: 'auto' }}>
+                            <PYQHeatmap />
+                        </div>
+                    ) : loading ? (
                         <div style={{ textAlign: 'center', padding: '50px' }}>Accessing Archives...</div>
                     ) : questions.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '50px', opacity: 0.5 }}>No records found in the archives.</div>
                     ) : (
-                        questions.map(q => (
-                            <div key={q.id} className="question-card">
-                                <div className="q-meta">
-                                    <div className="q-tags">
-                                        <span className="tag year">{q.year}</span>
-                                        <span className="tag subject">{q.subject}</span>
-                                        <span className="tag difficulty">{q.difficulty}</span>
-                                    </div>
-                                    <button
-                                        className={`fav-btn ${q.is_favorite ? 'active' : ''}`}
-                                        onClick={() => toggleFavorite(q.id)}
-                                        title="Mark as Favorite"
-                                    >
-                                        {q.is_favorite ? '★' : '☆'}
-                                    </button>
-                                </div>
-
-                                <div className="q-text">{q.question_text}</div>
-
-                                <div className="q-options">
-                                    {['A', 'B', 'C', 'D'].map(opt => {
-                                        const optionText = q[`option_${opt.toLowerCase()}` as keyof Question];
-                                        const isRevealed = revealedAnswers[q.id];
-                                        const isCorrect = q.correct_option === opt;
-
-                                        let className = 'option';
-                                        if (isRevealed) {
-                                            if (isCorrect) className += ' correct';
-                                            else className += ' wrong'; // Could highlight selected wrong answer if we tracked user selection
-                                        }
-
-                                        return (
-                                            <div key={opt} className={className}>
-                                                <strong>{opt}.</strong> {optionText}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <button className="reveal-btn" onClick={() => toggleReveal(q.id)}>
-                                        {revealedAnswers[q.id] ? 'Hide Answer' : 'Show Answer'}
-                                    </button>
-                                </div>
-
-                                {revealedAnswers[q.id] && (
-                                    <div className="explanation">
-                                        <h4>Explanation</h4>
-                                        {q.explanation}
-                                    </div>
-                                )}
-                            </div>
-                        ))
+                        <Virtuoso
+                            style={{ height: '100%' }}
+                            totalCount={questions.length}
+                            itemContent={Row}
+                        />
                     )}
                 </div>
             </div>

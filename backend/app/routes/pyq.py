@@ -47,10 +47,27 @@ def get_questions():
         query += " AND is_favorite = 1"
         
     if search:
-        query += " AND (question_text LIKE ? OR explanation LIKE ?)"
-        search_term = f"%{search}%"
-        params.append(search_term)
-        params.append(search_term)
+        # Optimization: Use FTS5 match if available
+        # First check if FTS table exists (safe check)
+        try:
+            # We join with FTS table for speed
+            # Note: We can't just join easily in one query if we want to keep all filters
+            # So we use the rowid from FTS to filter the main table
+            fts_query = "SELECT rowid FROM pyq_questions_fts WHERE pyq_questions_fts MATCH ? ORDER BY rank"
+            fts_rows = conn.execute(fts_query, (search,)).fetchall()
+            if fts_rows:
+                ids = [str(r['rowid']) for r in fts_rows]
+                query += f" AND id IN ({','.join(ids)})"
+            else:
+                # No matches found in FTS
+                query += " AND 1=0"
+        except Exception as e:
+            # Fallback to LIKE if FTS fails or table doesn't exist
+            print(f"FTS Search failed, falling back to LIKE: {e}")
+            query += " AND (question_text LIKE ? OR explanation LIKE ?)"
+            search_term = f"%{search}%"
+            params.append(search_term)
+            params.append(search_term)
         
     query += " ORDER BY year DESC, id ASC"
     
@@ -119,39 +136,108 @@ def toggle_favorite(id):
 
 @bp.route('/analytics', methods=['GET'])
 def get_analytics():
-    """Get simple analytics for charts"""
+    """Get analytics with optional filters"""
     conn = get_db()
     
-    # Subject distribution
-    subject_counts = conn.execute('''
+    # Base query filters
+    filters_sql = "WHERE 1=1"
+    params = []
+
+    subjects = request.args.getlist('subjects')
+    if subjects:
+        placeholders = ','.join(['?'] * len(subjects))
+        filters_sql += f" AND subject IN ({placeholders})"
+        params.extend(subjects)
+
+    years = request.args.getlist('years')
+    if years:
+        placeholders = ','.join(['?'] * len(years))
+        filters_sql += f" AND year IN ({placeholders})"
+        params.extend(years)
+
+    # Subject distribution (Filtered)
+    subject_counts = conn.execute(f'''
         SELECT subject, COUNT(*) as count 
         FROM pyq_questions 
+        {filters_sql}
         GROUP BY subject
-    ''').fetchall()
+    ''', params).fetchall()
     
-    # Year-wise distribution
-    year_counts = conn.execute('''
+    # Year-wise distribution (Filtered)
+    year_counts = conn.execute(f'''
         SELECT year, COUNT(*) as count 
         FROM pyq_questions 
+        {filters_sql}
         GROUP BY year 
         ORDER BY year
-    ''').fetchall()
+    ''', params).fetchall()
     
-    # Topic distribution (Top 20)
-    topic_counts = conn.execute('''
+    # Topic distribution (Top 20 Filtered)
+    topic_counts = conn.execute(f'''
         SELECT topic, COUNT(*) as count 
         FROM pyq_questions 
-        WHERE topic IS NOT NULL
+        {filters_sql} AND topic IS NOT NULL
         GROUP BY topic
         ORDER BY count DESC
         LIMIT 20
-    ''').fetchall()
+    ''', params).fetchall()
+
+    # Difficulty Trends (Filtered)
+    # Returns: year, difficulty, count
+    difficulty_trends = conn.execute(f'''
+        SELECT year, difficulty, COUNT(*) as count
+        FROM pyq_questions
+        {filters_sql}
+        GROUP BY year, difficulty
+        ORDER BY year
+    ''', params).fetchall()
     
     return jsonify({
         'by_subject': [dict(row) for row in subject_counts],
         'by_year': [dict(row) for row in year_counts],
-        'by_topic': [dict(row) for row in topic_counts]
+        'by_topic': [dict(row) for row in topic_counts],
+        'difficulty_trend': [dict(row) for row in difficulty_trends]
     })
+
+# In-memory rate limiter (Simple Dictionary)
+# Key: IP Address, Value: timestamp of last request
+_strategos_rate_limit = {}
+
+@bp.route('/strategos/<int:question_id>', methods=['POST'])
+def ask_strategos(question_id):
+    """Ask AI for tactical breakdown of a question"""
+    try:
+        # 1. Rate Limiting Check (Simple)
+        import time
+        client_ip = request.remote_addr
+        last_req = _strategos_rate_limit.get(client_ip, 0)
+        current_time = time.time()
+
+        if current_time - last_req < 5: # 5 seconds cooldown
+            return jsonify({'success': False, 'error': 'Strategos is thinking. Please wait 5 seconds.'}), 429
+
+        _strategos_rate_limit[client_ip] = current_time
+
+        conn = get_db()
+        question = conn.execute("SELECT * FROM pyq_questions WHERE id = ?", (question_id,)).fetchone()
+
+        if not question:
+            return jsonify({'error': 'Question not found'}), 404
+
+        from app.services.brain_service import brain_service
+
+        # Prepare payload
+        payload = {
+            "question": f"{question['question_text']}\nOptions:\nA) {question['option_a']}\nB) {question['option_b']}\nC) {question['option_c']}\nD) {question['option_d']}",
+            "reasoning": "User requested Strategos breakdown"
+        }
+
+        # Execute Action
+        result = brain_service.execute_action("ANALYZE_QUESTION", payload)
+        return jsonify(result)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @bp.route('/create-mock', methods=['POST'])
 def create_mock_from_filters():
@@ -521,3 +607,51 @@ def get_quiz_stats():
         print(f"Error fetching quiz stats: {e}")
         return jsonify({'error': str(e)}), 500
 
+
+@bp.route('/similar/<int:question_id>', methods=['GET'])
+def get_similar_questions(question_id):
+    """Find similar questions using FTS5"""
+    try:
+        conn = get_db()
+
+        # Get the question text
+        question = conn.execute("SELECT question_text, subject FROM pyq_questions WHERE id = ?", (question_id,)).fetchone()
+        if not question:
+            return jsonify({'error': 'Question not found'}), 404
+
+        text = question['question_text']
+        # Clean text for FTS query (remove special chars, etc.)
+        import re
+        clean_text = re.sub(r'[^a-zA-Z0-9 ]', '', text)
+        # Use first few important words or the whole thing?
+        # FTS MATCH query needs to be carefully constructed.
+        # Simple approach: "word1 OR word2 OR ..."
+        words = [w for w in clean_text.split() if len(w) > 4][:10] # Take top 10 long words
+        search_query = " OR ".join(words)
+
+        if not search_query:
+             return jsonify([])
+
+        # FTS Query
+        query = """
+            SELECT q.*
+            FROM pyq_questions_fts fts
+            JOIN pyq_questions q ON fts.rowid = q.id
+            WHERE pyq_questions_fts MATCH ?
+            AND q.id != ?
+            ORDER BY rank
+            LIMIT 5
+        """
+
+        similar = conn.execute(query, (search_query, question_id)).fetchall()
+        return jsonify([dict(q) for q in similar])
+
+    except Exception as e:
+        print(f"Error finding similar questions: {e}")
+        # Fallback to subject-based random
+        try:
+             conn = get_db()
+             fallback = conn.execute("SELECT * FROM pyq_questions WHERE subject = ? AND id != ? ORDER BY RANDOM() LIMIT 5", (question['subject'], question_id)).fetchall()
+             return jsonify([dict(q) for q in fallback])
+        except:
+             return jsonify([])
