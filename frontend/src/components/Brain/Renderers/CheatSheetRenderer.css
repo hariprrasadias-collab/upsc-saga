@@ -5,13 +5,68 @@
     height: 100%;
 }
 
+.cs-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+
 .cs-title {
     font-size: 1.5rem;
     color: var(--text-highlight);
-    text-align: center;
-    margin-bottom: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 2px;
+    margin: 0;
+}
+
+.cs-controls {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.cs-search-input {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    width: 200px;
+    transition: width 0.3s;
+}
+
+.cs-search-input:focus {
+    width: 250px;
+    border-color: var(--accent-primary);
+    outline: none;
+}
+
+.cs-action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: var(--text-secondary);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.cs-action-btn:hover {
+    background: var(--accent-primary);
+    color: black;
+}
+
+.cs-action-btn.active {
+    background: var(--accent-primary);
+    color: black;
+    animation: pulse 1s infinite;
 }
 
 .cs-tabs-nav {
@@ -19,7 +74,6 @@
     gap: 0.5rem;
     overflow-x: auto;
     padding-bottom: 5px;
-    border-bottom: 2px solid var(--glass-border);
 }
 
 /* Scrollbar for nav */
@@ -42,6 +96,10 @@
     white-space: nowrap;
     transition: all 0.2s ease;
     font-weight: 500;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .cs-tab-btn:hover {
@@ -54,6 +112,18 @@
     color: var(--text-primary);
     border-bottom: 2px solid var(--accent-primary);
     box-shadow: 0 -4px 10px rgba(var(--accent-primary-rgb), 0.2);
+}
+
+.cs-tab-btn.match-highlight {
+    border-color: var(--warning-color);
+}
+
+.match-dot {
+    width: 6px;
+    height: 6px;
+    background-color: var(--warning-color);
+    border-radius: 50%;
+    display: inline-block;
 }
 
 .cs-tab-content {
@@ -77,6 +147,12 @@
     to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
 .cheat-sheet-legacy {
     border: 1px dashed var(--warning-color);
     padding: 1rem;
@@ -92,4 +168,13 @@
     border-radius: 4px;
     margin-bottom: 1rem;
     font-weight: bold;
+}
+
+/* Mermaid */
+.mermaid-container {
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
 }

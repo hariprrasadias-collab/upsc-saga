@@ -774,7 +774,9 @@ class BrainService:
                             {"id": "facts", "label": "⚡ Quick Facts", "content": "- Fact 1\n- Fact 2"},
                             {"id": "dates", "label": "📅 Key Dates", "content": "- 1947: Independence"},
                             {"id": "judgments", "label": "⚖️ Judgments", "content": "- Keshavananda Bharati Case"},
-                            {"id": "mnemonics", "label": "🧠 Mnemonics", "content": "- ABCDE for something"}
+                            {"id": "mnemonics", "label": "🧠 Mnemonics", "content": "- ABCDE for something"},
+                            {"id": "examiner", "label": "🧐 Examiner's View", "content": "**High Yield Keywords:**\n- Secularism\n- Basic Structure\n\n**Focus Areas:**\n- Preamble as part of Constitution"},
+                            {"id": "concept_map", "label": "🗺️ Concept Map", "content": "graph TD; A[Constitution] --> B[Preamble]; B --> C[Justice]; B --> D[Liberty];", "type": "mermaid"}
                         ]
                     })
                 }
@@ -1392,10 +1394,12 @@ class BrainService:
                             {{ "id": "articles", "label": "📜 Articles/Sections", "content": "Markdown list of relevant legal articles" }},
                             {{ "id": "dates", "label": "📅 Timeline", "content": "Markdown chronological list" }},
                             {{ "id": "judgments", "label": "⚖️ Case Laws", "content": "Markdown of 3 key judgments/committees" }},
-                            {{ "id": "mnemonics", "label": "🧠 Mnemonics", "content": "1 clever mnemonic to remember this topic" }}
+                            {{ "id": "mnemonics", "label": "🧠 Mnemonics", "content": "1 clever mnemonic to remember this topic" }},
+                            {{ "id": "examiner", "label": "🧐 Examiner's View", "content": "Markdown: What keywords/themes does the examiner look for? High yield areas." }},
+                            {{ "id": "concept_map", "label": "🗺️ Concept Map", "content": "Mermaid JS diagram code (graph TD or mindmap) illustrating the concept", "type": "mermaid" }}
                         ]
                     }}
-                    Ensure content is concise Markdown.
+                    Ensure content is concise Markdown. For the concept_map, provide ONLY the valid Mermaid code string.
                     """
                     response = self.model.generate_content(prompt)
                     # Use _parse_response to handle JSON extraction safely
