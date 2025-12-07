@@ -3,6 +3,13 @@
     flex-direction: column;
     gap: 1rem;
     height: 100%;
+    background: transparent; /* Default */
+}
+
+.cheat-sheet-container.fullscreen-mode {
+    background: #0f0f13; /* Dark background for fullscreen */
+    padding: 2rem;
+    overflow: auto;
 }
 
 .cs-header {
@@ -34,12 +41,12 @@
     padding: 0.4rem 0.8rem;
     border-radius: 4px;
     font-size: 0.9rem;
-    width: 200px;
+    width: 150px;
     transition: width 0.3s;
 }
 
 .cs-search-input:focus {
-    width: 250px;
+    width: 200px;
     border-color: var(--accent-primary);
     outline: none;
 }
@@ -48,19 +55,21 @@
     background: rgba(255, 255, 255, 0.1);
     border: none;
     color: var(--text-secondary);
-    width: 32px;
-    height: 32px;
+    width: 36px; /* Slightly larger for touch targets */
+    height: 36px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
+    font-size: 1.1rem;
 }
 
 .cs-action-btn:hover {
     background: var(--accent-primary);
     color: black;
+    transform: translateY(-2px);
 }
 
 .cs-action-btn.active {
@@ -177,4 +186,46 @@
     padding: 1rem;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
+    overflow-x: auto;
+}
+
+/* Quiz Styles */
+.quiz-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.quiz-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.quiz-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.quiz-q {
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.quiz-a {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--glass-border);
+    color: var(--accent-secondary);
+    font-style: italic;
+}
+
+.click-hint {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    text-align: right;
+    margin-top: 0.2rem;
 }

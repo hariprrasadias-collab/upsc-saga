@@ -776,7 +776,8 @@ class BrainService:
                             {"id": "judgments", "label": "⚖️ Judgments", "content": "- Keshavananda Bharati Case"},
                             {"id": "mnemonics", "label": "🧠 Mnemonics", "content": "- ABCDE for something"},
                             {"id": "examiner", "label": "🧐 Examiner's View", "content": "**High Yield Keywords:**\n- Secularism\n- Basic Structure\n\n**Focus Areas:**\n- Preamble as part of Constitution"},
-                            {"id": "concept_map", "label": "🗺️ Concept Map", "content": "graph TD; A[Constitution] --> B[Preamble]; B --> C[Justice]; B --> D[Liberty];", "type": "mermaid"}
+                            {"id": "concept_map", "label": "🗺️ Concept Map", "content": "graph TD; A[Constitution] --> B[Preamble]; B --> C[Justice]; B --> D[Liberty];", "type": "mermaid"},
+                            {"id": "quiz", "label": "❓ Active Recall", "content": json.dumps([{"q": "Who is the custodian of the Constitution?", "a": "Supreme Court"}, {"q": "Article 32?", "a": "Right to Constitutional Remedies"}]), "type": "quiz"}
                         ]
                     })
                 }
@@ -1396,10 +1397,11 @@ class BrainService:
                             {{ "id": "judgments", "label": "⚖️ Case Laws", "content": "Markdown of 3 key judgments/committees" }},
                             {{ "id": "mnemonics", "label": "🧠 Mnemonics", "content": "1 clever mnemonic to remember this topic" }},
                             {{ "id": "examiner", "label": "🧐 Examiner's View", "content": "Markdown: What keywords/themes does the examiner look for? High yield areas." }},
-                            {{ "id": "concept_map", "label": "🗺️ Concept Map", "content": "Mermaid JS diagram code (graph TD or mindmap) illustrating the concept", "type": "mermaid" }}
+                            {{ "id": "concept_map", "label": "🗺️ Concept Map", "content": "Mermaid JS diagram code (graph TD or mindmap) illustrating the concept", "type": "mermaid" }},
+                            {{ "id": "quiz", "label": "❓ Active Recall", "content": "JSON Array of 5 objects: [ { 'q': 'Question?', 'a': 'Short Answer' } ]", "type": "quiz" }}
                         ]
                     }}
-                    Ensure content is concise Markdown. For the concept_map, provide ONLY the valid Mermaid code string.
+                    Ensure content is concise Markdown. For the concept_map, provide ONLY the valid Mermaid code string. For quiz, ensure valid JSON string in content field.
                     """
                     response = self.model.generate_content(prompt)
                     # Use _parse_response to handle JSON extraction safely

@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import MarkdownRenderer from '../../Shared/MarkdownRenderer';
 import mermaid from 'mermaid';
+import { motion, AnimatePresence } from 'framer-motion';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 import './CheatSheetRenderer.css';
 
 interface CheatSheetTab {
     id: string;
     label: string;
     content: string;
-    type?: string; // 'markdown' (default) or 'mermaid'
+    type?: string; // 'markdown', 'mermaid', 'quiz'
 }
 
 interface CheatSheetData {
@@ -25,8 +28,12 @@ const MermaidDiagram: React.FC<{ code: string }> = ({ code }) => {
 
     useEffect(() => {
         if (ref.current) {
-            mermaid.initialize({ startOnLoad: true, theme: 'dark' });
-            mermaid.run({ nodes: [ref.current] });
+            try {
+                mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+                mermaid.run({ nodes: [ref.current] });
+            } catch (e) {
+                console.error("Mermaid Render Error:", e);
+            }
         }
     }, [code]);
 
@@ -37,12 +44,70 @@ const MermaidDiagram: React.FC<{ code: string }> = ({ code }) => {
     );
 };
 
+// Quiz Component
+const ActiveRecallQuiz: React.FC<{ content: string }> = ({ content }) => {
+    const [questions, setQuestions] = useState<{q: string, a: string}[]>([]);
+    const [revealed, setRevealed] = useState<number[]>([]);
+
+    useEffect(() => {
+        try {
+            const parsed = JSON.parse(content);
+            if (Array.isArray(parsed)) {
+                setQuestions(parsed);
+            }
+        } catch (e) {
+            console.error("Quiz Parse Error", e);
+        }
+    }, [content]);
+
+    const toggleReveal = (index: number) => {
+        if (revealed.includes(index)) {
+            setRevealed(prev => prev.filter(i => i !== index));
+        } else {
+            setRevealed(prev => [...prev, index]);
+        }
+    };
+
+    return (
+        <div className="quiz-container">
+            {questions.map((item, index) => (
+                <motion.div
+                    key={index}
+                    className="quiz-card"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    onClick={() => toggleReveal(index)}
+                >
+                    <div className="quiz-q">❓ {item.q}</div>
+                    <AnimatePresence>
+                        {revealed.includes(index) && (
+                            <motion.div
+                                className="quiz-a"
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                            >
+                                ✅ {item.a}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                    {!revealed.includes(index) && <div className="click-hint">(Click to reveal)</div>}
+                </motion.div>
+            ))}
+        </div>
+    );
+};
+
 const CheatSheetRenderer: React.FC<CheatSheetRendererProps> = ({ content }) => {
     const [data, setData] = useState<CheatSheetData | null>(null);
     const [activeTab, setActiveTab] = useState<string>('');
     const [searchTerm, setSearchTerm] = useState('');
     const [isLegacy, setIsLegacy] = useState<boolean>(false);
     const [isSpeaking, setIsSpeaking] = useState(false);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+
+    const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         try {
@@ -72,7 +137,16 @@ const CheatSheetRenderer: React.FC<CheatSheetRendererProps> = ({ content }) => {
 
         const currentTabObj = data.tabs.find(t => t.id === activeTab);
         if (currentTabObj) {
-            const utterance = new SpeechSynthesisUtterance(currentTabObj.content);
+            // If quiz, read Q&A
+            let textToRead = currentTabObj.content;
+            if (currentTabObj.type === 'quiz') {
+                try {
+                    const qData = JSON.parse(currentTabObj.content);
+                    textToRead = qData.map((x: any) => `Question: ${x.q}. Answer: ${x.a}`).join('. ');
+                } catch {}
+            }
+
+            const utterance = new SpeechSynthesisUtterance(textToRead);
             utterance.rate = 1.0;
             utterance.pitch = 1.0;
             utterance.onend = () => setIsSpeaking(false);
@@ -81,27 +155,43 @@ const CheatSheetRenderer: React.FC<CheatSheetRendererProps> = ({ content }) => {
         }
     };
 
-    // Filter/Search Logic
-    const getFilteredTabs = () => {
-        if (!data) return [];
-        if (!searchTerm) return data.tabs;
+    const handleExportPDF = async () => {
+        if (!containerRef.current || !data) return;
 
-        // Return tabs where content or label matches search term
-        return data.tabs.filter(tab =>
-            tab.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            tab.content.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+        const element = containerRef.current;
+        const canvas = await html2canvas(element, { backgroundColor: '#1a1a1a' });
+        const imgData = canvas.toDataURL('image/png');
+
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`${data.title.replace(/\s+/g, '_')}_CheatSheet.pdf`);
     };
 
-    // Highlight search term in text (simple version)
-    // Note: ReactMarkdown doesn't easily support dynamic highlighting without plugins.
-    // For now, search just filters tabs visibility in the nav, but we keep all tabs available content-wise?
-    // Better: If search is active, show tabs that match.
+    const toggleFullscreen = () => {
+        if (!document.fullscreenElement) {
+            containerRef.current?.requestFullscreen().catch(err => {
+                console.error(`Error attempting to enable fullscreen: ${err.message}`);
+            });
+            setIsFullscreen(true);
+        } else {
+            document.exitFullscreen();
+            setIsFullscreen(false);
+        }
+    };
 
-    // Actually, let's keep all tabs in nav, but highlight the one containing the term?
-    // Or just highlight matches?
+    // Listen for fullscreen change events (ESC key)
+    useEffect(() => {
+        const handleFSChange = () => {
+            setIsFullscreen(!!document.fullscreenElement);
+        };
+        document.addEventListener('fullscreenchange', handleFSChange);
+        return () => document.removeEventListener('fullscreenchange', handleFSChange);
+    }, []);
 
-    // Implementation: Search highlights matching tabs in Nav bar.
     const hasMatch = (tab: CheatSheetTab) => {
         if (!searchTerm) return false;
         return tab.content.toLowerCase().includes(searchTerm.toLowerCase());
@@ -119,13 +209,13 @@ const CheatSheetRenderer: React.FC<CheatSheetRendererProps> = ({ content }) => {
     if (!data) return <div className="loading-pulse">Deciphering Codex...</div>;
 
     return (
-        <div className="cheat-sheet-container">
+        <div className={`cheat-sheet-container ${isFullscreen ? 'fullscreen-mode' : ''}`} ref={containerRef}>
             <header className="cs-header">
                 <h3 className="cs-title">{data.title}</h3>
                 <div className="cs-controls">
                     <input
                         type="text"
-                        placeholder="Search cheat sheet..."
+                        placeholder="Search..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="cs-search-input"
@@ -139,10 +229,17 @@ const CheatSheetRenderer: React.FC<CheatSheetRendererProps> = ({ content }) => {
                     </button>
                     <button
                         className="cs-action-btn"
-                        onClick={() => navigator.clipboard.writeText(JSON.stringify(data, null, 2))}
-                        title="Copy Raw JSON"
+                        onClick={handleExportPDF}
+                        title="Export to PDF"
                     >
-                        📋
+                        📄
+                    </button>
+                    <button
+                        className="cs-action-btn"
+                        onClick={toggleFullscreen}
+                        title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+                    >
+                        {isFullscreen ? '🔽' : '⛶'}
                     </button>
                 </div>
             </header>
@@ -169,6 +266,8 @@ const CheatSheetRenderer: React.FC<CheatSheetRendererProps> = ({ content }) => {
                     >
                         {tab.type === 'mermaid' ? (
                             <MermaidDiagram code={tab.content} />
+                        ) : tab.type === 'quiz' ? (
+                            <ActiveRecallQuiz content={tab.content} />
                         ) : (
                             <MarkdownRenderer content={tab.content} />
                         )}
