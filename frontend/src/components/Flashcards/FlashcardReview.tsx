@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import './Flashcards.css';
 import { useAnalytics } from '../../contexts/AnalyticsContext';
 import MarkdownRenderer from '../Shared/MarkdownRenderer';
+import MapWorkCard from './MapWorkCard';
 
 interface Card {
     id: number;
@@ -10,6 +11,8 @@ interface Card {
     back: string;
     maturity?: string;
     urgency?: number;
+    card_type?: string;
+    source?: string;
 }
 
 interface FlashcardReviewProps {
@@ -109,6 +112,44 @@ const FlashcardReview: React.FC<FlashcardReviewProps> = ({ deckId, onFinish }) =
     }
 
     const currentCard = cards[currentIndex];
+
+    // Check if this is a Map Work card
+    if (currentCard.card_type === 'map_work') {
+        let mapData = [];
+        try {
+            mapData = JSON.parse(currentCard.back);
+        } catch (e) {
+            console.error("Failed to parse map data", e);
+        }
+
+        if (mapData.length > 0) {
+            return (
+                 <div className="flashcard-review" style={{ height: '600px' }}> {/* Increased height for map */}
+                    <div className="review-progress">
+                        <div className="progress-text">
+                            Card {currentIndex + 1} / {cards.length}
+                        </div>
+                        <div className="progress-bar-container">
+                            <div
+                                className="progress-bar-fill"
+                                style={{ width: `${((currentIndex + 1) / cards.length) * 100}%` }}
+                            />
+                        </div>
+                    </div>
+
+                    <MapWorkCard
+                        data={mapData}
+                        onComplete={() => handleRating(3)} // Auto-rate as Good on completion for now
+                    />
+
+                    <div className="session-stats">
+                         <span>Reviewed: {cardsReviewed}</span>
+                         <button onClick={finishSession} className="end-session-btn">End Session</button>
+                    </div>
+                </div>
+            );
+        }
+    }
 
     return (
         <div className="flashcard-review" tabIndex={0} onKeyDown={handleKeyPress}>
