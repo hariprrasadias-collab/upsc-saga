@@ -30,11 +30,13 @@ class ModelManager:
     ]
 
     # High Speed/Volume Models (High Rate Limit, Low Cost)
+    # Removing likely-invalid names to reduce 404 noise
     FAST_MODELS = [
         'gemini-1.5-flash',
         'gemini-1.5-flash-latest',
-        'gemini-2.0-flash', # Experimental but fast
-        'gemini-2.0-flash-001'
+        'gemini-1.5-flash-001', # Explicit stable version
+        'gemini-2.0-flash',
+        'gemini-2.0-flash-exp', # Experimental if available
     ]
 
     def __init__(self):
@@ -52,6 +54,9 @@ class ModelManager:
         # Smart Features
         self.cooldowns = {} # Map model_name -> datetime until available
         self.response_cache = TTLCache(maxsize=100, ttl=3600) # 1 Hour Cache
+
+        # Circuit Breaker / Panic Mode
+        self._panic_mode_until = None
 
         if self.api_key:
             self._configure()
@@ -115,6 +120,21 @@ class ModelManager:
         self.cooldowns[model_name] = datetime.now() + timedelta(seconds=duration_seconds)
         print(f"❄️ Model {model_name} in cool-down for {duration_seconds}s")
 
+    def _check_panic_mode(self):
+        """Check if circuit breaker is active."""
+        if self._panic_mode_until:
+            if datetime.now() < self._panic_mode_until:
+                return True
+            else:
+                print("🟢 Panic Mode Lifted. Resuming API calls.")
+                self._panic_mode_until = None
+        return False
+
+    def _trigger_panic_mode(self, duration_seconds=60):
+        """Activate circuit breaker to stop hammering API."""
+        self._panic_mode_until = datetime.now() + timedelta(seconds=duration_seconds)
+        print(f"🛑 PANIC MODE ACTIVATED: Skipping API calls for {duration_seconds}s")
+
     def switch_model(self, model_type='fast'):
         """Rotate to the next available healthy model within the tier."""
         rotation = self._get_model_list(model_type)
@@ -142,7 +162,7 @@ class ModelManager:
 
     def _get_cache_key(self, prompt, model_type, kwargs):
         """Generate a stable hash key for caching."""
-        # Simple hash of prompt + model_type + str(kwargs)
+        # Simple hash of prompt + model_type + str(sorted kwargs)
         content = f"{prompt}|{model_type}|{str(sorted(kwargs.items()))}"
         return hashlib.md5(content.encode('utf-8')).hexdigest()
 
@@ -151,10 +171,11 @@ class ModelManager:
         Robust content generation with:
         - Tiered Usage (Pro vs Fast)
         - Caching (TTL)
-        - Exponential Backoff
+        - Exponential Backoff (Capped)
         - Model Rotation
         - Cool-down Logic
         - AUTOMATIC FALLBACK: Pro -> Fast -> Mock Safe Response (No Exceptions)
+        - Circuit Breaker (Panic Mode)
 
         Args:
             prompt (str): The input prompt.
@@ -166,6 +187,15 @@ class ModelManager:
         if not self.is_configured:
             print("⚠️ API Key missing. Returning Safe Fallback.")
             return FallbackResponse("System Offline (No API Key). Please check configuration.")
+
+        # 0.5 Circuit Breaker Check
+        if self._check_panic_mode():
+            # If in panic mode, immediately return fallback unless it's a cached response we can serve
+            cache_key = self._get_cache_key(prompt, model_type, kwargs)
+            if cache_key in self.response_cache:
+                return self.response_cache[cache_key]
+            print(f"🛑 Skipping API call (Panic Mode Active). Returning Mock.")
+            return FallbackResponse("Oracle is silent (High Traffic Protection).")
 
         # 1. Check Cache
         cache_key = self._get_cache_key(prompt, model_type, kwargs)
@@ -201,7 +231,8 @@ class ModelManager:
                     print(f"⚠️ API Error ({type(e).__name__}) with {current_model_name}: {e}")
                     self._mark_cooldown(current_model_name, duration_seconds=60)
 
-                    sleep_time = min(2 ** attempts, 10) + random.uniform(0, 1)
+                    # Cap sleep to 5s max to prevent sticking
+                    sleep_time = min(2 ** attempts, 5) + random.uniform(0, 1)
                     print(f"📉 Rotating & Sleeping {sleep_time:.2f}s...")
 
                     self.switch_model(model_type)
@@ -210,6 +241,7 @@ class ModelManager:
 
                 except Exception as e:
                     print(f"❌ Unrecoverable Error with {current_model_name}: {e}")
+                    # If 404, don't sleep, just rotate
                     self.switch_model(model_type)
                     attempts += 1
 
@@ -224,10 +256,11 @@ class ModelManager:
                 print("🛡️ ACTIVATING FALLBACK: Downgrading to FAST tier.")
                 return self.generate_content(prompt, model_type='fast', _is_fallback_retry=True, **kwargs)
 
-            # FINAL SAFETY NET (If Fast fails or recursive fallback fails)
-            print("🏳️ ALL SYSTEMS FAILED. Returning Safe Mock Response.")
+            # FINAL SAFETY NET
+            print("🏳️ ALL SYSTEMS FAILED. Triggering Panic Mode and Returning Safe Mock.")
+            self._trigger_panic_mode(duration_seconds=60)
             return FallbackResponse(
-                "The Oracle is momentarily silent (High Traffic). Please try again in a few moments."
+                "Oracle is silent (High Traffic). Please try again later."
             )
 
 # Singleton Instance

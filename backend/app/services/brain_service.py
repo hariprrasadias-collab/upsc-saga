@@ -648,9 +648,15 @@ class BrainService:
                 # If we have structured data, use it
                 if eli5_res.get('data'):
                     data = eli5_res.get('data')
-                    content_to_save = json.dumps(data)
-                    # Create a readable flashcard
-                    flashcard_back = f"🧸 ELI5: {data.get('eli5', '')}\n\n💡 Analogy: {data.get('analogy', '')}"
+                    # Check for fallback/empty data to avoid crashing
+                    if data and isinstance(data, dict) and 'eli5' in data:
+                        content_to_save = json.dumps(data)
+                        # Create a readable flashcard
+                        flashcard_back = f"🧸 ELI5: {data.get('eli5', '')}\n\n💡 Analogy: {data.get('analogy', '')}"
+                    else:
+                        # Panic mode safe default
+                        content_to_save = "Content unavailable due to high traffic."
+                        flashcard_back = content_to_save
 
                 self._add_flashcard(
                     user_id, topic, subject,
@@ -1489,6 +1495,20 @@ class BrainService:
                     Do NOT include markdown formatting like ```json ... ```, just the raw JSON.
                     """
                     response = model_manager.generate_content(prompt)
+                    data = self._parse_response(response.text)
+
+                    # Handle panic mode fallback
+                    if data.get('error'):
+                        data = {
+                            "eli5": "The Brain is currently overwhelmed by high traffic (Quota Limit).",
+                            "eli15": "Please review this topic manually or try again later.",
+                            "eli_expert": "Service unavailable.",
+                            "analogy": "Traffic Jam",
+                            "visual_analogy_prompt": "A busy highway",
+                            "real_world_example": "Server Overload",
+                            "quiz": []
+                        }
+
                     result = {
                         "success": True,
                         "message": "ELI5 Generated.",
@@ -1564,6 +1584,10 @@ class BrainService:
         try:
             text = response_text.strip()
             
+            # 0. Check for Oracle Silence (Panic Mode)
+            if "Oracle is silent" in text:
+                return {"error": "Quota Exceeded", "is_fallback": True}
+
             # 1. Try to find JSON code block
             import re
             json_match = re.search(r"```json\s*(.*?)\s*```", text, re.DOTALL)
