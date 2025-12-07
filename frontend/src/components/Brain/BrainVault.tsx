@@ -7,6 +7,7 @@ import ChatInterface from './Renderers/ChatInterface';
 import VisualPromptRenderer from './Renderers/VisualPromptRenderer';
 import EssayRenderer from './Renderers/EssayRenderer';
 import MapRenderer from './Renderers/MapRenderer';
+import CheatSheetRenderer from './Renderers/CheatSheetRenderer';
 
 interface AIContent {
     id: number;
@@ -104,6 +105,8 @@ const BrainVault: React.FC = () => {
             case 'map_work':
             case 'mapwork': // just in case
                 return <MapRenderer content={item.content} metadata={item.metadata} />;
+            case 'cheat_sheet':
+                return <CheatSheetRenderer content={item.content} />;
             default:
                 return (
                     <div>
