@@ -1,11 +1,13 @@
 from app import cgi_fix
 from flask import Flask
 from flask_cors import CORS
+from flask_compress import Compress
 
 def create_app():
     app = Flask(__name__)
     app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
     CORS(app, resources={r"/*": {"origins": "*"}})
+    Compress(app) # Enable Gzip compression
 
     from . import db
     db.init_app(app)
