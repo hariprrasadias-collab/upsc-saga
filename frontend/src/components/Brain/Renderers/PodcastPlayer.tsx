@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Renderers.css';
 
 interface PodcastRendererProps {
@@ -9,51 +9,79 @@ interface PodcastRendererProps {
 const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
+    const [speed, setSpeed] = useState(1.0);
+    const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
-    // Mock progress for visual effect
+    // Initialize/Re-initialize Utterance
+    useEffect(() => {
+        const utterance = new SpeechSynthesisUtterance(content);
+        utterance.rate = speed;
+        utterance.pitch = 1.0;
+
+        const voices = window.speechSynthesis.getVoices();
+        const preferredVoice = voices.find(v => v.name.includes('Google US English') || v.name.includes('Samantha'));
+        if (preferredVoice) utterance.voice = preferredVoice;
+
+        utterance.onend = () => {
+            setIsPlaying(false);
+            setProgress(100);
+        };
+
+        utteranceRef.current = utterance;
+
+        // Cleanup on unmount or content change
+        return () => {
+            window.speechSynthesis.cancel();
+        };
+    }, [content]);
+
+    // Handle Speed Change - Restart if playing to apply rate
+    useEffect(() => {
+        if (utteranceRef.current) {
+            utteranceRef.current.rate = speed;
+        }
+
+        if (isPlaying) {
+            // Cancel current speech and restart with new rate
+            window.speechSynthesis.cancel();
+            if (utteranceRef.current) {
+                 window.speechSynthesis.speak(utteranceRef.current);
+            }
+        }
+    }, [speed]);
+
+    // Playback Control
     useEffect(() => {
         let interval: any;
-        if (isPlaying && progress < 100) {
-            interval = setInterval(() => {
-                setProgress(p => (p >= 100 ? 0 : p + 1));
-            }, 100);
 
-            // TTS Logic
+        if (isPlaying) {
             if (!window.speechSynthesis.speaking) {
-                const utterance = new SpeechSynthesisUtterance(content);
-                // Create a cleaner version of text for speech (remove Speaker names if possible)
-                // For now, reading raw content is fine, maybe slightly sped up
-                utterance.rate = 1.1;
-                utterance.pitch = 1.0;
-
-                // Try to find a good English voice
-                const voices = window.speechSynthesis.getVoices();
-                const preferredVoice = voices.find(v => v.name.includes('Google US English') || v.name.includes('Samantha'));
-                if (preferredVoice) utterance.voice = preferredVoice;
-
-                utterance.onend = () => {
-                    setIsPlaying(false);
-                    setProgress(100);
-                };
-
-                window.speechSynthesis.speak(utterance);
+                 if (utteranceRef.current) {
+                     utteranceRef.current.rate = speed;
+                     window.speechSynthesis.speak(utteranceRef.current);
+                 }
             } else {
-                window.speechSynthesis.resume();
+                 window.speechSynthesis.resume();
             }
 
-        } else if (!isPlaying) {
+             interval = setInterval(() => {
+                setProgress(p => (p >= 100 ? 0 : p + 1));
+            }, 1000 / speed);
+
+        } else {
+            // Pause
             window.speechSynthesis.pause();
+            clearInterval(interval);
         }
 
         return () => clearInterval(interval);
     }, [isPlaying]);
 
-    // Cleanup on unmount
-    useEffect(() => {
-        return () => {
-            window.speechSynthesis.cancel();
-        };
-    }, []);
+    const handleSpeedChange = () => {
+        const speeds = [0.75, 1.0, 1.25, 1.5, 2.0];
+        const nextIdx = (speeds.indexOf(speed) + 1) % speeds.length;
+        setSpeed(speeds[nextIdx]);
+    };
 
     return (
         <div className="podcast-player-container glass-card">
@@ -73,13 +101,20 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
                     {isPlaying ? '⏸' : '▶'}
                 </button>
 
+                 <button className="speed-btn" onClick={handleSpeedChange} title="Playback Speed">
+                    {speed}x
+                </button>
+
                 {/* Waveform Visualizer */}
                 <div className="waveform-container">
                     {[...Array(20)].map((_, i) => (
                         <div
                             key={i}
                             className={`wave-bar ${isPlaying ? 'animating' : ''}`}
-                            style={{ animationDelay: `${i * 0.1}s` }}
+                            style={{
+                                animationDelay: `${i * 0.1}s`,
+                                animationDuration: `${1.2 / speed}s`
+                            }}
                         ></div>
                     ))}
                 </div>

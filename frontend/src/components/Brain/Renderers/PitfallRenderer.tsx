@@ -1,24 +1,15 @@
 import React from 'react';
-import './Renderers.css';
 import MarkdownRenderer from '../../Shared/MarkdownRenderer';
 
-interface PitfallProps {
+interface Props {
     content: string;
 }
 
-const PitfallRenderer: React.FC<PitfallProps> = ({ content }) => {
-    // Try to parse bullet points as individual "mistakes" if possible
-    // Otherwise just render the markdown in a warning box
-
+const PitfallRenderer: React.FC<Props> = ({ content }) => {
     return (
-        <div className="pitfall-container">
-            <div className="pitfall-banner">
-                <span className="warning-icon">⚠️</span>
-                <h3>Common Pitfalls & Mistakes</h3>
-            </div>
-            <div className="pitfall-card glass-card">
-                <MarkdownRenderer content={content} />
-            </div>
+        <div className="pitfall-container" style={{ border: '1px solid #ef4444', padding: '15px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.05)' }}>
+            <h3 style={{ color: '#ef4444', marginTop: 0 }}>⚠️ Common Pitfalls</h3>
+            <MarkdownRenderer content={content} />
         </div>
     );
 };
