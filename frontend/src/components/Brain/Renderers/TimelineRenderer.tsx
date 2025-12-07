@@ -1,15 +1,20 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import './Renderers.css';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaSearch, FaSortAlphaDown, FaSortAlphaUp, FaList, FaStream, FaCalendarAlt, FaExpandAlt, FaCompressAlt } from 'react-icons/fa';
+import {
+    FaSearch, FaSortAlphaDown, FaSortAlphaUp, FaList, FaStream,
+    FaExpandAlt, FaPlay, FaPause, FaStepForward, FaStepBackward,
+    FaCompressAlt
+} from 'react-icons/fa';
 
 interface TimelineEvent {
+    id: string; // Unique ID for keys
     year: string;
-    dateRaw?: string; // Original date string for display
-    numericYear: number; // For sorting
+    numericYear: number;
+    endYear?: number; // For ranges
     event: string;
     description?: string;
-    category?: string; // Extracted or inferred
+    category?: string;
 }
 
 interface TimelineRendererProps {
@@ -24,50 +29,41 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
     const [activeTab, setActiveTab] = useState<string>('all');
     const [selectedEvent, setSelectedEvent] = useState<TimelineEvent | null>(null);
 
-    // --- Parser Logic ---
+    // Advanced Features State
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [zoomLevel, setZoomLevel] = useState(1); // 0.5 to 2.0
+    const presentationTimerRef = useRef<number | null>(null);
+
+    // --- Parser Logic (Enhanced) ---
     const parseTimeline = (text: string, meta: any): TimelineEvent[] => {
-        // 1. Try to use Metadata if available (Best Source)
         if (meta && Array.isArray(meta.events)) {
-            return meta.events.map((e: any) => ({
+            return meta.events.map((e: any, idx: number) => ({
+                id: `meta-${idx}`,
                 year: e.year || e.date,
-                dateRaw: e.date,
                 numericYear: parseInt(String(e.year || e.date).replace(/\D/g, '')) || 0,
+                endYear: e.end_year ? parseInt(String(e.end_year).replace(/\D/g, '')) : undefined,
                 event: e.title || e.event,
                 description: e.description,
                 category: e.category
             }));
         }
 
-        // 2. Parse Text Content (Fallback)
         const lines = text.split('\n');
         const events: TimelineEvent[] = [];
         
-        lines.forEach(line => {
+        lines.forEach((line, idx) => {
             if (!line.trim()) return;
-
-            // Regex strategies
-            // Format A: "1947: Independence - India becomes free"
-            // Format B: "**1947** - Independence" (Markdown bold)
-            // Format C: "- 1947: Independence" (List item)
-
-            // Clean up list markers and leading whitespace
             const cleanLine = line.replace(/^[\-\*]\s*/, '').trim();
 
-            // Match Year at start (supports 1000 BC, c. 1500, etc.)
-            // Capturing groups: 1=YearPart, 2=Rest
-            // Added \s* to start and more robust separator handling
-            const match = cleanLine.match(/^(\d{4}(?:\s?BC|AD|BCE|CE)?|c\.\s?\d{4}|[A-Za-z]{3}\s\d{4}|\d{1,2}(?:st|nd|rd|th)?\s[A-Za-z]+|[A-Za-z]+\s\d{1,2},?\s\d{4})[:\-\s]+(.+)/i);
+            // Enhanced Regex: Captures "1939-1945" or "1947"
+            const match = cleanLine.match(/^((?:\d{4}(?:\s?-\s?\d{4})?)|\d{4}(?:\s?BC|AD|BCE|CE)?|c\.\s?\d{4})[:\-\s]+(.+)/i);
 
             if (match) {
                 const yearStr = match[1].trim();
                 const rest = match[2].trim();
 
-                // Separate Event and Description if possible (split by " - " or ": ")
-                // But typically the first separator was already consumed by regex.
-                // Look for a secondary separator like " - " inside 'rest'
                 let title = rest;
                 let desc = '';
-
                 const splitIndex = rest.indexOf(' - ');
                 if (splitIndex > 0) {
                     title = rest.substring(0, splitIndex).trim();
@@ -78,51 +74,55 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
                      desc = parts.slice(1).join(': ').trim();
                 }
 
-                // Try to extract numeric year for sorting
-                const numMatch = yearStr.match(/(\d+)/);
-                let numYear = numMatch ? parseInt(numMatch[1]) : 0;
-                if (yearStr.toUpperCase().includes('BC') || yearStr.toUpperCase().includes('BCE')) {
-                    numYear = -numYear;
+                // Range parsing
+                const rangeMatch = yearStr.match(/(\d{4})\s?-\s?(\d{4})/);
+                let numYear = 0;
+                let endYear: number | undefined = undefined;
+
+                if (rangeMatch) {
+                    numYear = parseInt(rangeMatch[1]);
+                    endYear = parseInt(rangeMatch[2]);
+                } else {
+                    const numMatch = yearStr.match(/(\d+)/);
+                    numYear = numMatch ? parseInt(numMatch[1]) : 0;
+                    if (yearStr.toUpperCase().includes('BC') || yearStr.toUpperCase().includes('BCE')) {
+                        numYear = -numYear;
+                    }
                 }
 
                 events.push({
+                    id: `text-${idx}`,
                     year: yearStr,
                     numericYear: numYear,
-                    event: title.replace(/^\*\*|\*\*$/g, ''), // Remove markdown bold
+                    endYear,
+                    event: title.replace(/^\*\*|\*\*$/g, ''),
                     description: desc,
                 });
             }
         });
-
         return events;
     };
 
     const allEvents = useMemo(() => parseTimeline(content, metadata), [content, metadata]);
 
-    // --- Eras / Tabs Logic ---
+    // --- Eras & Filtering ---
     const eras = useMemo(() => {
         const uniqueEras = new Set<string>();
         uniqueEras.add('all');
-
         allEvents.forEach(e => {
-            // Group by Century logic
             if (e.numericYear !== 0) {
                const century = Math.floor((Math.abs(e.numericYear) - 1) / 100) + 1;
                const eraLabel = e.numericYear < 0 ? `${century}c BC` : `${century}c AD`;
                uniqueEras.add(eraLabel);
             }
         });
-
-        // Sort eras naturally? 'all' first, then BC desc, then AD asc
         return Array.from(uniqueEras).sort((a, b) => {
             if (a === 'all') return -1;
             if (b === 'all') return 1;
-            // Simple string sort for now, ideally sophisticated logic for BC/AD
             return a.localeCompare(b, undefined, { numeric: true });
         });
     }, [allEvents]);
 
-    // --- Filtering & Sorting ---
     const filteredEvents = useMemo(() => {
         let processed = allEvents.filter(e => {
             const matchesSearch =
@@ -131,9 +131,8 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
                 (e.description && e.description.toLowerCase().includes(searchTerm.toLowerCase()));
 
             if (!matchesSearch) return false;
-
             if (activeTab !== 'all') {
-                if (e.numericYear === 0) return true; // Keep undated events in all views usually, or maybe not
+                if (e.numericYear === 0) return true;
                 const century = Math.floor((Math.abs(e.numericYear) - 1) / 100) + 1;
                 const eraLabel = e.numericYear < 0 ? `${century}c BC` : `${century}c AD`;
                 return eraLabel === activeTab;
@@ -145,30 +144,72 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
             const diff = a.numericYear - b.numericYear;
             return sortOrder === 'asc' ? diff : -diff;
         });
-
         return processed;
     }, [allEvents, searchTerm, activeTab, sortOrder]);
 
 
+    // --- Presentation Mode Logic ---
+    useEffect(() => {
+        if (isPlaying && filteredEvents.length > 0) {
+            presentationTimerRef.current = window.setInterval(() => {
+                setSelectedEvent(prev => {
+                    const currentIndex = prev ? filteredEvents.findIndex(e => e.id === prev.id) : -1;
+                    const nextIndex = currentIndex + 1;
+                    if (nextIndex >= filteredEvents.length) {
+                        setIsPlaying(false); // Stop at end
+                        return prev;
+                    }
+                    return filteredEvents[nextIndex];
+                });
+            }, 4000); // 4 seconds per slide
+        } else {
+            if (presentationTimerRef.current) {
+                clearInterval(presentationTimerRef.current);
+            }
+        }
+        return () => {
+            if (presentationTimerRef.current) clearInterval(presentationTimerRef.current);
+        };
+    }, [isPlaying, filteredEvents]);
+
+    // Helper to highlight text
+    const HighlightText = ({ text, highlight }: { text: string, highlight: string }) => {
+        if (!highlight.trim()) return <>{text}</>;
+        const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+        return (
+            <>
+                {parts.map((part, i) =>
+                    part.toLowerCase() === highlight.toLowerCase() ?
+                    <span key={i} className="search-highlight">{part}</span> : part
+                )}
+            </>
+        );
+    };
+
     // --- Renderers ---
 
-    // Vertical "Snake" or Center Axis Layout
     const renderVertical = () => (
-        <div className="timeline-vertical">
+        <div className="timeline-vertical" style={{ '--zoom-scale': zoomLevel } as React.CSSProperties}>
             <div className="timeline-center-line"></div>
             {filteredEvents.map((evt, idx) => (
                 <motion.div
-                    key={`${evt.year}-${idx}`}
+                    key={evt.id}
                     className={`timeline-node ${idx % 2 === 0 ? 'left' : 'right'}`}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.05 }}
                     onClick={() => setSelectedEvent(evt)}
+                    style={{ marginBottom: `${2 * zoomLevel}rem` }}
                 >
                     <div className="node-content glass-card hover-glow">
                         <div className="node-date">{evt.year}</div>
-                        <h4 className="node-title">{evt.event}</h4>
-                        {evt.description && <p className="node-desc-preview">{evt.description.substring(0, 100)}{evt.description.length > 100 ? '...' : ''}</p>}
+                        <h4 className="node-title"><HighlightText text={evt.event} highlight={searchTerm} /></h4>
+                        {evt.description && (
+                            <p className="node-desc-preview">
+                                <HighlightText text={evt.description.substring(0, 100)} highlight={searchTerm} />
+                                {evt.description.length > 100 ? '...' : ''}
+                            </p>
+                        )}
                     </div>
                     <div className="node-dot"></div>
                 </motion.div>
@@ -176,36 +217,46 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
         </div>
     );
 
-    // Horizontal Scroll Layout
     const renderHorizontal = () => (
         <div className="timeline-horizontal-wrapper custom-scrollbar">
-            <div className="timeline-horizontal-track">
+            <div className="timeline-horizontal-track" style={{ gap: `${40 * zoomLevel}px` }}>
                 <div className="timeline-horiz-line"></div>
-                {filteredEvents.map((evt, idx) => (
-                    <motion.div
-                        key={`${evt.year}-${idx}`}
-                        className="timeline-card-horiz glass-card"
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: idx * 0.05 }}
-                        onClick={() => setSelectedEvent(evt)}
-                    >
-                        <div className="horiz-dot"></div>
-                        <div className="horiz-date">{evt.year}</div>
-                        <h4 className="horiz-title">{evt.event}</h4>
-                    </motion.div>
-                ))}
+                {filteredEvents.map((evt, idx) => {
+                    // Calculate duration width if endYear exists
+                    let durationWidth = 0;
+                    if (evt.endYear && evt.numericYear) {
+                         // extremely simplified pixel mapping
+                         durationWidth = (evt.endYear - evt.numericYear) * 10 * zoomLevel;
+                         if (durationWidth < 0) durationWidth = 0;
+                    }
+
+                    return (
+                        <motion.div
+                            key={evt.id}
+                            className="timeline-card-horiz glass-card"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: idx * 0.05 }}
+                            onClick={() => setSelectedEvent(evt)}
+                            style={{ minWidth: durationWidth > 200 ? `${durationWidth}px` : '200px' }}
+                        >
+                            <div className="horiz-dot"></div>
+                            {durationWidth > 0 && <div className="duration-bar" style={{ width: '100%' }}></div>}
+                            <div className="horiz-date">{evt.year}</div>
+                            <h4 className="horiz-title"><HighlightText text={evt.event} highlight={searchTerm} /></h4>
+                        </motion.div>
+                    );
+                })}
             </div>
         </div>
     );
 
-    // Compact List Layout
     const renderCompact = () => (
         <div className="timeline-compact">
-            {filteredEvents.map((evt, idx) => (
-                <div key={idx} className="compact-row" onClick={() => setSelectedEvent(evt)}>
+            {filteredEvents.map((evt) => (
+                <div key={evt.id} className="compact-row" onClick={() => setSelectedEvent(evt)}>
                     <span className="compact-date">{evt.year}</span>
-                    <span className="compact-title">{evt.event}</span>
+                    <span className="compact-title"><HighlightText text={evt.event} highlight={searchTerm} /></span>
                 </div>
             ))}
         </div>
@@ -220,7 +271,7 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
                         <FaSearch className="search-icon-sm" />
                         <input
                             type="text"
-                            placeholder="Filter events..."
+                            placeholder="Search & Highlight..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -228,9 +279,39 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
                     <button className="icon-btn" onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')} title="Sort Date">
                         {sortOrder === 'asc' ? <FaSortAlphaDown /> : <FaSortAlphaUp />}
                     </button>
+
+                    {/* Zoom Control */}
+                    <div className="zoom-control">
+                        <span className="zoom-label">Zoom</span>
+                        <input
+                            type="range"
+                            min="0.5"
+                            max="2"
+                            step="0.1"
+                            value={zoomLevel}
+                            onChange={(e) => setZoomLevel(parseFloat(e.target.value))}
+                            title="Adjust Density"
+                        />
+                    </div>
                 </div>
 
                 <div className="control-group view-toggles">
+                     {/* Presentation Toggle */}
+                    <button
+                        className={`view-btn play-btn ${isPlaying ? 'active-pulse' : ''}`}
+                        onClick={() => {
+                            if (!isPlaying && !selectedEvent && filteredEvents.length > 0) {
+                                setSelectedEvent(filteredEvents[0]);
+                            }
+                            setIsPlaying(!isPlaying);
+                        }}
+                        title={isPlaying ? "Pause Presentation" : "Start Presentation"}
+                    >
+                        {isPlaying ? <FaPause /> : <FaPlay />}
+                    </button>
+
+                    <div className="divider-v"></div>
+
                     <button className={`view-btn ${viewMode === 'vertical' ? 'active' : ''}`} onClick={() => setViewMode('vertical')} title="Vertical View"><FaStream /></button>
                     <button className={`view-btn ${viewMode === 'horizontal' ? 'active' : ''}`} onClick={() => setViewMode('horizontal')} title="Horizontal View"><FaExpandAlt /></button>
                     <button className={`view-btn ${viewMode === 'compact' ? 'active' : ''}`} onClick={() => setViewMode('compact')} title="Compact List"><FaList /></button>
@@ -265,7 +346,7 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
                 )}
             </div>
 
-            {/* Detail Modal / Overlay */}
+            {/* Detail Modal / Presentation Overlay */}
             <AnimatePresence>
                 {selectedEvent && (
                     <motion.div
@@ -273,23 +354,33 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        onClick={() => setSelectedEvent(null)}
+                        onClick={() => !isPlaying && setSelectedEvent(null)}
                     >
                         <motion.div
-                            className="event-modal glass-panel"
+                            className={`event-modal glass-panel ${isPlaying ? 'presentation-mode' : ''}`}
                             initial={{ scale: 0.8, y: 50 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.8, y: 50 }}
                             onClick={e => e.stopPropagation()}
                         >
-                            <button className="close-modal-btn" onClick={() => setSelectedEvent(null)}>×</button>
+                            {!isPlaying && (
+                                <button className="close-modal-btn" onClick={() => setSelectedEvent(null)}>×</button>
+                            )}
+
+                            {isPlaying && (
+                                <div className="presentation-controls">
+                                    <button onClick={() => setIsPlaying(false)} title="Exit Presentation">Exit</button>
+                                    <span className="presentation-status">Auto-Playing...</span>
+                                </div>
+                            )}
+
                             <h2 className="modal-year neon-text">{selectedEvent.year}</h2>
                             <h3 className="modal-title">{selectedEvent.event}</h3>
-                            <div className="modal-desc">
+                            <div className="modal-desc custom-scrollbar">
                                 {selectedEvent.description ? (
                                     <p>{selectedEvent.description}</p>
                                 ) : (
-                                    <p className="no-desc">No detailed description available for this event.</p>
+                                    <p className="no-desc">No detailed description available.</p>
                                 )}
                             </div>
                         </motion.div>

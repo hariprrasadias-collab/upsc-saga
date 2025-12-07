@@ -26,6 +26,13 @@
     align-items: center;
 }
 
+.divider-v {
+    width: 1px;
+    height: 24px;
+    background: rgba(255,255,255,0.2);
+    margin: 0 5px;
+}
+
 .search-wrapper {
     position: relative;
     display: flex;
@@ -58,6 +65,13 @@
     font-size: 0.9rem;
 }
 
+.search-highlight {
+    background: rgba(255, 215, 0, 0.3);
+    color: #fff;
+    border-bottom: 2px solid #ffd700;
+    font-weight: bold;
+}
+
 .icon-btn, .view-btn {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -82,6 +96,55 @@
     border-color: #00fff2;
     color: #00fff2;
     box-shadow: 0 0 10px rgba(0, 255, 242, 0.3);
+}
+
+.view-btn.play-btn {
+    border-color: #ffd700;
+    color: #ffd700;
+}
+.view-btn.play-btn.active-pulse {
+    background: rgba(255, 215, 0, 0.2);
+    animation: pulse-gold 2s infinite;
+}
+
+@keyframes pulse-gold {
+    0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+}
+
+/* Zoom Control */
+.zoom-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,0,0,0.3);
+    padding: 5px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.zoom-label {
+    font-size: 0.7rem;
+    color: #aaa;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+.zoom-control input[type=range] {
+    width: 80px;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    -webkit-appearance: none;
+    cursor: pointer;
+}
+.zoom-control input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: #00fff2;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0,255,242,0.5);
 }
 
 /* Era Tabs */
@@ -158,7 +221,6 @@
     align-items: flex-start;
     position: relative;
     width: 100%;
-    margin-bottom: 40px;
 }
 
 .node-content {
@@ -258,8 +320,7 @@
 
 .timeline-card-horiz {
     position: relative;
-    min-width: 250px;
-    max-width: 250px;
+    /* min-width: 250px;  overridden by inline styles for duration */
     padding: 20px;
     background: rgba(20, 20, 30, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -267,7 +328,7 @@
     z-index: 1;
     cursor: pointer;
     transition: all 0.3s;
-    height: 160px;
+    height: 180px;
     display: flex;
     flex-direction: column;
 }
@@ -285,27 +346,19 @@
     background: #00fff2;
     border-radius: 50%;
     position: absolute;
-    top: -6px; /* Sits on top edge ? No, align with line */
-    /* To align with line, we need calculation. Or simpler: just put dot on card edge */
+    top: -6px;
+    left: 20px;
 }
 
-/* Adjust horizontal styling - put dot on the line */
-.timeline-card-horiz::before {
-    content: '';
+.duration-bar {
     position: absolute;
-    top: 50%; /* Center of card? No line is absolute. */
+    top: -2px;
+    left: 0;
+    height: 4px;
+    background: #00fff2;
+    box-shadow: 0 0 5px #00fff2;
+    border-radius: 2px;
 }
-
-/* Let's make the line run through the middle of the viewport, cards alternating up/down?
-   For simplicity, cards are centered on the line, or line is behind them.
-*/
-.timeline-horizontal-track {
-    align-items: center;
-}
-.timeline-card-horiz {
-    margin-top: 0;
-}
-
 
 .horiz-date {
     color: #00fff2;
@@ -321,7 +374,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
 }
 
@@ -345,7 +398,7 @@
 }
 
 .compact-date {
-    width: 100px;
+    width: 120px;
     color: #00fff2;
     font-weight: bold;
     font-family: monospace;
@@ -380,6 +433,71 @@
     position: relative;
     border: 1px solid #00fff2;
     box-shadow: 0 0 40px rgba(0, 255, 242, 0.2);
+    transition: all 0.5s ease;
+}
+
+/* Presentation Mode Modal Style */
+.event-modal.presentation-mode {
+    max-width: 900px;
+    width: 95%;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-color: #ffd700;
+    box-shadow: 0 0 60px rgba(255, 215, 0, 0.3);
+    background: rgba(10, 10, 15, 0.95);
+}
+
+.event-modal.presentation-mode .modal-year {
+    font-size: 5rem;
+    color: #ffd700;
+    text-align: center;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.event-modal.presentation-mode .modal-title {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.event-modal.presentation-mode .modal-desc {
+    font-size: 1.5rem;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.presentation-controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.presentation-controls button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 5px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.presentation-status {
+    color: #ffd700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    animation: blink 2s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
 }
 
 .close-modal-btn {
@@ -425,7 +543,7 @@
     font-size: 1.1rem;
 }
 
-/* Re-include other renderer styles */
+/* Re-include other renderer styles (kept as is in overwrite) */
 /* Podcast Player */
 .podcast-player-container {
     display: flex;
