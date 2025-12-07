@@ -15,8 +15,6 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
     const [voicesLoaded, setVoicesLoaded] = useState(false);
     const [playbackRate, setPlaybackRate] = useState(1.1); // Default slightly energetic
     const [isZenMode, setIsZenMode] = useState(false);
-    const [speed, setSpeed] = useState(1.0);
-    const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
     // Refs
     const scriptRef = useRef<HTMLDivElement>(null);
@@ -40,54 +38,8 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
 
             if (match) {
                 parsed.push({ speaker: match[1].trim(), text: match[2].trim() });
-        const utterance = new SpeechSynthesisUtterance(content);
-        utterance.rate = speed;
-        utterance.pitch = 1.0;
-
-        const voices = window.speechSynthesis.getVoices();
-        const preferredVoice = voices.find(v => v.name.includes('Google US English') || v.name.includes('Samantha'));
-        if (preferredVoice) utterance.voice = preferredVoice;
-
-        utterance.onend = () => {
-            setIsPlaying(false);
-            setProgress(100);
-        };
-
-        utteranceRef.current = utterance;
-
-        // Cleanup on unmount or content change
-        return () => {
-            window.speechSynthesis.cancel();
-        };
-    }, [content]);
-
-    // Handle Speed Change - Restart if playing to apply rate
-    useEffect(() => {
-        if (utteranceRef.current) {
-            utteranceRef.current.rate = speed;
-        }
-
-        if (isPlaying) {
-            // Cancel current speech and restart with new rate
-            window.speechSynthesis.cancel();
-            if (utteranceRef.current) {
-                 window.speechSynthesis.speak(utteranceRef.current);
-            }
-        }
-    }, [speed]);
-
-    // Playback Control
-    useEffect(() => {
-        let interval: any;
-
-        if (isPlaying) {
-            if (!window.speechSynthesis.speaking) {
-                 if (utteranceRef.current) {
-                     utteranceRef.current.rate = speed;
-                     window.speechSynthesis.speak(utteranceRef.current);
-                 }
             } else {
-                 parsed.push({ speaker: 'Narrator', text: cleanLine });
+                parsed.push({ speaker: 'Narrator', text: cleanLine });
             }
         });
         setDialogue(parsed);
@@ -122,15 +74,6 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
     useEffect(() => {
         if (currentLineIndex >= 0) {
             localStorage.setItem(storageKey, currentLineIndex.toString());
-
-             interval = setInterval(() => {
-                setProgress(p => (p >= 100 ? 0 : p + 1));
-            }, 1000 / speed);
-
-        } else {
-            // Pause
-            window.speechSynthesis.pause();
-            clearInterval(interval);
         }
     }, [currentLineIndex, storageKey]);
 
@@ -361,11 +304,6 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
     const jumpToLine = (index: number) => {
         window.speechSynthesis.cancel();
         setCurrentLineIndex(index);
-        if (isPlaying) {
-            // Logic handles auto-resume via isPlaying dependency? 
-            // Actually no, effect depends on [isPlaying, lineIndex]. 
-            // Changing lineIndex triggers effect -> speakLine -> cancel -> speak. Correct.
-        }
     };
 
     // Derived State
@@ -374,20 +312,30 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
     const isExpertSpeaking = currentSpeaker.toLowerCase().includes('expert') || currentSpeaker.toLowerCase().includes('professor') || currentSpeaker.toLowerCase().includes('host');
     const ambientColor = isStudentSpeaking ? 'rgba(163, 113, 247, 0.2)' : (isExpertSpeaking ? 'rgba(0, 255, 242, 0.2)' : 'transparent');
 
+    const handleSpeedToggle = () => {
+        const potential = [0.8, 1.0, 1.25, 1.5, 2.0];
+        const idx = potential.indexOf(playbackRate);
+        const next = potential[(idx + 1) % potential.length];
+        setPlaybackRate(next);
+    };
+
     // Progress
     const progress = dialogue.length > 0 ? (currentLineIndex / dialogue.length) * 100 : 0;
-    const handleSpeedChange = () => {
-        const speeds = [0.75, 1.0, 1.25, 1.5, 2.0];
-        const nextIdx = (speeds.indexOf(speed) + 1) % speeds.length;
-        setSpeed(speeds[nextIdx]);
-    };
 
     return (
         <div
             ref={containerRef}
             className={`podcast-player-container glass-card ${isZenMode ? 'zen-mode' : ''}`}
             style={{
-                boxShadow: isPlaying ? `0 0 50px ${ambientColor}` : 'none',
+                // Phase 7: Sentient Lighting Logic
+                boxShadow: isPlaying ? (() => {
+                    const txt = dialogue[currentLineIndex]?.text.toLowerCase() || '';
+                    let glow = ambientColor; // Default to speaker color
+                    if (txt.includes('!')) glow = 'rgba(255, 68, 68, 0.6)'; // Excitement
+                    if (txt.includes('wow') || txt.includes('amazing')) glow = 'rgba(255, 215, 0, 0.6)'; // Wonder
+                    if (txt.includes('?')) glow = 'rgba(163, 113, 247, 0.6)'; // Question
+                    return `0 20px 60px ${glow}`;
+                })() : '0 20px 50px rgba(0,0,0,0.5)',
                 transition: 'all 0.5s',
                 border: isPlaying ? (isStudentSpeaking ? '1px solid rgba(163, 113, 247, 0.5)' : '1px solid rgba(0, 255, 242, 0.5)') : '1px solid rgba(255,255,255,0.1)',
                 position: isZenMode ? 'fixed' : 'relative',
@@ -402,7 +350,7 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
             }}
         >
 
-            {/* STUDIO VISUALS - DYNAMIC CAM + 3D PARALLAX */}
+            {/* STUDIO VISUALS - DYNAMIC CAM + 3D PARALLAX + SENTIENT LIGHTING */}
             <div
                 className="podcast-studio-visual"
                 onMouseMove={(e) => {
@@ -424,13 +372,12 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
                 }}
                 style={{
                     flex: isZenMode ? 1 : '0 0 auto',
-                    transition: 'transform 0.1s ease-out, opacity 0.5s', // Fast tilt, slow fade
+                    transition: 'transform 0.1s ease-out, opacity 0.5s, box-shadow 0.5s', 
                     transform: isPlaying
                         ? (isExpertSpeaking ? 'scale(1.05) translateX(-10px)' : (isStudentSpeaking ? 'scale(1.05) translateX(10px)' : 'scale(1)'))
                         : 'scale(1)',
                     position: 'relative',
                     overflow: 'hidden',
-                    boxShadow: '0 20px 50px rgba(0,0,0,0.5)', // Deep shadow
                     transformStyle: 'preserve-3d'
                 }}
             >
@@ -471,18 +418,20 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
                             border: '1px solid rgba(255,255,255,0.15)',
                             boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
                         }}>
-                            {dialogue[currentLineIndex].text.split(' ').map((word, i) => {
+                             {dialogue[currentLineIndex].text.split(' ').map((word, i) => {
                                 // Keyword Detection (Capitalized or Specific)
-                                const isKey = /^[A-Z][a-z]+/.test(word.replace(/[^a-zA-Z]/g, '')) && word.length > 3;
-                                const isImpact = ['?', '!', 'crucial', 'important', 'key'].some(k => word.toLowerCase().includes(k));
+                                const clean = word.replace(/[^a-zA-Z]/g, '');
+                                const isKey = /^[A-Z][a-z]+/.test(clean) && clean.length > 3;
+                                const isImpact = ['?', '!', 'crucial', 'important', 'key', 'must'].some(k => word.toLowerCase().includes(k));
                                 
                                 return (
                                     <span key={i} style={{ 
                                         color: isKey ? '#ffd700' : (isImpact ? '#ff4d4d' : 'inherit'),
                                         textShadow: isKey ? '0 0 10px rgba(255, 215, 0, 0.5)' : 'none',
                                         display: 'inline-block',
-                                        transform: isImpact ? 'scale(1.1)' : 'scale(1)',
-                                        marginRight: '6px'
+                                        transform: isImpact ? 'scale(1.15)' : 'scale(1)',
+                                        marginRight: '6px',
+                                        transition: 'transform 0.2s'
                                     }}>
                                         {word}
                                     </span>
@@ -496,13 +445,13 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
                 {isPlaying && currentLineIndex >= 0 && (
                     <div className="reaction-zone" style={{ position: 'absolute', top: '20%', left: '50%', transform: 'translateX(-50%) translateZ(30px)', zIndex: 20 }}>
                         {(dialogue[currentLineIndex].text.toLowerCase().includes('wow') || dialogue[currentLineIndex].text.includes('!')) && (
-                            <div style={{ fontSize: '5rem', animation: 'floatUp 0.8s ease-out forwards', filter: 'drop-shadow(0 0 20px rgba(255,165,0,0.5))' }}>🔥</div>
+                            <div style={{ fontSize: '6rem', animation: 'floatUp 0.8s ease-out forwards', filter: 'drop-shadow(0 0 20px rgba(255,165,0,0.6))' }}>🔥</div>
                         )}
                         {(dialogue[currentLineIndex].text.toLowerCase().includes('haha') || dialogue[currentLineIndex].text.toLowerCase().includes('funny')) && (
-                            <div style={{ fontSize: '5rem', animation: 'floatUp 0.8s ease-out forwards', filter: 'drop-shadow(0 0 20px rgba(255,255,0,0.5))' }}>😂</div>
+                            <div style={{ fontSize: '6rem', animation: 'floatUp 0.8s ease-out forwards', filter: 'drop-shadow(0 0 20px rgba(255,255,0,0.6))' }}>😂</div>
                         )}
                         {(dialogue[currentLineIndex].text.includes('?')) && (
-                            <div style={{ fontSize: '5rem', animation: 'floatUp 0.8s ease-out forwards', filter: 'drop-shadow(0 0 20px rgba(0,255,255,0.5))' }}>🤔</div>
+                            <div style={{ fontSize: '6rem', animation: 'floatUp 0.8s ease-out forwards', filter: 'drop-shadow(0 0 20px rgba(0,255,255,0.6))' }}>🤔</div>
                         )}
                     </div>
                 )}
@@ -581,22 +530,6 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
                                 )}
                                 🎙️ AI Cast • {voices.length} Engines • {Math.round(progress)}% Complete
                             </span>
-
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <span style={{ fontSize: '0.7rem', color: '#aaa' }}>Speed:</span>
-                                <select
-                                    value={playbackRate}
-                                    onChange={(e) => setPlaybackRate(parseFloat(e.target.value))}
-                                    className="map-select"
-                                    style={{ background: 'rgba(0,0,0,0.5)', color: 'white', border: '1px solid #555', borderRadius: '4px', padding: '2px 5px', fontSize: '0.8rem', height: 'auto' }}
-                                >
-                                    <option value="0.8">0.8x</option>
-                                    <option value="1.0">1.0x</option>
-                                    <option value="1.1">1.1x</option>
-                                    <option value="1.25">1.25x</option>
-                                    <option value="1.5">1.5x</option>
-                                </select>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -612,12 +545,21 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
                         {isPlaying ? '⏸' : '▶'}
                     </button>
 
-                 <button className="speed-btn" onClick={handleSpeedChange} title="Playback Speed">
-                    {speed}x
-                </button>
+                    <button className="speed-btn" onClick={handleSpeedToggle} title="Playback Speed" style={{ 
+                        background: 'rgba(255,255,255,0.1)', 
+                        border: '1px solid rgba(255,255,255,0.2)', 
+                        color: 'white', 
+                        padding: '8px 12px',
+                        borderRadius: '20px',
+                        cursor: 'pointer',
+                        fontSize: '0.8rem',
+                        marginLeft: '10px'
+                    }}>
+                        {playbackRate}x
+                    </button>
 
                     {/* Progress Bar */}
-                    <div className="waveform-container" style={{ cursor: 'pointer' }} onClick={(e) => {
+                    <div className="waveform-container" style={{ cursor: 'pointer', flex: 1, marginLeft: '15px' }} onClick={(e) => {
                         const rect = e.currentTarget.getBoundingClientRect();
                         const x = e.clientX - rect.left;
                         const pct = x / rect.width;
@@ -633,13 +575,21 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
                                 borderRadius: '4px',
                                 boxShadow: '0 0 10px rgba(255,255,255,0.3)'
                             }}
-                            key={i}
-                            className={`wave-bar ${isPlaying ? 'animating' : ''}`}
-                            style={{
-                                animationDelay: `${i * 0.1}s`,
-                                animationDuration: `${1.2 / speed}s`
-                            }}
-                        ></div>
+                        >
+                            {/* Animated Bars Effect */}
+                             {[...Array(20)].map((_, i) => (
+                                <div key={i} className={`wave-bar ${isPlaying ? 'animating' : ''}`} 
+                                    style={{ 
+                                        animationDelay: `${i * 0.05}s`,
+                                        height: '100%',
+                                        width: '2px',
+                                        background: 'rgba(255,255,255,0.2)',
+                                        display: 'inline-block',
+                                        marginRight: '2px'
+                                    }} 
+                                />
+                             ))}
+                        </div>
                     </div>
 
                     <div className="time-display" style={{ minWidth: '45px' }}>
