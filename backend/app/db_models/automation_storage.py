@@ -12,7 +12,7 @@ def init_automation_tables():
             user_id INTEGER,
             topic TEXT,
             dialogue TEXT, -- The full script
-            insight TEXT, -- Key takeaway
+            insight TEXT, -- Key takeaway or verdict JSON
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')

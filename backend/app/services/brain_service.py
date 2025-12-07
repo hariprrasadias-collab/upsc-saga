@@ -25,16 +25,12 @@ class BrainService:
     
     def __init__(self):
         # Initialize Brain Service - Core Logic
-        # Initialize Brain Service - Core Logic
         self.api_key = os.environ.get('GEMINI_API_KEY')
-        self.is_lobotomized = False
-
         self.is_lobotomized = False
 
         if not self.api_key:
             print("⚠️ BrainService Warning: GEMINI_API_KEY not found. The Brain will be lobotomized (Mock Mode).")
             self.model = None
-            self.is_lobotomized = True
             self.is_lobotomized = True
         else:
             try:
@@ -44,7 +40,6 @@ class BrainService:
             except Exception as e:
                 print(f"BrainService Error: Failed to initialize Gemini: {e}")
                 self.model = None
-                self.is_lobotomized = True
                 self.is_lobotomized = True
             
         self.registry = SynapseRegistry.get_instance()
@@ -420,10 +415,14 @@ class BrainService:
                 self._add_flashcard(
                     user_id, topic, subject,
                     f"Socratic Debate: {topic}",
-                    socratic_res.get('dialogue'),
+                    # Store plain text in flashcard, structured json in DB
+                    "See Socratic Archives for full structured debate.",
                     'ai_generated_socratic'
                 )
-                save_socratic_dialogue(user_id, topic, socratic_res.get('dialogue'))
+                # Parse verdict to JSON string for storage
+                verdict_json = json.dumps(socratic_res.get('verdict', {}))
+                # Now pass raw JSON string of dialogue
+                save_socratic_dialogue(user_id, topic, socratic_res.get('dialogue'), verdict_json)
 
             # 12. Triangulation Analysis
             triangulation_res = self.execute_action("TRIANGULATE_TOPIC", {"topic": topic, "reasoning": "Task Completion Automation"})
@@ -746,7 +745,7 @@ class BrainService:
             elif action_type == "PREDICT_QUESTIONS":
                 return {"success": True, "data": [{"question": "Mock Question?", "type": "MCQ"}]}
             elif action_type == "GENERATE_SOCRATIC_DIALOGUE":
-                return {"success": True, "dialogue": "Student: Why? Socrates: Why not?"}
+                return {"success": True, "dialogue": "Student: Why? Socrates: Why not?", "verdict": {"winner": "N/A"}}
             elif action_type == "TRIANGULATE_TOPIC":
                 return {"success": True, "data": {"synthesis": "Mock Synthesis", "way_forward": {}}}
             elif action_type == "DECODE_NEURAL_HASH":
@@ -1197,36 +1196,17 @@ class BrainService:
 
             elif action_type == "GENERATE_SOCRATIC_DIALOGUE":
                 try:
-                    from app.services.socratic_service import AGENTS, get_model
+                    from app.services.socratic_service import generate_autonomous_debate
                     topic = payload.get('topic', 'Philosophy')
 
-                    # Simulate a 3-turn debate
-                    model = get_model()
-                    turns = []
-
-                    # 1. User Statement (Simulated)
-                    prompt1 = f"Generate a provocative student opinion about '{topic}' that is slightly flawed."
-                    response1 = model.generate_content(prompt1)
-                    user_statement = response1.text.strip()
-                    turns.append(f"Student: {user_statement}")
-
-                    # 2. Socrates Responds
-                    agent = AGENTS['skeptic']
-                    prompt2 = f"You are {agent['name']}. The student says: '{user_statement}'. Respond with a short, deep question."
-                    response2 = model.generate_content(prompt2)
-                    socrates_response = response2.text.strip()
-                    turns.append(f"Socrates: {socrates_response}")
-
-                    # 3. Student Rethinks
-                    prompt3 = f"The student reflects on '{socrates_response}'. Generate their realization."
-                    response3 = model.generate_content(prompt3)
-                    realization = response3.text.strip()
-                    turns.append(f"Student: {realization}")
+                    # Generate a full autonomous debate (6 turns) with verdict
+                    dialogue_text, history, verdict = generate_autonomous_debate(topic, turns=6)
 
                     result = {
                         "success": True,
                         "message": "Socratic Dialogue Generated.",
-                        "script": "\\n\\n".join(turns)
+                        "dialogue": dialogue_text,
+                        "verdict": verdict
                     }
                 except Exception as e:
                     result = {"success": False, "message": f"Socratic Gen Failed: {str(e)}"}
