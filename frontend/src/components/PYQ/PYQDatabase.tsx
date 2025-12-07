@@ -6,6 +6,7 @@ import { brainService } from '../../services/BrainService';
 import MarkdownRenderer from '../Shared/MarkdownRenderer';
 import { Virtuoso } from 'react-virtuoso';
 import PYQHeatmap from '../Analytics/PYQHeatmap';
+import DifficultyTrendChart from '../Analytics/DifficultyTrendChart';
 
 
 interface Question {
@@ -27,6 +28,7 @@ interface Question {
 interface Analytics {
     by_subject: { subject: string; count: number }[];
     by_year: { year: number; count: number }[];
+    difficulty_trend?: any[];
 }
 
 const PYQDatabase: React.FC = () => {
@@ -35,6 +37,8 @@ const PYQDatabase: React.FC = () => {
     const [analytics, setAnalytics] = useState<Analytics | null>(null);
     const [loading, setLoading] = useState(true);
     const [startingQuiz, setStartingQuiz] = useState(false);
+    const [strategosAnalysis, setStrategosAnalysis] = useState<string | null>(null);
+    const [analyzingId, setAnalyzingId] = useState<number | null>(null);
 
     // Filters
     const [selectedYears, setSelectedYears] = useState<number[]>([]);
@@ -103,18 +107,21 @@ const PYQDatabase: React.FC = () => {
             const data = await res.json();
             setQuestions(data);
 
-            // Fetch Analytics only once
-            if (!analytics) {
-                const analyticsRes = await fetch('/api/pyq/analytics');
-                const analyticsData = await analyticsRes.json();
-                setAnalytics(analyticsData);
-            }
+            // Fetch Analytics (Dynamic based on filters)
+            const analyticsParams = new URLSearchParams();
+            selectedSubjects.forEach(s => analyticsParams.append('subjects', s));
+            selectedYears.forEach(y => analyticsParams.append('years', y.toString()));
+
+            const analyticsRes = await fetch(`/api/pyq/analytics?${analyticsParams.toString()}`);
+            const analyticsData = await analyticsRes.json();
+            setAnalytics(analyticsData);
+
         } catch (err) {
             console.error("Failed to fetch PYQ data", err);
         } finally {
             setLoading(false);
         }
-    }, [searchQuery, showFavoritesOnly, selectedYears, selectedSubjects, selectedTopics, analytics]);
+    }, [searchQuery, showFavoritesOnly, selectedYears, selectedSubjects, selectedTopics]);
 
     useEffect(() => {
         fetchData();
@@ -248,6 +255,23 @@ const PYQDatabase: React.FC = () => {
         }
     };
 
+    const askStrategos = async (id: number) => {
+        setAnalyzingId(id);
+        try {
+            const res = await fetch(`/api/pyq/strategos/${id}`, { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                setStrategosAnalysis(data.analysis);
+            } else {
+                alert("Strategos is offline.");
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setAnalyzingId(null);
+        }
+    };
+
     const findSimilar = async (id: number) => {
         if (showSimilar === id) {
             setShowSimilar(null);
@@ -315,6 +339,14 @@ const PYQDatabase: React.FC = () => {
                         <button className="similar-btn" onClick={() => findSimilar(q.id)}>
                              🔍 Find Similar
                         </button>
+                        <button
+                            className="strategos-btn"
+                            onClick={() => askStrategos(q.id)}
+                            disabled={analyzingId === q.id}
+                            style={{ background: '#8e44ad', marginLeft: '10px' }}
+                        >
+                             {analyzingId === q.id ? 'Thinking...' : '🧠 Ask Strategos'}
+                        </button>
                     </div>
 
                     {isRevealed && (
@@ -352,6 +384,7 @@ const PYQDatabase: React.FC = () => {
             {/* SIDEBAR FILTERS */}
             <div className="pyq-sidebar">
                 <div className="filter-section">
+                    {analytics?.difficulty_trend && <DifficultyTrendChart data={analytics.difficulty_trend} />}
                     <h3>Years</h3>
                     <div className="filter-group">
                         {analytics?.by_year.map(item => (
@@ -503,6 +536,23 @@ const PYQDatabase: React.FC = () => {
                             <button onClick={() => setTrendAnalysis(null)} style={{ background: 'none', border: 'none', color: '#bdc3c7', cursor: 'pointer' }}>✕</button>
                         </div>
                         <MarkdownRenderer content={trendAnalysis} />
+                    </div>
+                )}
+
+                {strategosAnalysis && (
+                    <div className="trend-analysis-panel" style={{
+                        background: 'rgba(41, 128, 185, 0.1)',
+                        border: '1px solid #3498db',
+                        borderRadius: '8px',
+                        padding: '15px',
+                        marginBottom: '20px',
+                        color: '#ecf0f1'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                            <h3 style={{ margin: 0, color: '#3498db' }}>🧠 Tactical Breakdown</h3>
+                            <button onClick={() => setStrategosAnalysis(null)} style={{ background: 'none', border: 'none', color: '#bdc3c7', cursor: 'pointer' }}>✕</button>
+                        </div>
+                        <MarkdownRenderer content={strategosAnalysis} />
                     </div>
                 )}
 

@@ -136,39 +136,93 @@ def toggle_favorite(id):
 
 @bp.route('/analytics', methods=['GET'])
 def get_analytics():
-    """Get simple analytics for charts"""
+    """Get analytics with optional filters"""
     conn = get_db()
     
-    # Subject distribution
-    subject_counts = conn.execute('''
+    # Base query filters
+    filters_sql = "WHERE 1=1"
+    params = []
+
+    subjects = request.args.getlist('subjects')
+    if subjects:
+        placeholders = ','.join(['?'] * len(subjects))
+        filters_sql += f" AND subject IN ({placeholders})"
+        params.extend(subjects)
+
+    years = request.args.getlist('years')
+    if years:
+        placeholders = ','.join(['?'] * len(years))
+        filters_sql += f" AND year IN ({placeholders})"
+        params.extend(years)
+
+    # Subject distribution (Filtered)
+    subject_counts = conn.execute(f'''
         SELECT subject, COUNT(*) as count 
         FROM pyq_questions 
+        {filters_sql}
         GROUP BY subject
-    ''').fetchall()
+    ''', params).fetchall()
     
-    # Year-wise distribution
-    year_counts = conn.execute('''
+    # Year-wise distribution (Filtered)
+    year_counts = conn.execute(f'''
         SELECT year, COUNT(*) as count 
         FROM pyq_questions 
+        {filters_sql}
         GROUP BY year 
         ORDER BY year
-    ''').fetchall()
+    ''', params).fetchall()
     
-    # Topic distribution (Top 20)
-    topic_counts = conn.execute('''
+    # Topic distribution (Top 20 Filtered)
+    topic_counts = conn.execute(f'''
         SELECT topic, COUNT(*) as count 
         FROM pyq_questions 
-        WHERE topic IS NOT NULL
+        {filters_sql} AND topic IS NOT NULL
         GROUP BY topic
         ORDER BY count DESC
         LIMIT 20
-    ''').fetchall()
+    ''', params).fetchall()
+
+    # Difficulty Trends (Filtered)
+    # Returns: year, difficulty, count
+    difficulty_trends = conn.execute(f'''
+        SELECT year, difficulty, COUNT(*) as count
+        FROM pyq_questions
+        {filters_sql}
+        GROUP BY year, difficulty
+        ORDER BY year
+    ''', params).fetchall()
     
     return jsonify({
         'by_subject': [dict(row) for row in subject_counts],
         'by_year': [dict(row) for row in year_counts],
-        'by_topic': [dict(row) for row in topic_counts]
+        'by_topic': [dict(row) for row in topic_counts],
+        'difficulty_trend': [dict(row) for row in difficulty_trends]
     })
+
+@bp.route('/strategos/<int:question_id>', methods=['POST'])
+def ask_strategos(question_id):
+    """Ask AI for tactical breakdown of a question"""
+    try:
+        conn = get_db()
+        question = conn.execute("SELECT * FROM pyq_questions WHERE id = ?", (question_id,)).fetchone()
+
+        if not question:
+            return jsonify({'error': 'Question not found'}), 404
+
+        from app.services.brain_service import brain_service
+
+        # Prepare payload
+        payload = {
+            "question": f"{question['question_text']}\nOptions:\nA) {question['option_a']}\nB) {question['option_b']}\nC) {question['option_c']}\nD) {question['option_d']}",
+            "reasoning": "User requested Strategos breakdown"
+        }
+
+        # Execute Action
+        result = brain_service.execute_action("ANALYZE_QUESTION", payload)
+        return jsonify(result)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @bp.route('/create-mock', methods=['POST'])
 def create_mock_from_filters():
