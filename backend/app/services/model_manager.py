@@ -16,14 +16,14 @@ class ModelManager:
     caching, and cool-down logic to handle rate limits (429) and ensure high availability.
     """
 
-    # Priority list of models to try (Based on 'list_models.py' output)
+    # Priority list of models to try (Prioritizing Pro models for Pro subscription usage)
     MODEL_ROTATION = [
-        'gemini-2.0-flash',
-        'gemini-2.0-flash-001',
-        'gemini-2.0-flash-lite-preview-02-05',
-        'gemini-1.5-flash',
         'gemini-1.5-pro',
-        'gemini-2.0-pro-exp-02-05'
+        'gemini-1.5-pro-latest',
+        'gemini-2.0-pro-exp-02-05',
+        'gemini-2.5-pro',
+        'gemini-2.0-flash',
+        'gemini-1.5-flash',
     ]
 
     def __init__(self):
