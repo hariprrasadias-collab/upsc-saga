@@ -23,23 +23,24 @@ class ModelManager:
     """
 
     # High Intelligence Models (Low Rate Limit, High Cost)
-    # Using confirmed available models
     PRO_MODELS = [
         'gemini-2.5-pro',
         'gemini-2.0-pro-exp-02-05',
         'gemini-2.0-pro-exp',
-        'gemini-1.5-pro-latest', # Alias
         'gemini-1.5-pro',
+        'gemini-1.5-pro-latest',
     ]
 
     # High Speed/Volume Models (High Rate Limit, Low Cost)
+    # Expanded list to maximize availability
     FAST_MODELS = [
         'gemini-2.5-flash',
+        'gemini-exp-1206', # Often very capable and high limit
+        'gemini-2.0-flash-lite-preview-02-05', # Ultra lightweight
         'gemini-2.0-flash',
-        'gemini-2.0-flash-exp',
-        'gemini-1.5-flash-latest', # Alias
         'gemini-1.5-flash',
-        'gemini-1.5-flash-001',
+        'gemini-1.5-flash-8b',
+        'gemini-flash-latest',
     ]
 
     def __init__(self):
@@ -133,7 +134,7 @@ class ModelManager:
                 self._panic_mode_until = None
         return False
 
-    def _trigger_panic_mode(self, duration_seconds=60):
+    def _trigger_panic_mode(self, duration_seconds=10):
         """Activate circuit breaker to stop hammering API."""
         self._panic_mode_until = datetime.now() + timedelta(seconds=duration_seconds)
         print(f"🛑 PANIC MODE ACTIVATED: Skipping API calls for {duration_seconds}s")
@@ -234,8 +235,8 @@ class ModelManager:
                     print(f"⚠️ API Error ({type(e).__name__}) with {current_model_name}: {e}")
                     self._mark_cooldown(current_model_name, duration_seconds=60)
 
-                    # Cap sleep to 5s max to prevent sticking
-                    sleep_time = min(2 ** attempts, 5) + random.uniform(0, 1)
+                    # Cap sleep to 8s max to prevent sticking, but give enough time for minor glitches
+                    sleep_time = min(2 ** attempts, 8) + random.uniform(0, 1)
                     print(f"📉 Rotating & Sleeping {sleep_time:.2f}s...")
 
                     self.switch_model(model_type)
@@ -261,7 +262,7 @@ class ModelManager:
 
             # FINAL SAFETY NET
             print("🏳️ ALL SYSTEMS FAILED. Triggering Panic Mode and Returning Safe Mock.")
-            self._trigger_panic_mode(duration_seconds=60)
+            self._trigger_panic_mode(duration_seconds=10) # Reduced from 60s
             return FallbackResponse(
                 "Oracle is silent (High Traffic). Please try again later."
             )

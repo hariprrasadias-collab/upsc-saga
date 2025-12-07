@@ -197,6 +197,10 @@ class ForesightEngine:
         try:
             response = model_manager.generate_content(prompt, model_type='pro')
             text = response.text.strip()
+
+            if "Oracle is silent" in text:
+                return candidates[:10]
+
             json_match = re.search(r'\[.*\]', text, re.DOTALL)
             
             if json_match:
@@ -312,6 +316,11 @@ class ForesightEngine:
             response = model_manager.generate_content(prompt, model_type='pro')
             
             text = response.text.strip()
+
+            if "Oracle is silent" in text:
+                print("Oracle fallback active")
+                return []
+
             json_match = re.search(r'\[.*\]', text, re.DOTALL)
             
             if json_match:
