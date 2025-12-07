@@ -1056,3 +1056,50 @@
     font-size: 1.5rem;
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
+/* Fullscreen Map Mode */
+.map-renderer-container.fullscreen-map {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    border-radius: 0;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background: #000; /* Ensure opaque background */
+}
+
+.fullscreen-map .map-viewport {
+    flex: 1;
+    height: auto !important;
+    max-height: none;
+}
+
+.fullscreen-map svg {
+    height: 100%;
+}
+
+.review-header {
+    font-weight: bold;
+    color: #a371f7;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+.review-stat {
+    margin-top: 5px;
+    font-size: 1.1rem;
+}
+
+.pulse {
+    animation: pulse-ring 2s infinite;
+}
+
+@keyframes pulse-ring {
+    0% { transform: scale(0.8); opacity: 0.8; stroke-width: 4px; }
+    100% { transform: scale(1.5); opacity: 0; stroke-width: 0px; }
+}
