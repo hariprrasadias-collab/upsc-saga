@@ -15,9 +15,11 @@ interface MapRendererProps {
     metadata?: any;
 }
 
+// --- Utils ---
+
 // Haversine formula for distance in km
 function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon2: number) {
-    const R = 6371; // Radius of the earth in km
+    const R = 6371;
     const dLat = deg2rad(lat2 - lat1);
     const dLon = deg2rad(lon2 - lon1);
     const a =
@@ -26,13 +28,73 @@ function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon
         Math.sin(dLon / 2) * Math.sin(dLon / 2)
         ;
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const d = R * c; // Distance in km
+    const d = R * c;
     return d;
 }
 
 function deg2rad(deg: number) {
     return deg * (Math.PI / 180)
 }
+
+// Simple Audio Synth
+const playSound = (type: 'correct' | 'wrong' | 'tick' | 'win') => {
+    try {
+        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        const now = ctx.currentTime;
+
+        if (type === 'correct') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, now);
+            osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        } else if (type === 'wrong') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(200, now);
+            osc.frequency.linearRampToValueAtTime(100, now + 0.3);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        } else if (type === 'tick') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(800, now);
+            gain.gain.setValueAtTime(0.02, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+            osc.start(now);
+            osc.stop(now + 0.05);
+        } else if (type === 'win') {
+             // Arpeggio
+            osc.type = 'triangle';
+            gain.gain.value = 0.1;
+
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                 const osc2 = ctx.createOscillator();
+                 const gain2 = ctx.createGain();
+                 osc2.connect(gain2);
+                 gain2.connect(ctx.destination);
+                 osc2.frequency.value = freq;
+                 const start = now + (i * 0.1);
+                 gain2.gain.setValueAtTime(0.1, start);
+                 gain2.gain.exponentialRampToValueAtTime(0.01, start + 0.3);
+                 osc2.start(start);
+                 osc2.stop(start + 0.3);
+            });
+        }
+    } catch (e) {
+        console.error("Audio Error", e);
+    }
+};
+
 
 const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
     const svgRef = useRef<SVGSVGElement>(null);
@@ -49,18 +111,22 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
     const [mode, setMode] = useState<'explore' | 'practice'>('explore');
     const [quizIndex, setQuizIndex] = useState(0);
     const [quizScore, setQuizScore] = useState(0);
-    const [showResult, setShowResult] = useState(false); // Result of current question
+    const [streak, setStreak] = useState(0);
+    const [showResult, setShowResult] = useState(false);
     const [lastGuess, setLastGuess] = useState<{ lat: number, lon: number, distance: number, correct: boolean } | null>(null);
     const [feedbackMsg, setFeedbackMsg] = useState<string>("");
 
-    // D3 Zoom Behavior instance
+    // Timer State
+    const [timeLeft, setTimeLeft] = useState(15);
+    const timerRef = useRef<any>(null);
+
     const zoomBehavior = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
 
-    // Parse Locations: Check Metadata FIRST, then Content
+    // --- Data Loading ---
+
+    // 1. Parse Locations
     useEffect(() => {
         let foundLocations: Location[] = [];
-
-        // Helper to extract locations from any object
         const extract = (data: any) => {
             if (!data) return [];
             if (data.locations && Array.isArray(data.locations)) return data.locations;
@@ -68,55 +134,160 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
             return [];
         };
 
-        // Priority 1: properties on metadata object
         if (metadata) {
             if (typeof metadata === 'string') {
                 try {
-                    const parsed = JSON.parse(metadata);
-                    foundLocations = extract(parsed);
-                } catch (e) {
-                    // ignore
-                }
+                    foundLocations = extract(JSON.parse(metadata));
+                } catch (e) {}
             } else {
                 foundLocations = extract(metadata);
             }
         }
 
-        // Priority 2: Try to parse content as JSON if no metadata locations found
         if (foundLocations.length === 0) {
             try {
-                const parsed = JSON.parse(content);
-                foundLocations = extract(parsed);
-            } catch (e) {
-                // ignore
-            }
+                foundLocations = extract(JSON.parse(content));
+            } catch (e) {}
         }
-
         setLocations(foundLocations);
-
     }, [content, metadata]);
 
-    // Fetch Map Data
+    // 2. Smart Projection & Map Fetching
     useEffect(() => {
+        if (locations.length === 0) return;
+
+        // Check bounds
+        const lats = locations.map(l => l.lat);
+        const lons = locations.map(l => l.lon);
+        const minLat = Math.min(...lats);
+        const maxLat = Math.max(...lats);
+        const minLon = Math.min(...lons);
+        const maxLon = Math.max(...lons);
+
+        // India Bounds (approx)
+        const isIndia = (minLat >= 6 && maxLat <= 38 && minLon >= 68 && maxLon <= 98);
+
         const fetchMap = async () => {
             try {
-                const res = await fetch('https://raw.githubusercontent.com/geohacker/india/master/district/india_district.geojson');
+                let url = 'https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson';
+                let projCenter: [number, number] = [0, 20];
+                let projScale = 150;
+
+                if (isIndia) {
+                    url = 'https://raw.githubusercontent.com/geohacker/india/master/district/india_district.geojson';
+                    projCenter = [82, 23];
+                    projScale = 800;
+                }
+
+                const res = await fetch(url);
                 if (res.ok) {
                     const data = await res.json();
-                    setGeoData(data);
-                } else {
-                    const resWorld = await fetch('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson');
-                    const dataWorld = await resWorld.json();
-                    setGeoData(dataWorld);
+                    setGeoData({
+                        geojson: data,
+                        center: projCenter,
+                        scale: projScale,
+                        type: isIndia ? 'india' : 'world'
+                    });
                 }
             } catch (error) {
                 console.error("Failed to load map data", error);
             }
         };
         fetchMap();
-    }, []);
+    }, [locations]);
 
-    // Initialize D3 and Zoom
+
+    // --- Game Logic ---
+
+    // Timer Tick
+    useEffect(() => {
+        if (mode === 'practice' && !showResult && quizIndex < locations.length) {
+            if (timeLeft > 0) {
+                timerRef.current = setTimeout(() => {
+                    setTimeLeft(prev => prev - 1);
+                    if (timeLeft <= 5) playSound('tick');
+                }, 1000);
+            } else {
+                // Time's up!
+                handleTimeOut();
+            }
+        }
+        return () => {
+            if (timerRef.current) clearTimeout(timerRef.current);
+        };
+    }, [timeLeft, mode, showResult, quizIndex, locations.length]);
+
+    const handleTimeOut = () => {
+        if (!locations[quizIndex]) return;
+        playSound('wrong');
+        setStreak(0);
+        setShowResult(true);
+        setFeedbackMsg("⏰ Time's up!");
+        setLastGuess(null); // No guess made
+    };
+
+    const handleMapClick = (event: React.MouseEvent) => {
+        if (mode !== 'practice' || showResult) return;
+        if (!projectionRef.current || !locations[quizIndex]) return;
+
+        const [svgX, svgY] = d3.pointer(event, svgRef.current);
+        const transform = zoomTransform;
+        const x = (svgX - transform.x) / transform.k;
+        const y = (svgY - transform.y) / transform.k;
+
+        const coords = projectionRef.current.invert?.([x, y]);
+        if (coords) {
+            const [lon, lat] = coords;
+            const target = locations[quizIndex];
+            const dist = getDistanceFromLatLonInKm(lat, lon, target.lat, target.lon);
+
+            // Dynamic threshold based on map scale? For now fixed.
+            const threshold = geoData?.type === 'india' ? 150 : 500;
+            const isCorrect = dist <= threshold;
+
+            setLastGuess({ lat, lon, distance: Math.round(dist), correct: isCorrect });
+            setShowResult(true);
+
+            if (isCorrect) {
+                playSound('correct');
+                setFeedbackMsg(`🎯 Great! Off by ${Math.round(dist)}km.`);
+                setQuizScore(prev => prev + 1);
+                setStreak(prev => prev + 1);
+            } else {
+                playSound('wrong');
+                setFeedbackMsg(`❌ Missed by ${Math.round(dist)}km.`);
+                setStreak(0);
+            }
+        }
+    };
+
+    const nextQuestion = () => {
+        if (quizIndex < locations.length - 1) {
+            setQuizIndex(prev => prev + 1);
+            setShowResult(false);
+            setLastGuess(null);
+            setFeedbackMsg("");
+            setTimeLeft(15); // Reset Timer
+        } else {
+            playSound('win');
+            setFeedbackMsg("🎉 Practice Complete!");
+        }
+    };
+
+    const resetQuiz = () => {
+        setQuizIndex(0);
+        setQuizScore(0);
+        setStreak(0);
+        setShowResult(false);
+        setLastGuess(null);
+        setFeedbackMsg("");
+        setTimeLeft(15);
+    };
+
+
+    // --- Drawing ---
+
+    // 1. Map Base
     useEffect(() => {
         if (!svgRef.current || !gRef.current || !geoData) return;
 
@@ -124,17 +295,15 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
         const width = 600;
         const height = 600;
 
-        // India-centric Projection
         const projection = d3.geoMercator()
-            .center([82, 23])
-            .scale(800)
+            .center(geoData.center)
+            .scale(geoData.scale)
             .translate([width / 2, height / 2]);
 
         projectionRef.current = projection;
-
         const path = d3.geoPath().projection(projection);
 
-        // Define Zoom
+        // Zoom setup
         zoomBehavior.current = d3.zoom<SVGSVGElement, unknown>()
             .scaleExtent([1, 8])
             .on("zoom", (event) => {
@@ -143,53 +312,33 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                     setZoomTransform(event.transform);
                 }
             });
-
         svg.call(zoomBehavior.current);
 
-        // Bind Data
+        // Draw Map
         const g = d3.select(gRef.current);
-        // Only clear paths, not circles which are managed by the other effect?
-        // Actually, we should redraw paths here.
-        // We use a specific class for paths to differentiate from points if needed,
-        // or just clear everything if we assume this effect always runs before the other.
-        // But effects run in order of definition usually, or concurrently.
-        // Safer to just clear specific elements or rely on data join.
         g.selectAll("path").remove();
 
-        // Draw Colors based on Theme
         let fill = '#1a1a2e';
         let stroke = 'rgba(0, 255, 242, 0.2)';
-
-        if (theme === 'atlas') {
-            fill = '#e0e0e0';
-            stroke = '#999';
-        } else if (theme === 'ancient') {
-            fill = '#f4e4bc'; // Parchment
-            stroke = '#b08d55'; // Sepia/Brown
-        }
-
-        // Draw Map Paths
-        // In Ancient mode, we might want less detailed borders or fainter ones
-        const strokeWidth = theme === 'ancient' ? 0.3 : 0.5;
+        if (theme === 'atlas') { fill = '#e0e0e0'; stroke = '#999'; }
+        else if (theme === 'ancient') { fill = '#f4e4bc'; stroke = '#b08d55'; }
 
         g.selectAll("path")
-            .data(geoData.features)
+            .data(geoData.geojson.features)
             .enter()
             .append("path")
             .attr("d", path as any)
             .attr("fill", fill)
             .attr("stroke", stroke)
-            .attr("stroke-width", strokeWidth);
+            .attr("stroke-width", theme === 'ancient' ? 0.3 : 0.5);
 
     }, [geoData, theme]);
 
-
-    // Render Points (Dynamic based on Mode)
+    // 2. Points & Game Overlay
     useEffect(() => {
         if (!gRef.current || !projectionRef.current || !geoData) return;
         const g = d3.select(gRef.current);
 
-        // Remove existing points and lines first
         g.selectAll(".map-point").remove();
         g.selectAll(".feedback-line").remove();
         g.selectAll(".guess-point").remove();
@@ -209,40 +358,33 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                     .attr("stroke", "#fff")
                     .attr("stroke-width", 1)
                     .attr("class", "map-point")
-                    .on("mouseover", (event, d) => {
-                        setTooltip({
-                            x: event.pageX,
-                            y: event.pageY,
-                            text: `${d.name}`
-                        });
-                    })
+                    .on("mouseover", (event, d) => setTooltip({ x: event.pageX, y: event.pageY, text: d.name }))
                     .on("mouseout", () => setTooltip(null));
             }
         } else {
             // PRACTICE MODE
-            // Show only the CORRECT point IF we are showing results
             if (showResult && locations[quizIndex]) {
                 const target = locations[quizIndex];
 
-                // Draw Correct Point
+                // Correct Point
                 g.append("circle")
                     .attr("cx", projectionRef.current!([target.lon, target.lat])?.[0] || 0)
                     .attr("cy", projectionRef.current!([target.lon, target.lat])?.[1] || 0)
                     .attr("r", 8 / (zoomTransform.k || 1))
-                    .attr("fill", "#2ea043") // Green
+                    .attr("fill", "#2ea043")
                     .attr("stroke", "#fff")
                     .attr("class", "map-point");
 
-                // Draw User Guess
+                // User Guess
                 if (lastGuess) {
                      g.append("circle")
                         .attr("cx", projectionRef.current!([lastGuess.lon, lastGuess.lat])?.[0] || 0)
                         .attr("cy", projectionRef.current!([lastGuess.lon, lastGuess.lat])?.[1] || 0)
                         .attr("r", 6 / (zoomTransform.k || 1))
-                        .attr("fill", lastGuess.correct ? "#2ea043" : "#da3633") // Red/Green
+                        .attr("fill", lastGuess.correct ? "#2ea043" : "#da3633")
                         .attr("class", "guess-point");
 
-                    // Draw Line
+                    // Line
                     g.append("line")
                         .attr("x1", projectionRef.current!([target.lon, target.lat])?.[0] || 0)
                         .attr("y1", projectionRef.current!([target.lon, target.lat])?.[1] || 0)
@@ -255,202 +397,102 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                 }
             }
         }
+    }, [locations, mode, quizIndex, showResult, lastGuess, zoomTransform, theme, geoData]); // Added geoData to deps
 
-    }, [locations, mode, quizIndex, showResult, lastGuess, zoomTransform, theme]);
 
+    // --- Render Helpers ---
 
-    // Click Handler for Map
-    const handleMapClick = (event: React.MouseEvent) => {
-        if (mode !== 'practice' || showResult) return;
-        if (!projectionRef.current || !locations[quizIndex]) return;
-
-        // Get SVG coordinates
-        const [svgX, svgY] = d3.pointer(event, svgRef.current);
-
-        // Apply Inverse Transform (Zoom) to get "unzoomed" coordinates relative to G
-        // Transform: output = input * k + [tx, ty]
-        // input = (output - [tx, ty]) / k
-        const transform = zoomTransform;
-        const x = (svgX - transform.x) / transform.k;
-        const y = (svgY - transform.y) / transform.k;
-
-        // Invert Projection to get Lat/Lon
-        const coords = projectionRef.current.invert?.([x, y]);
-        if (coords) {
-            const [lon, lat] = coords;
-            const target = locations[quizIndex];
-
-            // Calculate Distance
-            const dist = getDistanceFromLatLonInKm(lat, lon, target.lat, target.lon);
-            const threshold = 150; // 150km tolerance (India is big)
-            const isCorrect = dist <= threshold;
-
-            setLastGuess({ lat, lon, distance: Math.round(dist), correct: isCorrect });
-            setShowResult(true);
-
-            if (isCorrect) {
-                setFeedbackMsg(`🎯 Great job! You were off by only ${Math.round(dist)}km.`);
-                setQuizScore(prev => prev + 1);
-            } else {
-                setFeedbackMsg(`❌ Missed! You were off by ${Math.round(dist)}km. See the correct location.`);
-            }
-        }
-    };
-
-    const nextQuestion = () => {
-        if (quizIndex < locations.length - 1) {
-            setQuizIndex(prev => prev + 1);
-            setShowResult(false);
-            setLastGuess(null);
-            setFeedbackMsg("");
-        } else {
-            setFeedbackMsg("🎉 Practice Complete!");
-        }
-    };
-
-    const resetQuiz = () => {
-        setQuizIndex(0);
-        setQuizScore(0);
-        setShowResult(false);
-        setLastGuess(null);
-        setFeedbackMsg("");
-        // Keep in practice mode
-    };
-
-    // Manual Zoom Control
     const handleZoom = (factor: number) => {
         if (!svgRef.current || !zoomBehavior.current) return;
-        d3.select(svgRef.current)
-            .transition()
-            .duration(300)
-            .call(zoomBehavior.current.scaleBy, factor);
+        d3.select(svgRef.current).transition().duration(300).call(zoomBehavior.current.scaleBy, factor);
     };
 
     const handleReset = () => {
         if (!svgRef.current || !zoomBehavior.current) return;
-        d3.select(svgRef.current)
-            .transition()
-            .duration(750)
-            .call(zoomBehavior.current.transform, d3.zoomIdentity);
+        d3.select(svgRef.current).transition().duration(750).call(zoomBehavior.current.transform, d3.zoomIdentity);
     };
 
-    // Fly-To Function
     const flyToLocation = (loc: Location) => {
-        if (!svgRef.current || !zoomBehavior.current) return;
-
-        const width = 600;
-        const height = 600;
-        // Re-create temporary projection to calculate center (since ref is stable)
-        const projection = d3.geoMercator().center([82, 23]).scale(800).translate([width / 2, height / 2]);
+        if (!svgRef.current || !zoomBehavior.current || !geoData) return;
+        // Re-calculate projection for center
+        const projection = d3.geoMercator().center(geoData.center).scale(geoData.scale).translate([300, 300]);
         const [x, y] = projection([loc.lon, loc.lat]) || [0, 0];
-
-        // Calculate transform to center this point
         const scale = 4;
-        const translate = [width / 2 - scale * x, height / 2 - scale * y];
+        const translate = [300 - scale * x, 300 - scale * y];
 
         d3.select(svgRef.current)
             .transition()
             .duration(1500)
-            .call(
-                zoomBehavior.current.transform,
-                d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale)
-            );
+            .call(zoomBehavior.current.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
     };
-
 
     return (
         <div className={`map-renderer-container ${theme}`}>
             <div className="map-header">
                 <h3 style={{color: theme === 'ancient' ? '#8b4513' : 'inherit'}}>
-                    {mode === 'explore' ? '📍 AI Cartographer' : '⚔️ Map Practice'}
+                    {mode === 'explore' ? '📍 AI Cartographer' : '⚔️ Map Arena'}
                 </h3>
                 <div className="map-controls-row">
-                    <button
-                        className={`map-btn-sm ${theme === 'cyber' ? 'active' : ''}`}
-                        onClick={() => setTheme('cyber')}
-                    >
-                        🌙 Cyber
-                    </button>
-                    <button
-                        className={`map-btn-sm ${theme === 'atlas' ? 'active' : ''}`}
-                        onClick={() => setTheme('atlas')}
-                    >
-                        ☀️ Atlas
-                    </button>
-                    <button
-                        className={`map-btn-sm ${theme === 'ancient' ? 'active' : ''}`}
-                        onClick={() => setTheme('ancient')}
-                    >
-                        📜 Ancient
-                    </button>
+                    <button className={`map-btn-sm ${theme === 'cyber' ? 'active' : ''}`} onClick={() => setTheme('cyber')}>🌙 Cyber</button>
+                    <button className={`map-btn-sm ${theme === 'atlas' ? 'active' : ''}`} onClick={() => setTheme('atlas')}>☀️ Atlas</button>
+                    <button className={`map-btn-sm ${theme === 'ancient' ? 'active' : ''}`} onClick={() => setTheme('ancient')}>📜 Ancient</button>
                 </div>
             </div>
 
             <div className="mode-toggle-bar" style={{marginBottom: 10, display: 'flex', gap: 10}}>
-                <button
-                    className={`map-btn-sm ${mode === 'explore' ? 'active' : ''}`}
-                    onClick={() => { setMode('explore'); handleReset(); }}
-                >
-                    Explore
-                </button>
-                <button
-                    className={`map-btn-sm ${mode === 'practice' ? 'active' : ''}`}
-                    onClick={() => { setMode('practice'); handleReset(); }}
-                >
-                    Practice
-                </button>
+                <button className={`map-btn-sm ${mode === 'explore' ? 'active' : ''}`} onClick={() => { setMode('explore'); handleReset(); }}>Explore</button>
+                <button className={`map-btn-sm ${mode === 'practice' ? 'active' : ''}`} onClick={() => { setMode('practice'); handleReset(); resetQuiz(); }}>Practice</button>
             </div>
 
             {mode === 'practice' && locations.length > 0 && (
                  <div className="instruction-box">
-                    <div style={{display:'flex', justifyContent:'space-between', marginBottom: 5}}>
-                        <span><strong>Question {quizIndex + 1}/{locations.length}</strong></span>
-                        <span>Score: {quizScore}</span>
+                    <div className="hud-row">
+                        <div className="hud-stat">
+                            <span className="hud-label">Question</span>
+                            <span className="hud-value">{quizIndex + 1}/{locations.length}</span>
+                        </div>
+                         <div className="hud-stat">
+                            <span className="hud-label">Streak</span>
+                            <span className={`hud-value ${streak > 2 ? 'streak-fire' : ''}`}>
+                                {streak} 🔥
+                            </span>
+                        </div>
+                        <div className="hud-stat">
+                            <span className="hud-label">Score</span>
+                            <span className="hud-value">{quizScore}</span>
+                        </div>
                     </div>
+
+                    {/* Timer Bar */}
+                    {!showResult && quizIndex < locations.length && (
+                        <div className="timer-bar-container">
+                            <div
+                                className={`timer-bar-fill ${timeLeft < 5 ? 'critical' : ''}`}
+                                style={{width: `${(timeLeft / 15) * 100}%`}}
+                            ></div>
+                        </div>
+                    )}
+
                     {quizIndex < locations.length ? (
-                        <div style={{fontSize: '1.1rem', marginBottom: 5}}>
-                            Locate <strong>{locations[quizIndex].name}</strong> on the map.
+                        <div className="question-text">
+                            Locate <strong>{locations[quizIndex].name}</strong>
                         </div>
                     ) : (
-                        <div style={{color: '#2ea043', fontWeight: 'bold'}}>
+                        <div className="completion-box">
                             Session Complete! You scored {quizScore}/{locations.length}.
-                            <button onClick={resetQuiz} style={{marginLeft: 10, padding: '2px 8px', borderRadius: 4, cursor:'pointer'}}>Restart</button>
+                            <button onClick={resetQuiz} className="retry-btn">Restart</button>
                         </div>
                     )}
 
                     {feedbackMsg && (
-                        <div style={{marginTop: 5, padding: 5, background: 'rgba(0,0,0,0.2)', borderRadius: 4}}>
+                        <div className={`feedback-box ${lastGuess?.correct ? 'success' : 'failure'}`}>
                             {feedbackMsg}
-                            {showResult && quizIndex < locations.length - 1 && (
+                            {showResult && (
                                 <button
-                                    onClick={nextQuestion}
-                                    style={{
-                                        marginLeft: 10,
-                                        background: '#238636',
-                                        color: 'white',
-                                        border: 'none',
-                                        padding: '4px 12px',
-                                        borderRadius: 4,
-                                        cursor: 'pointer'
-                                    }}
+                                    onClick={quizIndex < locations.length - 1 ? nextQuestion : () => setFeedbackMsg("🎉 All Done!")}
+                                    className="next-btn"
                                 >
-                                    Next ➡️
-                                </button>
-                            )}
-                             {showResult && quizIndex === locations.length - 1 && (
-                                <button
-                                    onClick={() => setFeedbackMsg("🎉 All Done! Review the map or Restart.")}
-                                    style={{
-                                        marginLeft: 10,
-                                        background: '#238636',
-                                        color: 'white',
-                                        border: 'none',
-                                        padding: '4px 12px',
-                                        borderRadius: 4,
-                                        cursor: 'pointer'
-                                    }}
-                                >
-                                    Finish
+                                    {quizIndex < locations.length - 1 ? 'Next ➡️' : 'Finish'}
                                 </button>
                             )}
                         </div>
@@ -465,8 +507,8 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                     <button onClick={handleReset}>↺</button>
                 </div>
 
-                <div style={{ position: 'absolute', top: 10, left: 10, color: theme === 'ancient' ? '#8b4513' : 'rgba(255,255,255,0.5)', fontSize: '0.7rem', zIndex: 5, pointerEvents: 'none' }}>
-                    {mode === 'explore' ? `Points: ${locations.length}` : 'Quiz Mode Active'}
+                <div className="map-info-overlay">
+                    {mode === 'explore' ? `${locations.length} Locations` : geoData?.type === 'india' ? '🇮🇳 India Focus' : '🌍 World Map'}
                 </div>
 
                 <svg
@@ -481,10 +523,7 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                 </svg>
 
                 {tooltip && mode === 'explore' && (
-                    <div
-                        className="map-tooltip"
-                        style={{ top: tooltip.y - 40, left: tooltip.x + 20 }}
-                    >
+                    <div className="map-tooltip" style={{ top: tooltip.y - 40, left: tooltip.x + 20 }}>
                         {tooltip.text}
                     </div>
                 )}
@@ -497,7 +536,6 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                             key={i}
                             className="legend-item interactive"
                             onClick={() => flyToLocation(loc)}
-                            title="Click to Fly To"
                         >
                             <span className="dot" style={{ background: theme === 'cyber' ? '#ff00dd' : '#d32f2f' }}></span>
                             <div>

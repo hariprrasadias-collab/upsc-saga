@@ -494,6 +494,24 @@
     color: #000;
 }
 
+.map-info-overlay {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.8rem;
+    z-index: 5;
+    pointer-events: none;
+    padding: 2px 6px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 4px;
+}
+
+.ancient .map-info-overlay {
+    color: #8b4513;
+    background: rgba(244, 228, 188, 0.5);
+}
+
 .map-tooltip {
     position: absolute;
     background: rgba(0, 0, 0, 0.9);
@@ -560,6 +578,131 @@
     border-radius: 50%;
     margin-top: 4px;
     flex-shrink: 0;
+}
+
+/* Map HUD & Practice Mode */
+
+.hud-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    background: rgba(0,0,0,0.2);
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.hud-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hud-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #8b949e;
+    margin-bottom: 2px;
+}
+
+.hud-value {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+.streak-fire {
+    color: #ff9800;
+    text-shadow: 0 0 10px rgba(255, 152, 0, 0.6);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.timer-bar-container {
+    height: 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.timer-bar-fill {
+    height: 100%;
+    background: #00fff2;
+    transition: width 1s linear, background 0.3s;
+}
+
+.timer-bar-fill.critical {
+    background: #f85149;
+    box-shadow: 0 0 10px #f85149;
+}
+
+.instruction-box {
+    margin-top: 15px;
+    padding: 15px;
+    background: #1f6feb;
+    background: linear-gradient(135deg, #1f6feb, #238636);
+    color: white;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    animation: fadeIn 0.3s ease-out;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.question-text {
+    font-size: 1.2rem;
+    text-align: center;
+    margin: 10px 0;
+}
+
+.feedback-box {
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.feedback-box.success {
+    background: rgba(46, 160, 67, 0.2);
+    border: 1px solid #3fb950;
+    color: #3fb950;
+}
+
+.feedback-box.failure {
+    background: rgba(248, 81, 73, 0.2);
+    border: 1px solid #f85149;
+    color: #f85149;
+}
+
+.next-btn, .retry-btn {
+    background: #fff;
+    color: #333;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.next-btn:hover, .retry-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.completion-box {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff;
 }
 
 /* Podcast Waveform */
