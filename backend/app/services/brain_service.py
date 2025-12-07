@@ -423,7 +423,9 @@ class BrainService:
                     socratic_res.get('dialogue'),
                     'ai_generated_socratic'
                 )
-                save_socratic_dialogue(user_id, topic, socratic_res.get('dialogue'))
+                # Parse verdict to JSON string for storage
+                verdict_json = json.dumps(socratic_res.get('verdict', {}))
+                save_socratic_dialogue(user_id, topic, socratic_res.get('dialogue'), verdict_json)
 
             # 12. Triangulation Analysis
             triangulation_res = self.execute_action("TRIANGULATE_TOPIC", {"topic": topic, "reasoning": "Task Completion Automation"})
@@ -1169,13 +1171,14 @@ class BrainService:
                     from app.services.socratic_service import generate_autonomous_debate
                     topic = payload.get('topic', 'Philosophy')
 
-                    # Generate a full autonomous debate (6 turns)
-                    dialogue_text, history = generate_autonomous_debate(topic, turns=6)
+                    # Generate a full autonomous debate (6 turns) with verdict
+                    dialogue_text, history, verdict = generate_autonomous_debate(topic, turns=6)
 
                     result = {
                         "success": True,
                         "message": "Socratic Dialogue Generated.",
-                        "dialogue": dialogue_text
+                        "dialogue": dialogue_text,
+                        "verdict": verdict
                     }
                 except Exception as e:
                     result = {"success": False, "message": f"Socratic Gen Failed: {str(e)}"}

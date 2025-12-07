@@ -257,8 +257,73 @@ def generate_autonomous_debate(topic, turns=6):
             if turn.get('thoughts'):
                 formatted_dialogue += f"> *Thinking: {turn.get('thoughts')}*\n\n"
 
-        return formatted_dialogue, history
+        # Generate Verdict (Athena's Judgment)
+        verdict = generate_debate_verdict(topic, history)
+
+        # Append verdict to formatted dialogue
+        formatted_dialogue += f"\n---\n\n## ⚖️ Athena's Judgment\n\n"
+        formatted_dialogue += f"**Winner:** {verdict.get('winner', 'No clear winner')}\n\n"
+        formatted_dialogue += f"**Synthesis:** {verdict.get('synthesis', '')}\n\n"
+        formatted_dialogue += f"**Key Concepts:** {', '.join(verdict.get('key_concepts', []))}\n"
+
+        return formatted_dialogue, history, verdict
 
     except Exception as e:
         print(f"Autonomous Debate Error: {e}")
-        return f"Error generating debate: {str(e)}", []
+        return f"Error generating debate: {str(e)}", [], {}
+
+def generate_debate_verdict(topic, history):
+    """
+    Analyzes a full debate history and provides a structured verdict.
+    """
+    if not GEMINI_API_KEY:
+        return {}
+
+    model = get_model()
+
+    transcript = ""
+    for turn in history:
+        speaker = turn.get('speakerId', 'unknown')
+        name = AGENTS.get(speaker, {'name': 'Unknown'}).get('name')
+        text = turn.get('text', '')
+        transcript += f"{name}: {text}\n"
+
+    judge_prompt = f"""
+    You are Athena, the Goddess of Wisdom. You have observed a debate on "{topic}".
+
+    TRANSCRIPT:
+    {transcript}
+
+    TASK:
+    1. Identify the "Winner" (the agent who provided the most robust, logical, or impactful argument).
+    2. Extract 3-5 Key Concepts (philosophical terms, fallacies, or ideas mentioned).
+    3. Provide a "Synthesis" - a profound paragraph that reconciles the opposing views or highlights the complexity.
+    4. Select the "Best Quote" from the transcript.
+
+    Return JSON:
+    {{
+        "winner": "Name of Agent",
+        "key_concepts": ["concept1", "concept2", ...],
+        "synthesis": "...",
+        "best_quote": "..."
+    }}
+    """
+
+    try:
+        response = model.generate_content(judge_prompt)
+        text = response.text.replace('```json', '').replace('```', '').strip()
+
+        start = text.find('{')
+        end = text.rfind('}')
+        if start != -1 and end != -1:
+            text = text[start:end+1]
+
+        return json.loads(text)
+    except Exception as e:
+        print(f"Verdict Generation Error: {e}")
+        return {
+            "winner": "Undecided",
+            "key_concepts": [],
+            "synthesis": "The debate was too complex for a verdict.",
+            "best_quote": ""
+        }
