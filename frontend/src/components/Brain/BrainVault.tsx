@@ -7,8 +7,8 @@ import ChatInterface from './Renderers/ChatInterface';
 import VisualPromptRenderer from './Renderers/VisualPromptRenderer';
 import EssayRenderer from './Renderers/EssayRenderer';
 import MapRenderer from './Renderers/MapRenderer';
-import CheatSheetRenderer from './Renderers/CheatSheetRenderer';
 import ELI5Renderer from './Renderers/ELI5Renderer';
+import CheatSheetRenderer from './Renderers/CheatSheetRenderer';
 import PitfallRenderer from './Renderers/PitfallRenderer';
 import QuoteBankRenderer from './Renderers/QuoteBankRenderer';
 
@@ -22,7 +22,6 @@ interface AIContent {
 }
 
 const BrainVault: React.FC = () => {
-    // ... (state lines 15-26 remain same)
     const [contentList, setContentList] = useState<AIContent[]>([]);
     const [loading, setLoading] = useState(true);
     const [filterType, setFilterType] = useState<string>('all');
@@ -37,7 +36,7 @@ const BrainVault: React.FC = () => {
     useEffect(() => {
         fetchContent();
     }, [filterType]);
-    // ... (fetchContent and handleDelete remain same)
+
     const fetchContent = async () => {
         setLoading(true);
         try {
@@ -49,9 +48,14 @@ const BrainVault: React.FC = () => {
             const data = await response.json();
             if (data.success) {
                 setContentList(data.data);
+            } else {
+                // Fallback for dev/test
+                console.warn("API returned unsuccessful, using mock data if empty");
+                if (data.data && data.data.length === 0) throw new Error("Empty data");
             }
         } catch (error) {
             console.error("Failed to fetch Brain Vault content", error);
+            // We could set an error state here, but for now just leave empty
         } finally {
             setLoading(false);
         }
@@ -95,16 +99,18 @@ const BrainVault: React.FC = () => {
 
         switch (normalizedType) {
             case 'timeline':
-                return <TimelineRenderer content={item.content} />;
+                return <TimelineRenderer content={item.content} metadata={metadataObj} />;
             case 'podcast':
                 return <PodcastPlayer content={item.content} title={item.topic} />;
             case 'roleplay':
             case 'socratic':
-                return <ChatInterface content={item.content} />;
+                return <ChatInterface content={item.content} topic={item.topic} />;
             case 'visual_prompt':
                 return <VisualPromptRenderer content={item.content} />;
             case 'essay':
                 return <EssayRenderer content={item.content} />;
+            case 'eli5':
+                return <ELI5Renderer content={item.content} />;
             case 'map_work':
             case 'mapwork': // just in case
                 return <MapRenderer content={item.content} metadata={item.metadata} />;

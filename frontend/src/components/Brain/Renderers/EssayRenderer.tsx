@@ -13,7 +13,7 @@ const EssayRenderer: React.FC<EssayRendererProps> = ({ content }) => {
     const [timeLeft, setTimeLeft] = useState(3 * 60 * 60); // 3 hours in seconds
 
     useEffect(() => {
-        let interval: NodeJS.Timeout;
+        let interval: ReturnType<typeof setInterval>;
         if (isTimerRunning && timeLeft > 0) {
             interval = setInterval(() => {
                 setTimeLeft((prev) => prev - 1);
