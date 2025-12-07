@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 import json
 import re
 from app.db_models.automation_storage import save_foresight_prediction
+from app.services.model_manager import model_manager
 
 load_dotenv()
 
