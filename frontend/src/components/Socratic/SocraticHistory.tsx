@@ -23,16 +23,17 @@ interface Turn {
     text: string;
     type: string;
     technique?: string;
+    fallacies?: string[];
     timestamp: number;
 }
 
-const AGENTS: Record<string, { name: string, icon: string, voice: string }> = {
-    'skeptic': { name: 'Socrates', icon: '🤔', voice: 'Google US English Male' },
-    'idealist': { name: 'Plato', icon: '✨', voice: 'Google UK English Female' },
-    'realist': { name: 'Aristotle', icon: '📜', voice: 'Google UK English Male' },
-    'iconoclast': { name: 'Nietzsche', icon: '⚡', voice: 'Google Deutsch Male' }, // Fallback logic needed
-    'sage': { name: 'Confucius', icon: '🎍', voice: 'Google UK English Male' },
-    'strategist': { name: 'Machiavelli', icon: '♟️', voice: 'Google US English Male' }
+const AGENTS: Record<string, { name: string, icon: string, voice: string, color: string }> = {
+    'skeptic': { name: 'Socrates', icon: '🤔', voice: 'Google US English Male', color: '#3498db' },
+    'idealist': { name: 'Plato', icon: '✨', voice: 'Google UK English Female', color: '#9b59b6' },
+    'realist': { name: 'Aristotle', icon: '📜', voice: 'Google UK English Male', color: '#2ecc71' },
+    'iconoclast': { name: 'Nietzsche', icon: '⚡', voice: 'Google Deutsch Male', color: '#e74c3c' },
+    'sage': { name: 'Confucius', icon: '🎍', voice: 'Google UK English Male', color: '#f1c40f' },
+    'strategist': { name: 'Machiavelli', icon: '♟️', voice: 'Google US English Male', color: '#34495e' }
 };
 
 const SocraticHistory: React.FC = () => {
@@ -40,6 +41,8 @@ const SocraticHistory: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [selectedDialogue, setSelectedDialogue] = useState<Dialogue | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [analysisMode, setAnalysisMode] = useState(false);
+    const [isContinuing, setIsContinuing] = useState(false);
 
     // Playback State
     const [isPlaying, setIsPlaying] = useState(false);
@@ -102,6 +105,43 @@ const SocraticHistory: React.FC = () => {
         document.body.removeChild(element);
     };
 
+    const handleContinueDebate = async () => {
+        if (!selectedDialogue) return;
+        if (!confirm("Extend this debate for 3 more turns? (This will update the archive)")) return;
+
+        setIsContinuing(true);
+        try {
+            const response = await fetch('http://localhost:5000/api/socratic/continue', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    id: selectedDialogue.id,
+                    topic: selectedDialogue.topic,
+                    history: parsedDialogue
+                })
+            });
+            const data = await response.json();
+            if (data.success) {
+                // Update local state
+                const updatedDialogue = {
+                    ...selectedDialogue,
+                    dialogue: data.dialogue,
+                    insight: data.insight
+                };
+                setSelectedDialogue(updatedDialogue);
+                // Update list
+                setHistory(prev => prev.map(d => d.id === updatedDialogue.id ? updatedDialogue : d));
+            } else {
+                alert("Failed to continue debate.");
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Error continuing debate.");
+        } finally {
+            setIsContinuing(false);
+        }
+    };
+
     // Helper to parse content
     const getVerdict = (jsonStr: string): Verdict | null => {
         try {
@@ -114,7 +154,6 @@ const SocraticHistory: React.FC = () => {
     const parsedDialogue: Turn[] | string = useMemo(() => {
         if (!selectedDialogue) return "";
         try {
-            // Check if it's JSON array
             const parsed = JSON.parse(selectedDialogue.dialogue);
             if (Array.isArray(parsed)) return parsed;
             return selectedDialogue.dialogue;
@@ -149,10 +188,7 @@ const SocraticHistory: React.FC = () => {
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.rate = 1.0;
 
-        // Voice Selection
         const voices = window.speechSynthesis.getVoices();
-        // Try to match specific voice, fallback to gender
-        // Note: Voice names vary by OS/Browser. This is a best-effort heuristic.
         const voiceName = speaker?.voice || '';
         const selectedVoice = voices.find(v => v.name.includes(voiceName)) ||
                               voices.find(v => v.lang.startsWith('en'));
@@ -185,7 +221,7 @@ const SocraticHistory: React.FC = () => {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    deck_id: 1, // Default deck for now, logic could be improved
+                    deck_id: 1,
                     front: front,
                     back: back,
                     source: 'socratic_archive'
@@ -242,6 +278,13 @@ const SocraticHistory: React.FC = () => {
                             <div className="view-header">
                                 <h2>{selectedDialogue.topic}</h2>
                                 <div className="action-buttons">
+                                     <button
+                                        className={`mode-btn ${analysisMode ? 'active' : ''}`}
+                                        onClick={() => setAnalysisMode(!analysisMode)}
+                                        title="Toggle Logical Analysis"
+                                    >
+                                        🧠 Analysis
+                                    </button>
                                     {Array.isArray(parsedDialogue) && (
                                         <button
                                             className={`play-btn ${isPlaying ? 'playing' : ''}`}
@@ -306,13 +349,16 @@ const SocraticHistory: React.FC = () => {
                                             <div
                                                 key={idx}
                                                 className={`script-turn ${currentTurnIndex === idx ? 'speaking' : ''}`}
+                                                style={{ borderLeftColor: AGENTS[turn.speakerId]?.color || '#fff' }}
                                             >
                                                 <div className="turn-avatar">
                                                     {AGENTS[turn.speakerId]?.icon || '👤'}
                                                 </div>
                                                 <div className="turn-body">
                                                     <div className="turn-meta">
-                                                        <span className="turn-speaker">{AGENTS[turn.speakerId]?.name || 'Unknown'}</span>
+                                                        <span className="turn-speaker" style={{ color: AGENTS[turn.speakerId]?.color }}>
+                                                            {AGENTS[turn.speakerId]?.name || 'Unknown'}
+                                                        </span>
                                                         {turn.technique && (
                                                             <span className="turn-technique">Using: {turn.technique}</span>
                                                         )}
@@ -327,10 +373,34 @@ const SocraticHistory: React.FC = () => {
                                                             ⚡
                                                         </button>
                                                     </div>
-                                                    <div className="turn-text">{turn.text}</div>
+
+                                                    <div className="turn-text">
+                                                        {turn.text}
+                                                    </div>
+
+                                                    {/* Fallacy Warning in Analysis Mode */}
+                                                    {analysisMode && turn.fallacies && turn.fallacies.length > 0 && (
+                                                        <div className="fallacy-box">
+                                                            <span className="fallacy-icon">⚠️</span>
+                                                            <span className="fallacy-label">Potential Fallacy detected in previous argument: </span>
+                                                            {turn.fallacies.join(', ')}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))}
+
+                                        {/* Continue Button */}
+                                        <div className="continue-section">
+                                            <button
+                                                className="continue-btn"
+                                                onClick={handleContinueDebate}
+                                                disabled={isContinuing}
+                                            >
+                                                {isContinuing ? 'Summoning Agents...' : '🔄 Extend Debate (3 Turns)'}
+                                            </button>
+                                        </div>
+
                                     </div>
                                 ) : (
                                     <MarkdownRenderer content={parsedDialogue} />

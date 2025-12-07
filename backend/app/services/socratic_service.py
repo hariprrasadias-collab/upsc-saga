@@ -63,7 +63,8 @@ def generate_debate_turn(topic, history, user_input=None):
             "speakerId": "skeptic",
             "text": "My connection to the Muses is severed (Missing API Key).",
             "type": "error",
-            "technique": "Silence"
+            "technique": "Silence",
+            "fallacies": []
         }
 
     model = get_model()
@@ -144,7 +145,7 @@ def generate_debate_turn(topic, history, user_input=None):
     
     TASK:
     Generate your response.
-    1. THINK: Identify fallacies or weak points.
+    1. THINK: Identify fallacies or weak points in the previous speaker's argument (if any).
     2. TECHNIQUE: Name the rhetorical device you will use (e.g., Elenchus, Ad Hominem, Syllogism, Analogy, Aphorism, Dialectic).
     3. SPEAK: Keep it under 3 sentences. Be profound, challenging, and in-character.
     
@@ -152,6 +153,7 @@ def generate_debate_turn(topic, history, user_input=None):
     {{
         "thought_process": "I observe that...",
         "rhetorical_technique": "Name of technique",
+        "detected_fallacies_in_prev_turn": ["Strawman", "Ad Hominem"] (or empty list),
         "text": "...",
         "type": "ARGUMENT" | "QUESTION" | "REBUTTAL"
     }}
@@ -168,9 +170,9 @@ def generate_debate_turn(topic, history, user_input=None):
                 json_str = text[start_idx:end_idx+1]
                 result = json.loads(json_str)
             else:
-                result = {"text": text, "type": "ARGUMENT", "thought_process": "", "rhetorical_technique": "Direct Assertion"}
+                result = {"text": text, "type": "ARGUMENT", "thought_process": "", "rhetorical_technique": "Direct Assertion", "detected_fallacies_in_prev_turn": []}
         except json.JSONDecodeError:
-             result = {"text": text, "type": "ARGUMENT", "thought_process": "", "rhetorical_technique": "Direct Assertion"}
+             result = {"text": text, "type": "ARGUMENT", "thought_process": "", "rhetorical_technique": "Direct Assertion", "detected_fallacies_in_prev_turn": []}
         
         return {
             "speakerId": next_speaker_id,
@@ -178,6 +180,7 @@ def generate_debate_turn(topic, history, user_input=None):
             "type": result.get('type', 'ARGUMENT'),
             "thoughts": result.get('thought_process', ''),
             "technique": result.get('rhetorical_technique', 'Rhetoric'),
+            "fallacies": result.get('detected_fallacies_in_prev_turn', []),
             "timestamp": int(time.time() * 1000)
         }
     except Exception as e:
@@ -186,7 +189,8 @@ def generate_debate_turn(topic, history, user_input=None):
             "speakerId": next_speaker_id,
             "text": f"Error: {str(e)}",
             "type": "error",
-            "technique": "System Failure"
+            "technique": "System Failure",
+            "fallacies": []
         }
 
 def generate_autonomous_debate(topic, turns=6):
@@ -215,6 +219,7 @@ def generate_autonomous_debate(topic, turns=6):
             "text": resp.text.strip(),
             "type": "ARGUMENT",
             "technique": "Opening Statement",
+            "fallacies": [],
             "timestamp": int(time.time() * 1000)
         })
 
@@ -233,6 +238,37 @@ def generate_autonomous_debate(topic, turns=6):
     except Exception as e:
         print(f"Autonomous Debate Error: {e}")
         return json.dumps([{"text": f"Error: {e}", "speakerId": "skeptic"}]), [], {}
+
+def continue_autonomous_debate(topic, current_history, additional_turns=3):
+    """
+    Continues an existing debate for more turns.
+    Returns: updated JSON string, updated history, new verdict.
+    """
+    if not GEMINI_API_KEY:
+         return json.dumps(current_history), current_history, {}
+
+    # Ensure history is list
+    if isinstance(current_history, str):
+        try:
+            current_history = json.loads(current_history)
+        except:
+            current_history = []
+
+    history = list(current_history)
+
+    try:
+        for _ in range(additional_turns):
+            turn_data = generate_debate_turn(topic, history)
+            history.append(turn_data)
+            time.sleep(0.5)
+
+        verdict = generate_debate_verdict(topic, history)
+        return json.dumps(history), history, verdict
+
+    except Exception as e:
+        print(f"Continuation Error: {e}")
+        return json.dumps(history), history, {}
+
 
 def generate_debate_verdict(topic, history):
     """
@@ -262,7 +298,7 @@ def generate_debate_verdict(topic, history):
     2. Extract 3-5 Key Concepts (philosophical terms, fallacies, or ideas mentioned).
     3. Provide a "Synthesis" - a profound paragraph that reconciles the opposing views.
     4. Select the "Best Quote".
-    5. Identify 1-2 "Mental Models" or "Frameworks" used (e.g., Utilitarianism, Categorical Imperative, Second Order Thinking).
+    5. Identify 1-2 "Mental Models" or "Frameworks" used.
 
     Return JSON:
     {{
