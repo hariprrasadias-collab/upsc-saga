@@ -1,25 +1,16 @@
 import React from 'react';
-import './Renderers.css';
 import MarkdownRenderer from '../../Shared/MarkdownRenderer';
 
-interface ELI5Props {
+interface Props {
     content: string;
 }
 
-const ELI5Renderer: React.FC<ELI5Props> = ({ content }) => {
+const ELI5Renderer: React.FC<Props> = ({ content }) => {
     return (
-        <div className="eli5-container glass-card">
-            <div className="eli5-header">
-                <span className="eli5-icon">🧸</span>
-                <h2>Explain Like I'm 5</h2>
-            </div>
-            <div className="eli5-content">
+        <div className="eli5-container" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", sans-serif', padding: '20px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '15px' }}>
+            <h3 style={{ color: '#facc15', marginTop: 0 }}>👶 Explain Like I'm 5</h3>
+            <div style={{ fontSize: '1.1em', lineHeight: '1.6' }}>
                 <MarkdownRenderer content={content} />
-            </div>
-            <div className="eli5-footer">
-                <span className="tag">#Simple</span>
-                <span className="tag">#Fun</span>
-                <span className="tag">#Basics</span>
             </div>
         </div>
     );

@@ -1,32 +1,15 @@
 import React from 'react';
-import './Renderers.css';
+import MarkdownRenderer from '../../Shared/MarkdownRenderer';
 
-interface QuoteBankProps {
+interface Props {
     content: string;
 }
 
-const QuoteBankRenderer: React.FC<QuoteBankProps> = ({ content }) => {
-    // Expected format: "Quote" - Author (or similar)
-    const quotes = content.split('\n').filter(l => l.trim().length > 0).map(line => {
-        const parts = line.split('-');
-        if (parts.length > 1) {
-            return {
-                text: parts[0].trim().replace(/^["']|["']$/g, ''), // Remove quotes if present
-                author: parts.slice(1).join('-').trim()
-            };
-        }
-        return { text: line.replace(/^["']|["']$/g, ''), author: 'Anonymous' };
-    });
-
+const QuoteBankRenderer: React.FC<Props> = ({ content }) => {
     return (
-        <div className="quote-bank-container">
-            {quotes.map((quote, idx) => (
-                <div key={idx} className="quote-card glass-card">
-                    <div className="quote-icon">❝</div>
-                    <p className="quote-text">{quote.text}</p>
-                    <div className="quote-author">— {quote.author}</div>
-                </div>
-            ))}
+        <div className="quote-bank-container" style={{ borderLeft: '4px solid #a855f7', paddingLeft: '20px', margin: '10px 0', background: 'rgba(168, 85, 247, 0.05)', padding: '15px' }}>
+            <h3 style={{ color: '#a855f7', marginTop: 0 }}>💬 Quote Bank</h3>
+            <MarkdownRenderer content={content} />
         </div>
     );
 };

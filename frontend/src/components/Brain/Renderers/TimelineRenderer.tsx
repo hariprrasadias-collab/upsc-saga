@@ -6,6 +6,7 @@ import {
     FaExpandAlt, FaPlay, FaPause, FaStepForward, FaStepBackward,
     FaCompressAlt
 } from 'react-icons/fa';
+import MarkdownRenderer from '../../Shared/MarkdownRenderer';
 
 interface TimelineEvent {
     id: string; // Unique ID for keys

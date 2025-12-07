@@ -2,6 +2,7 @@ import google.generativeai as genai
 import os
 import json
 import random
+import time
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -28,6 +29,24 @@ AGENTS = {
         'role': 'The Realist',
         'style': 'Empirical, practical, systematic. Categorizes arguments. Concerned with what IS and what is FEASIBLE.',
         'focus': 'Evidence & Pragmatism'
+    },
+    'iconoclast': {
+        'name': 'Nietzsche',
+        'role': 'The Iconoclast',
+        'style': 'Challenges established values. Focuses on Will to Power. Critiques "slave morality" and conformity.',
+        'focus': 'Power & Individualism'
+    },
+    'sage': {
+        'name': 'Confucius',
+        'role': 'The Harmonizer',
+        'style': 'Focuses on social order, ritual (Li), family duty, and ethical leadership. Conservative and community-oriented.',
+        'focus': 'Harmony & Duty'
+    },
+    'strategist': {
+        'name': 'Machiavelli',
+        'role': 'The Pragmatist',
+        'style': 'Focuses on effectiveness, statecraft, and maintaining power. The ends justify the means. Coldly rational.',
+        'focus': 'Realpolitik & Outcome'
     }
 }
 
@@ -43,14 +62,17 @@ def generate_debate_turn(topic, history, user_input=None):
         return {
             "speakerId": "skeptic",
             "text": "My connection to the Muses is severed (Missing API Key).",
-            "type": "error"
+            "type": "error",
+            "technique": "Silence",
+            "fallacies": []
         }
 
     model = get_model()
     
     # 1. Context Construction
     context_str = ""
-    for turn in history[-6:]:
+    relevant_history = history[-10:] if len(history) > 10 else history
+    for turn in relevant_history:
         speaker = turn.get('speakerId', 'unknown')
         name = AGENTS.get(speaker, {'name': 'User'}).get('name')
         text = turn.get('text', '')
@@ -60,47 +82,51 @@ def generate_debate_turn(topic, history, user_input=None):
         context_str += f"User: {user_input}\n"
 
     # 2. The Moderator (Dynamic Speaker Selection & Scoring)
-    # We ask the model to act as a "Debate Moderator" first to analyze the state.
-    
+    agent_descriptions = "\n".join([f"{k}: {v['name']} ({v['role']})" for k, v in AGENTS.items()])
+
     moderator_prompt = f"""
     You are the Moderator of a high-stakes philosophical debate on "{topic}".
     
     AGENTS:
-    1. Socrates (Skeptic): Attacks logic/definitions.
-    2. Plato (Idealist): Attacks lack of vision/morality.
-    3. Aristotle (Realist): Attacks lack of evidence/feasibility.
+    {agent_descriptions}
 
     CONVERSATION SO FAR:
     {context_str}
 
     TASK:
-    1. Analyze the User's last argument (if any). Score it (0-10) on Logic, Relevance, and Impact.
-    2. Decide WHO should speak next to best challenge the User or advance the debate.
-       - If User was vague -> Socrates.
-       - If User was cynical/pragmatic -> Plato.
-       - If User was overly idealistic -> Aristotle.
+    1. Analyze the Last Argument.
+    2. Decide WHO should speak next.
+       - Select the agent whose philosophy most directly CONFLICTS with the last point.
+       - Do not let the same person speak twice in a row.
     3. Provide a "Secret Strategy" for the selected agent.
 
     Return JSON:
     {{
-        "user_score": {{ "logic": 0, "relevance": 0, "impact": 0 }},
-        "next_speaker_id": "skeptic" | "idealist" | "realist",
+        "next_speaker_id": "skeptic" | "idealist" | "realist" | "iconoclast" | "sage" | "strategist",
         "strategy": "..."
     }}
     """
     
     try:
         mod_response = model.generate_content(moderator_prompt)
-        mod_data = json.loads(mod_response.text.replace('```json', '').replace('```', '').strip())
+        text = mod_response.text.replace('```json', '').replace('```', '').strip()
+        start = text.find('{')
+        end = text.rfind('}')
+        if start != -1 and end != -1:
+            text = text[start:end+1]
+
+        mod_data = json.loads(text)
         
         next_speaker_id = mod_data.get('next_speaker_id', 'skeptic')
         strategy = mod_data.get('strategy', 'Question the premise.')
-        user_score = mod_data.get('user_score', {})
+
+        if next_speaker_id not in AGENTS:
+            next_speaker_id = random.choice(list(AGENTS.keys()))
+
     except Exception as e:
         print(f"Moderator Error: {e}")
         next_speaker_id = random.choice(list(AGENTS.keys()))
         strategy = "Respond relevantly."
-        user_score = {}
 
     # 3. The Agent (Generation with Chain of Thought)
     agent = AGENTS[next_speaker_id]
@@ -119,12 +145,15 @@ def generate_debate_turn(topic, history, user_input=None):
     
     TASK:
     Generate your response.
-    1. First, THINK silently about the user's argument. Identify fallacies or weak points.
-    2. Then, SPEAK. Keep it under 3 sentences. Be profound, challenging, and in-character.
+    1. THINK: Identify fallacies or weak points in the previous speaker's argument (if any).
+    2. TECHNIQUE: Name the rhetorical device you will use (e.g., Elenchus, Ad Hominem, Syllogism, Analogy, Aphorism, Dialectic).
+    3. SPEAK: Keep it under 3 sentences. Be profound, challenging, and in-character.
     
     Return JSON:
     {{
-        "thought_process": "I observe that the user...",
+        "thought_process": "I observe that...",
+        "rhetorical_technique": "Name of technique",
+        "detected_fallacies_in_prev_turn": ["Strawman", "Ad Hominem"] (or empty list),
         "text": "...",
         "type": "ARGUMENT" | "QUESTION" | "REBUTTAL"
     }}
@@ -133,9 +162,7 @@ def generate_debate_turn(topic, history, user_input=None):
     try:
         response = model.generate_content(agent_prompt)
         text = response.text.strip()
-        # Robust JSON extraction
         try:
-            # Find the first '{' and last '}'
             start_idx = text.find('{')
             end_idx = text.rfind('}')
             
@@ -143,28 +170,161 @@ def generate_debate_turn(topic, history, user_input=None):
                 json_str = text[start_idx:end_idx+1]
                 result = json.loads(json_str)
             else:
-                # Fallback if no JSON found
-                print(f"No JSON found in response: {text}")
-                result = {"text": text, "type": "ARGUMENT", "thought_process": "I spoke without thinking structure."}
+                result = {"text": text, "type": "ARGUMENT", "thought_process": "", "rhetorical_technique": "Direct Assertion", "detected_fallacies_in_prev_turn": []}
         except json.JSONDecodeError:
-             print(f"JSON Decode Error. Raw text: {text}")
-             result = {"text": text, "type": "ARGUMENT", "thought_process": "My thoughts are unstructured."}
+             result = {"text": text, "type": "ARGUMENT", "thought_process": "", "rhetorical_technique": "Direct Assertion", "detected_fallacies_in_prev_turn": []}
         
         return {
             "speakerId": next_speaker_id,
             "text": result.get('text', 'I am contemplating...'),
             "type": result.get('type', 'ARGUMENT'),
             "thoughts": result.get('thought_process', ''),
-            "score": user_score,
-            "timestamp": 0
+            "technique": result.get('rhetorical_technique', 'Rhetoric'),
+            "fallacies": result.get('detected_fallacies_in_prev_turn', []),
+            "timestamp": int(time.time() * 1000)
         }
     except Exception as e:
         print(f"Agent Error: {e}")
         return {
             "speakerId": next_speaker_id,
-            "text": f"The complexity of this argument eludes me for a moment. (AI Error: {str(e)})",
+            "text": f"Error: {str(e)}",
+            "type": "error",
+            "technique": "System Failure",
+            "fallacies": []
+        }
+
+def generate_autonomous_debate(topic, turns=6):
+    """
+    Generates a full multi-turn debate.
+    Returns:
+    1. JSON string of the full history (for DB storage in 'dialogue' column)
+    2. Raw history list
+    3. Verdict dict
+    """
+    if not GEMINI_API_KEY:
+        return json.dumps([{"text": "System Offline", "speakerId": "skeptic"}]), [], {}
+
+    history = []
+
+    try:
+        model = get_model()
+        starters = ['idealist', 'iconoclast', 'strategist', 'sage']
+        starter_id = random.choice(starters)
+        starter_agent = AGENTS[starter_id]
+
+        # Initial turn
+        resp = model.generate_content(f"You are {starter_agent['name']}. Make a provocative opening statement about '{topic}' using a specific rhetorical technique.")
+        history.append({
+            "speakerId": starter_id,
+            "text": resp.text.strip(),
             "type": "ARGUMENT",
-            "thoughts": f"System failure: {str(e)}",
-            "score": {},
-            "timestamp": 0
+            "technique": "Opening Statement",
+            "fallacies": [],
+            "timestamp": int(time.time() * 1000)
+        })
+
+        # Subsequent turns
+        for _ in range(turns - 1):
+            turn_data = generate_debate_turn(topic, history)
+            history.append(turn_data)
+            time.sleep(0.5)
+
+        # Generate Verdict
+        verdict = generate_debate_verdict(topic, history)
+
+        # Return serialized JSON for storage
+        return json.dumps(history), history, verdict
+
+    except Exception as e:
+        print(f"Autonomous Debate Error: {e}")
+        return json.dumps([{"text": f"Error: {e}", "speakerId": "skeptic"}]), [], {}
+
+def continue_autonomous_debate(topic, current_history, additional_turns=3):
+    """
+    Continues an existing debate for more turns.
+    Returns: updated JSON string, updated history, new verdict.
+    """
+    if not GEMINI_API_KEY:
+         return json.dumps(current_history), current_history, {}
+
+    # Ensure history is list
+    if isinstance(current_history, str):
+        try:
+            current_history = json.loads(current_history)
+        except:
+            current_history = []
+
+    history = list(current_history)
+
+    try:
+        for _ in range(additional_turns):
+            turn_data = generate_debate_turn(topic, history)
+            history.append(turn_data)
+            time.sleep(0.5)
+
+        verdict = generate_debate_verdict(topic, history)
+        return json.dumps(history), history, verdict
+
+    except Exception as e:
+        print(f"Continuation Error: {e}")
+        return json.dumps(history), history, {}
+
+
+def generate_debate_verdict(topic, history):
+    """
+    Analyzes a full debate history and provides a structured verdict.
+    """
+    if not GEMINI_API_KEY:
+        return {}
+
+    model = get_model()
+
+    transcript = ""
+    for turn in history:
+        speaker = turn.get('speakerId', 'unknown')
+        name = AGENTS.get(speaker, {'name': 'Unknown'}).get('name')
+        text = turn.get('text', '')
+        technique = turn.get('technique', '')
+        transcript += f"{name} ({technique}): {text}\n"
+
+    judge_prompt = f"""
+    You are Athena, the Goddess of Wisdom. You have observed a debate on "{topic}".
+
+    TRANSCRIPT:
+    {transcript}
+
+    TASK:
+    1. Identify the "Winner" (the agent who provided the most robust, logical, or impactful argument).
+    2. Extract 3-5 Key Concepts (philosophical terms, fallacies, or ideas mentioned).
+    3. Provide a "Synthesis" - a profound paragraph that reconciles the opposing views.
+    4. Select the "Best Quote".
+    5. Identify 1-2 "Mental Models" or "Frameworks" used.
+
+    Return JSON:
+    {{
+        "winner": "Name of Agent",
+        "key_concepts": ["concept1", "concept2", ...],
+        "synthesis": "...",
+        "best_quote": "...",
+        "mental_models": ["model1", "model2"]
+    }}
+    """
+
+    try:
+        response = model.generate_content(judge_prompt)
+        text = response.text.replace('```json', '').replace('```', '').strip()
+
+        start = text.find('{')
+        end = text.rfind('}')
+        if start != -1 and end != -1:
+            text = text[start:end+1]
+
+        return json.loads(text)
+    except Exception as e:
+        print(f"Verdict Generation Error: {e}")
+        return {
+            "winner": "Undecided",
+            "key_concepts": [],
+            "synthesis": "Analysis failed.",
+            "best_quote": ""
         }

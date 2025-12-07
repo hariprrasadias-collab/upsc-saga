@@ -7,6 +7,10 @@ import ChatInterface from './Renderers/ChatInterface';
 import VisualPromptRenderer from './Renderers/VisualPromptRenderer';
 import EssayRenderer from './Renderers/EssayRenderer';
 import MapRenderer from './Renderers/MapRenderer';
+import CheatSheetRenderer from './Renderers/CheatSheetRenderer';
+import ELI5Renderer from './Renderers/ELI5Renderer';
+import PitfallRenderer from './Renderers/PitfallRenderer';
+import QuoteBankRenderer from './Renderers/QuoteBankRenderer';
 
 interface AIContent {
     id: number;
@@ -18,7 +22,6 @@ interface AIContent {
 }
 
 const BrainVault: React.FC = () => {
-    // ... (state lines 15-26 remain same)
     const [contentList, setContentList] = useState<AIContent[]>([]);
     const [loading, setLoading] = useState(true);
     const [filterType, setFilterType] = useState<string>('all');
@@ -33,7 +36,7 @@ const BrainVault: React.FC = () => {
     useEffect(() => {
         fetchContent();
     }, [filterType]);
-    // ... (fetchContent and handleDelete remain same)
+
     const fetchContent = async () => {
         setLoading(true);
         try {
@@ -45,9 +48,14 @@ const BrainVault: React.FC = () => {
             const data = await response.json();
             if (data.success) {
                 setContentList(data.data);
+            } else {
+                // Fallback for dev/test
+                console.warn("API returned unsuccessful, using mock data if empty");
+                if (data.data && data.data.length === 0) throw new Error("Empty data");
             }
         } catch (error) {
             console.error("Failed to fetch Brain Vault content", error);
+            // We could set an error state here, but for now just leave empty
         } finally {
             setLoading(false);
         }
@@ -104,6 +112,14 @@ const BrainVault: React.FC = () => {
             case 'map_work':
             case 'mapwork': // just in case
                 return <MapRenderer content={item.content} metadata={item.metadata} />;
+            case 'cheat_sheet':
+                return <CheatSheetRenderer content={item.content} />;
+            case 'eli5':
+                return <ELI5Renderer content={item.content} />;
+            case 'pitfalls':
+                return <PitfallRenderer content={item.content} />;
+            case 'quote_bank':
+                return <QuoteBankRenderer content={item.content} />;
             default:
                 return (
                     <div>
