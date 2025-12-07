@@ -10,6 +10,11 @@ from cachetools import TTLCache
 
 load_dotenv()
 
+class FallbackResponse:
+    """A safe, mock response object mimicking genai.GenerateContentResponse"""
+    def __init__(self, text):
+        self.text = text
+
 class ModelManager:
     """
     Centralized manager for Gemini models with automatic fallback, rotation,
@@ -141,7 +146,7 @@ class ModelManager:
         content = f"{prompt}|{model_type}|{str(sorted(kwargs.items()))}"
         return hashlib.md5(content.encode('utf-8')).hexdigest()
 
-    def generate_content(self, prompt, model_type='fast', **kwargs):
+    def generate_content(self, prompt, model_type='fast', _is_fallback_retry=False, **kwargs):
         """
         Robust content generation with:
         - Tiered Usage (Pro vs Fast)
@@ -149,68 +154,81 @@ class ModelManager:
         - Exponential Backoff
         - Model Rotation
         - Cool-down Logic
+        - AUTOMATIC FALLBACK: Pro -> Fast -> Mock Safe Response (No Exceptions)
 
         Args:
             prompt (str): The input prompt.
             model_type (str): 'fast' (default) or 'pro'.
+            _is_fallback_retry (bool): Internal flag to prevent infinite recursion.
             **kwargs: Additional arguments for genai.
         """
+        # 0. Safety Check for API Key
         if not self.is_configured:
-            raise Exception("Gemini API Key missing")
+            print("⚠️ API Key missing. Returning Safe Fallback.")
+            return FallbackResponse("System Offline (No API Key). Please check configuration.")
 
         # 1. Check Cache
         cache_key = self._get_cache_key(prompt, model_type, kwargs)
         if cache_key in self.response_cache:
-            # print("⚡ Returning Cached Response") # Debug
             return self.response_cache[cache_key]
 
         rotation = self._get_model_list(model_type)
         max_retries = len(rotation) * 2
         attempts = 0
 
-        while attempts < max_retries:
-            idx = self.current_indices.get(model_type, 0) % len(rotation)
-            current_model_name = rotation[idx]
+        try:
+            while attempts < max_retries:
+                idx = self.current_indices.get(model_type, 0) % len(rotation)
+                current_model_name = rotation[idx]
 
-            # Ensure we have a model (get_model handles cooldown checks internally)
-            model = self.get_model(model_name=current_model_name, model_type=model_type)
+                # Ensure we have a model (get_model handles cooldown checks internally)
+                model = self.get_model(model_name=current_model_name, model_type=model_type)
 
-            if not model:
-                # get_model might return None if implicit switch happened or instantiation failed
-                # Try switching
-                model = self.switch_model(model_type)
                 if not model:
-                     attempts += 1
-                     continue
+                    model = self.switch_model(model_type)
+                    if not model:
+                        attempts += 1
+                        continue
 
-            try:
-                response = model.generate_content(prompt, **kwargs)
+                try:
+                    response = model.generate_content(prompt, **kwargs)
 
-                # Cache successful response
-                self.response_cache[cache_key] = response
-                return response
+                    # Cache successful response
+                    self.response_cache[cache_key] = response
+                    return response
 
-            except (ResourceExhausted, ServiceUnavailable, InternalServerError) as e:
-                print(f"⚠️ API Error ({type(e).__name__}) with {current_model_name}: {e}")
+                except (ResourceExhausted, ServiceUnavailable, InternalServerError) as e:
+                    print(f"⚠️ API Error ({type(e).__name__}) with {current_model_name}: {e}")
+                    self._mark_cooldown(current_model_name, duration_seconds=60)
 
-                # Mark for cooldown
-                self._mark_cooldown(current_model_name, duration_seconds=60)
+                    sleep_time = min(2 ** attempts, 10) + random.uniform(0, 1)
+                    print(f"📉 Rotating & Sleeping {sleep_time:.2f}s...")
 
-                # Exponential Backoff
-                sleep_time = min(2 ** attempts, 30) + random.uniform(0, 1)
-                print(f"📉 Rotating & Sleeping {sleep_time:.2f}s...")
+                    self.switch_model(model_type)
+                    time.sleep(sleep_time)
+                    attempts += 1
 
-                self.switch_model(model_type)
-                time.sleep(sleep_time)
-                attempts += 1
+                except Exception as e:
+                    print(f"❌ Unrecoverable Error with {current_model_name}: {e}")
+                    self.switch_model(model_type)
+                    attempts += 1
 
-            except Exception as e:
-                print(f"❌ Unrecoverable Error with {current_model_name}: {e}")
-                # Don't cooldown for generic logic errors, but do switch
-                self.switch_model(model_type)
-                attempts += 1
+            # If loop finishes, we failed all retries for this tier.
+            raise Exception(f"All {model_type} models exhausted.")
 
-        raise Exception(f"All {model_type} models failed to generate content after multiple retries.")
+        except Exception as tier_failure:
+            print(f"🚨 Tier '{model_type}' Failed: {tier_failure}")
+
+            # AUTOMATIC FALLBACK STRATEGY
+            if model_type == 'pro' and not _is_fallback_retry:
+                print("🛡️ ACTIVATING FALLBACK: Downgrading to FAST tier.")
+                return self.generate_content(prompt, model_type='fast', _is_fallback_retry=True, **kwargs)
+
+            # FINAL SAFETY NET (If Fast fails or recursive fallback fails)
+            print("🏳️ ALL SYSTEMS FAILED. Returning Safe Mock Response.")
+            return FallbackResponse(
+                "The Oracle is momentarily silent (High Traffic). Please try again in a few moments."
+            )
 
 # Singleton Instance
 model_manager = ModelManager()
