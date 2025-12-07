@@ -106,16 +106,16 @@ const playSound = (type: 'correct' | 'wrong' | 'tick' | 'win' | 'giveup' | 'hint
             osc.type = 'triangle';
             gain.gain.value = 0.1;
             [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
-                 const osc2 = ctx.createOscillator();
-                 const gain2 = ctx.createGain();
-                 osc2.connect(gain2);
-                 gain2.connect(ctx.destination);
-                 osc2.frequency.value = freq;
-                 const start = now + (i * 0.1);
-                 gain2.gain.setValueAtTime(0.1, start);
-                 gain2.gain.exponentialRampToValueAtTime(0.01, start + 0.3);
-                 osc2.start(start);
-                 osc2.stop(start + 0.3);
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
+                osc2.connect(gain2);
+                gain2.connect(ctx.destination);
+                osc2.frequency.value = freq;
+                const start = now + (i * 0.1);
+                gain2.gain.setValueAtTime(0.1, start);
+                gain2.gain.exponentialRampToValueAtTime(0.01, start + 0.3);
+                osc2.start(start);
+                osc2.stop(start + 0.3);
             });
         }
     } catch (e) {
@@ -159,7 +159,7 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
     const [mapError, setMapError] = useState(false);
 
     // D3 Zoom Behavior instance
-    const zoomBehavior = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
+
 
     // Parse Locations
     useEffect(() => {
@@ -175,30 +175,29 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                 lon: l.lon,
                 reason: l.reason || l.hint || l.description || "Historical Site"
             }));
-            if (data.locations && Array.isArray(data.locations)) return data.locations;
-            if (Array.isArray(data) && data.length > 0 && (data[0].lat || data[0].lon || data[0].name)) return data;
-            return [];
+
         };
 
         if (metadata) {
             if (typeof metadata === 'string') {
-                try { foundLocations = extract(JSON.parse(metadata)); } catch (e) {}
+                try { foundLocations = extract(JSON.parse(metadata)); } catch (e) { }
             } else {
                 foundLocations = extract(metadata);
             }
         }
         if (foundLocations.length === 0) {
-            try { foundLocations = extract(JSON.parse(content)); } catch (e) {}
+            try { foundLocations = extract(JSON.parse(content)); } catch (e) { }
 
-        if (foundLocations.length === 0) {
-            try {
-                if (content.trim().startsWith('{') || content.trim().startsWith('[')) {
-                    foundLocations = extract(JSON.parse(content));
-                }
-            } catch (e) {}
+            if (foundLocations.length === 0) {
+                try {
+                    if (content.trim().startsWith('{') || content.trim().startsWith('[')) {
+                        foundLocations = extract(JSON.parse(content));
+                    }
+                } catch (e) { }
+            }
         }
         setLocations(foundLocations);
-    }, [content, metadata]);
+        }, [content, metadata]);
 
     // Map Fetching
     useEffect(() => {
@@ -239,20 +238,25 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                     };
                     geoCache[cacheKey] = result;
                     setGeoData(result);
-                    setGeoData(data);
+
                 } else {
                     throw new Error("Failed to load India map");
                 }
             } catch (error) {
                 console.warn("Primary map load failed, trying fallback...", error);
                 try {
-                     const resWorld = await fetch('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson');
-                     if (resWorld.ok) {
-                         const dataWorld = await resWorld.json();
-                         setGeoData(dataWorld);
-                     } else {
-                         throw new Error("Failed to load world map");
-                     }
+                    const resWorld = await fetch('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson');
+                    if (resWorld.ok) {
+                        const dataWorld = await resWorld.json();
+                        setGeoData({
+                            geojson: dataWorld,
+                            center: [0, 20],
+                            scale: 150,
+                            type: 'world'
+                        });
+                    } else {
+                        throw new Error("Failed to load world map");
+                    }
                 } catch (e2) {
                     console.error("All map loads failed", e2);
                     setMapError(true);
@@ -500,14 +504,8 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
             .attr("stroke", theme === 'cyber' ? "rgba(0, 255, 242, 0.05)" : "rgba(0,0,0,0.05)")
             .attr("stroke-width", 0.5);
 
-        g.selectAll("path.feature")
-            .data(geoData.geojson.features)
-        const fill = theme === 'cyber' ? '#1a1a2e' : '#f0f0f0';
-        const stroke = theme === 'cyber' ? 'rgba(0, 255, 242, 0.2)' : '#ccc';
-        const pointColor = theme === 'cyber' ? '#ff00dd' : '#d32f2f';
-
         g.selectAll("path")
-            .data(geoData.features)
+            .data(geoData.geojson.features)
             .enter()
             .append("path")
             .attr("class", "feature")
@@ -539,8 +537,8 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
         // 2. Get point 100px to the right
         // We need to account for zoom transform.
         // Screen pixels 300,300 -> Transformed: (300-tx)/k
-        const p1 = [ (300 - zoomTransform.x)/k, (300 - zoomTransform.y)/k ];
-        const p2 = [ (400 - zoomTransform.x)/k, (300 - zoomTransform.y)/k ];
+        const p1 = [(300 - zoomTransform.x) / k, (300 - zoomTransform.y) / k];
+        const p2 = [(400 - zoomTransform.x) / k, (300 - zoomTransform.y) / k];
 
         const c1 = projectionRef.current.invert?.([p1[0], p1[1]]);
         const c2 = projectionRef.current.invert?.([p2[0], p2[1]]);
@@ -571,27 +569,8 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                 .attr("fill", "#fff")
                 .attr("font-size", "12px")
                 .text(`${Math.round(distKm)} km`);
-        if (locations.length > 0) {
-            g.selectAll("circle")
-                .data(locations)
-                .enter()
-                .append("circle")
-                .attr("cx", d => projection([d.lon, d.lat])?.[0] || 0)
-                .attr("cy", d => projection([d.lon, d.lat])?.[1] || 0)
-                .attr("r", 6 / (zoomTransform.k || 1))
-                .attr("fill", pointColor)
-                .attr("stroke", "#fff")
-                .attr("stroke-width", 1)
-                .style("cursor", "pointer")
-                .on("mouseover", (event, d) => {
-                    setTooltip({ x: event.pageX, y: event.pageY, text: `${d.name}` });
-                })
-                .on("mouseout", () => setTooltip(null))
-                .on("click", (event, d) => flyToLocation(d));
         }
-    }, [geoData, locations, theme]);
-
-    }, [zoomTransform, geoData]); // Re-run on zoom
+    }, [geoData, locations, theme, zoomTransform]);
 
     // Overlay Elements
     useEffect(() => {
@@ -616,8 +595,8 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                 .attr("class", "map-point");
         };
 
-        const drawLine = (start: {lat: number, lon: number}, end: {lat: number, lon: number}, color: string) => {
-             g.append("line")
+        const drawLine = (start: { lat: number, lon: number }, end: { lat: number, lon: number }, color: string) => {
+            g.append("line")
                 .attr("x1", projectionRef.current!([start.lon, start.lat])?.[0] || 0)
                 .attr("y1", projectionRef.current!([start.lon, start.lat])?.[1] || 0)
                 .attr("x2", projectionRef.current!([end.lon, end.lat])?.[0] || 0)
@@ -686,7 +665,7 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                 attempts.forEach(a => {
                     drawPoint(a.target.lat, a.target.lon, "rgba(255,255,255,0.3)", 4);
                 });
-                 g.append("circle")
+                g.append("circle")
                     .attr("cx", projectionRef.current!([item.target.lon, item.target.lat])?.[0] || 0)
                     .attr("cy", projectionRef.current!([item.target.lon, item.target.lat])?.[1] || 0)
                     .attr("r", 25 / (zoomTransform.k || 1))
@@ -698,31 +677,13 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                 drawPoint(item.target.lat, item.target.lon, "#2ea043", 8);
 
                 if (item.guess) {
-                     drawPoint(item.guess.lat, item.guess.lon, item.correct ? "#2ea043" : "#da3633", 6);
-                     drawLine(item.target, item.guess, "#da3633");
+                    drawPoint(item.guess.lat, item.guess.lon, item.correct ? "#2ea043" : "#da3633", 6);
+                    drawLine(item.target, item.guess, "#da3633");
                 }
             }
         }
     }, [locations, mode, quizIndex, showResult, attempts, reviewIndex, zoomTransform, theme, geoData, showHintCircle]);
-    const handleZoom = (factor: number) => {
-        if (!svgRef.current || !zoomBehavior.current) return;
-        d3.select(svgRef.current).transition().duration(300).call(zoomBehavior.current.scaleBy, factor);
-    };
 
-    const handleReset = () => {
-        if (!svgRef.current || !zoomBehavior.current) return;
-        d3.select(svgRef.current).transition().duration(750).call(zoomBehavior.current.transform, d3.zoomIdentity);
-    };
-
-    const flyToLocation = (loc: Location) => {
-        if (!svgRef.current || !zoomBehavior.current) return;
-        const projection = d3.geoMercator().center([82, 23]).scale(800).translate([300, 300]);
-        const [x, y] = projection([loc.lon, loc.lat]) || [0, 0];
-        const scale = 4;
-        const translate = [300 - scale * x, 300 - scale * y];
-        d3.select(svgRef.current).transition().duration(1500)
-            .call(zoomBehavior.current.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
-    };
 
     if (mapError) {
         return <div className="map-error glass-card">⚠️ Unable to load map data. Please check connection.</div>;
@@ -731,7 +692,7 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
     return (
         <div className={`map-renderer-container ${theme} ${isFullscreen ? 'fullscreen-map' : ''}`}>
             <div className="map-header">
-                <h3 style={{color: theme === 'ancient' ? '#8b4513' : 'inherit'}}>
+                <h3 style={{ color: theme === 'ancient' ? '#8b4513' : 'inherit' }}>
                     {mode === 'explore' ? '📍 AI Cartographer' : (mode === 'review' ? '📝 Review Mode' : '⚔️ Map Arena')}
                 </h3>
                 <div className="map-controls-row">
@@ -744,12 +705,12 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                 </div>
             </div>
 
-            <div className="mode-toggle-bar" style={{marginBottom: 10, display: 'flex', gap: 10}}>
+            <div className="mode-toggle-bar" style={{ marginBottom: 10, display: 'flex', gap: 10 }}>
                 <button className={`map-btn-sm ${mode === 'explore' ? 'active' : ''}`} onClick={() => { setMode('explore'); handleReset(); }}>Explore</button>
                 <button className={`map-btn-sm ${mode === 'practice' ? 'active' : ''}`} onClick={() => { setMode('practice'); handleReset(); resetQuiz(); }}>Practice</button>
                 {attempts.length > 0 && <button className={`map-btn-sm ${mode === 'review' ? 'active' : ''}`} onClick={startReview}>Review</button>}
 
-                <div style={{flex: 1}}></div>
+                <div style={{ flex: 1 }}></div>
                 {mode === 'practice' && (
                     <button
                         className={`map-btn-sm ${isHardcore ? 'active' : ''}`}
@@ -762,13 +723,13 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
             </div>
 
             {mode === 'practice' && locations.length > 0 && (
-                 <div className="instruction-box">
+                <div className="instruction-box">
                     <div className="hud-row">
                         <div className="hud-stat">
                             <span className="hud-label">Question</span>
                             <span className="hud-value">{quizIndex + 1}/{locations.length}</span>
                         </div>
-                         <div className="hud-stat">
+                        <div className="hud-stat">
                             <span className="hud-label">Streak</span>
                             <span className={`hud-value ${streak > 2 ? 'streak-fire' : ''}`}>
                                 {streak} 🔥
@@ -776,7 +737,7 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                         </div>
                         <div className="hud-stat">
                             <span className="hud-label">Marks</span>
-                            <span className="hud-value" style={{color: totalMarks < 0 ? '#f85149' : '#3fb950'}}>
+                            <span className="hud-value" style={{ color: totalMarks < 0 ? '#f85149' : '#3fb950' }}>
                                 {totalMarks > 0 ? '+' : ''}{totalMarks}
                             </span>
                         </div>
@@ -786,7 +747,7 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                         <div className="timer-bar-container">
                             <div
                                 className={`timer-bar-fill ${timeLeft < 5 ? 'critical' : ''}`}
-                                style={{width: `${(timeLeft / 20) * 100}%`}}
+                                style={{ width: `${(timeLeft / 20) * 100}%` }}
                             ></div>
                         </div>
                     )}
@@ -798,8 +759,8 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                                 "{locations[quizIndex].reason || "No description available."}"
                             </div>
                             {!showResult && (
-                                <div style={{display: 'flex', gap: 10, justifyContent: 'center', marginTop: 10}}>
-                                    <button onClick={handleHint} className="give-up-btn" style={{background: '#0d1117', border: '1px solid #30363d'}}>
+                                <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 10 }}>
+                                    <button onClick={handleHint} className="give-up-btn" style={{ background: '#0d1117', border: '1px solid #30363d' }}>
                                         💡 Hint (-1.0)
                                     </button>
                                     <button onClick={handleGiveUp} className="give-up-btn">
@@ -811,18 +772,18 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                     ) : (
                         <div className="completion-box">
                             <div>Session Complete!</div>
-                            <div style={{fontSize: '1.5rem', margin: '10px 0', color: totalMarks >= 0 ? '#3fb950' : '#f85149'}}>
+                            <div style={{ fontSize: '1.5rem', margin: '10px 0', color: totalMarks >= 0 ? '#3fb950' : '#f85149' }}>
                                 Final Score: {totalMarks}
                             </div>
                             <div className="completion-actions">
                                 <button onClick={resetQuiz} className="retry-btn">Restart</button>
-                                <button onClick={startReview} className="next-btn" style={{marginLeft: 10}}>Review Mistakes ➡️</button>
+                                <button onClick={startReview} className="next-btn" style={{ marginLeft: 10 }}>Review Mistakes ➡️</button>
                             </div>
                         </div>
                     )}
 
                     {feedbackMsg && (
-                        <div className={`feedback-box ${attempts[attempts.length-1]?.correct ? 'success' : 'failure'}`}>
+                        <div className={`feedback-box ${attempts[attempts.length - 1]?.correct ? 'success' : 'failure'}`}>
                             {feedbackMsg}
                             {showResult && (
                                 <button
@@ -834,7 +795,7 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                             )}
                         </div>
                     )}
-                 </div>
+                </div>
             )}
 
             {mode === 'review' && (
@@ -851,7 +812,7 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                             {attempts[reviewIndex].marks}
                         </span>
                     </div>
-                    <div className="review-controls" style={{marginTop: 10, display: 'flex', gap: 10, justifyContent: 'center'}}>
+                    <div className="review-controls" style={{ marginTop: 10, display: 'flex', gap: 10, justifyContent: 'center' }}>
                         <button onClick={prevReview} disabled={reviewIndex === 0} className="map-btn-sm">⬅️ Prev</button>
                         <button onClick={nextReview} disabled={reviewIndex === attempts.length - 1} className="map-btn-sm">Next ➡️</button>
                         <button onClick={resetQuiz} className="map-btn-sm">Exit</button>
@@ -876,15 +837,11 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                     height="600"
                     viewBox="0 0 600 600"
                     onClick={handleMapClick}
-                    style={{cursor: mode === 'practice' && !showResult ? 'crosshair' : 'default'}}
+                    style={{ cursor: mode === 'practice' && !showResult ? 'crosshair' : 'default' }}
                 >
                     <g ref={gRef}></g>
                 </svg>
 
-                {tooltip && mode === 'explore' && (
-                <svg ref={svgRef} width="100%" height="600" viewBox="0 0 600 600">
-                    <g ref={gRef}></g>
-                </svg>
 
                 {tooltip && (
                     <div className="map-tooltip" style={{ top: tooltip.y - 40, left: tooltip.x + 20 }}>
@@ -910,14 +867,7 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                     ))}
                 </div>
             )}
-            <div className="map-legend">
-                {locations.map((loc, i) => (
-                    <div key={i} className="legend-item interactive" onClick={() => flyToLocation(loc)}>
-                        <span className="dot" style={{ background: theme === 'cyber' ? '#ff00dd' : '#d32f2f' }}></span>
-                        <div><strong>{loc.name}</strong><div className="legend-desc">{loc.reason}</div></div>
-                    </div>
-                ))}
-            </div>
+
         </div>
     );
 };

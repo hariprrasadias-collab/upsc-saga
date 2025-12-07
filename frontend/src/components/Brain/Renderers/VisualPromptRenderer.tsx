@@ -78,7 +78,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
 
     // Grid View State
     const [viewMode, setViewMode] = useState<'single' | 'grid'>('single');
-    const [gridImages, setGridImages] = useState<{url: string, model: string}[]>([]);
+    const [gridImages, setGridImages] = useState<{ url: string, model: string }[]>([]);
 
     const [imageLoading, setImageLoading] = useState(false);
     const [imageError, setImageError] = useState(false);
@@ -111,7 +111,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
 
     // HUD Update Loop
     useEffect(() => {
-        let interval: NodeJS.Timeout;
+        let interval: any;
         if (isGenerating || imageLoading) {
             interval = setInterval(() => {
                 setHudStats({
@@ -144,7 +144,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
     };
 
     const addStyleTag = (tag: string) => {
-         setPrompt(prev => {
+        setPrompt(prev => {
             if (prev.includes(tag)) return prev;
             const separator = prev.trim().endsWith(',') || prev.trim().endsWith('.') ? ' ' : ', ';
             return `${prev.trim()}${separator}${tag}`;
@@ -172,7 +172,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
             setSeed(finalSeed);
             setRandomSeed(false);
         } else if (randomSeed) {
-             setSeed(finalSeed); // Sync UI
+            setSeed(finalSeed); // Sync UI
         }
 
         // Parse --no
@@ -196,9 +196,9 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         }
 
         if (width === 0) {
-             const selectedRatio = ASPECT_RATIOS.find(r => r.id === aspectRatio) || ASPECT_RATIOS[0];
-             width = selectedRatio.width;
-             height = selectedRatio.height;
+            const selectedRatio = ASPECT_RATIOS.find(r => r.id === aspectRatio) || ASPECT_RATIOS[0];
+            width = selectedRatio.width;
+            height = selectedRatio.height;
         }
 
         return { finalPrompt: finalPrompt.trim(), finalSeed, finalNegative, width, height };
@@ -281,7 +281,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
 
         // Add 3 random style tags
         const allTags = Object.values(STYLE_MATRIX).flat();
-        const randomTags = Array.from({length: 3}, () => allTags[Math.floor(Math.random() * allTags.length)]);
+        const randomTags = Array.from({ length: 3 }, () => allTags[Math.floor(Math.random() * allTags.length)]);
 
         setPrompt(prev => {
             let p = prev;
@@ -402,13 +402,13 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
                 </div>
 
                 <div className="vp-toolbar-group">
-                     <button
+                    <button
                         className={`settings-toggle-btn ${showTemplates ? 'active' : ''}`}
                         onClick={() => setShowTemplates(!showTemplates)}
                     >
                         <FaFileAlt /> Templates
                     </button>
-                     <button
+                    <button
                         className={`settings-toggle-btn ${showPresets ? 'active' : ''}`}
                         onClick={() => setShowPresets(!showPresets)}
                     >
@@ -468,7 +468,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
                 </div>
             )}
 
-             {showStyleMatrix && (
+            {showStyleMatrix && (
                 <div className="vp-style-matrix">
                     {Object.entries(STYLE_MATRIX).map(([category, styles]) => (
                         <div key={category} className="style-category">
@@ -501,7 +501,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
                         >
                             {MODELS.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
                         </select>
-                         {viewMode === 'grid' && <span className="vp-helper-text">Grid mode uses 4 fixed models.</span>}
+                        {viewMode === 'grid' && <span className="vp-helper-text">Grid mode uses 4 fixed models.</span>}
                     </div>
 
                     <div className="vp-control-group">
@@ -543,7 +543,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
                         </div>
                     </div>
 
-                     <div className="vp-control-group full-width">
+                    <div className="vp-control-group full-width">
                         <label className="vp-label">Negative Prompt (Exclude)</label>
                         <input
                             type="text"
@@ -575,13 +575,13 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
                     </button>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '5px', gap: '10px' }}>
-                     <button className="magic-btn chaos" onClick={handleChaos} title="Randomize Settings & Style">
+                    <button className="magic-btn chaos" onClick={handleChaos} title="Randomize Settings & Style">
                         <FaBolt /> Chaos Mode
                     </button>
-                     <button className="magic-btn secondary" onClick={handleRemix} title="Remix with random seed">
+                    <button className="magic-btn secondary" onClick={handleRemix} title="Remix with random seed">
                         <FaRandom /> Remix
                     </button>
-                     <button className="magic-btn" onClick={handleMagicEnhance} title="Add magic modifiers">
+                    <button className="magic-btn" onClick={handleMagicEnhance} title="Add magic modifiers">
                         <FaMagic /> Magic Enhance
                     </button>
                 </div>
@@ -643,7 +643,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
                                     setImageError(true);
                                 }}
                             />
-                             {!imageLoading && (
+                            {!imageLoading && (
                                 <div className="vp-overlay">
                                     <button className="download-img-btn" onClick={() => handleGenerate(true)}>
                                         <FaExpand /> Upscale 2x
@@ -658,7 +658,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
 
                     {/* Grid View */}
                     {viewMode === 'grid' && gridImages.length > 0 && !imageError && (
-                         <div className="vp-grid-layout" style={{ display: imageLoading ? 'none' : 'grid' }}>
+                        <div className="vp-grid-layout" style={{ display: imageLoading ? 'none' : 'grid' }}>
                             {gridImages.map((img, idx) => (
                                 <div key={idx} className="vp-grid-item">
                                     <img
@@ -670,14 +670,14 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
                                         }}
                                     />
                                     <span className="grid-label">{img.model}</span>
-                                    <button className="grid-save-btn" onClick={() => downloadImage(img.url)}><FaDownload/></button>
+                                    <button className="grid-save-btn" onClick={() => downloadImage(img.url)}><FaDownload /></button>
                                 </div>
                             ))}
                         </div>
                     )}
 
                     {imageError && (
-                        <div className="error-message" style={{color: '#f85149', padding: '20px'}}>
+                        <div className="error-message" style={{ color: '#f85149', padding: '20px' }}>
                             ⚠️ Image generation failed. The prompt might be too complex for the external grid.
                         </div>
                     )}
@@ -704,7 +704,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
                     onClick={() => handleGenerate(false)}
                     disabled={isGenerating || imageLoading}
                 >
-                    {(isGenerating || imageLoading) ? <><div className="spinner" style={{width: 12, height: 12, borderWidth: 2}}></div> Processing...</> : <><FaRocket /> Generate Image</>}
+                    {(isGenerating || imageLoading) ? <><div className="spinner" style={{ width: 12, height: 12, borderWidth: 2 }}></div> Processing...</> : <><FaRocket /> Generate Image</>}
                 </button>
             </div>
 
