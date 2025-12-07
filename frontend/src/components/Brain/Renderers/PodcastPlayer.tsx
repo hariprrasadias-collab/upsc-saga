@@ -15,6 +15,8 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
     const [voicesLoaded, setVoicesLoaded] = useState(false);
     const [playbackRate, setPlaybackRate] = useState(1.1); // Default slightly energetic
     const [isZenMode, setIsZenMode] = useState(false);
+    const [speed, setSpeed] = useState(1.0);
+    const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
     // Refs
     const scriptRef = useRef<HTMLDivElement>(null);
@@ -38,8 +40,54 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
 
             if (match) {
                 parsed.push({ speaker: match[1].trim(), text: match[2].trim() });
+        const utterance = new SpeechSynthesisUtterance(content);
+        utterance.rate = speed;
+        utterance.pitch = 1.0;
+
+        const voices = window.speechSynthesis.getVoices();
+        const preferredVoice = voices.find(v => v.name.includes('Google US English') || v.name.includes('Samantha'));
+        if (preferredVoice) utterance.voice = preferredVoice;
+
+        utterance.onend = () => {
+            setIsPlaying(false);
+            setProgress(100);
+        };
+
+        utteranceRef.current = utterance;
+
+        // Cleanup on unmount or content change
+        return () => {
+            window.speechSynthesis.cancel();
+        };
+    }, [content]);
+
+    // Handle Speed Change - Restart if playing to apply rate
+    useEffect(() => {
+        if (utteranceRef.current) {
+            utteranceRef.current.rate = speed;
+        }
+
+        if (isPlaying) {
+            // Cancel current speech and restart with new rate
+            window.speechSynthesis.cancel();
+            if (utteranceRef.current) {
+                 window.speechSynthesis.speak(utteranceRef.current);
+            }
+        }
+    }, [speed]);
+
+    // Playback Control
+    useEffect(() => {
+        let interval: any;
+
+        if (isPlaying) {
+            if (!window.speechSynthesis.speaking) {
+                 if (utteranceRef.current) {
+                     utteranceRef.current.rate = speed;
+                     window.speechSynthesis.speak(utteranceRef.current);
+                 }
             } else {
-                parsed.push({ speaker: 'Narrator', text: cleanLine });
+                 parsed.push({ speaker: 'Narrator', text: cleanLine });
             }
         });
         setDialogue(parsed);
@@ -74,6 +122,15 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
     useEffect(() => {
         if (currentLineIndex >= 0) {
             localStorage.setItem(storageKey, currentLineIndex.toString());
+
+             interval = setInterval(() => {
+                setProgress(p => (p >= 100 ? 0 : p + 1));
+            }, 1000 / speed);
+
+        } else {
+            // Pause
+            window.speechSynthesis.pause();
+            clearInterval(interval);
         }
     }, [currentLineIndex, storageKey]);
 
@@ -319,6 +376,11 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
 
     // Progress
     const progress = dialogue.length > 0 ? (currentLineIndex / dialogue.length) * 100 : 0;
+    const handleSpeedChange = () => {
+        const speeds = [0.75, 1.0, 1.25, 1.5, 2.0];
+        const nextIdx = (speeds.indexOf(speed) + 1) % speeds.length;
+        setSpeed(speeds[nextIdx]);
+    };
 
     return (
         <div
@@ -550,6 +612,10 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
                         {isPlaying ? '⏸' : '▶'}
                     </button>
 
+                 <button className="speed-btn" onClick={handleSpeedChange} title="Playback Speed">
+                    {speed}x
+                </button>
+
                     {/* Progress Bar */}
                     <div className="waveform-container" style={{ cursor: 'pointer' }} onClick={(e) => {
                         const rect = e.currentTarget.getBoundingClientRect();
@@ -566,6 +632,12 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
                                 transition: 'width 0.3s ease-out',
                                 borderRadius: '4px',
                                 boxShadow: '0 0 10px rgba(255,255,255,0.3)'
+                            }}
+                            key={i}
+                            className={`wave-bar ${isPlaying ? 'animating' : ''}`}
+                            style={{
+                                animationDelay: `${i * 0.1}s`,
+                                animationDuration: `${1.2 / speed}s`
                             }}
                         ></div>
                     </div>
