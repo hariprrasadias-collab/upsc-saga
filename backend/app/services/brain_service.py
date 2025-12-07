@@ -1166,38 +1166,16 @@ class BrainService:
 
             elif action_type == "GENERATE_SOCRATIC_DIALOGUE":
                 try:
-                    from app.services.socratic_service import AGENTS, get_model
+                    from app.services.socratic_service import generate_autonomous_debate
                     topic = payload.get('topic', 'Philosophy')
 
-                    # Simulate a 3-turn debate
-                    model = get_model()
-                    turns = []
-
-                    # 1. User Statement (Simulated)
-                    prompt1 = f"Generate a provocative student opinion about '{topic}' that is slightly flawed."
-                    response1 = model.generate_content(prompt1)
-                    user_statement = response1.text.strip()
-                    turns.append(f"Student: {user_statement}")
-
-                    # 2. Socrates Responds
-                    agent = AGENTS['skeptic']
-                    prompt2 = f"You are {agent['name']}. The student says: '{user_statement}'. Respond with a short, deep question."
-                    response2 = model.generate_content(prompt2)
-                    socrates_response = response2.text.strip()
-                    turns.append(f"Socrates: {socrates_response}")
-
-                    # 3. Student Rethinks
-                    prompt3 = f"The student reflects on '{socrates_response}'. Generate their realization."
-                    response3 = model.generate_content(prompt3)
-                    student_realization = response3.text.strip()
-                    turns.append(f"Student (Reflecting): {student_realization}")
-
-                    dialogue = "\n\n".join(turns)
+                    # Generate a full autonomous debate (6 turns)
+                    dialogue_text, history = generate_autonomous_debate(topic, turns=6)
 
                     result = {
                         "success": True,
                         "message": "Socratic Dialogue Generated.",
-                        "dialogue": dialogue
+                        "dialogue": dialogue_text
                     }
                 except Exception as e:
                     result = {"success": False, "message": f"Socratic Gen Failed: {str(e)}"}

@@ -2,6 +2,7 @@ import google.generativeai as genai
 import os
 import json
 import random
+import time
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -28,6 +29,24 @@ AGENTS = {
         'role': 'The Realist',
         'style': 'Empirical, practical, systematic. Categorizes arguments. Concerned with what IS and what is FEASIBLE.',
         'focus': 'Evidence & Pragmatism'
+    },
+    'iconoclast': {
+        'name': 'Nietzsche',
+        'role': 'The Iconoclast',
+        'style': 'Challenges established values. Focuses on Will to Power. Critiques "slave morality" and conformity.',
+        'focus': 'Power & Individualism'
+    },
+    'sage': {
+        'name': 'Confucius',
+        'role': 'The Harmonizer',
+        'style': 'Focuses on social order, ritual (Li), family duty, and ethical leadership. Conservative and community-oriented.',
+        'focus': 'Harmony & Duty'
+    },
+    'strategist': {
+        'name': 'Machiavelli',
+        'role': 'The Pragmatist',
+        'style': 'Focuses on effectiveness, statecraft, and maintaining power. The ends justify the means. Coldly rational.',
+        'focus': 'Realpolitik & Outcome'
     }
 }
 
@@ -50,7 +69,9 @@ def generate_debate_turn(topic, history, user_input=None):
     
     # 1. Context Construction
     context_str = ""
-    for turn in history[-6:]:
+    # Look deeper into history for context
+    relevant_history = history[-10:] if len(history) > 10 else history
+    for turn in relevant_history:
         speaker = turn.get('speakerId', 'unknown')
         name = AGENTS.get(speaker, {'name': 'User'}).get('name')
         text = turn.get('text', '')
@@ -62,40 +83,50 @@ def generate_debate_turn(topic, history, user_input=None):
     # 2. The Moderator (Dynamic Speaker Selection & Scoring)
     # We ask the model to act as a "Debate Moderator" first to analyze the state.
     
+    agent_descriptions = "\n".join([f"{k}: {v['name']} ({v['role']})" for k, v in AGENTS.items()])
+
     moderator_prompt = f"""
     You are the Moderator of a high-stakes philosophical debate on "{topic}".
     
     AGENTS:
-    1. Socrates (Skeptic): Attacks logic/definitions.
-    2. Plato (Idealist): Attacks lack of vision/morality.
-    3. Aristotle (Realist): Attacks lack of evidence/feasibility.
+    {agent_descriptions}
 
     CONVERSATION SO FAR:
     {context_str}
 
     TASK:
-    1. Analyze the User's last argument (if any). Score it (0-10) on Logic, Relevance, and Impact.
-    2. Decide WHO should speak next to best challenge the User or advance the debate.
-       - If User was vague -> Socrates.
-       - If User was cynical/pragmatic -> Plato.
-       - If User was overly idealistic -> Aristotle.
+    1. Analyze the Last Argument (by User or Agent). Score it (0-10) on Logic, Relevance, and Impact.
+    2. Decide WHO should speak next to best challenge the argument or advance the debate.
+       - Select the agent whose philosophy most directly CONFLICTS with the last point.
+       - Do not let the same person speak twice in a row.
     3. Provide a "Secret Strategy" for the selected agent.
 
     Return JSON:
     {{
         "user_score": {{ "logic": 0, "relevance": 0, "impact": 0 }},
-        "next_speaker_id": "skeptic" | "idealist" | "realist",
+        "next_speaker_id": "skeptic" | "idealist" | "realist" | "iconoclast" | "sage" | "strategist",
         "strategy": "..."
     }}
     """
     
     try:
         mod_response = model.generate_content(moderator_prompt)
-        mod_data = json.loads(mod_response.text.replace('```json', '').replace('```', '').strip())
+        text = mod_response.text.replace('```json', '').replace('```', '').strip()
+        start = text.find('{')
+        end = text.rfind('}')
+        if start != -1 and end != -1:
+            text = text[start:end+1]
+
+        mod_data = json.loads(text)
         
         next_speaker_id = mod_data.get('next_speaker_id', 'skeptic')
         strategy = mod_data.get('strategy', 'Question the premise.')
         user_score = mod_data.get('user_score', {})
+
+        # Fallback if invalid ID
+        if next_speaker_id not in AGENTS:
+            next_speaker_id = random.choice(list(AGENTS.keys()))
+
     except Exception as e:
         print(f"Moderator Error: {e}")
         next_speaker_id = random.choice(list(AGENTS.keys()))
@@ -119,12 +150,12 @@ def generate_debate_turn(topic, history, user_input=None):
     
     TASK:
     Generate your response.
-    1. First, THINK silently about the user's argument. Identify fallacies or weak points.
+    1. First, THINK silently about the previous argument. Identify fallacies or weak points.
     2. Then, SPEAK. Keep it under 3 sentences. Be profound, challenging, and in-character.
     
     Return JSON:
     {{
-        "thought_process": "I observe that the user...",
+        "thought_process": "I observe that...",
         "text": "...",
         "type": "ARGUMENT" | "QUESTION" | "REBUTTAL"
     }}
@@ -156,7 +187,7 @@ def generate_debate_turn(topic, history, user_input=None):
             "type": result.get('type', 'ARGUMENT'),
             "thoughts": result.get('thought_process', ''),
             "score": user_score,
-            "timestamp": 0
+            "timestamp": int(time.time() * 1000)
         }
     except Exception as e:
         print(f"Agent Error: {e}")
@@ -166,5 +197,68 @@ def generate_debate_turn(topic, history, user_input=None):
             "type": "ARGUMENT",
             "thoughts": f"System failure: {str(e)}",
             "score": {},
-            "timestamp": 0
+            "timestamp": int(time.time() * 1000)
         }
+
+def generate_autonomous_debate(topic, turns=6):
+    """
+    Generates a full multi-turn debate between agents automatically.
+    Returns a formatted dialogue string and the raw history.
+    """
+    if not GEMINI_API_KEY:
+        return "System Offline (No API Key).", []
+
+    history = []
+
+    # Initial Prompt to kickstart
+    initial_prompt = f"Make a provocative opening statement about '{topic}' that invites debate."
+
+    try:
+        model = get_model()
+        # Randomly pick a starter who isn't a skeptic (Skeptics usually respond)
+        starters = ['idealist', 'iconoclast', 'strategist', 'sage']
+        starter_id = random.choice(starters)
+        starter_agent = AGENTS[starter_id]
+
+        resp = model.generate_content(f"You are {starter_agent['name']}. {initial_prompt}")
+        history.append({
+            "speakerId": starter_id,
+            "text": resp.text.strip(),
+            "type": "ARGUMENT",
+            "timestamp": int(time.time() * 1000)
+        })
+
+        # Loop for subsequent turns
+        for _ in range(turns - 1):
+            turn_data = generate_debate_turn(topic, history)
+            history.append(turn_data)
+            # Small delay to avoid rate limits if any, though Gemini is fast
+            time.sleep(0.5)
+
+        # Format Dialogue
+        formatted_dialogue = f"# 🏛️ Socratic Debate: {topic}\n\n"
+        for turn in history:
+            speaker_id = turn.get('speakerId')
+            agent = AGENTS.get(speaker_id, {'name': 'Unknown'})
+            name = agent['name']
+            text = turn.get('text')
+
+            # Add an icon
+            icon = "🗣️"
+            if speaker_id == 'skeptic': icon = "🤔"
+            elif speaker_id == 'idealist': icon = "✨"
+            elif speaker_id == 'realist': icon = "📜"
+            elif speaker_id == 'iconoclast': icon = "⚡"
+            elif speaker_id == 'sage': icon = "🎍"
+            elif speaker_id == 'strategist': icon = "♟️"
+
+            formatted_dialogue += f"### {icon} {name}\n{text}\n\n"
+
+            if turn.get('thoughts'):
+                formatted_dialogue += f"> *Thinking: {turn.get('thoughts')}*\n\n"
+
+        return formatted_dialogue, history
+
+    except Exception as e:
+        print(f"Autonomous Debate Error: {e}")
+        return f"Error generating debate: {str(e)}", []
