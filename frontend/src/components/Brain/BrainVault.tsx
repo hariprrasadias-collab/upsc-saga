@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaList, FaThLarge, FaStar, FaRegStar } from 'react-icons/fa';
 import './BrainVault.css';
 import MarkdownRenderer from '../Shared/MarkdownRenderer';
 import TimelineRenderer from './Renderers/TimelineRenderer';
@@ -22,12 +24,16 @@ interface AIContent {
 }
 
 const BrainVault: React.FC = () => {
-    // ... (state lines 15-26 remain same)
     const [contentList, setContentList] = useState<AIContent[]>([]);
     const [loading, setLoading] = useState(true);
     const [filterType, setFilterType] = useState<string>('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedContent, setSelectedContent] = useState<AIContent | null>(null);
+    const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+    const [favorites, setFavorites] = useState<number[]>(() => {
+        const saved = localStorage.getItem('brain_vault_favorites');
+        return saved ? JSON.parse(saved) : [];
+    });
 
     const contentTypes = [
         'all', 'podcast', 'essay', 'visual_prompt', 'roleplay',
@@ -37,11 +43,22 @@ const BrainVault: React.FC = () => {
     useEffect(() => {
         fetchContent();
     }, [filterType]);
+
+    useEffect(() => {
+        localStorage.setItem('brain_vault_favorites', JSON.stringify(favorites));
+    }, [favorites]);
+
+    const toggleFavorite = (id: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setFavorites(prev =>
+            prev.includes(id) ? prev.filter(fid => fid !== id) : [...prev, id]
+        );
+    };
     // ... (fetchContent and handleDelete remain same)
     const fetchContent = async () => {
         setLoading(true);
         try {
-            let url = 'http://localhost:5000/api/automation/content';
+            let url = 'http://127.0.0.1:5000/api/automation/content';
             if (filterType !== 'all') {
                 url += `?type=${filterType}`;
             }
@@ -62,7 +79,7 @@ const BrainVault: React.FC = () => {
         if (!window.confirm("Delete this artifact from the Neural Storage?")) return;
 
         try {
-            await fetch(`http://localhost:5000/api/automation/content/${id}`, { method: 'DELETE' });
+            await fetch(`http://127.0.0.1:5000/api/automation/content/${id}`, { method: 'DELETE' });
             setContentList(prev => prev.filter(item => item.id !== id));
             if (selectedContent?.id === id) setSelectedContent(null);
         } catch (error) {
@@ -72,7 +89,14 @@ const BrainVault: React.FC = () => {
 
     const filteredList = contentList.filter(item =>
         item.topic.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    ).sort((a, b) => {
+        // Favorites first
+        const aFav = favorites.includes(a.id);
+        const bFav = favorites.includes(b.id);
+        if (aFav && !bFav) return -1;
+        if (!aFav && bFav) return 1;
+        return 0;
+    });
 
     const renderContentBody = (item: AIContent) => {
         const normalizedType = String(item.content_type || '').trim().toLowerCase();
@@ -141,6 +165,22 @@ const BrainVault: React.FC = () => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
+                <div className="view-toggles">
+                    <button
+                        className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+                        onClick={() => setViewMode('list')}
+                        title="List View"
+                    >
+                        <FaList />
+                    </button>
+                    <button
+                        className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                        onClick={() => setViewMode('grid')}
+                        title="Grid View"
+                    >
+                        <FaThLarge />
+                    </button>
+                </div>
             </header>
 
             <nav className="vault-filters">
@@ -155,40 +195,69 @@ const BrainVault: React.FC = () => {
                 ))}
             </nav>
 
-            <div className="vault-layout">
-                <aside className="content-list-panel glass-panel">
-                    {loading ? (
-                        <div className="loading-state">Accessing Neural Storage...</div>
-                    ) : (
-                        <ul className="content-list-ul">
-                            {filteredList.map(item => (
-                                <li
-                                    key={item.id}
-                                    className={`vault-item ${selectedContent?.id === item.id ? 'active' : ''}`}
-                                    onClick={() => setSelectedContent(item)}
-                                >
-                                    <div className="item-header">
-                                        <span className="item-type-tag">{item.content_type}</span>
-                                        <button
-                                            className="delete-btn"
-                                            onClick={(e) => handleDelete(item.id, e)}
-                                            title="Delete Artifact"
+            <div className={`vault-layout ${viewMode === 'grid' ? 'grid-layout-active' : ''}`}>
+                <AnimatePresence mode="wait">
+                    {(viewMode === 'list' || !selectedContent) && (
+                        <motion.aside
+                            className={`content-list-panel glass-panel ${viewMode === 'grid' ? 'full-width-grid' : ''}`}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                        >
+                            {loading ? (
+                                <div className="loading-state">Accessing Neural Storage...</div>
+                            ) : (
+                                <ul className={`content-list-ul ${viewMode === 'grid' ? 'grid-view-ul' : ''}`}>
+                                    {filteredList.map(item => (
+                                        <motion.li
+                                            key={item.id}
+                                            layoutId={`card-${item.id}`}
+                                            className={`vault-item ${selectedContent?.id === item.id ? 'active' : ''} ${viewMode === 'grid' ? 'grid-card' : ''}`}
+                                            onClick={() => setSelectedContent(item)}
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
                                         >
-                                            ×
-                                        </button>
-                                    </div>
-                                    <h4 className="item-topic">{item.topic}</h4>
-                                    <span className="item-date">{new Date(item.created_at).toLocaleDateString()}</span>
-                                </li>
-                            ))}
-                            {filteredList.length === 0 && !loading && (
-                                <div className="empty-state">No artifacts found.</div>
+                                            <div className="item-header">
+                                                <span className={`item-type-tag type-${item.content_type}`}>{item.content_type}</span>
+                                                <div className="item-actions">
+                                                    <button
+                                                        className={`favorite-btn ${favorites.includes(item.id) ? 'is-fav' : ''}`}
+                                                        onClick={(e) => toggleFavorite(item.id, e)}
+                                                    >
+                                                        {favorites.includes(item.id) ? <FaStar /> : <FaRegStar />}
+                                                    </button>
+                                                    <button
+                                                        className="delete-btn"
+                                                        onClick={(e) => handleDelete(item.id, e)}
+                                                        title="Delete Artifact"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <h4 className="item-topic">{item.topic}</h4>
+                                            <span className="item-date">{new Date(item.created_at).toLocaleDateString()}</span>
+                                        </motion.li>
+                                    ))}
+                                    {filteredList.length === 0 && !loading && (
+                                        <div className="empty-state">No artifacts found.</div>
+                                    )}
+                                </ul>
                             )}
-                        </ul>
+                        </motion.aside>
                     )}
-                </aside>
+                </AnimatePresence>
 
-                <main className="content-view-panel glass-panel">
+                {/* Only show main panel if in list mode OR if an item is selected in grid mode (modal style could be better but sticking to panel for now) */}
+                {(viewMode === 'list' || selectedContent) && (
+                    <motion.main
+                        className={`content-view-panel glass-panel ${viewMode === 'grid' ? 'grid-overlay' : ''}`}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                    >
+                        {viewMode === 'grid' && selectedContent && (
+                            <button className="close-overlay-btn" onClick={() => setSelectedContent(null)}>Back to Grid</button>
+                        )}
                     {selectedContent ? (
                         <div className="content-view-inner">
                             <div className="view-header">
@@ -224,7 +293,8 @@ const BrainVault: React.FC = () => {
                             <p>Choose an item from the left to view its neural contents.</p>
                         </div>
                     )}
-                </main>
+                </motion.main>
+                )}
             </div>
         </div>
     );

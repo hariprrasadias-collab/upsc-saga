@@ -106,18 +106,28 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
                 </button>
 
                 {/* Waveform Visualizer */}
-                <div className="waveform-container">
+                <div className="waveform-container" style={{display: 'flex', alignItems: 'center', height: '30px', gap: '3px', flexGrow: 1, margin: '0 15px'}}>
                     {[...Array(20)].map((_, i) => (
                         <div
                             key={i}
                             className={`wave-bar ${isPlaying ? 'animating' : ''}`}
                             style={{
-                                animationDelay: `${i * 0.1}s`,
-                                animationDuration: `${1.2 / speed}s`
+                                flex: 1,
+                                backgroundColor: '#4ade80',
+                                borderRadius: '2px',
+                                height: '10%',
+                                animation: isPlaying ? `wave 1s ease-in-out infinite` : 'none',
+                                animationDelay: `${i * 0.05}s`
                             }}
                         ></div>
                     ))}
                 </div>
+                <style>{`
+                    @keyframes wave {
+                        0%, 100% { height: 10%; opacity: 0.5; }
+                        50% { height: 100%; opacity: 1; }
+                    }
+                `}</style>
 
                 <div className="time-display">
                     {Math.floor(progress / 60)}:{(progress % 60).toString().padStart(2, '0')}

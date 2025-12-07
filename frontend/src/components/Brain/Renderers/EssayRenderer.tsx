@@ -6,11 +6,29 @@ interface EssayRendererProps {
     content: string; // The prompt and thesis
 }
 
+// Simple hash to use as key for local storage based on content
+const getHash = (str: string) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash = hash & hash;
+    }
+    return hash;
+};
+
 const EssayRenderer: React.FC<EssayRendererProps> = ({ content }) => {
     const [showThesis, setShowThesis] = useState(false);
-    const [userEssay, setUserEssay] = useState('');
+    const contentHash = getHash(content);
+    const [userEssay, setUserEssay] = useState(() => {
+        return localStorage.getItem(`essay_draft_${contentHash}`) || '';
+    });
     const [isTimerRunning, setIsTimerRunning] = useState(false);
     const [timeLeft, setTimeLeft] = useState(3 * 60 * 60); // 3 hours in seconds
+
+    useEffect(() => {
+        localStorage.setItem(`essay_draft_${contentHash}`, userEssay);
+    }, [userEssay, contentHash]);
 
     useEffect(() => {
         let interval: NodeJS.Timeout;
@@ -41,6 +59,20 @@ const EssayRenderer: React.FC<EssayRendererProps> = ({ content }) => {
             setIsTimerRunning(!isTimerRunning);
         }
     };
+
+    const handleDownload = () => {
+        const element = document.createElement("a");
+        const file = new Blob([`ESSAY TOPIC:\n${content}\n\n---\n\nMY RESPONSE:\n\n${userEssay}`], {type: 'text/plain'});
+        element.href = URL.createObjectURL(file);
+        element.download = "upsc_essay_draft.txt";
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    };
+
+    const wordCount = userEssay.trim().split(/\s+/).filter(Boolean).length;
+    const wordTarget = 1200;
+    const progress = Math.min((wordCount / wordTarget) * 100, 100);
 
     return (
         <div className="essay-renderer-container">
@@ -86,14 +118,20 @@ const EssayRenderer: React.FC<EssayRendererProps> = ({ content }) => {
                             onChange={(e) => setUserEssay(e.target.value)}
                             rows={15}
                         />
-                        <div className="word-count">
-                            Word Count: {userEssay.trim().split(/\s+/).filter(Boolean).length}
+                        <div className="essay-stats-bar">
+                            <div className="word-count-group">
+                                <div className="progress-ring-mini" style={{background: `conic-gradient(#4ade80 ${progress}%, #333 ${progress}%)`}}></div>
+                                <span>{wordCount} / {wordTarget} words</span>
+                            </div>
+                            <button className="download-btn" onClick={handleDownload}>
+                                💾 Download .txt
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 <div className="paper-footer">
-                    <span>Time Left: {formatTime(timeLeft)}</span>
+                    <span className={`timer-display ${timeLeft < 300 ? 'urgent' : ''}`}>Time Left: {formatTime(timeLeft)}</span>
                     <button
                         className={`start-writing-btn ${isTimerRunning ? 'active' : ''}`}
                         onClick={toggleTimer}
