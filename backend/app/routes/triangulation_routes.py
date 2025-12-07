@@ -24,15 +24,44 @@ def get_history():
         from app.db import get_db
         import json
         conn = get_db()
+
+        # Pagination & Filtering
         limit = request.args.get('limit', 20)
-        rows = conn.execute('SELECT * FROM triangulation_reports ORDER BY created_at DESC LIMIT ?', (limit,)).fetchall()
+        search = request.args.get('search', '')
+
+        query = 'SELECT * FROM triangulation_reports'
+        params = []
+
+        if search:
+            query += ' WHERE topic LIKE ?'
+            params.append(f'%{search}%')
+
+        query += ' ORDER BY created_at DESC LIMIT ?'
+        params.append(limit)
+
+        rows = conn.execute(query, params).fetchall()
+
         data = []
         for row in rows:
             d = dict(row)
             try:
-                d['way_forward'] = json.loads(d['way_forward'])
+                # This could be the full report OR just the way_forward dict (legacy)
+                parsed_json = json.loads(d['way_forward'])
+
+                # Check if it's the new Full Report format
+                if 'way_forward' in parsed_json or 'core_topic' in parsed_json:
+                     d['full_report'] = parsed_json
+                     # For backward compatibility with simpler views, ensure way_forward exists
+                     d['way_forward'] = parsed_json.get('way_forward', {})
+                else:
+                    # Legacy: It IS the way_forward dict
+                    d['full_report'] = {} # Indicate no full report
+                    d['way_forward'] = parsed_json
+
             except:
+                d['full_report'] = {}
                 d['way_forward'] = {}
+
             data.append(d)
         return jsonify({'success': True, 'data': data})
     except Exception as e:

@@ -434,7 +434,7 @@ class BrainService:
                     content,
                     'ai_generated_triangulation'
                 )
-                save_triangulation(topic, synthesis, data.get('way_forward', {}))
+                save_triangulation(topic, synthesis, data)
 
             # 13. Neural Hash Decoding
             synthesis_text = ""

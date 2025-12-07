@@ -18,12 +18,14 @@ def init_automation_tables():
     ''')
 
     # 2. Triangulation Reports
+    # Note: 'way_forward' column now stores the FULL JSON report for newer entries,
+    # not just the way_forward section.
     conn.execute('''
         CREATE TABLE IF NOT EXISTS triangulation_reports (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             topic TEXT,
             synthesis TEXT,
-            way_forward TEXT, -- JSON
+            way_forward TEXT, -- JSON (Full Report)
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -76,10 +78,14 @@ def save_socratic_dialogue(user_id, topic, dialogue, insight=""):
                  (user_id, topic, dialogue, insight))
     conn.commit()
 
-def save_triangulation(topic, synthesis, way_forward):
+def save_triangulation(topic, synthesis, full_report_data):
+    """
+    Saves the triangulation report.
+    'full_report_data' is the entire JSON dictionary from the AI.
+    """
     conn = get_db()
     conn.execute('INSERT INTO triangulation_reports (topic, synthesis, way_forward) VALUES (?, ?, ?)', 
-                 (topic, synthesis, json.dumps(way_forward)))
+                 (topic, synthesis, json.dumps(full_report_data)))
     conn.commit()
 
 def save_neural_hash(topic, data):

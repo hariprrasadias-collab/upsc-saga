@@ -2,10 +2,6 @@ import React, { useState, useMemo, useEffect } from 'react';
 import './Renderers.css';
 import MarkdownRenderer from '../../Shared/MarkdownRenderer';
 
-interface Props {
-    content: string;
-}
-
 interface QuizItem {
     question: string;
     options: string[];
@@ -20,6 +16,10 @@ interface ELI5Data {
     visual_analogy_prompt?: string;
     real_world_example: string;
     quiz?: QuizItem[];
+}
+
+interface ELI5Props {
+    content: string;
 }
 
 const ELI5Renderer: React.FC<ELI5Props> = ({ content }) => {
