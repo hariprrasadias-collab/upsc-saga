@@ -786,7 +786,21 @@ class BrainService:
             elif action_type == "GENERATE_TOPIC_LINKAGES":
                 return {"success": True, "linkages": ["Mock Linkage 1"]}
             elif action_type == "GENERATE_CHEAT_SHEET":
-                return {"success": True, "content": "Mock Cheat Sheet"}
+                return {
+                    "success": True,
+                    "content": json.dumps({
+                        "title": "Mock Topic Cheat Sheet",
+                        "tabs": [
+                            {"id": "facts", "label": "⚡ Quick Facts", "content": "- Fact 1\n- Fact 2"},
+                            {"id": "dates", "label": "📅 Key Dates", "content": "- 1947: Independence"},
+                            {"id": "judgments", "label": "⚖️ Judgments", "content": "- Keshavananda Bharati Case"},
+                            {"id": "mnemonics", "label": "🧠 Mnemonics", "content": "- ABCDE for something"},
+                            {"id": "examiner", "label": "🧐 Examiner's View", "content": "**High Yield Keywords:**\n- Secularism\n- Basic Structure\n\n**Focus Areas:**\n- Preamble as part of Constitution"},
+                            {"id": "concept_map", "label": "🗺️ Concept Map", "content": "graph TD; A[Constitution] --> B[Preamble]; B --> C[Justice]; B --> D[Liberty];", "type": "mermaid"},
+                            {"id": "quiz", "label": "❓ Active Recall", "content": json.dumps([{"q": "Who is the custodian of the Constitution?", "a": "Supreme Court"}, {"q": "Article 32?", "a": "Right to Constitutional Remedies"}]), "type": "quiz"}
+                        ]
+                    })
+                }
             elif action_type == "GENERATE_QUOTE_BANK":
                 return {"success": True, "quotes": "Mock Quote", "data": "Mock Data"}
             elif action_type == "GENERATE_TIMELINE":
@@ -1344,19 +1358,32 @@ class BrainService:
                 try:
                     topic = payload.get('topic', '')
                     prompt = f"""
-                    Create a 'Cheat Sheet' for '{topic}' for last minute revision.
-                    Include:
-                    1. Key Articles/Sections (if any)
-                    2. Important Dates/Timeline (if any)
-                    3. 3 Key Judgments/Committees
-                    4. 1 Mnemonics
-                    Keep it very concise.
+                    Create a structured 'Cheat Sheet' for '{topic}' for last minute revision.
+                    Return a JSON object with this structure:
+                    {{
+                        "title": "{topic}",
+                        "tabs": [
+                            {{ "id": "facts", "label": "⚡ Quick Facts", "content": "Markdown list of key definitions and facts" }},
+                            {{ "id": "articles", "label": "📜 Articles/Sections", "content": "Markdown list of relevant legal articles" }},
+                            {{ "id": "dates", "label": "📅 Timeline", "content": "Markdown chronological list" }},
+                            {{ "id": "judgments", "label": "⚖️ Case Laws", "content": "Markdown of 3 key judgments/committees" }},
+                            {{ "id": "mnemonics", "label": "🧠 Mnemonics", "content": "1 clever mnemonic to remember this topic" }},
+                            {{ "id": "examiner", "label": "🧐 Examiner's View", "content": "Markdown: What keywords/themes does the examiner look for? High yield areas." }},
+                            {{ "id": "concept_map", "label": "🗺️ Concept Map", "content": "Mermaid JS diagram code (graph TD or mindmap) illustrating the concept", "type": "mermaid" }},
+                            {{ "id": "quiz", "label": "❓ Active Recall", "content": "JSON Array of 5 objects: [ { 'q': 'Question?', 'a': 'Short Answer' } ]", "type": "quiz" }}
+                        ]
+                    }}
+                    Ensure content is concise Markdown. For the concept_map, provide ONLY the valid Mermaid code string. For quiz, ensure valid JSON string in content field.
                     """
                     response = self.model.generate_content(prompt)
+                    # Use _parse_response to handle JSON extraction safely
+                    json_content = self._parse_response(response.text)
+
+                    # Ensure it's stored as a stringified JSON for consistent DB storage
                     result = {
                         "success": True,
                         "message": "Cheat Sheet Generated.",
-                        "content": response.text
+                        "content": json.dumps(json_content)
                     }
                 except Exception as e:
                     result = {"success": False, "message": f"Cheat Sheet Gen Failed: {str(e)}"}
