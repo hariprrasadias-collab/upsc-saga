@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify
 from app.db import get_db
+from app import cache
 import datetime
 
 bp = Blueprint('dashboard', __name__, url_prefix='/api')
@@ -8,6 +9,7 @@ def get_today_date_str():
     return datetime.date.today().isoformat()
 
 @bp.route('/dashboard-data')
+@cache.cached(timeout=60, query_string=True) # Cache for 1 minute
 def get_dashboard_data():
     user_id = 1
     conn = get_db()

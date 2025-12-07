@@ -2,12 +2,20 @@ from app import cgi_fix
 from flask import Flask
 from flask_cors import CORS
 from flask_compress import Compress
+from flask_caching import Cache
+
+cache = Cache()
 
 def create_app():
     app = Flask(__name__)
     app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
     CORS(app, resources={r"/*": {"origins": "*"}})
     Compress(app) # Enable Gzip compression
+
+    # Configure Caching (Simple Local Memory Cache for speed)
+    app.config['CACHE_TYPE'] = 'SimpleCache'
+    app.config['CACHE_DEFAULT_TIMEOUT'] = 300 # 5 minutes default
+    cache.init_app(app)
 
     from . import db
     db.init_app(app)
