@@ -26,27 +26,51 @@ export class SocraticEngine {
     private agents: DebateAgent[] = [
         {
             id: 'skeptic',
-            name: 'Socrates the Skeptic',
-            role: 'The Challenger',
+            name: 'Socrates',
+            role: 'The Skeptic',
             persona: 'Questions assumptions, demands definitions, exposes contradictions.',
             color: '#e74c3c', // Red
             avatar: '🤔'
         },
         {
             id: 'idealist',
-            name: 'Plato the Idealist',
-            role: 'The Visionary',
+            name: 'Plato',
+            role: 'The Idealist',
             persona: 'Focuses on moral ideals, perfect forms, and "what ought to be".',
             color: '#3498db', // Blue
             avatar: '✨'
         },
         {
             id: 'realist',
-            name: 'Aristotle the Realist',
-            role: 'The Pragmatist',
+            name: 'Aristotle',
+            role: 'The Realist',
             persona: 'Focuses on empirical evidence, practical implementation, and "what is".',
             color: '#2ecc71', // Green
             avatar: '📜'
+        },
+        {
+            id: 'iconoclast',
+            name: 'Nietzsche',
+            role: 'The Iconoclast',
+            persona: 'Challenges values, focuses on Will to Power, critiques slave morality.',
+            color: '#8e44ad', // Purple
+            avatar: '⚡'
+        },
+        {
+            id: 'sage',
+            name: 'Confucius',
+            role: 'The Harmonizer',
+            persona: 'Focuses on social order, ritual, duty, and ethics.',
+            color: '#f1c40f', // Yellow
+            avatar: '🎍'
+        },
+        {
+            id: 'strategist',
+            name: 'Machiavelli',
+            role: 'The Pragmatist',
+            persona: 'Focuses on power dynamics, effectiveness, and realpolitik.',
+            color: '#34495e', // Dark Blue/Grey
+            avatar: '♟️'
         }
     ];
 
@@ -59,7 +83,7 @@ export class SocraticEngine {
         this.topic = topic;
         this.history = [];
 
-        // Initial Argument by the Idealist
+        // Initial Argument by the Idealist (or random in future)
         const turn: DebateTurn = {
             speakerId: 'idealist',
             text: `We must consider "${topic}" not just as a syllabus item, but as a fundamental pillar of a just society. Its theoretical perfection offers a blueprint for governance.`,

@@ -1,37 +1,15 @@
 import React from 'react';
-import './Renderers.css';
 import MarkdownRenderer from '../../Shared/MarkdownRenderer';
 
-interface CheatSheetProps {
+interface Props {
     content: string;
 }
 
-const CheatSheetRenderer: React.FC<CheatSheetProps> = ({ content }) => {
-    // Heuristic: Split by "##" or lines that look like headers
-    const sections = content.split(/^##\s+/m).filter(s => s.trim().length > 0);
-
+const CheatSheetRenderer: React.FC<Props> = ({ content }) => {
     return (
-        <div className="cheat-sheet-grid">
-            {sections.map((sec, idx) => {
-                const lines = sec.split('\n');
-                const title = lines[0].trim();
-                const body = lines.slice(1).join('\n').trim();
-
-                return (
-                    <div key={idx} className="cheat-sheet-card glass-card">
-                        <h3 className="cheat-title">{title || "Notes"}</h3>
-                        <div className="cheat-body">
-                            <MarkdownRenderer content={body} />
-                        </div>
-                    </div>
-                );
-            })}
-            {/* Fallback if no sections detected */}
-            {sections.length === 0 && (
-                <div className="cheat-sheet-card glass-card full-width">
-                    <MarkdownRenderer content={content} />
-                </div>
-            )}
+        <div className="cheat-sheet-container" style={{ border: '1px solid #4ade80', padding: '15px', borderRadius: '8px', background: 'rgba(74, 222, 128, 0.05)' }}>
+            <h3 style={{ color: '#4ade80', marginTop: 0, borderBottom: '1px solid rgba(74, 222, 128, 0.3)', paddingBottom: '10px' }}>📝 Quick Reference</h3>
+            <MarkdownRenderer content={content} />
         </div>
     );
 };

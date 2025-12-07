@@ -156,6 +156,12 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
     const zoomBehavior = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
 
     // Data Parsing
+    const [mapError, setMapError] = useState(false);
+
+    // D3 Zoom Behavior instance
+    const zoomBehavior = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
+
+    // Parse Locations
     useEffect(() => {
         let foundLocations: Location[] = [];
         const extract = (data: any) => {
@@ -169,6 +175,9 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                 lon: l.lon,
                 reason: l.reason || l.hint || l.description || "Historical Site"
             }));
+            if (data.locations && Array.isArray(data.locations)) return data.locations;
+            if (Array.isArray(data) && data.length > 0 && (data[0].lat || data[0].lon || data[0].name)) return data;
+            return [];
         };
 
         if (metadata) {
@@ -180,6 +189,13 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
         }
         if (foundLocations.length === 0) {
             try { foundLocations = extract(JSON.parse(content)); } catch (e) {}
+
+        if (foundLocations.length === 0) {
+            try {
+                if (content.trim().startsWith('{') || content.trim().startsWith('[')) {
+                    foundLocations = extract(JSON.parse(content));
+                }
+            } catch (e) {}
         }
         setLocations(foundLocations);
     }, [content, metadata]);
@@ -223,9 +239,24 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                     };
                     geoCache[cacheKey] = result;
                     setGeoData(result);
+                    setGeoData(data);
+                } else {
+                    throw new Error("Failed to load India map");
                 }
             } catch (error) {
-                console.error("Failed to load map data", error);
+                console.warn("Primary map load failed, trying fallback...", error);
+                try {
+                     const resWorld = await fetch('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson');
+                     if (resWorld.ok) {
+                         const dataWorld = await resWorld.json();
+                         setGeoData(dataWorld);
+                     } else {
+                         throw new Error("Failed to load world map");
+                     }
+                } catch (e2) {
+                    console.error("All map loads failed", e2);
+                    setMapError(true);
+                }
             }
         };
         fetchMap();
@@ -411,6 +442,7 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
             .call(zoomBehavior.current.transform, d3.zoomIdentity.translate(300 - scale * x, 300 - scale * y).scale(scale));
     };
 
+    // Initialize D3
     useEffect(() => {
         if (!svgRef.current || !gRef.current || !geoData) return;
 
@@ -470,6 +502,12 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
 
         g.selectAll("path.feature")
             .data(geoData.geojson.features)
+        const fill = theme === 'cyber' ? '#1a1a2e' : '#f0f0f0';
+        const stroke = theme === 'cyber' ? 'rgba(0, 255, 242, 0.2)' : '#ccc';
+        const pointColor = theme === 'cyber' ? '#ff00dd' : '#d32f2f';
+
+        g.selectAll("path")
+            .data(geoData.features)
             .enter()
             .append("path")
             .attr("class", "feature")
@@ -533,7 +571,25 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                 .attr("fill", "#fff")
                 .attr("font-size", "12px")
                 .text(`${Math.round(distKm)} km`);
+        if (locations.length > 0) {
+            g.selectAll("circle")
+                .data(locations)
+                .enter()
+                .append("circle")
+                .attr("cx", d => projection([d.lon, d.lat])?.[0] || 0)
+                .attr("cy", d => projection([d.lon, d.lat])?.[1] || 0)
+                .attr("r", 6 / (zoomTransform.k || 1))
+                .attr("fill", pointColor)
+                .attr("stroke", "#fff")
+                .attr("stroke-width", 1)
+                .style("cursor", "pointer")
+                .on("mouseover", (event, d) => {
+                    setTooltip({ x: event.pageX, y: event.pageY, text: `${d.name}` });
+                })
+                .on("mouseout", () => setTooltip(null))
+                .on("click", (event, d) => flyToLocation(d));
         }
+    }, [geoData, locations, theme]);
 
     }, [zoomTransform, geoData]); // Re-run on zoom
 
@@ -648,6 +704,29 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
             }
         }
     }, [locations, mode, quizIndex, showResult, attempts, reviewIndex, zoomTransform, theme, geoData, showHintCircle]);
+    const handleZoom = (factor: number) => {
+        if (!svgRef.current || !zoomBehavior.current) return;
+        d3.select(svgRef.current).transition().duration(300).call(zoomBehavior.current.scaleBy, factor);
+    };
+
+    const handleReset = () => {
+        if (!svgRef.current || !zoomBehavior.current) return;
+        d3.select(svgRef.current).transition().duration(750).call(zoomBehavior.current.transform, d3.zoomIdentity);
+    };
+
+    const flyToLocation = (loc: Location) => {
+        if (!svgRef.current || !zoomBehavior.current) return;
+        const projection = d3.geoMercator().center([82, 23]).scale(800).translate([300, 300]);
+        const [x, y] = projection([loc.lon, loc.lat]) || [0, 0];
+        const scale = 4;
+        const translate = [300 - scale * x, 300 - scale * y];
+        d3.select(svgRef.current).transition().duration(1500)
+            .call(zoomBehavior.current.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
+    };
+
+    if (mapError) {
+        return <div className="map-error glass-card">⚠️ Unable to load map data. Please check connection.</div>;
+    }
 
     return (
         <div className={`map-renderer-container ${theme} ${isFullscreen ? 'fullscreen-map' : ''}`}>
@@ -803,6 +882,11 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                 </svg>
 
                 {tooltip && mode === 'explore' && (
+                <svg ref={svgRef} width="100%" height="600" viewBox="0 0 600 600">
+                    <g ref={gRef}></g>
+                </svg>
+
+                {tooltip && (
                     <div className="map-tooltip" style={{ top: tooltip.y - 40, left: tooltip.x + 20 }}>
                         {tooltip.text}
                     </div>
@@ -826,6 +910,14 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                     ))}
                 </div>
             )}
+            <div className="map-legend">
+                {locations.map((loc, i) => (
+                    <div key={i} className="legend-item interactive" onClick={() => flyToLocation(loc)}>
+                        <span className="dot" style={{ background: theme === 'cyber' ? '#ff00dd' : '#d32f2f' }}></span>
+                        <div><strong>{loc.name}</strong><div className="legend-desc">{loc.reason}</div></div>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };

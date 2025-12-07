@@ -25,16 +25,12 @@ class BrainService:
     
     def __init__(self):
         # Initialize Brain Service - Core Logic
-        # Initialize Brain Service - Core Logic
         self.api_key = os.environ.get('GEMINI_API_KEY')
-        self.is_lobotomized = False
-
         self.is_lobotomized = False
 
         if not self.api_key:
             print("⚠️ BrainService Warning: GEMINI_API_KEY not found. The Brain will be lobotomized (Mock Mode).")
             self.model = None
-            self.is_lobotomized = True
             self.is_lobotomized = True
         else:
             try:
@@ -44,7 +40,6 @@ class BrainService:
             except Exception as e:
                 print(f"BrainService Error: Failed to initialize Gemini: {e}")
                 self.model = None
-                self.is_lobotomized = True
                 self.is_lobotomized = True
             
         self.registry = SynapseRegistry.get_instance()
@@ -191,7 +186,7 @@ class BrainService:
             print(f"Brain Think Error: {e}")
             return {"response_text": f"I had a headache thinking about that. Error: {str(e)}", "actions": []}
 
-    def _add_flashcard(self, user_id, topic, subject, front, back, source):
+    def _add_flashcard(self, user_id, topic, subject, front, back, source, card_type='basic'):
         """Helper to create a deck if needed and add a flashcard."""
         try:
             from app.db import get_db
@@ -209,9 +204,9 @@ class BrainService:
                 conn.commit()
 
             conn.execute('''
-                INSERT INTO flashcards (deck_id, front, back, source)
-                VALUES (?, ?, ?, ?)
-            ''', (deck_id, front, back, source))
+                INSERT INTO flashcards (deck_id, front, back, source, card_type)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (deck_id, front, back, source, card_type))
             conn.commit()
         except Exception as e:
             print(f"Brain: Flashcard creation failed: {e}")
@@ -420,10 +415,14 @@ class BrainService:
                 self._add_flashcard(
                     user_id, topic, subject,
                     f"Socratic Debate: {topic}",
-                    socratic_res.get('dialogue'),
+                    # Store plain text in flashcard, structured json in DB
+                    "See Socratic Archives for full structured debate.",
                     'ai_generated_socratic'
                 )
-                save_socratic_dialogue(user_id, topic, socratic_res.get('dialogue'))
+                # Parse verdict to JSON string for storage
+                verdict_json = json.dumps(socratic_res.get('verdict', {}))
+                # Now pass raw JSON string of dialogue
+                save_socratic_dialogue(user_id, topic, socratic_res.get('dialogue'), verdict_json)
 
             # 12. Triangulation Analysis
             triangulation_res = self.execute_action("TRIANGULATE_TOPIC", {"topic": topic, "reasoning": "Task Completion Automation"})
@@ -547,17 +546,20 @@ class BrainService:
                     save_ai_content('roleplay', topic, scenario_text)
 
             # 20. Map Work
-            if subject in ["Geography", "Environment", "International Relations"]:
+            if subject in ["Geography", "Environment", "International Relations", "History", "Ancient History", "Medieval History", "Modern History"]:
                 map_res = self.execute_action("GENERATE_MAP_WORK", {"topic": topic, "reasoning": "Task Completion Automation"})
                 if map_res.get('success'):
                     locations = map_res.get('locations', [])
                     if locations:
-                        content = "\n".join([f"- {l['name']} ({l.get('lat',0)}, {l.get('lon',0)}): {l['reason']}" for l in locations])
+                        # Serialize the locations list to JSON for the 'back' content
+                        # Front card will instruct the user to check map work
+                        content = json.dumps(locations)
                         self._add_flashcard(
                             user_id, topic, subject,
-                            f"Map Work: {topic}",
+                            f"Map Work Challenge: {topic}",
                             content,
-                            'ai_generated_mapwork'
+                            'ai_generated_mapwork',
+                            card_type='map_work'
                         )
                         save_ai_content('map_work', topic, content, {'locations': locations})
 
@@ -746,7 +748,7 @@ class BrainService:
             elif action_type == "PREDICT_QUESTIONS":
                 return {"success": True, "data": [{"question": "Mock Question?", "type": "MCQ"}]}
             elif action_type == "GENERATE_SOCRATIC_DIALOGUE":
-                return {"success": True, "dialogue": "Student: Why? Socrates: Why not?"}
+                return {"success": True, "dialogue": "Student: Why? Socrates: Why not?", "verdict": {"winner": "N/A"}}
             elif action_type == "TRIANGULATE_TOPIC":
                 return {"success": True, "data": {"synthesis": "Mock Synthesis", "way_forward": {}}}
             elif action_type == "DECODE_NEURAL_HASH":
@@ -762,7 +764,25 @@ class BrainService:
             elif action_type == "GENERATE_ROLEPLAY_SCENARIO":
                 return {"success": True, "scenario": "Mock Roleplay Scenario"}
             elif action_type == "GENERATE_MAP_WORK":
-                return {"success": True, "locations": []}
+                return {
+                    "success": True,
+                    "locations": [
+                        {
+                            "name": "Pataliputra",
+                            "lat": 25.61,
+                            "lon": 85.14,
+                            "reason": "Capital of Mauryan Empire (Mock)",
+                            "question": "Locate the capital of the Mauryan Empire."
+                        },
+                        {
+                            "name": "Taxila",
+                            "lat": 33.74,
+                            "lon": 72.78,
+                            "reason": "Ancient centre of learning (Mock)",
+                            "question": "Locate the ancient university town of Taxila."
+                        }
+                    ]
+                }
             elif action_type == "GENERATE_TOPIC_LINKAGES":
                 return {"success": True, "linkages": ["Mock Linkage 1"]}
             elif action_type == "GENERATE_CHEAT_SHEET":
@@ -1164,99 +1184,27 @@ class BrainService:
                 except Exception as e:
                     result = {"success": False, "message": f"Recommendation Failed: {str(e)}"}
 
-            elif action_type == "GENERATE_SOCRATIC_DIALOGUE":
-                try:
-                    from app.services.socratic_service import AGENTS, get_model
-                    topic = payload.get('topic', 'Philosophy')
-
-                    # Simulate a 3-turn debate
-                    model = get_model()
-                    turns = []
-
-                    # 1. User Statement (Simulated)
-                    prompt1 = f"Generate a provocative student opinion about '{topic}' that is slightly flawed."
-                    response1 = model.generate_content(prompt1)
-                    user_statement = response1.text.strip()
-                    turns.append(f"Student: {user_statement}")
-
-                    # 2. Socrates Responds
-                    agent = AGENTS['skeptic']
-                    prompt2 = f"You are {agent['name']}. The student says: '{user_statement}'. Respond with a short, deep question."
-                    response2 = model.generate_content(prompt2)
-                    socrates_response = response2.text.strip()
-                    turns.append(f"Socrates: {socrates_response}")
-
-                    # 3. Student Rethinks
-                    prompt3 = f"The student reflects on '{socrates_response}'. Generate their realization."
-                    response3 = model.generate_content(prompt3)
-                    student_realization = response3.text.strip()
-                    turns.append(f"Student (Reflecting): {student_realization}")
-
-                    dialogue = "\n\n".join(turns)
-
-                    result = {
-                        "success": True,
-                        "message": "Socratic Dialogue Generated.",
-                        "dialogue": dialogue
-                    }
-                except Exception as e:
-                    result = {"success": False, "message": f"Socratic Gen Failed: {str(e)}"}
-
-            elif action_type == "TRIANGULATE_TOPIC":
-                try:
-                    from app.services.triangulation_service import analyze_topic_triangulation
-                    topic = payload.get('topic', '')
-                    data = analyze_topic_triangulation(topic)
-
-                    if data.get('error'):
-                        result = {"success": False, "message": data['error']}
-                    else:
-                        result = {
-                            "success": True,
-                            "message": "Triangulation Complete.",
-                            "data": data
-                        }
-                except Exception as e:
-                    result = {"success": False, "message": f"Triangulation Failed: {str(e)}"}
-
-            elif action_type == "FIND_COMMON_PITFALLS":
-                try:
-                    topic = payload.get('topic', '')
-                    subject = payload.get('subject', '')
-                    prompt = f"""
-                    Identify 3-5 common mistakes, misconceptions, or traps students fall into when studying '{topic}' in {subject} for UPSC.
-                    Return as a JSON list of strings.
-                    Example: ["Confusing Article 32 with 226", "Ignoring the proviso..."]
-                    """
-                    response = self.model.generate_content(prompt)
-                    data = self._parse_response(response.text)
-
-                    # Handle if data is list directly or dict
-                    pitfalls = []
-                    if isinstance(data, list):
-                        pitfalls = data
-                    elif isinstance(data, dict):
-                        # try to find a list value
-                        for k, v in data.items():
-                            if isinstance(v, list):
-                                pitfalls = v
-                                break
-
-                    result = {
-                        "success": True,
-                        "message": "Pitfalls Identified.",
-                        "pitfalls": pitfalls
-                    }
-                except Exception as e:
-                    result = {"success": False, "message": f"Pitfall Detection Failed: {str(e)}"}
-
             elif action_type == "GENERATE_PODCAST_SCRIPT":
                 try:
                     topic = payload.get('topic', '')
                     prompt = f"""
-                    Write a short, engaging podcast script (2 hosts: 'Expert' and 'Curious Student') explaining '{topic}'.
-                    Keep it conversational, simple, and use analogies. Duration: 2 minutes reading time.
-                    Start directly with the script. Do NOT say "Here is a script".
+                    Generate a 'Coffee Chat' style dialogue about {topic}.
+                    
+                    **Cast:**
+                    1. **Host**: Quick, smart, funny.
+                    2. **Guest**: Skeptical, asks "Wait, what?" often.
+
+                    **Refined Style Guide:**
+                    - **Start In Media Res**: Jump straight into the gossip/hook. No "Welcome to the podcast".
+                    - **Super Short Sentences**: People speak in bursts. Max 12 words per line.
+                    - **Reactions**: Use "Whoa", "No way", "Crazy", "Right?" constantly.
+                    - **Analogy First**: Explain complex things using pizza, traffic, or dating analogies.
+                    
+                    **Format:**
+                    Host: [Text]
+                    Guest: [Text]
+                    
+                    **Goal:** Make it feel like I'm eavesdropping on two smart friends at a cafe.
                     """
                     response = self.model.generate_content(prompt)
                     result = {
@@ -1266,6 +1214,23 @@ class BrainService:
                     }
                 except Exception as e:
                     result = {"success": False, "message": f"Podcast Gen Failed: {str(e)}"}
+
+            elif action_type == "GENERATE_SOCRATIC_DIALOGUE":
+                try:
+                    from app.services.socratic_service import generate_autonomous_debate
+                    topic = payload.get('topic', 'Philosophy')
+
+                    # Generate a full autonomous debate (6 turns) with verdict
+                    dialogue_text, history, verdict = generate_autonomous_debate(topic, turns=6)
+
+                    result = {
+                        "success": True,
+                        "message": "Socratic Dialogue Generated.",
+                        "dialogue": dialogue_text,
+                        "verdict": verdict
+                    }
+                except Exception as e:
+                    result = {"success": False, "message": f"Socratic Gen Failed: {str(e)}"}
 
             elif action_type == "GENERATE_ESSAY_PROMPT":
                 try:
@@ -1330,7 +1295,14 @@ class BrainService:
                     topic = payload.get('topic', '')
                     prompt = f"""
                     Identify 3-5 key geographical locations related to '{topic}' for map pointing.
-                    Return JSON list: [{{ "name": "...", "lat": 0.0, "lon": 0.0, "reason": "..." }}]
+                    Return JSON list: [{{
+                        "name": "Name of Place",
+                        "lat": 0.0,
+                        "lon": 0.0,
+                        "reason": "Historical/Geographical significance",
+                        "question": "Question to ask user to find this place (e.g. 'Locate the capital of...')"
+                    }}]
+                    Ensure coordinates are accurate.
                     """
                     response = self.model.generate_content(prompt)
                     data = self._parse_response(response.text)
