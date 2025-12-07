@@ -25,16 +25,12 @@ class BrainService:
     
     def __init__(self):
         # Initialize Brain Service - Core Logic
-        # Initialize Brain Service - Core Logic
         self.api_key = os.environ.get('GEMINI_API_KEY')
-        self.is_lobotomized = False
-
         self.is_lobotomized = False
 
         if not self.api_key:
             print("⚠️ BrainService Warning: GEMINI_API_KEY not found. The Brain will be lobotomized (Mock Mode).")
             self.model = None
-            self.is_lobotomized = True
             self.is_lobotomized = True
         else:
             try:
@@ -44,7 +40,6 @@ class BrainService:
             except Exception as e:
                 print(f"BrainService Error: Failed to initialize Gemini: {e}")
                 self.model = None
-                self.is_lobotomized = True
                 self.is_lobotomized = True
             
         self.registry = SynapseRegistry.get_instance()
@@ -420,11 +415,13 @@ class BrainService:
                 self._add_flashcard(
                     user_id, topic, subject,
                     f"Socratic Debate: {topic}",
-                    socratic_res.get('dialogue'),
+                    # Store plain text in flashcard, structured json in DB
+                    "See Socratic Archives for full structured debate.",
                     'ai_generated_socratic'
                 )
                 # Parse verdict to JSON string for storage
                 verdict_json = json.dumps(socratic_res.get('verdict', {}))
+                # Now pass raw JSON string of dialogue
                 save_socratic_dialogue(user_id, topic, socratic_res.get('dialogue'), verdict_json)
 
             # 12. Triangulation Analysis
@@ -748,7 +745,7 @@ class BrainService:
             elif action_type == "PREDICT_QUESTIONS":
                 return {"success": True, "data": [{"question": "Mock Question?", "type": "MCQ"}]}
             elif action_type == "GENERATE_SOCRATIC_DIALOGUE":
-                return {"success": True, "dialogue": "Student: Why? Socrates: Why not?"}
+                return {"success": True, "dialogue": "Student: Why? Socrates: Why not?", "verdict": {"winner": "N/A"}}
             elif action_type == "TRIANGULATE_TOPIC":
                 return {"success": True, "data": {"synthesis": "Mock Synthesis", "way_forward": {}}}
             elif action_type == "DECODE_NEURAL_HASH":

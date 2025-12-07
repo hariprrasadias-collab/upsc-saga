@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import './SocraticHistory.css';
 import MarkdownRenderer from '../Shared/MarkdownRenderer';
 
@@ -6,7 +6,7 @@ interface Dialogue {
     id: number;
     topic: string;
     dialogue: string;
-    insight: string; // This is now a JSON string containing the verdict
+    insight: string;
     created_at: string;
 }
 
@@ -15,7 +15,25 @@ interface Verdict {
     key_concepts: string[];
     synthesis: string;
     best_quote: string;
+    mental_models?: string[];
 }
+
+interface Turn {
+    speakerId: string;
+    text: string;
+    type: string;
+    technique?: string;
+    timestamp: number;
+}
+
+const AGENTS: Record<string, { name: string, icon: string, voice: string }> = {
+    'skeptic': { name: 'Socrates', icon: '🤔', voice: 'Google US English Male' },
+    'idealist': { name: 'Plato', icon: '✨', voice: 'Google UK English Female' },
+    'realist': { name: 'Aristotle', icon: '📜', voice: 'Google UK English Male' },
+    'iconoclast': { name: 'Nietzsche', icon: '⚡', voice: 'Google Deutsch Male' }, // Fallback logic needed
+    'sage': { name: 'Confucius', icon: '🎍', voice: 'Google UK English Male' },
+    'strategist': { name: 'Machiavelli', icon: '♟️', voice: 'Google US English Male' }
+};
 
 const SocraticHistory: React.FC = () => {
     const [history, setHistory] = useState<Dialogue[]>([]);
@@ -23,11 +41,18 @@ const SocraticHistory: React.FC = () => {
     const [selectedDialogue, setSelectedDialogue] = useState<Dialogue | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
 
+    // Playback State
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [currentTurnIndex, setCurrentTurnIndex] = useState(-1);
+    const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+
     useEffect(() => {
         fetchHistory();
+        return () => {
+            stopPlayback();
+        };
     }, []);
 
-    // Optimized filtering with useMemo
     const filteredHistory = useMemo(() => {
         if (searchTerm.trim() === '') return history;
         const lowerTerm = searchTerm.toLowerCase();
@@ -52,25 +77,32 @@ const SocraticHistory: React.FC = () => {
     };
 
     const handleCopy = () => {
-        if (selectedDialogue) {
-            navigator.clipboard.writeText(selectedDialogue.dialogue);
-            alert("Dialogue copied to clipboard!");
-        }
+        if (!selectedDialogue) return;
+        const text = typeof parsedDialogue === 'string'
+            ? parsedDialogue
+            : parsedDialogue.map(t => `${AGENTS[t.speakerId]?.name || 'Unknown'}: ${t.text}`).join('\n\n');
+
+        navigator.clipboard.writeText(text);
+        alert("Dialogue copied to clipboard!");
     };
 
     const handleDownload = () => {
         if (!selectedDialogue) return;
 
+        const text = typeof parsedDialogue === 'string'
+            ? parsedDialogue
+            : parsedDialogue.map(t => `${AGENTS[t.speakerId]?.name || 'Unknown'}: ${t.text}`).join('\n\n');
+
         const element = document.createElement("a");
-        const file = new Blob([selectedDialogue.dialogue], {type: 'text/plain'});
+        const file = new Blob([text], {type: 'text/plain'});
         element.href = URL.createObjectURL(file);
         element.download = `Socratic_Debate_${selectedDialogue.topic.replace(/\s+/g, '_')}.md`;
-        document.body.appendChild(element); // Required for this to work in FireFox
+        document.body.appendChild(element);
         element.click();
         document.body.removeChild(element);
     };
 
-    // Helper to parse the insight/verdict
+    // Helper to parse content
     const getVerdict = (jsonStr: string): Verdict | null => {
         try {
             return JSON.parse(jsonStr);
@@ -79,7 +111,91 @@ const SocraticHistory: React.FC = () => {
         }
     };
 
+    const parsedDialogue: Turn[] | string = useMemo(() => {
+        if (!selectedDialogue) return "";
+        try {
+            // Check if it's JSON array
+            const parsed = JSON.parse(selectedDialogue.dialogue);
+            if (Array.isArray(parsed)) return parsed;
+            return selectedDialogue.dialogue;
+        } catch {
+            return selectedDialogue.dialogue;
+        }
+    }, [selectedDialogue]);
+
     const selectedVerdict = selectedDialogue ? getVerdict(selectedDialogue.insight) : null;
+
+    // --- TTS Logic ---
+
+    const stopPlayback = () => {
+        window.speechSynthesis.cancel();
+        setIsPlaying(false);
+        setCurrentTurnIndex(-1);
+    };
+
+    const speakTurn = (index: number) => {
+        if (typeof parsedDialogue === 'string') return;
+        if (index >= parsedDialogue.length) {
+            stopPlayback();
+            return;
+        }
+
+        const turn = parsedDialogue[index];
+        setCurrentTurnIndex(index);
+
+        const text = turn.text;
+        const speaker = AGENTS[turn.speakerId];
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.0;
+
+        // Voice Selection
+        const voices = window.speechSynthesis.getVoices();
+        // Try to match specific voice, fallback to gender
+        // Note: Voice names vary by OS/Browser. This is a best-effort heuristic.
+        const voiceName = speaker?.voice || '';
+        const selectedVoice = voices.find(v => v.name.includes(voiceName)) ||
+                              voices.find(v => v.lang.startsWith('en'));
+
+        if (selectedVoice) utterance.voice = selectedVoice;
+
+        utterance.onend = () => {
+            speakTurn(index + 1);
+        };
+
+        utteranceRef.current = utterance;
+        window.speechSynthesis.speak(utterance);
+    };
+
+    const togglePlay = () => {
+        if (isPlaying) {
+            stopPlayback();
+        } else {
+            if (typeof parsedDialogue !== 'string') {
+                setIsPlaying(true);
+                speakTurn(0);
+            }
+        }
+    };
+
+    const createFlashcard = async (front: string, back: string) => {
+        if (!confirm("Create Flashcard from this insight?")) return;
+        try {
+            await fetch('http://localhost:5000/api/flashcards', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    deck_id: 1, // Default deck for now, logic could be improved
+                    front: front,
+                    back: back,
+                    source: 'socratic_archive'
+                })
+            });
+            alert("Flashcard Created!");
+        } catch (e) {
+            alert("Failed to create flashcard.");
+        }
+    };
 
     return (
         <div className="socratic-history-container">
@@ -107,18 +223,15 @@ const SocraticHistory: React.FC = () => {
                                 <li
                                     key={item.id}
                                     className={`history-item ${selectedDialogue?.id === item.id ? 'active' : ''}`}
-                                    onClick={() => setSelectedDialogue(item)}
+                                    onClick={() => {
+                                        stopPlayback();
+                                        setSelectedDialogue(item);
+                                    }}
                                 >
                                     <div className="item-topic">{item.topic}</div>
                                     <div className="item-date">{new Date(item.created_at).toLocaleDateString()}</div>
-                                    <div className="item-preview">
-                                        {item.dialogue.substring(0, 50)}...
-                                    </div>
                                 </li>
                             ))}
-                            {filteredHistory.length === 0 && !loading && (
-                                <div className="no-results">No dialogues found.</div>
-                            )}
                         </ul>
                     )}
                 </div>
@@ -129,11 +242,20 @@ const SocraticHistory: React.FC = () => {
                             <div className="view-header">
                                 <h2>{selectedDialogue.topic}</h2>
                                 <div className="action-buttons">
-                                    <button className="copy-btn" onClick={handleDownload} title="Download Transcript">
-                                        📥 Download
+                                    {Array.isArray(parsedDialogue) && (
+                                        <button
+                                            className={`play-btn ${isPlaying ? 'playing' : ''}`}
+                                            onClick={togglePlay}
+                                            title={isPlaying ? "Stop Debate" : "Listen to Debate"}
+                                        >
+                                            {isPlaying ? "⏹️ Stop" : "▶️ Listen"}
+                                        </button>
+                                    )}
+                                    <button className="copy-btn" onClick={handleDownload} title="Download">
+                                        📥
                                     </button>
-                                    <button className="copy-btn" onClick={handleCopy} title="Copy to Clipboard">
-                                        📋 Copy
+                                    <button className="copy-btn" onClick={handleCopy} title="Copy">
+                                        📋
                                     </button>
                                 </div>
                             </div>
@@ -143,14 +265,32 @@ const SocraticHistory: React.FC = () => {
                                 <div className="verdict-card">
                                     <div className="verdict-header">
                                         <h3>⚖️ Athena's Judgment</h3>
+                                        <button
+                                            className="card-add-btn"
+                                            onClick={() => createFlashcard(`Socratic Verdict: ${selectedDialogue.topic}`, selectedVerdict.synthesis)}
+                                            title="Save Verdict as Flashcard"
+                                        >
+                                            ⚡
+                                        </button>
+                                    </div>
+                                    <div className="winner-row">
                                         <span className="winner-badge">🏆 Winner: {selectedVerdict.winner}</span>
                                     </div>
+
                                     <p className="verdict-synthesis">{selectedVerdict.synthesis}</p>
+
                                     <div className="verdict-tags">
                                         {selectedVerdict.key_concepts?.map((tag, idx) => (
                                             <span key={idx} className="concept-tag">{tag}</span>
                                         ))}
                                     </div>
+
+                                    {selectedVerdict.mental_models && (
+                                        <div className="mental-models">
+                                            <strong>🧠 Mental Models:</strong> {selectedVerdict.mental_models.join(', ')}
+                                        </div>
+                                    )}
+
                                     {selectedVerdict.best_quote && (
                                         <div className="best-quote">
                                             " {selectedVerdict.best_quote} "
@@ -159,21 +299,48 @@ const SocraticHistory: React.FC = () => {
                                 </div>
                             )}
 
-                            {/* Legacy Insight Fallback */}
-                            {!selectedVerdict && selectedDialogue.insight && (
-                                <div className="insight-box">
-                                    <strong>💡 Key Insight:</strong> {selectedDialogue.insight}
-                                </div>
-                            )}
-
                             <div className="dialogue-content custom-scrollbar">
-                                <MarkdownRenderer content={selectedDialogue.dialogue} />
+                                {Array.isArray(parsedDialogue) ? (
+                                    <div className="script-view">
+                                        {parsedDialogue.map((turn, idx) => (
+                                            <div
+                                                key={idx}
+                                                className={`script-turn ${currentTurnIndex === idx ? 'speaking' : ''}`}
+                                            >
+                                                <div className="turn-avatar">
+                                                    {AGENTS[turn.speakerId]?.icon || '👤'}
+                                                </div>
+                                                <div className="turn-body">
+                                                    <div className="turn-meta">
+                                                        <span className="turn-speaker">{AGENTS[turn.speakerId]?.name || 'Unknown'}</span>
+                                                        {turn.technique && (
+                                                            <span className="turn-technique">Using: {turn.technique}</span>
+                                                        )}
+                                                        <button
+                                                            className="mini-card-btn"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                createFlashcard(`${AGENTS[turn.speakerId]?.name} on ${selectedDialogue.topic}`, turn.text);
+                                                            }}
+                                                            title="Save as Flashcard"
+                                                        >
+                                                            ⚡
+                                                        </button>
+                                                    </div>
+                                                    <div className="turn-text">{turn.text}</div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <MarkdownRenderer content={parsedDialogue} />
+                                )}
                             </div>
                         </>
                     ) : (
                         <div className="placeholder-text">
                             <div className="placeholder-icon">📜</div>
-                            Select a dialogue from the archives to review the wisdom of the ancients.
+                            Select a dialogue to review the wisdom of the ancients.
                         </div>
                     )}
                 </div>
