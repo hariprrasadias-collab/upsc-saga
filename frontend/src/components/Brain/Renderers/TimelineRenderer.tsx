@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import './Renderers.css';
 import MarkdownRenderer from '../../Shared/MarkdownRenderer';
 
@@ -84,17 +85,65 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content }) => {
     }
 
     return (
-        <div className="timeline-container">
+        <div className="timeline-container-vertical">
+            <div className="timeline-line"></div>
             {events.map((evt, idx) => (
-                <div key={idx} className="timeline-item">
-                    <div className="timeline-marker"></div>
-                    <div className="timeline-date">{evt.year}</div>
-                    <div className="timeline-content glass-card">
+                <motion.div
+                    key={idx}
+                    className="timeline-item-vertical"
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: idx * 0.1 }}
+                >
+                    <div className="timeline-marker-dot"></div>
+                    <div className="timeline-date-label">{evt.year}</div>
+                    <div className="timeline-content-card glass-card">
                         <h4>{evt.event}</h4>
                         {evt.description && <p>{evt.description}</p>}
                     </div>
-                </div>
+                </motion.div>
             ))}
+            <style>{`
+                .timeline-container-vertical {
+                    position: relative;
+                    padding: 20px 0 20px 30px;
+                    border-left: 2px solid rgba(168, 85, 247, 0.3);
+                    margin-left: 10px;
+                }
+                .timeline-item-vertical {
+                    position: relative;
+                    margin-bottom: 30px;
+                    padding-left: 20px;
+                }
+                .timeline-marker-dot {
+                    position: absolute;
+                    left: -37px;
+                    top: 15px;
+                    width: 12px;
+                    height: 12px;
+                    background: #a855f7;
+                    border-radius: 50%;
+                    box-shadow: 0 0 10px #a855f7;
+                    z-index: 2;
+                }
+                .timeline-date-label {
+                    font-size: 0.85rem;
+                    color: #a855f7;
+                    font-weight: bold;
+                    margin-bottom: 5px;
+                }
+                .timeline-content-card h4 {
+                    margin: 0 0 5px 0;
+                    color: #e2e8f0;
+                }
+                .timeline-content-card p {
+                    margin: 0;
+                    font-size: 0.9rem;
+                    color: #94a3b8;
+                    line-height: 1.5;
+                }
+            `}</style>
         </div>
     );
 };

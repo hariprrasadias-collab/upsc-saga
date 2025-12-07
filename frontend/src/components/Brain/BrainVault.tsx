@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaList, FaThLarge, FaStar, FaRegStar } from 'react-icons/fa';
+import { FaList, FaThLarge, FaStar, FaRegStar, FaCheckCircle, FaRegCircle } from 'react-icons/fa';
 import './BrainVault.css';
 import MarkdownRenderer from '../Shared/MarkdownRenderer';
 import TimelineRenderer from './Renderers/TimelineRenderer';
@@ -34,6 +34,10 @@ const BrainVault: React.FC = () => {
         const saved = localStorage.getItem('brain_vault_favorites');
         return saved ? JSON.parse(saved) : [];
     });
+    const [reviewedItems, setReviewedItems] = useState<number[]>(() => {
+        const saved = localStorage.getItem('brain_vault_reviewed');
+        return saved ? JSON.parse(saved) : [];
+    });
 
     const contentTypes = [
         'all', 'podcast', 'essay', 'visual_prompt', 'roleplay',
@@ -48,12 +52,41 @@ const BrainVault: React.FC = () => {
         localStorage.setItem('brain_vault_favorites', JSON.stringify(favorites));
     }, [favorites]);
 
+    useEffect(() => {
+        localStorage.setItem('brain_vault_reviewed', JSON.stringify(reviewedItems));
+    }, [reviewedItems]);
+
     const toggleFavorite = (id: number, e: React.MouseEvent) => {
         e.stopPropagation();
         setFavorites(prev =>
             prev.includes(id) ? prev.filter(fid => fid !== id) : [...prev, id]
         );
     };
+
+    const toggleReviewed = (id: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setReviewedItems(prev =>
+            prev.includes(id) ? prev.filter(rid => rid !== id) : [...prev, id]
+        );
+    };
+
+    const HighlightText = ({ text, highlight }: { text: string, highlight: string }) => {
+        if (!highlight.trim()) return <>{text}</>;
+        const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+        return (
+            <>
+                {parts.map((part, i) =>
+                    part.toLowerCase() === highlight.toLowerCase()
+                        ? <mark key={i} style={{backgroundColor: 'rgba(255, 255, 0, 0.4)', color: 'inherit', borderRadius: '2px'}}>{part}</mark>
+                        : part
+                )}
+            </>
+        );
+    };
+
+    const masteryPercentage = contentList.length > 0
+        ? Math.round((reviewedItems.length / contentList.length) * 100)
+        : 0;
     // ... (fetchContent and handleDelete remain same)
     const fetchContent = async () => {
         setLoading(true);
@@ -166,6 +199,12 @@ const BrainVault: React.FC = () => {
                     />
                 </div>
                 <div className="view-toggles">
+                    <div className="mastery-indicator" title="Vault Mastery">
+                        <div className="mastery-bar">
+                            <div className="mastery-fill" style={{width: `${masteryPercentage}%`}}></div>
+                        </div>
+                        <span className="mastery-text">{masteryPercentage}%</span>
+                    </div>
                     <button
                         className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
                         onClick={() => setViewMode('list')}
@@ -221,6 +260,13 @@ const BrainVault: React.FC = () => {
                                                 <span className={`item-type-tag type-${item.content_type}`}>{item.content_type}</span>
                                                 <div className="item-actions">
                                                     <button
+                                                        className={`action-icon-btn ${reviewedItems.includes(item.id) ? 'is-reviewed' : ''}`}
+                                                        onClick={(e) => toggleReviewed(item.id, e)}
+                                                        title="Mark as Reviewed"
+                                                    >
+                                                        {reviewedItems.includes(item.id) ? <FaCheckCircle color="#4ade80" /> : <FaRegCircle />}
+                                                    </button>
+                                                    <button
                                                         className={`favorite-btn ${favorites.includes(item.id) ? 'is-fav' : ''}`}
                                                         onClick={(e) => toggleFavorite(item.id, e)}
                                                     >
@@ -235,7 +281,9 @@ const BrainVault: React.FC = () => {
                                                     </button>
                                                 </div>
                                             </div>
-                                            <h4 className="item-topic">{item.topic}</h4>
+                                            <h4 className={`item-topic ${reviewedItems.includes(item.id) ? 'dimmed' : ''}`}>
+                                                <HighlightText text={item.topic} highlight={searchTerm} />
+                                            </h4>
                                             <span className="item-date">{new Date(item.created_at).toLocaleDateString()}</span>
                                         </motion.li>
                                     ))}

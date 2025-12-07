@@ -25,6 +25,7 @@ const EssayRenderer: React.FC<EssayRendererProps> = ({ content }) => {
     });
     const [isTimerRunning, setIsTimerRunning] = useState(false);
     const [timeLeft, setTimeLeft] = useState(3 * 60 * 60); // 3 hours in seconds
+    const [isFocusMode, setIsFocusMode] = useState(false);
 
     useEffect(() => {
         localStorage.setItem(`essay_draft_${contentHash}`, userEssay);
@@ -75,22 +76,34 @@ const EssayRenderer: React.FC<EssayRendererProps> = ({ content }) => {
     const progress = Math.min((wordCount / wordTarget) * 100, 100);
 
     return (
-        <div className="essay-renderer-container">
+        <div className={`essay-renderer-container ${isFocusMode ? 'focus-mode-active' : ''}`}>
             <div className="essay-paper glass-card">
                 <div className="paper-header">
                     <span className="paper-icon">✍️</span>
                     <h3>UPSC Mains Evaluator</h3>
-                    <span className="paper-marks">250 Marks</span>
+                    <div className="header-controls">
+                        <span className="paper-marks">250 Marks</span>
+                        <button
+                            className={`focus-mode-btn ${isFocusMode ? 'active' : ''}`}
+                            onClick={() => setIsFocusMode(!isFocusMode)}
+                            title="Toggle Focus Mode"
+                        >
+                            {isFocusMode ? '🗗 Exit Focus' : '🗖 Focus Mode'}
+                        </button>
+                    </div>
                 </div>
 
                 <div className="paper-content">
-                    <div className="prompt-section">
-                        <h4>Essay Topic</h4>
+                    <div className={`prompt-section ${isFocusMode ? 'collapsed' : ''}`}>
+                        <div className="prompt-header">
+                            <h4>Essay Topic</h4>
+                        </div>
                         <div className="prompt-text">
                             <MarkdownRenderer content={content} />
                         </div>
                     </div>
 
+                    {!isFocusMode && (
                     <div className="thesis-hint-section">
                         <button
                             className="reveal-btn"
@@ -108,6 +121,7 @@ const EssayRenderer: React.FC<EssayRendererProps> = ({ content }) => {
                             </div>
                         )}
                     </div>
+                    )}
 
                     <div className="writing-section">
                         <h4>Your Response</h4>
@@ -116,7 +130,7 @@ const EssayRenderer: React.FC<EssayRendererProps> = ({ content }) => {
                             placeholder="Start writing your essay here..."
                             value={userEssay}
                             onChange={(e) => setUserEssay(e.target.value)}
-                            rows={15}
+                            rows={isFocusMode ? 25 : 15}
                         />
                         <div className="essay-stats-bar">
                             <div className="word-count-group">

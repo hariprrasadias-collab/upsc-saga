@@ -24,6 +24,8 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
     const [theme, setTheme] = useState<'cyber' | 'atlas'>('cyber');
     const [zoomTransform, setZoomTransform] = useState<d3.ZoomTransform>(d3.zoomIdentity);
     const [mapError, setMapError] = useState(false);
+    const [isPracticeMode, setIsPracticeMode] = useState(false);
+    const [revealedLocations, setRevealedLocations] = useState<string[]>([]);
 
     // D3 Zoom Behavior instance
     const zoomBehavior = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
@@ -134,17 +136,25 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                 .attr("cx", d => projection([d.lon, d.lat])?.[0] || 0)
                 .attr("cy", d => projection([d.lon, d.lat])?.[1] || 0)
                 .attr("r", 6 / (zoomTransform.k || 1))
-                .attr("fill", pointColor)
+                .attr("fill", d => isPracticeMode && !revealedLocations.includes(d.name) ? '#888' : pointColor)
                 .attr("stroke", "#fff")
                 .attr("stroke-width", 1)
                 .style("cursor", "pointer")
                 .on("mouseover", (event, d) => {
-                    setTooltip({ x: event.pageX, y: event.pageY, text: `${d.name}` });
+                    if (!isPracticeMode || revealedLocations.includes(d.name)) {
+                        setTooltip({ x: event.pageX, y: event.pageY, text: `${d.name}` });
+                    }
                 })
                 .on("mouseout", () => setTooltip(null))
-                .on("click", (event, d) => flyToLocation(d));
+                .on("click", (event, d) => {
+                    if (isPracticeMode) {
+                        setRevealedLocations(prev => [...prev, d.name]);
+                        setTooltip({ x: event.pageX, y: event.pageY, text: `${d.name}` });
+                    }
+                    flyToLocation(d);
+                });
         }
-    }, [geoData, locations, theme]);
+    }, [geoData, locations, theme, isPracticeMode, revealedLocations]);
 
     const handleZoom = (factor: number) => {
         if (!svgRef.current || !zoomBehavior.current) return;
@@ -154,6 +164,11 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
     const handleReset = () => {
         if (!svgRef.current || !zoomBehavior.current) return;
         d3.select(svgRef.current).transition().duration(750).call(zoomBehavior.current.transform, d3.zoomIdentity);
+    };
+
+    const togglePracticeMode = () => {
+        setIsPracticeMode(!isPracticeMode);
+        setRevealedLocations([]); // Reset revealed on toggle
     };
 
     const flyToLocation = (loc: Location) => {
@@ -175,6 +190,9 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
             <div className="map-header">
                 <h3>📍 AI Cartographer</h3>
                 <div className="map-controls-row">
+                    <button className={`map-btn-sm ${isPracticeMode ? 'active' : ''}`} onClick={togglePracticeMode}>
+                        {isPracticeMode ? '🎓 Exit Quiz' : '🎓 Quiz Mode'}
+                    </button>
                     <button className="map-btn-sm" onClick={() => setTheme(prev => prev === 'cyber' ? 'atlas' : 'cyber')}>
                         {theme === 'cyber' ? '🌙 Cyber' : '☀️ Atlas'}
                     </button>
@@ -202,8 +220,15 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
             <div className="map-legend">
                 {locations.map((loc, i) => (
                     <div key={i} className="legend-item interactive" onClick={() => flyToLocation(loc)}>
-                        <span className="dot" style={{ background: theme === 'cyber' ? '#ff00dd' : '#d32f2f' }}></span>
-                        <div><strong>{loc.name}</strong><div className="legend-desc">{loc.reason}</div></div>
+                        <span className="dot" style={{ background: (isPracticeMode && !revealedLocations.includes(loc.name)) ? '#888' : (theme === 'cyber' ? '#ff00dd' : '#d32f2f') }}></span>
+                        <div>
+                            <strong>
+                                {isPracticeMode && !revealedLocations.includes(loc.name) ? '???' : loc.name}
+                            </strong>
+                            <div className="legend-desc">
+                                {isPracticeMode && !revealedLocations.includes(loc.name) ? 'Click point on map to reveal' : loc.reason}
+                            </div>
+                        </div>
                     </div>
                 ))}
             </div>
