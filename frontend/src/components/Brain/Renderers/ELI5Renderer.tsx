@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import './Renderers.css';
 import MarkdownRenderer from '../../Shared/MarkdownRenderer';
 
-interface ELI5Props {
+interface Props {
     content: string;
 }
 
