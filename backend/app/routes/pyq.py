@@ -47,10 +47,27 @@ def get_questions():
         query += " AND is_favorite = 1"
         
     if search:
-        query += " AND (question_text LIKE ? OR explanation LIKE ?)"
-        search_term = f"%{search}%"
-        params.append(search_term)
-        params.append(search_term)
+        # Optimization: Use FTS5 match if available
+        # First check if FTS table exists (safe check)
+        try:
+            # We join with FTS table for speed
+            # Note: We can't just join easily in one query if we want to keep all filters
+            # So we use the rowid from FTS to filter the main table
+            fts_query = "SELECT rowid FROM pyq_questions_fts WHERE pyq_questions_fts MATCH ? ORDER BY rank"
+            fts_rows = conn.execute(fts_query, (search,)).fetchall()
+            if fts_rows:
+                ids = [str(r['rowid']) for r in fts_rows]
+                query += f" AND id IN ({','.join(ids)})"
+            else:
+                # No matches found in FTS
+                query += " AND 1=0"
+        except Exception as e:
+            # Fallback to LIKE if FTS fails or table doesn't exist
+            print(f"FTS Search failed, falling back to LIKE: {e}")
+            query += " AND (question_text LIKE ? OR explanation LIKE ?)"
+            search_term = f"%{search}%"
+            params.append(search_term)
+            params.append(search_term)
         
     query += " ORDER BY year DESC, id ASC"
     
@@ -521,3 +538,51 @@ def get_quiz_stats():
         print(f"Error fetching quiz stats: {e}")
         return jsonify({'error': str(e)}), 500
 
+
+@bp.route('/similar/<int:question_id>', methods=['GET'])
+def get_similar_questions(question_id):
+    """Find similar questions using FTS5"""
+    try:
+        conn = get_db()
+
+        # Get the question text
+        question = conn.execute("SELECT question_text, subject FROM pyq_questions WHERE id = ?", (question_id,)).fetchone()
+        if not question:
+            return jsonify({'error': 'Question not found'}), 404
+
+        text = question['question_text']
+        # Clean text for FTS query (remove special chars, etc.)
+        import re
+        clean_text = re.sub(r'[^a-zA-Z0-9 ]', '', text)
+        # Use first few important words or the whole thing?
+        # FTS MATCH query needs to be carefully constructed.
+        # Simple approach: "word1 OR word2 OR ..."
+        words = [w for w in clean_text.split() if len(w) > 4][:10] # Take top 10 long words
+        search_query = " OR ".join(words)
+
+        if not search_query:
+             return jsonify([])
+
+        # FTS Query
+        query = """
+            SELECT q.*
+            FROM pyq_questions_fts fts
+            JOIN pyq_questions q ON fts.rowid = q.id
+            WHERE pyq_questions_fts MATCH ?
+            AND q.id != ?
+            ORDER BY rank
+            LIMIT 5
+        """
+
+        similar = conn.execute(query, (search_query, question_id)).fetchall()
+        return jsonify([dict(q) for q in similar])
+
+    except Exception as e:
+        print(f"Error finding similar questions: {e}")
+        # Fallback to subject-based random
+        try:
+             conn = get_db()
+             fallback = conn.execute("SELECT * FROM pyq_questions WHERE subject = ? AND id != ? ORDER BY RANDOM() LIMIT 5", (question['subject'], question_id)).fetchall()
+             return jsonify([dict(q) for q in fallback])
+        except:
+             return jsonify([])
