@@ -25,15 +25,10 @@ class ForesightEngine:
         self.api_key = os.environ.get('GEMINI_API_KEY')
         if not self.api_key:
             print("⚠️ ForesightEngine Warning: GEMINI_API_KEY not found")
-            self.model = None
+        elif model_manager.is_configured:
+            print("🔮 ForesightEngine Online: Oracle Activated via ModelManager")
         else:
-            try:
-                genai.configure(api_key=self.api_key)
-                self.model = genai.GenerativeModel('gemini-2.0-flash-001')
-                print("🔮 ForesightEngine Online: Oracle Activated")
-            except Exception as e:
-                print(f"❌ ForesightEngine Error: {e}")
-                self.model = None
+            print("❌ ForesightEngine Error: ModelManager not configured")
     
     def predict_questions(
         self, 
@@ -52,7 +47,7 @@ class ForesightEngine:
         Returns:
             List of predictions with probability scores
         """
-        if not self.model:
+        if not model_manager.is_configured:
             return []
         
         # 1. Gather PYQ patterns
@@ -199,7 +194,7 @@ class ForesightEngine:
         """
         
         try:
-            response = self.model.generate_content(prompt)
+            response = model_manager.generate_content(prompt)
             text = response.text.strip()
             json_match = re.search(r'\[.*\]', text, re.DOTALL)
             
@@ -312,7 +307,7 @@ class ForesightEngine:
         """
         
         try:
-            response = self.model.generate_content(prompt)
+            response = model_manager.generate_content(prompt)
             
             text = response.text.strip()
             json_match = re.search(r'\[.*\]', text, re.DOTALL)
