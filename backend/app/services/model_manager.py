@@ -4,7 +4,7 @@ import random
 import hashlib
 from datetime import datetime, timedelta
 import google.generativeai as genai
-from google.api_core.exceptions import ResourceExhausted, ServiceUnavailable, InternalServerError
+from google.api_core.exceptions import ResourceExhausted, ServiceUnavailable, InternalServerError, NotFound, InvalidArgument
 from dotenv import load_dotenv
 from cachetools import TTLCache
 
@@ -16,15 +16,14 @@ class ModelManager:
     caching, and cool-down logic to handle rate limits (429) and ensure high availability.
     """
 
-    # Priority list of models to try
+    # Priority list of models to try (Based on 'list_models.py' output)
     MODEL_ROTATION = [
         'gemini-2.0-flash',
         'gemini-2.0-flash-001',
+        'gemini-2.0-flash-lite-preview-02-05',
         'gemini-1.5-flash',
-        'gemini-1.5-flash-latest',
         'gemini-1.5-pro',
-        'gemini-1.5-pro-latest',
-        'gemini-1.0-pro'
+        'gemini-2.0-pro-exp-02-05'
     ]
 
     def __init__(self):
@@ -171,6 +170,13 @@ class ModelManager:
                 self.switch_model()
                 time.sleep(sleep_time)
                 attempts += 1
+
+            except (NotFound, InvalidArgument) as e:
+                # 404/400 Errors - Model likely invalid or deprecated
+                print(f"❌ Invalid Model {current_model_name}: {e}. Removing from rotation.")
+                self.MODEL_ROTATION.remove(current_model_name)
+                # Don't increment attempts heavily, just switch instantly
+                self.switch_model()
 
             except Exception as e:
                 print(f"❌ Unrecoverable Error with {current_model_name}: {e}")

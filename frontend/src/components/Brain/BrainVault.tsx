@@ -7,7 +7,6 @@ import ChatInterface from './Renderers/ChatInterface';
 import VisualPromptRenderer from './Renderers/VisualPromptRenderer';
 import EssayRenderer from './Renderers/EssayRenderer';
 import MapRenderer from './Renderers/MapRenderer';
-import ELI5Renderer from './Renderers/ELI5Renderer';
 import CheatSheetRenderer from './Renderers/CheatSheetRenderer';
 import ELI5Renderer from './Renderers/ELI5Renderer';
 import PitfallRenderer from './Renderers/PitfallRenderer';
@@ -105,13 +104,11 @@ const BrainVault: React.FC = () => {
                 return <PodcastPlayer content={item.content} title={item.topic} />;
             case 'roleplay':
             case 'socratic':
-                return <ChatInterface content={item.content} topic={item.topic} />;
+                return <ChatInterface content={item.content} />;
             case 'visual_prompt':
                 return <VisualPromptRenderer content={item.content} />;
             case 'essay':
                 return <EssayRenderer content={item.content} />;
-            case 'eli5':
-                return <ELI5Renderer content={item.content} />;
             case 'map_work':
             case 'mapwork': // just in case
                 return <MapRenderer content={item.content} metadata={item.metadata} />;

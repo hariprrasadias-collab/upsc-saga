@@ -640,24 +640,13 @@ class BrainService:
             # 28. ELI5 (Simplification)
             eli5_res = self.execute_action("GENERATE_ELI5", {"topic": topic, "reasoning": "Task Completion Automation"})
             if eli5_res.get('success'):
-                # Handle new structured data or legacy string
-                content_to_save = eli5_res.get('explanation')
-                flashcard_back = content_to_save
-
-                # If we have structured data, use it
-                if eli5_res.get('data'):
-                    data = eli5_res.get('data')
-                    content_to_save = json.dumps(data)
-                    # Create a readable flashcard
-                    flashcard_back = f"🧸 ELI5: {data.get('eli5', '')}\n\n💡 Analogy: {data.get('analogy', '')}"
-
                 self._add_flashcard(
                     user_id, topic, subject,
                     f"ELI5: {topic}",
-                    flashcard_back,
+                    eli5_res.get('explanation'),
                     'ai_generated_eli5'
                 )
-                save_ai_content('eli5', topic, content_to_save)
+                save_ai_content('eli5', topic, eli5_res.get('explanation'))
 
             # 29. Check for Book Completion -> Trigger Boss Fight
             # Load books data to identify if a book is completed
@@ -1467,28 +1456,15 @@ class BrainService:
                 try:
                     topic = payload.get('topic', '')
                     prompt = f"""
-                    Explain the concept of '{topic}' at multiple levels of complexity.
-                    Return strictly valid JSON with this structure:
-                    {{
-                        "eli5": "Explanation for a 5-year-old using simple analogies",
-                        "eli15": "Explanation for a teenager (high school level)",
-                        "eli_expert": "Academic/Professional definition with technical nuance",
-                        "analogy": "A creative, distinct analogy to help visualize it",
-                        "visual_analogy_prompt": "A detailed text-to-image prompt to visualize the analogy (e.g. 'A digital painting of...')",
-                        "real_world_example": "A concrete real-world application or example",
-                        "quiz": [
-                            {{ "question": "Simple check question 1", "options": ["Option A", "Option B", "Option C"], "answer": "Option A" }},
-                            {{ "question": "Simple check question 2", "options": ["Option A", "Option B", "Option C"], "answer": "Option B" }}
-                        ]
-                    }}
-                    Do NOT include markdown formatting like ```json ... ```, just the raw JSON.
+                    Explain the concept of '{topic}' as if I were a 5-year-old (ELI5).
+                    Use simple analogies and simple language.
+                    Start directly with the explanation. Do NOT say "Okay" or "Here is".
                     """
                     response = model_manager.generate_content(prompt)
                     result = {
                         "success": True,
                         "message": "ELI5 Generated.",
-                        "explanation": json.dumps(data), # Backward compatibility for some viewers
-                        "data": data # New structured data
+                        "explanation": response.text
                     }
                 except Exception as e:
                     result = {"success": False, "message": f"ELI5 Gen Failed: {str(e)}"}
