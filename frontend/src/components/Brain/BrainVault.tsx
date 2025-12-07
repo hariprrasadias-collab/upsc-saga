@@ -9,7 +9,6 @@ import EssayRenderer from './Renderers/EssayRenderer';
 import MapRenderer from './Renderers/MapRenderer';
 import ELI5Renderer from './Renderers/ELI5Renderer';
 import CheatSheetRenderer from './Renderers/CheatSheetRenderer';
-import ELI5Renderer from './Renderers/ELI5Renderer';
 import PitfallRenderer from './Renderers/PitfallRenderer';
 import QuoteBankRenderer from './Renderers/QuoteBankRenderer';
 
