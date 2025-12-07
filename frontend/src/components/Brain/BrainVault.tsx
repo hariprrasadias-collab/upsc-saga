@@ -7,6 +7,10 @@ import ChatInterface from './Renderers/ChatInterface';
 import VisualPromptRenderer from './Renderers/VisualPromptRenderer';
 import EssayRenderer from './Renderers/EssayRenderer';
 import MapRenderer from './Renderers/MapRenderer';
+import CheatSheetRenderer from './Renderers/CheatSheetRenderer';
+import ELI5Renderer from './Renderers/ELI5Renderer';
+import PitfallRenderer from './Renderers/PitfallRenderer';
+import QuoteBankRenderer from './Renderers/QuoteBankRenderer';
 
 interface AIContent {
     id: number;
@@ -104,6 +108,14 @@ const BrainVault: React.FC = () => {
             case 'map_work':
             case 'mapwork': // just in case
                 return <MapRenderer content={item.content} metadata={item.metadata} />;
+            case 'cheat_sheet':
+                return <CheatSheetRenderer content={item.content} />;
+            case 'eli5':
+                return <ELI5Renderer content={item.content} />;
+            case 'pitfalls':
+                return <PitfallRenderer content={item.content} />;
+            case 'quote_bank':
+                return <QuoteBankRenderer content={item.content} />;
             default:
                 return (
                     <div>

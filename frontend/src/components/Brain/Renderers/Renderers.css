@@ -638,6 +638,95 @@
     }
 }
 
+/* PODCAST STUDIO */
+.podcast-studio-visual {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 12px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.avatar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    opacity: 0.5;
+    transition: all 0.3s;
+    transform: scale(0.9);
+}
+
+.avatar.speaking {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.avatar-icon {
+    font-size: 3rem;
+    background: rgba(255, 255, 255, 0.1);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    border: 2px solid transparent;
+}
+
+.avatar.host.speaking .avatar-icon {
+    border-color: #00fff2;
+    box-shadow: 0 0 30px rgba(0, 255, 242, 0.4);
+}
+
+.avatar.guest.speaking .avatar-icon {
+    border-color: #a371f7;
+    box-shadow: 0 0 30px rgba(163, 113, 247, 0.4);
+}
+
+.avatar-label {
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.visualizer-waves {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+}
+
+.wave-circle {
+    width: 10px;
+    height: 10px;
+    background: white;
+    border-radius: 50%;
+    margin: 0 5px;
+    animation: wavePulse 1s infinite;
+}
+
+@keyframes wavePulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+
+    50% {
+        transform: scale(2);
+        opacity: 1;
+    }
+}
+
 /* Map Practice Mode Styles */
 .map-btn-sm.active {
     background: #a371f7;

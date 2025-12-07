@@ -1163,6 +1163,37 @@ class BrainService:
                 except Exception as e:
                     result = {"success": False, "message": f"Recommendation Failed: {str(e)}"}
 
+            elif action_type == "GENERATE_PODCAST_SCRIPT":
+                try:
+                    topic = payload.get('topic', '')
+                    prompt = f"""
+                    Generate a 'Coffee Chat' style dialogue about {topic}.
+                    
+                    **Cast:**
+                    1. **Host**: Quick, smart, funny.
+                    2. **Guest**: Skeptical, asks "Wait, what?" often.
+
+                    **Refined Style Guide:**
+                    - **Start In Media Res**: Jump straight into the gossip/hook. No "Welcome to the podcast".
+                    - **Super Short Sentences**: People speak in bursts. Max 12 words per line.
+                    - **Reactions**: Use "Whoa", "No way", "Crazy", "Right?" constantly.
+                    - **Analogy First**: Explain complex things using pizza, traffic, or dating analogies.
+                    
+                    **Format:**
+                    Host: [Text]
+                    Guest: [Text]
+                    
+                    **Goal:** Make it feel like I'm eavesdropping on two smart friends at a cafe.
+                    """
+                    response = self.model.generate_content(prompt)
+                    result = {
+                        "success": True,
+                        "message": "Podcast Script Generated.",
+                        "script": response.text
+                    }
+                except Exception as e:
+                    result = {"success": False, "message": f"Podcast Gen Failed: {str(e)}"}
+
             elif action_type == "GENERATE_SOCRATIC_DIALOGUE":
                 try:
                     from app.services.socratic_service import generate_autonomous_debate
@@ -1179,71 +1210,6 @@ class BrainService:
                     }
                 except Exception as e:
                     result = {"success": False, "message": f"Socratic Gen Failed: {str(e)}"}
-
-            elif action_type == "TRIANGULATE_TOPIC":
-                try:
-                    from app.services.triangulation_service import analyze_topic_triangulation
-                    topic = payload.get('topic', '')
-                    data = analyze_topic_triangulation(topic)
-
-                    if data.get('error'):
-                        result = {"success": False, "message": data['error']}
-                    else:
-                        result = {
-                            "success": True,
-                            "message": "Triangulation Complete.",
-                            "data": data
-                        }
-                except Exception as e:
-                    result = {"success": False, "message": f"Triangulation Failed: {str(e)}"}
-
-            elif action_type == "FIND_COMMON_PITFALLS":
-                try:
-                    topic = payload.get('topic', '')
-                    subject = payload.get('subject', '')
-                    prompt = f"""
-                    Identify 3-5 common mistakes, misconceptions, or traps students fall into when studying '{topic}' in {subject} for UPSC.
-                    Return as a JSON list of strings.
-                    Example: ["Confusing Article 32 with 226", "Ignoring the proviso..."]
-                    """
-                    response = self.model.generate_content(prompt)
-                    data = self._parse_response(response.text)
-
-                    # Handle if data is list directly or dict
-                    pitfalls = []
-                    if isinstance(data, list):
-                        pitfalls = data
-                    elif isinstance(data, dict):
-                        # try to find a list value
-                        for k, v in data.items():
-                            if isinstance(v, list):
-                                pitfalls = v
-                                break
-
-                    result = {
-                        "success": True,
-                        "message": "Pitfalls Identified.",
-                        "pitfalls": pitfalls
-                    }
-                except Exception as e:
-                    result = {"success": False, "message": f"Pitfall Detection Failed: {str(e)}"}
-
-            elif action_type == "GENERATE_PODCAST_SCRIPT":
-                try:
-                    topic = payload.get('topic', '')
-                    prompt = f"""
-                    Write a short, engaging podcast script (2 hosts: 'Expert' and 'Curious Student') explaining '{topic}'.
-                    Keep it conversational, simple, and use analogies. Duration: 2 minutes reading time.
-                    Start directly with the script. Do NOT say "Here is a script".
-                    """
-                    response = self.model.generate_content(prompt)
-                    result = {
-                        "success": True,
-                        "message": "Podcast Script Generated.",
-                        "script": response.text
-                    }
-                except Exception as e:
-                    result = {"success": False, "message": f"Podcast Gen Failed: {str(e)}"}
 
             elif action_type == "GENERATE_ESSAY_PROMPT":
                 try:

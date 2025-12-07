@@ -23,50 +23,37 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
     const [tooltip, setTooltip] = useState<{ x: number, y: number, text: string } | null>(null);
     const [theme, setTheme] = useState<'cyber' | 'atlas'>('cyber');
     const [zoomTransform, setZoomTransform] = useState<d3.ZoomTransform>(d3.zoomIdentity);
+    const [mapError, setMapError] = useState(false);
 
     // D3 Zoom Behavior instance
     const zoomBehavior = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
 
-    // Parse Locations: Check Metadata FIRST, then Content
+    // Parse Locations
     useEffect(() => {
         let foundLocations: Location[] = [];
-
-        // Helper to extract locations from any object
         const extract = (data: any) => {
             if (!data) return [];
             if (data.locations && Array.isArray(data.locations)) return data.locations;
-            if (Array.isArray(data)) return data;
+            if (Array.isArray(data) && data.length > 0 && (data[0].lat || data[0].lon || data[0].name)) return data;
             return [];
         };
 
-        // Priority 1: properties on metadata object
         if (metadata) {
-            // Check if metadata itself is a string that needs parsing
             if (typeof metadata === 'string') {
-                try {
-                    const parsed = JSON.parse(metadata);
-                    foundLocations = extract(parsed);
-                } catch (e) {
-                    // ignore
-                }
+                try { foundLocations = extract(JSON.parse(metadata)); } catch (e) {}
             } else {
                 foundLocations = extract(metadata);
             }
         }
 
-        // Priority 2: Try to parse content as JSON if no metadata locations found
         if (foundLocations.length === 0) {
             try {
-                const parsed = JSON.parse(content);
-                foundLocations = extract(parsed);
-            } catch (e) {
-                // ignore
-            }
+                if (content.trim().startsWith('{') || content.trim().startsWith('[')) {
+                    foundLocations = extract(JSON.parse(content));
+                }
+            } catch (e) {}
         }
-
-        console.log("MapRenderer: Resolved Locations:", foundLocations);
         setLocations(foundLocations);
-
     }, [content, metadata]);
 
     // Fetch Map Data
@@ -78,34 +65,40 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                     const data = await res.json();
                     setGeoData(data);
                 } else {
-                    const resWorld = await fetch('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson');
-                    const dataWorld = await resWorld.json();
-                    setGeoData(dataWorld);
+                    throw new Error("Failed to load India map");
                 }
             } catch (error) {
-                console.error("Failed to load map data", error);
+                console.warn("Primary map load failed, trying fallback...", error);
+                try {
+                     const resWorld = await fetch('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson');
+                     if (resWorld.ok) {
+                         const dataWorld = await resWorld.json();
+                         setGeoData(dataWorld);
+                     } else {
+                         throw new Error("Failed to load world map");
+                     }
+                } catch (e2) {
+                    console.error("All map loads failed", e2);
+                    setMapError(true);
+                }
             }
         };
         fetchMap();
     }, []);
 
-    // Initialize D3 and Zoom
+    // Initialize D3
     useEffect(() => {
         if (!svgRef.current || !gRef.current || !geoData) return;
 
         const svg = d3.select(svgRef.current);
         const width = 600;
         const height = 600;
-
-        // India-centric Projection
         const projection = d3.geoMercator()
             .center([82, 23])
             .scale(800)
             .translate([width / 2, height / 2]);
-
         const path = d3.geoPath().projection(projection);
 
-        // Define Zoom
         zoomBehavior.current = d3.zoom<SVGSVGElement, unknown>()
             .scaleExtent([1, 8])
             .on("zoom", (event) => {
@@ -117,16 +110,13 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
 
         svg.call(zoomBehavior.current);
 
-        // Bind Data
         const g = d3.select(gRef.current);
         g.selectAll("*").remove();
 
-        // Draw Colors based on Theme
-        const fill = theme === 'cyber' ? '#1a1a2e' : '#e0e0e0';
-        const stroke = theme === 'cyber' ? 'rgba(0, 255, 242, 0.2)' : '#999';
+        const fill = theme === 'cyber' ? '#1a1a2e' : '#f0f0f0';
+        const stroke = theme === 'cyber' ? 'rgba(0, 255, 242, 0.2)' : '#ccc';
         const pointColor = theme === 'cyber' ? '#ff00dd' : '#d32f2f';
 
-        // Draw Map Paths
         g.selectAll("path")
             .data(geoData.features)
             .enter()
@@ -136,7 +126,6 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
             .attr("stroke", stroke)
             .attr("stroke-width", 0.5);
 
-        // Draw Points
         if (locations.length > 0) {
             g.selectAll("circle")
                 .data(locations)
@@ -144,66 +133,42 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                 .append("circle")
                 .attr("cx", d => projection([d.lon, d.lat])?.[0] || 0)
                 .attr("cy", d => projection([d.lon, d.lat])?.[1] || 0)
-                .attr("r", 6 / (zoomTransform.k || 1)) // Keep size constant relative to view? No, scale naturally or inverse
+                .attr("r", 6 / (zoomTransform.k || 1))
                 .attr("fill", pointColor)
                 .attr("stroke", "#fff")
                 .attr("stroke-width", 1)
-                .attr("class", "map-point")
+                .style("cursor", "pointer")
                 .on("mouseover", (event, d) => {
-                    setTooltip({
-                        x: event.pageX,
-                        y: event.pageY,
-                        text: `${d.name}`
-                    });
+                    setTooltip({ x: event.pageX, y: event.pageY, text: `${d.name}` });
                 })
-                .on("mouseout", () => setTooltip(null));
+                .on("mouseout", () => setTooltip(null))
+                .on("click", (event, d) => flyToLocation(d));
         }
+    }, [geoData, locations, theme]);
 
-    }, [geoData, locations, theme]); // Re-render on theme change
-
-    // Manual Zoom Control
     const handleZoom = (factor: number) => {
         if (!svgRef.current || !zoomBehavior.current) return;
-        d3.select(svgRef.current)
-            .transition()
-            .duration(300)
-            .call(zoomBehavior.current.scaleBy, factor);
+        d3.select(svgRef.current).transition().duration(300).call(zoomBehavior.current.scaleBy, factor);
     };
 
     const handleReset = () => {
         if (!svgRef.current || !zoomBehavior.current) return;
-        d3.select(svgRef.current)
-            .transition()
-            .duration(750)
-            .call(zoomBehavior.current.transform, d3.zoomIdentity);
+        d3.select(svgRef.current).transition().duration(750).call(zoomBehavior.current.transform, d3.zoomIdentity);
     };
 
-    // Fly-To Function
     const flyToLocation = (loc: Location) => {
         if (!svgRef.current || !zoomBehavior.current) return;
-
-        const width = 600;
-        const height = 600;
-        const projection = d3.geoMercator()
-            .center([82, 23])
-            .scale(800)
-            .translate([width / 2, height / 2]);
-
+        const projection = d3.geoMercator().center([82, 23]).scale(800).translate([300, 300]);
         const [x, y] = projection([loc.lon, loc.lat]) || [0, 0];
-
-        // Calculate transform to center this point
         const scale = 4;
-        const translate = [width / 2 - scale * x, height / 2 - scale * y];
-
-        d3.select(svgRef.current)
-            .transition()
-            .duration(1500)
-            .call(
-                zoomBehavior.current.transform,
-                d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale)
-            );
+        const translate = [300 - scale * x, 300 - scale * y];
+        d3.select(svgRef.current).transition().duration(1500)
+            .call(zoomBehavior.current.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
     };
 
+    if (mapError) {
+        return <div className="map-error glass-card">⚠️ Unable to load map data. Please check connection.</div>;
+    }
 
     return (
         <div className={`map-renderer-container glass-card ${theme}`}>
@@ -223,19 +188,12 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                     <button onClick={handleReset}>↺</button>
                 </div>
 
-                <div style={{ position: 'absolute', top: 10, left: 10, color: 'rgba(255,255,255,0.5)', fontSize: '0.7rem', zIndex: 5, pointerEvents: 'none' }}>
-                    Points: {locations.length} (Lat/Lon)
-                </div>
-
                 <svg ref={svgRef} width="100%" height="600" viewBox="0 0 600 600">
                     <g ref={gRef}></g>
                 </svg>
 
                 {tooltip && (
-                    <div
-                        className="map-tooltip"
-                        style={{ top: tooltip.y - 40, left: tooltip.x + 20 }}
-                    >
+                    <div className="map-tooltip" style={{ top: tooltip.y - 40, left: tooltip.x + 20 }}>
                         {tooltip.text}
                     </div>
                 )}
@@ -243,17 +201,9 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
 
             <div className="map-legend">
                 {locations.map((loc, i) => (
-                    <div
-                        key={i}
-                        className="legend-item interactive"
-                        onClick={() => flyToLocation(loc)}
-                        title="Click to Fly To"
-                    >
+                    <div key={i} className="legend-item interactive" onClick={() => flyToLocation(loc)}>
                         <span className="dot" style={{ background: theme === 'cyber' ? '#ff00dd' : '#d32f2f' }}></span>
-                        <div>
-                            <strong>{loc.name}</strong>
-                            <div className="legend-desc">{loc.reason}</div>
-                        </div>
+                        <div><strong>{loc.name}</strong><div className="legend-desc">{loc.reason}</div></div>
                     </div>
                 ))}
             </div>

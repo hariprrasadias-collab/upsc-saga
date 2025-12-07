@@ -1,5 +1,6 @@
 import React from 'react';
 import './Renderers.css';
+import MarkdownRenderer from '../../Shared/MarkdownRenderer';
 
 interface TimelineEvent {
     year: string;
@@ -12,20 +13,58 @@ interface TimelineRendererProps {
 }
 
 const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content }) => {
-    // Basic parser for AI generated timelines (Expected format: "Year: Event - Description")
+    // Robust parser for AI generated timelines
+    // Supports:
+    // 1. "Year: Event - Description"
+    // 2. "**Year**: Event - Description"
+    // 3. "- Year: Event"
     const parseTimeline = (text: string): TimelineEvent[] => {
         const lines = text.split('\n');
         const events: TimelineEvent[] = [];
         
         lines.forEach(line => {
-            // Regex to find Year (matches 4 digits or date-like strings at start)
-            const match = line.match(/^(\d{4}|[A-Za-z]+\s\d{4}|[^:]+):(.+)/);
-            if (match) {
-                const parts = match[2].split('-');
+            const cleanLine = line.trim().replace(/^[-*]\s+/, ''); // Remove bullet points
+
+            // Regex strategies
+            // 1. Standard: 1947: Independence
+            // 2. Bold Year: **1947**: Independence
+            // 3. Loose: 1947 - Independence
+
+            let year = '';
+            let rest = '';
+
+            // Strategy A: Colon separated
+            const colonMatch = cleanLine.match(/^(\*\*.*?\*\*|\d{4}(?:-\d{4})?|[^:]+):(.+)/);
+            if (colonMatch) {
+                year = colonMatch[1].replace(/\*\*/g, '').trim();
+                rest = colonMatch[2].trim();
+            } else {
+                // Strategy B: Dash separated (if starts with year-like)
+                const dashMatch = cleanLine.match(/^(\d{4})\s?-\s?(.+)/);
+                if (dashMatch) {
+                    year = dashMatch[1].trim();
+                    rest = dashMatch[2].trim();
+                }
+            }
+
+            if (year && rest) {
+                // Split rest into event and description if possible
+                // Look for second dash or just take the whole thing as event if short
+                const parts = rest.split(' - ');
+                let evtTitle = parts[0].trim();
+                let evtDesc = parts.slice(1).join(' - ').trim();
+
+                // If description is empty, check if event title is very long, maybe it contains description
+                if (!evtDesc && evtTitle.length > 50 && evtTitle.includes('.')) {
+                     const splitIdx = evtTitle.indexOf('.');
+                     evtDesc = evtTitle.substring(splitIdx + 1).trim();
+                     evtTitle = evtTitle.substring(0, splitIdx + 1).trim();
+                }
+
                 events.push({
-                    year: match[1].trim(),
-                    event: parts[0].trim(),
-                    description: parts.slice(1).join('-').trim()
+                    year: year,
+                    event: evtTitle,
+                    description: evtDesc
                 });
             }
         });
@@ -35,7 +74,13 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content }) => {
     const events = parseTimeline(content);
 
     if (events.length === 0) {
-        return <div className="raw-content">{content}</div>;
+        return (
+            <div className="timeline-container-fallback">
+                 <div className="glass-card">
+                    <MarkdownRenderer content={content} />
+                 </div>
+            </div>
+        );
     }
 
     return (
