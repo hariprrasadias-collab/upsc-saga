@@ -25,7 +25,6 @@ interface MapRendererProps {
 
 // --- Utils ---
 
-// Haversine formula for distance in km
 function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon2: number) {
     const R = 6371;
     const dLat = deg2rad(lat2 - lat1);
@@ -33,23 +32,30 @@ function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon
     const a =
         Math.sin(dLat / 2) * Math.sin(dLat / 2) +
         Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2)
-        ;
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const d = R * c;
-    return d;
+    return R * c;
 }
 
 function deg2rad(deg: number) {
     return deg * (Math.PI / 180)
 }
 
-// Simple Audio Synth
-const playSound = (type: 'correct' | 'wrong' | 'tick' | 'win' | 'giveup') => {
+// Simple Audio Synth (Singleton Pattern)
+let audioCtx: AudioContext | null = null;
+
+const playSound = (type: 'correct' | 'wrong' | 'tick' | 'win' | 'giveup' | 'hint') => {
     try {
-        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-        if (!AudioContext) return;
-        const ctx = new AudioContext();
+        if (!audioCtx) {
+            const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+            if (AudioContext) audioCtx = new AudioContext();
+        }
+        if (!audioCtx) return;
+
+        // Resume if suspended (browser policy)
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const ctx = audioCtx;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.connect(gain);
@@ -88,11 +94,17 @@ const playSound = (type: 'correct' | 'wrong' | 'tick' | 'win' | 'giveup') => {
             gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
             osc.start(now);
             osc.stop(now + 0.5);
+        } else if (type === 'hint') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, now);
+            osc.frequency.exponentialRampToValueAtTime(400, now + 0.3);
+            gain.gain.setValueAtTime(0.05, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
         } else if (type === 'win') {
-             // Arpeggio
             osc.type = 'triangle';
             gain.gain.value = 0.1;
-
             [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
                  const osc2 = ctx.createOscillator();
                  const gain2 = ctx.createGain();
@@ -111,7 +123,6 @@ const playSound = (type: 'correct' | 'wrong' | 'tick' | 'win' | 'giveup') => {
     }
 };
 
-// Global Cache for GeoJSON to prevent re-fetching
 const geoCache: { [key: string]: any } = {};
 
 const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
@@ -126,27 +137,25 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
     const [zoomTransform, setZoomTransform] = useState<d3.ZoomTransform>(d3.zoomIdentity);
     const [isFullscreen, setIsFullscreen] = useState(false);
 
-    // Practice Mode State
+    // Modes & Toggles
     const [mode, setMode] = useState<'explore' | 'practice' | 'review'>('explore');
+    const [isHardcore, setIsHardcore] = useState(false);
+    const [showHintCircle, setShowHintCircle] = useState(false);
+
+    // Quiz State
     const [quizIndex, setQuizIndex] = useState(0);
     const [streak, setStreak] = useState(0);
     const [showResult, setShowResult] = useState(false);
     const [feedbackMsg, setFeedbackMsg] = useState<string>("");
-
-    // UPSC Scoring State
     const [totalMarks, setTotalMarks] = useState(0);
     const [attempts, setAttempts] = useState<Attempt[]>([]);
     const [reviewIndex, setReviewIndex] = useState(0);
 
-    // Timer State
     const [timeLeft, setTimeLeft] = useState(20);
     const timerRef = useRef<any>(null);
-
     const zoomBehavior = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
 
-    // --- Data Loading ---
-
-    // 1. Parse Locations
+    // Data Parsing
     useEffect(() => {
         let foundLocations: Location[] = [];
         const extract = (data: any) => {
@@ -154,8 +163,6 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
             let locs = [];
             if (data.locations && Array.isArray(data.locations)) locs = data.locations;
             else if (Array.isArray(data)) locs = data;
-
-            // Normalize
             return locs.map((l: any) => ({
                 name: l.name,
                 lat: l.lat,
@@ -166,45 +173,34 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
 
         if (metadata) {
             if (typeof metadata === 'string') {
-                try {
-                    foundLocations = extract(JSON.parse(metadata));
-                } catch (e) {}
+                try { foundLocations = extract(JSON.parse(metadata)); } catch (e) {}
             } else {
                 foundLocations = extract(metadata);
             }
         }
-
         if (foundLocations.length === 0) {
-            try {
-                foundLocations = extract(JSON.parse(content));
-            } catch (e) {}
+            try { foundLocations = extract(JSON.parse(content)); } catch (e) {}
         }
         setLocations(foundLocations);
     }, [content, metadata]);
 
-    // 2. Smart Projection & Map Fetching
+    // Map Fetching
     useEffect(() => {
         if (locations.length === 0) return;
-
-        // Check bounds
         const lats = locations.map(l => l.lat);
         const lons = locations.map(l => l.lon);
         const minLat = Math.min(...lats);
         const maxLat = Math.max(...lats);
         const minLon = Math.min(...lons);
         const maxLon = Math.max(...lons);
-
-        // India Bounds (approx)
         const isIndia = (minLat >= 6 && maxLat <= 38 && minLon >= 68 && maxLon <= 98);
 
         const fetchMap = async () => {
             const cacheKey = isIndia ? 'india' : 'world';
-
             if (geoCache[cacheKey]) {
                 setGeoData(geoCache[cacheKey]);
                 return;
             }
-
             try {
                 let url = 'https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson';
                 let projCenter: [number, number] = [0, 20];
@@ -235,10 +231,7 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
         fetchMap();
     }, [locations]);
 
-
-    // --- Game Logic ---
-
-    // Timer Tick
+    // Timer
     useEffect(() => {
         if (mode === 'practice' && !showResult && quizIndex < locations.length) {
             if (timeLeft > 0) {
@@ -250,10 +243,26 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                 handleTimeOut();
             }
         }
-        return () => {
-            if (timerRef.current) clearTimeout(timerRef.current);
-        };
+        return () => { if (timerRef.current) clearTimeout(timerRef.current); };
     }, [timeLeft, mode, showResult, quizIndex, locations.length]);
+
+    const submitScore = async (score: number) => {
+        try {
+            // Mock integration
+            console.log("Submitting Score:", score);
+            // Use relative URL for production compatibility
+            await fetch('/api/gamification/reward', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'MAP_WORK_COMPLETE',
+                    score: score
+                })
+            });
+        } catch (e) {
+            console.error("Failed to submit score", e);
+        }
+    };
 
     const recordAttempt = (guess: { lat: number, lon: number } | null, distance: number, correct: boolean, marks: number) => {
         setAttempts(prev => [...prev, {
@@ -272,7 +281,7 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
         setStreak(0);
         setShowResult(true);
         setFeedbackMsg(`⏰ Time's up! It was ${locations[quizIndex].name}.`);
-        recordAttempt(null, 9999, false, -0.66);
+        recordAttempt(null, 9999, false, isHardcore ? -1.32 : -0.66);
     };
 
     const handleGiveUp = () => {
@@ -281,16 +290,20 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
         setStreak(0);
         setShowResult(true);
         setFeedbackMsg(`🏳️ Gave up. It was ${locations[quizIndex].name}.`);
-        recordAttempt(null, 9999, false, -0.66);
+        recordAttempt(null, 9999, false, isHardcore ? -1.32 : -0.66);
+    };
+
+    const handleHint = () => {
+        if (showHintCircle) return; // Already showing
+        playSound('hint');
+        setTotalMarks(prev => parseFloat((prev - 1.0).toFixed(2)));
+        setShowHintCircle(true);
+        setTimeout(() => setShowHintCircle(false), 3000);
     };
 
     const handleMapClick = (event: React.MouseEvent) => {
         if ((mode !== 'practice' && mode !== 'review') || (mode === 'practice' && showResult)) return;
-
-        // Disable clicking in review mode unless we want manual exploration?
-        // For now, let's keep clicks disabled in review mode to avoid confusion.
         if (mode === 'review') return;
-
         if (!projectionRef.current || !locations[quizIndex]) return;
 
         const [svgX, svgY] = d3.pointer(event, svgRef.current);
@@ -307,7 +320,9 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
             const threshold = geoData?.type === 'india' ? 150 : 500;
             const isCorrect = dist <= threshold;
 
-            const marks = isCorrect ? 2.00 : -0.66;
+            let marks = 0;
+            if (isCorrect) marks = isHardcore ? 4.00 : 2.00;
+            else marks = isHardcore ? -1.32 : -0.66;
 
             setShowResult(true);
             recordAttempt({ lat, lon }, Math.round(dist), isCorrect, marks);
@@ -329,12 +344,15 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
             setQuizIndex(prev => prev + 1);
             setShowResult(false);
             setFeedbackMsg("");
+            setShowHintCircle(false);
             setTimeLeft(20);
         } else {
             playSound('win');
             setQuizIndex(locations.length); // Finish
             setShowResult(false);
             setFeedbackMsg("");
+            setShowHintCircle(false);
+            submitScore(totalMarks);
         }
     };
 
@@ -345,6 +363,7 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
         setStreak(0);
         setShowResult(false);
         setFeedbackMsg("");
+        setShowHintCircle(false);
         setTimeLeft(20);
         setMode('practice');
     };
@@ -356,31 +375,42 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
     };
 
     const flyToReviewItem = (index: number) => {
-        if (attempts[index]) {
-            flyToLocation(attempts[index].target);
-        }
+        if (attempts[index]) flyToLocation(attempts[index].target);
     };
 
     const nextReview = () => {
         if (reviewIndex < attempts.length - 1) {
-            const next = reviewIndex + 1;
-            setReviewIndex(next);
-            flyToReviewItem(next);
+            setReviewIndex(prev => { const n = prev + 1; flyToReviewItem(n); return n; });
         }
     };
 
     const prevReview = () => {
         if (reviewIndex > 0) {
-            const prev = reviewIndex - 1;
-            setReviewIndex(prev);
-            flyToReviewItem(prev);
+            setReviewIndex(prev => { const n = prev - 1; flyToReviewItem(n); return n; });
         }
     };
 
-
     // --- Drawing ---
 
-    // 1. Map Base
+    const handleZoom = (factor: number) => {
+        if (!svgRef.current || !zoomBehavior.current) return;
+        d3.select(svgRef.current).transition().duration(300).call(zoomBehavior.current.scaleBy, factor);
+    };
+
+    const handleReset = () => {
+        if (!svgRef.current || !zoomBehavior.current) return;
+        d3.select(svgRef.current).transition().duration(750).call(zoomBehavior.current.transform, d3.zoomIdentity);
+    };
+
+    const flyToLocation = (loc: Location) => {
+        if (!svgRef.current || !zoomBehavior.current || !geoData) return;
+        const projection = d3.geoMercator().center(geoData.center).scale(geoData.scale).translate([300, 300]);
+        const [x, y] = projection([loc.lon, loc.lat]) || [0, 0];
+        const scale = 4;
+        d3.select(svgRef.current).transition().duration(1500)
+            .call(zoomBehavior.current.transform, d3.zoomIdentity.translate(300 - scale * x, 300 - scale * y).scale(scale));
+    };
+
     useEffect(() => {
         if (!svgRef.current || !gRef.current || !geoData) return;
 
@@ -396,7 +426,6 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
         projectionRef.current = projection;
         const path = d3.geoPath().projection(projection);
 
-        // Zoom setup
         zoomBehavior.current = d3.zoom<SVGSVGElement, unknown>()
             .scaleExtent([1, 8])
             .on("zoom", (event) => {
@@ -410,34 +439,25 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
         const g = d3.select(gRef.current);
         g.selectAll("*").remove();
         svg.selectAll("defs").remove();
+        svg.selectAll(".scale-bar-group").remove(); // Clear previous scale bar
 
         if (theme === 'ancient') {
             const defs = svg.append("defs");
             const filter = defs.append("filter").attr("id", "paper-texture");
-            filter.append("feTurbulence")
-                .attr("type", "fractalNoise")
-                .attr("baseFrequency", "0.04")
-                .attr("numOctaves", "5")
-                .attr("result", "noise");
-            filter.append("feDiffuseLighting")
-                .attr("in", "noise")
-                .attr("lighting-color", "#f4e4bc")
-                .attr("surfaceScale", "2")
-                .append("feDistantLight")
-                .attr("azimuth", "45")
-                .attr("elevation", "60");
+            filter.append("feTurbulence").attr("type", "fractalNoise").attr("baseFrequency", "0.04").attr("numOctaves", "5").attr("result", "noise");
+            filter.append("feDiffuseLighting").attr("in", "noise").attr("lighting-color", "#f4e4bc").attr("surfaceScale", "2").append("feDistantLight").attr("azimuth", "45").attr("elevation", "60");
         }
 
         let fill = '#1a1a2e';
         let stroke = 'rgba(0, 255, 242, 0.2)';
         let strokeWidth = 0.5;
 
-        if (theme === 'atlas') { fill = '#e0e0e0'; stroke = '#999'; }
-        else if (theme === 'ancient') {
-            fill = '#f4e4bc';
-            stroke = '#8b4513';
-            strokeWidth = 0.3;
-        }
+        if (isHardcore) {
+            fill = '#000';
+            stroke = '#333';
+            strokeWidth = 0.2; // Hard to see
+        } else if (theme === 'atlas') { fill = '#e0e0e0'; stroke = '#999'; }
+        else if (theme === 'ancient') { fill = '#f4e4bc'; stroke = '#8b4513'; strokeWidth = 0.3; }
 
         const graticule = d3.geoGraticule();
         g.append("path")
@@ -457,11 +477,67 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
             .attr("fill", fill)
             .attr("stroke", stroke)
             .attr("stroke-width", strokeWidth)
-            .style("filter", theme === 'ancient' ? "url(#paper-texture)" : "none");
+            .style("filter", theme === 'ancient' && !isHardcore ? "url(#paper-texture)" : "none");
 
-    }, [geoData, theme]);
+    }, [geoData, theme, isHardcore]);
 
-    // 2. Points & Overlay
+    // Scale Bar Update
+    useEffect(() => {
+        if (!svgRef.current || !projectionRef.current) return;
+        const svg = d3.select(svgRef.current);
+        svg.selectAll(".scale-bar-group").remove();
+
+        const k = zoomTransform.k;
+        // Approximation: 1 degree latitude ~ 111km
+        // At scale S, 1 pixel = X km.
+        // D3 Mercator default: 2*PI pixels = World width.
+        // This is complex to calculate perfectly dynamic.
+        // Simpler: Use a fixed visual bar width (e.g., 100px) and calculate what distance that represents at current center.
+
+        // 1. Get center point inverted
+        const center = projectionRef.current.invert?.([300, 300]);
+        if (!center) return;
+
+        // 2. Get point 100px to the right
+        // We need to account for zoom transform.
+        // Screen pixels 300,300 -> Transformed: (300-tx)/k
+        const p1 = [ (300 - zoomTransform.x)/k, (300 - zoomTransform.y)/k ];
+        const p2 = [ (400 - zoomTransform.x)/k, (300 - zoomTransform.y)/k ];
+
+        const c1 = projectionRef.current.invert?.([p1[0], p1[1]]);
+        const c2 = projectionRef.current.invert?.([p2[0], p2[1]]);
+
+        if (c1 && c2) {
+            const distKm = getDistanceFromLatLonInKm(c1[1], c1[0], c2[1], c2[0]);
+
+            const scaleGroup = svg.append("g")
+                .attr("class", "scale-bar-group")
+                .attr("transform", "translate(20, 570)"); // Bottom Left
+
+            // Bar
+            scaleGroup.append("line")
+                .attr("x1", 0).attr("y1", 0)
+                .attr("x2", 100).attr("y2", 0)
+                .attr("stroke", "#fff")
+                .attr("stroke-width", 2);
+
+            // Ticks
+            scaleGroup.append("line").attr("x1", 0).attr("y1", -5).attr("x2", 0).attr("y2", 5).attr("stroke", "#fff");
+            scaleGroup.append("line").attr("x1", 100).attr("y1", -5).attr("x2", 100).attr("y2", 5).attr("stroke", "#fff");
+
+            // Text
+            scaleGroup.append("text")
+                .attr("x", 50)
+                .attr("y", -10)
+                .attr("text-anchor", "middle")
+                .attr("fill", "#fff")
+                .attr("font-size", "12px")
+                .text(`${Math.round(distKm)} km`);
+        }
+
+    }, [zoomTransform, geoData]); // Re-run on zoom
+
+    // Overlay Elements
     useEffect(() => {
         if (!gRef.current || !projectionRef.current || !geoData) return;
         const g = d3.select(gRef.current);
@@ -470,10 +546,10 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
         g.selectAll(".feedback-line").remove();
         g.selectAll(".guess-point").remove();
         g.selectAll(".target-ring").remove();
+        g.selectAll(".hint-circle").remove();
 
         const pointColor = theme === 'cyber' ? '#ff00dd' : (theme === 'ancient' ? '#8b4513' : '#d32f2f');
 
-        // Helper to draw point
         const drawPoint = (lat: number, lon: number, color: string, radius = 6) => {
             g.append("circle")
                 .attr("cx", projectionRef.current!([lon, lat])?.[0] || 0)
@@ -496,9 +572,21 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                 .attr("class", "feedback-line");
         };
 
+        // Draw Hint Radar
+        if (showHintCircle && locations[quizIndex]) {
+            const t = locations[quizIndex];
+            g.append("circle")
+                .attr("cx", projectionRef.current!([t.lon, t.lat])?.[0] || 0)
+                .attr("cy", projectionRef.current!([t.lon, t.lat])?.[1] || 0)
+                .attr("r", 50 / (zoomTransform.k || 1)) // Visual radius approx
+                .attr("fill", "rgba(0, 255, 242, 0.2)")
+                .attr("stroke", "rgba(0, 255, 242, 0.5)")
+                .attr("stroke-width", 1)
+                .attr("class", "hint-circle pulse");
+        }
+
         if (mode === 'explore') {
             if (locations.length > 0) {
-                // ... existing explore logic ...
                 g.selectAll("circle.map-point")
                     .data(locations)
                     .enter()
@@ -519,7 +607,6 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                 const currentAttempt = attempts[attempts.length - 1];
                 const target = currentAttempt.target;
 
-                // Target Ring
                 g.append("circle")
                     .attr("cx", projectionRef.current!([target.lon, target.lat])?.[0] || 0)
                     .attr("cy", projectionRef.current!([target.lon, target.lat])?.[1] || 0)
@@ -529,10 +616,8 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                     .attr("stroke-width", 2)
                     .attr("class", "target-ring");
 
-                // Correct Point
                 drawPoint(target.lat, target.lon, "#2ea043", 8);
 
-                // User Guess
                 if (currentAttempt.guess) {
                     drawPoint(currentAttempt.guess.lat, currentAttempt.guess.lon, currentAttempt.correct ? "#2ea043" : "#da3633", 6);
                     drawLine(target, currentAttempt.guess, currentAttempt.correct ? "#2ea043" : "#da3633");
@@ -542,14 +627,9 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
         else if (mode === 'review') {
             if (attempts.length > 0 && attempts[reviewIndex]) {
                 const item = attempts[reviewIndex];
-
-                // Draw ALL targets as ghosts
                 attempts.forEach(a => {
                     drawPoint(a.target.lat, a.target.lon, "rgba(255,255,255,0.3)", 4);
                 });
-
-                // Highlight Current
-                // Target
                  g.append("circle")
                     .attr("cx", projectionRef.current!([item.target.lon, item.target.lat])?.[0] || 0)
                     .attr("cy", projectionRef.current!([item.target.lon, item.target.lat])?.[1] || 0)
@@ -557,7 +637,7 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                     .attr("fill", "none")
                     .attr("stroke", "#00fff2")
                     .attr("stroke-width", 2)
-                    .attr("class", "target-ring pulse"); // Add CSS pulse?
+                    .attr("class", "target-ring pulse");
 
                 drawPoint(item.target.lat, item.target.lon, "#2ea043", 8);
 
@@ -567,33 +647,7 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                 }
             }
         }
-    }, [locations, mode, quizIndex, showResult, attempts, reviewIndex, zoomTransform, theme, geoData]);
-
-
-    // --- Render Helpers ---
-
-    const handleZoom = (factor: number) => {
-        if (!svgRef.current || !zoomBehavior.current) return;
-        d3.select(svgRef.current).transition().duration(300).call(zoomBehavior.current.scaleBy, factor);
-    };
-
-    const handleReset = () => {
-        if (!svgRef.current || !zoomBehavior.current) return;
-        d3.select(svgRef.current).transition().duration(750).call(zoomBehavior.current.transform, d3.zoomIdentity);
-    };
-
-    const flyToLocation = (loc: Location) => {
-        if (!svgRef.current || !zoomBehavior.current || !geoData) return;
-        const projection = d3.geoMercator().center(geoData.center).scale(geoData.scale).translate([300, 300]);
-        const [x, y] = projection([loc.lon, loc.lat]) || [0, 0];
-        const scale = 4;
-        const translate = [300 - scale * x, 300 - scale * y];
-
-        d3.select(svgRef.current)
-            .transition()
-            .duration(1500)
-            .call(zoomBehavior.current.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
-    };
+    }, [locations, mode, quizIndex, showResult, attempts, reviewIndex, zoomTransform, theme, geoData, showHintCircle]);
 
     return (
         <div className={`map-renderer-container ${theme} ${isFullscreen ? 'fullscreen-map' : ''}`}>
@@ -615,6 +669,17 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                 <button className={`map-btn-sm ${mode === 'explore' ? 'active' : ''}`} onClick={() => { setMode('explore'); handleReset(); }}>Explore</button>
                 <button className={`map-btn-sm ${mode === 'practice' ? 'active' : ''}`} onClick={() => { setMode('practice'); handleReset(); resetQuiz(); }}>Practice</button>
                 {attempts.length > 0 && <button className={`map-btn-sm ${mode === 'review' ? 'active' : ''}`} onClick={startReview}>Review</button>}
+
+                <div style={{flex: 1}}></div>
+                {mode === 'practice' && (
+                    <button
+                        className={`map-btn-sm ${isHardcore ? 'active' : ''}`}
+                        onClick={() => setIsHardcore(!isHardcore)}
+                        title="Blind Map, Double Points"
+                    >
+                        ☠️ Hardcore
+                    </button>
+                )}
             </div>
 
             {mode === 'practice' && locations.length > 0 && (
@@ -654,7 +719,14 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
                                 "{locations[quizIndex].reason || "No description available."}"
                             </div>
                             {!showResult && (
-                                <button onClick={handleGiveUp} className="give-up-btn">🏳️ Give Up</button>
+                                <div style={{display: 'flex', gap: 10, justifyContent: 'center', marginTop: 10}}>
+                                    <button onClick={handleHint} className="give-up-btn" style={{background: '#0d1117', border: '1px solid #30363d'}}>
+                                        💡 Hint (-1.0)
+                                    </button>
+                                    <button onClick={handleGiveUp} className="give-up-btn">
+                                        🏳️ Give Up
+                                    </button>
+                                </div>
                             )}
                         </div>
                     ) : (
