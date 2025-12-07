@@ -1479,7 +1479,12 @@ class BrainService:
                         "eli15": "Explanation for a teenager (high school level)",
                         "eli_expert": "Academic/Professional definition with technical nuance",
                         "analogy": "A creative, distinct analogy to help visualize it",
-                        "real_world_example": "A concrete real-world application or example"
+                        "visual_analogy_prompt": "A detailed text-to-image prompt to visualize the analogy (e.g. 'A digital painting of...')",
+                        "real_world_example": "A concrete real-world application or example",
+                        "quiz": [
+                            {{ "question": "Simple check question 1", "options": ["Option A", "Option B", "Option C"], "answer": "Option A" }},
+                            {{ "question": "Simple check question 2", "options": ["Option A", "Option B", "Option C"], "answer": "Option B" }}
+                        ]
                     }}
                     Do NOT include markdown formatting like ```json ... ```, just the raw JSON.
                     """
@@ -1489,7 +1494,15 @@ class BrainService:
                     # Validation: Ensure it is a dict
                     if not isinstance(data, dict):
                         # Fallback
-                        data = {"eli5": response.text, "eli15": "", "eli_expert": "", "analogy": "", "real_world_example": ""}
+                        data = {
+                            "eli5": response.text,
+                            "eli15": "",
+                            "eli_expert": "",
+                            "analogy": "",
+                            "real_world_example": "",
+                            "visual_analogy_prompt": "",
+                            "quiz": []
+                        }
 
                     result = {
                         "success": True,
