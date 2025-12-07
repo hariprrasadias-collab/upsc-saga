@@ -195,7 +195,7 @@ class ForesightEngine:
         """
         
         try:
-            response = model_manager.generate_content(prompt)
+            response = model_manager.generate_content(prompt, model_type='pro')
             text = response.text.strip()
             json_match = re.search(r'\[.*\]', text, re.DOTALL)
             
@@ -308,7 +308,8 @@ class ForesightEngine:
         """
         
         try:
-            response = model_manager.generate_content(prompt)
+            # Predictions require deep analysis
+            response = model_manager.generate_content(prompt, model_type='pro')
             
             text = response.text.strip()
             json_match = re.search(r'\[.*\]', text, re.DOTALL)

@@ -100,7 +100,7 @@ def generate_debate_turn(topic, history, user_input=None):
     """
     
     try:
-        mod_response = model_manager.generate_content(moderator_prompt)
+        mod_response = model_manager.generate_content(moderator_prompt, model_type='pro')
         text = mod_response.text.replace('```json', '').replace('```', '').strip()
         start = text.find('{')
         end = text.rfind('}')
@@ -152,7 +152,7 @@ def generate_debate_turn(topic, history, user_input=None):
     """
 
     try:
-        response = model_manager.generate_content(agent_prompt)
+        response = model_manager.generate_content(agent_prompt, model_type='pro')
         text = response.text.strip()
         try:
             start_idx = text.find('{')
@@ -205,7 +205,10 @@ def generate_autonomous_debate(topic, turns=6):
         starter_agent = AGENTS[starter_id]
 
         # Initial turn
-        resp = model_manager.generate_content(f"You are {starter_agent['name']}. Make a provocative opening statement about '{topic}' using a specific rhetorical technique.")
+        resp = model_manager.generate_content(
+            f"You are {starter_agent['name']}. Make a provocative opening statement about '{topic}' using a specific rhetorical technique.",
+            model_type='pro'
+        )
         history.append({
             "speakerId": starter_id,
             "text": resp.text.strip(),
@@ -303,7 +306,7 @@ def generate_debate_verdict(topic, history):
     """
 
     try:
-        response = model_manager.generate_content(judge_prompt)
+        response = model_manager.generate_content(judge_prompt, model_type='pro')
         text = response.text.replace('```json', '').replace('```', '').strip()
 
         start = text.find('{')
