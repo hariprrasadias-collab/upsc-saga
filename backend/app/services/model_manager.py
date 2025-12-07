@@ -23,20 +23,23 @@ class ModelManager:
     """
 
     # High Intelligence Models (Low Rate Limit, High Cost)
+    # Using confirmed available models
     PRO_MODELS = [
+        'gemini-2.5-pro',
+        'gemini-2.0-pro-exp-02-05',
+        'gemini-2.0-pro-exp',
+        'gemini-1.5-pro-latest', # Alias
         'gemini-1.5-pro',
-        'gemini-1.5-pro-latest',
-        'gemini-1.0-pro'
     ]
 
     # High Speed/Volume Models (High Rate Limit, Low Cost)
-    # Removing likely-invalid names to reduce 404 noise
     FAST_MODELS = [
-        'gemini-1.5-flash',
-        'gemini-1.5-flash-latest',
-        'gemini-1.5-flash-001', # Explicit stable version
+        'gemini-2.5-flash',
         'gemini-2.0-flash',
-        'gemini-2.0-flash-exp', # Experimental if available
+        'gemini-2.0-flash-exp',
+        'gemini-1.5-flash-latest', # Alias
+        'gemini-1.5-flash',
+        'gemini-1.5-flash-001',
     ]
 
     def __init__(self):

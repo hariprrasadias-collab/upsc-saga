@@ -248,8 +248,8 @@ class BrainService:
             from app.db import get_db
             conn = get_db()
             conn.execute('''
-                INSERT INTO answer_writing_prompts (question, subject, topic, difficulty, created_at)
-                VALUES (?, ?, ?, 'Hard', datetime('now'))
+                INSERT INTO answer_writing_prompts (question, subject, topic, difficulty, word_limit, created_at)
+                VALUES (?, ?, ?, 'Hard', 250, datetime('now'))
             ''', (prompt, subject, topic))
             conn.commit()
             print(f"Brain: Saved Essay Prompt for {topic}")
