@@ -99,7 +99,7 @@ const BrainVault: React.FC = () => {
 
         switch (normalizedType) {
             case 'timeline':
-                return <TimelineRenderer content={item.content} />;
+                return <TimelineRenderer content={item.content} metadata={metadataObj} />;
             case 'podcast':
                 return <PodcastPlayer content={item.content} title={item.topic} />;
             case 'roleplay':
