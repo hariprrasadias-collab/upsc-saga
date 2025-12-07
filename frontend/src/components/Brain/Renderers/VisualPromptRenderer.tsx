@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Renderers.css';
-import { FaDownload, FaCopy, FaRocket, FaMagic, FaCog, FaChevronDown, FaChevronUp, FaRandom, FaExpand, FaBan, FaPalette, FaSave, FaThLarge, FaSquare } from 'react-icons/fa';
+import { FaDownload, FaCopy, FaRocket, FaMagic, FaCog, FaChevronDown, FaChevronUp, FaRandom, FaExpand, FaBan, FaPalette, FaSave, FaThLarge, FaSquare, FaMicrophone, FaBolt, FaFileAlt } from 'react-icons/fa';
 
 interface VisualPromptRendererProps {
     content: string; // The raw prompt text
@@ -53,6 +53,17 @@ const MAGIC_MODIFIERS = [
     "volumetric lighting", "global illumination"
 ];
 
+const PROMPT_TEMPLATES = [
+    { label: "Cyberpunk Character", text: "A cyberpunk street samurai, neon lights, rainy street, high tech armor, detailed face, futuristic city background" },
+    { label: "Fantasy Landscape", text: "Epic fantasy landscape, floating islands, waterfalls, magical aura, detailed clouds, 8k resolution, matte painting" },
+    { label: "Isometric Room", text: "Isometric view of a cozy gamer room, neon lighting, detailed computer setup, posters, low poly style, 3d render" },
+    { label: "Product Shot", text: "Professional product photography of a [ITEM], studio lighting, neutral background, sharp focus, 4k" },
+    { label: "Logo Design", text: "Minimalist vector logo of a [SUBJECT], flat design, simple shapes, white background, professional branding" }
+];
+
+// Helper to simulate stats
+const getRandomStat = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1) + min);
+
 const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) => {
     const [prompt, setPrompt] = useState(content);
     const [negativePrompt, setNegativePrompt] = useState("");
@@ -75,6 +86,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
     // Advanced Settings
     const [showSettings, setShowSettings] = useState(false);
     const [showStyleMatrix, setShowStyleMatrix] = useState(false);
+    const [showTemplates, setShowTemplates] = useState(false);
     const [model, setModel] = useState('flux');
     const [aspectRatio, setAspectRatio] = useState('16:9');
     const [seed, setSeed] = useState<number>(Math.floor(Math.random() * 10000));
@@ -87,9 +99,30 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
     const [presetName, setPresetName] = useState("");
     const [showPresets, setShowPresets] = useState(false);
 
+    // Voice
+    const [isListening, setIsListening] = useState(false);
+
+    // Neural HUD Stats
+    const [hudStats, setHudStats] = useState({ vram: 0, ops: 0, entropy: 0 });
+
     useEffect(() => {
         setPrompt(content);
     }, [content]);
+
+    // HUD Update Loop
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (isGenerating || imageLoading) {
+            interval = setInterval(() => {
+                setHudStats({
+                    vram: getRandomStat(40, 95),
+                    ops: getRandomStat(120, 300),
+                    entropy: getRandomStat(10, 99)
+                });
+            }, 800);
+        }
+        return () => clearInterval(interval);
+    }, [isGenerating, imageLoading]);
 
     const handleCopy = () => {
         navigator.clipboard.writeText(prompt);
@@ -236,6 +269,55 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         setTimeout(() => handleGenerate(false), 0);
     };
 
+    const handleChaos = () => {
+        setRandomSeed(true);
+        // Pick random model
+        const randomModel = MODELS[Math.floor(Math.random() * MODELS.length)].id;
+        setModel(randomModel);
+
+        // Pick random Aspect Ratio
+        const randomAr = ASPECT_RATIOS[Math.floor(Math.random() * ASPECT_RATIOS.length)].id;
+        setAspectRatio(randomAr);
+
+        // Add 3 random style tags
+        const allTags = Object.values(STYLE_MATRIX).flat();
+        const randomTags = Array.from({length: 3}, () => allTags[Math.floor(Math.random() * allTags.length)]);
+
+        setPrompt(prev => {
+            let p = prev;
+            randomTags.forEach(tag => {
+                if (!p.includes(tag)) p += `, ${tag}`;
+            });
+            return p;
+        });
+
+        setTimeout(() => handleGenerate(false), 100);
+    };
+
+    const handleVoiceInput = () => {
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            alert("Voice input not supported in this browser.");
+            return;
+        }
+
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = () => setIsListening(true);
+        recognition.onend = () => setIsListening(false);
+
+        recognition.onresult = (event: any) => {
+            const transcript = event.results[0][0].transcript;
+            setPrompt(prev => prev + " " + transcript);
+        };
+
+        recognition.start();
+    };
+
     const downloadImage = async (imageUrl: string) => {
         try {
             const response = await fetch(imageUrl);
@@ -321,6 +403,12 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
 
                 <div className="vp-toolbar-group">
                      <button
+                        className={`settings-toggle-btn ${showTemplates ? 'active' : ''}`}
+                        onClick={() => setShowTemplates(!showTemplates)}
+                    >
+                        <FaFileAlt /> Templates
+                    </button>
+                     <button
                         className={`settings-toggle-btn ${showPresets ? 'active' : ''}`}
                         onClick={() => setShowPresets(!showPresets)}
                     >
@@ -340,6 +428,20 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
                     </button>
                 </div>
             </div>
+
+            {/* Templates Panel */}
+            {showTemplates && (
+                <div className="vp-presets-panel">
+                    <h4 className="style-cat-title">Quick Start Templates</h4>
+                    <div className="preset-list">
+                        {PROMPT_TEMPLATES.map(t => (
+                            <div key={t.label} className="preset-item" onClick={() => { setPrompt(t.text); setShowTemplates(false); }}>
+                                <span className="preset-name">{t.label}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Presets Modal/Panel */}
             {showPresets && (
@@ -464,8 +566,18 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
                         spellCheck="false"
                         placeholder="Describe your vision... (Tip: use --ar 16:9 or --no blur)"
                     />
+                    <button
+                        className={`mic-btn ${isListening ? 'listening' : ''}`}
+                        onClick={handleVoiceInput}
+                        title="Voice Input"
+                    >
+                        <FaMicrophone />
+                    </button>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '5px', gap: '10px' }}>
+                     <button className="magic-btn chaos" onClick={handleChaos} title="Randomize Settings & Style">
+                        <FaBolt /> Chaos Mode
+                    </button>
                      <button className="magic-btn secondary" onClick={handleRemix} title="Remix with random seed">
                         <FaRandom /> Remix
                     </button>
@@ -488,6 +600,24 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
             {/* Image Section */}
             {(generatedImage || gridImages.length > 0 || imageLoading) && (
                 <div className={`vp-result ${viewMode === 'grid' ? 'grid-mode' : ''}`}>
+
+                    {/* Neural HUD Overlay */}
+                    {(imageLoading || isGenerating) && (
+                        <div className="neural-hud">
+                            <div className="hud-row">
+                                <span className="hud-label">VRAM ALLOC</span>
+                                <span className="hud-value">{hudStats.vram}%</span>
+                            </div>
+                            <div className="hud-row">
+                                <span className="hud-label">TENSOR OPS</span>
+                                <span className="hud-value">{hudStats.ops} TFLOPS</span>
+                            </div>
+                            <div className="hud-row">
+                                <span className="hud-label">ENTROPY</span>
+                                <span className="hud-value">{hudStats.entropy}</span>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Matrix Scanline Overlay */}
                     {(imageLoading || isGenerating) && <div className="scanline-overlay"></div>}
