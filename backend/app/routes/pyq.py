@@ -199,10 +199,25 @@ def get_analytics():
         'difficulty_trend': [dict(row) for row in difficulty_trends]
     })
 
+# In-memory rate limiter (Simple Dictionary)
+# Key: IP Address, Value: timestamp of last request
+_strategos_rate_limit = {}
+
 @bp.route('/strategos/<int:question_id>', methods=['POST'])
 def ask_strategos(question_id):
     """Ask AI for tactical breakdown of a question"""
     try:
+        # 1. Rate Limiting Check (Simple)
+        import time
+        client_ip = request.remote_addr
+        last_req = _strategos_rate_limit.get(client_ip, 0)
+        current_time = time.time()
+
+        if current_time - last_req < 5: # 5 seconds cooldown
+            return jsonify({'success': False, 'error': 'Strategos is thinking. Please wait 5 seconds.'}), 429
+
+        _strategos_rate_limit[client_ip] = current_time
+
         conn = get_db()
         question = conn.execute("SELECT * FROM pyq_questions WHERE id = ?", (question_id,)).fetchone()
 

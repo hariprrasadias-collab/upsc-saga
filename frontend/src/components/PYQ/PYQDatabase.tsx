@@ -7,6 +7,8 @@ import MarkdownRenderer from '../Shared/MarkdownRenderer';
 import { Virtuoso } from 'react-virtuoso';
 import PYQHeatmap from '../Analytics/PYQHeatmap';
 import DifficultyTrendChart from '../Analytics/DifficultyTrendChart';
+import Modal from '../Shared/Modal';
+import { generateCombatSheet } from '../../util/exportUtils';
 
 
 interface Question {
@@ -503,6 +505,15 @@ const PYQDatabase: React.FC = () => {
                             ⚔️ Create Boss Battle
                         </button>
                         <button
+                            className="export-btn"
+                            onClick={() => generateCombatSheet(questions)}
+                            disabled={questions.length === 0}
+                            title="Print Combat Sheet"
+                            style={{ marginRight: '10px', background: '#7f8c8d', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
+                        >
+                            📄 Export Combat Sheet
+                        </button>
+                        <button
                             className="start-quiz-btn"
                             onClick={handleAnalyzeTrends}
                             disabled={isAnalyzing}
@@ -522,39 +533,23 @@ const PYQDatabase: React.FC = () => {
                     </div>
                 </div>
 
-                {trendAnalysis && (
-                    <div className="trend-analysis-panel" style={{
-                        background: 'rgba(142, 68, 173, 0.1)',
-                        border: '1px solid #8e44ad',
-                        borderRadius: '8px',
-                        padding: '15px',
-                        marginBottom: '20px',
-                        color: '#ecf0f1'
-                    }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                            <h3 style={{ margin: 0, color: '#9b59b6' }}>🧠 Strategos Trend Analysis</h3>
-                            <button onClick={() => setTrendAnalysis(null)} style={{ background: 'none', border: 'none', color: '#bdc3c7', cursor: 'pointer' }}>✕</button>
-                        </div>
-                        <MarkdownRenderer content={trendAnalysis} />
-                    </div>
-                )}
+                {/* Trend Analysis Modal */}
+                <Modal
+                    isOpen={!!trendAnalysis}
+                    onClose={() => setTrendAnalysis(null)}
+                    title="🧠 Strategos Trend Analysis"
+                >
+                    <MarkdownRenderer content={trendAnalysis || ''} />
+                </Modal>
 
-                {strategosAnalysis && (
-                    <div className="trend-analysis-panel" style={{
-                        background: 'rgba(41, 128, 185, 0.1)',
-                        border: '1px solid #3498db',
-                        borderRadius: '8px',
-                        padding: '15px',
-                        marginBottom: '20px',
-                        color: '#ecf0f1'
-                    }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                            <h3 style={{ margin: 0, color: '#3498db' }}>🧠 Tactical Breakdown</h3>
-                            <button onClick={() => setStrategosAnalysis(null)} style={{ background: 'none', border: 'none', color: '#bdc3c7', cursor: 'pointer' }}>✕</button>
-                        </div>
-                        <MarkdownRenderer content={strategosAnalysis} />
-                    </div>
-                )}
+                {/* Strategos Analysis Modal */}
+                <Modal
+                    isOpen={!!strategosAnalysis}
+                    onClose={() => setStrategosAnalysis(null)}
+                    title="🧠 Tactical Breakdown"
+                >
+                    <MarkdownRenderer content={strategosAnalysis || ''} />
+                </Modal>
 
                 {/* Active Filters Display */}
                 {(selectedYears.length > 0 || selectedSubjects.length > 0 || selectedTopics.length > 0) && (
