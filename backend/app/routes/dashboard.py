@@ -14,14 +14,21 @@ def get_dashboard_data():
     user_id = 1
     conn = get_db()
     
-    user = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+    # Optimized User Query: Select only stats needed for UI
+    user = conn.execute('''
+        SELECT id, username, current_xp, level, max_xp, hacksilver,
+               strength_stat, runic_stat, vitality_stat, luck_stat
+        FROM users WHERE id = ?
+    ''', (user_id,)).fetchone()
+
     if not user: 
         return jsonify({"error": "User not found"}), 404
     
-    # Get Tasks due TODAY
+    # Get Tasks due TODAY - Optimized Selection
+    # Note: 'tasks' table uses isCompleted (int) instead of status (text)
     today = get_today_date_str()
     tasks = conn.execute(
-        'SELECT * FROM tasks WHERE user_id = ? AND due_date = ? AND is_quest = 0 ORDER BY id DESC',
+        'SELECT id, title, due_date, isCompleted, priority FROM tasks WHERE user_id = ? AND due_date = ? AND is_quest = 0 ORDER BY id DESC',
         (user_id, today)
     ).fetchall()
     
