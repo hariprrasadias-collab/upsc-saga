@@ -321,86 +321,152 @@ class BrainService:
         except:
             pass
 
-        # 2. Construct Prompt
-        prompt = f"""
-# SYSTEM: You are the BRAIN of a UPSC Application.
-# TASK: A user has just COMPLETED the topic: "{topic}" ({subject}).
-# GOAL: Generate ALL necessary study artifacts (flashcards, notes, analysis, quizzes) in ONE SINGLE JSON OBJECT.
+        weak_areas_text = ""
+        try:
+            from app.services.weak_area_service import WeakAreaAnalyzer
+            weak_areas = WeakAreaAnalyzer.analyze_user_performance(user_id=1, days=30)
+            if weak_areas:
+                weak_areas_text = "USER WEAK AREAS:\n" + "\n".join([f"- {area['topic']} ({area['subject']}) - Accuracy: {area['accuracy_rate']}%" for area in weak_areas[:5]])
+        except:
+            pass
 
-# CONTEXT:
-## Previous Year Questions (PYQs) for Context:
+        # 2. Construct Prompt - Section by Section
+
+        prompt = f"""
+# SYSTEM: You are the BRAIN of a UPSC Civil Services Application (The Central Nervous System).
+# TASK: A user has just COMPLETED the topic: "{topic}" ({subject}).
+# GOAL: Generate comprehensive, high-yield study artifacts that EXCEED the quality of standard AI outputs.
+# TARGET AUDIENCE: A serious UPSC aspirant requiring deep analytical insight, interdisciplinary linkages, and exam-oriented content.
+
+# CRITICAL CONTEXT:
+## Previous Year Questions (PYQs) for Tone & Trend:
 {pyq_context}
 
-## Recently Completed Topics (for Linkages):
+## Recently Completed Topics (for Cross-Linkages):
 {', '.join(recent_topics)}
 
-# INSTRUCTIONS:
-Return a SINGLE JSON object with the following keys. Do NOT include markdown formatting (like ```json), just the raw JSON.
+## {weak_areas_text}
+
+# OUTPUT INSTRUCTIONS:
+Return a SINGLE VALID JSON object. No markdown formatting (like ```json). Just the raw JSON.
+The JSON must strictly follow the schema below.
 
 {{
   "flashcards": [
-      {{ "front": "Question...", "back": "Answer..." }} // Generate 5 high-quality flashcards
+      // Generate 5 High-Quality Flashcards.
+      // Criteria: Focus on specific facts, dates, constitutional articles, or conceptual nuances. Avoid generic questions.
+      {{ "front": "Specific Question...", "back": "Precise Answer..." }}
   ],
-  "revision_note": "Explain the topic '{topic}' (Concept, Relevance, Key Sub-topics). Keep it under 200 words.",
+
+  "revision_note": "A concise but dense summary of '{topic}' (Max 200 words). Structure it: 1. Core Concept 2. Relevance to Syllabus 3. Key Dimensions.",
+
   "mind_map": {{
+      // A hierarchical tree structure for visualization. Depth: at least 3 levels.
       "name": "{topic}",
-      "children": [ {{ "name": "Subtopic", "children": [...] }} ] // Depth 3 levels
+      "children": [
+          {{ "name": "Subtopic 1", "children": [ {{ "name": "Detail A" }}, {{ "name": "Detail B" }} ] }}
+      ]
   }},
+
   "mock_test": {{
+      // Generate 10 UPSC-Standard MCQs.
+      // Criteria:
+      // 1. Ambiguity: Questions must be clear.
+      // 2. Difficulty: Mix of Moderate and Hard.
+      // 3. Relevance: Directly examinable.
+      // 4. Format: Include Statement-based questions (1 only, 1 and 2 only, etc.).
       "title": "Test: {topic}",
       "questions": [
           {{
-              "question_text": "...",
-              "option_a": "...", "option_b": "...", "option_c": "...", "option_d": "...",
-              "correct_answer": "A",
-              "explanation": "..."
-          }} // Generate 10 UPSC-standard MCQs
+              "question_text": "Consider the following statements regarding {topic}...",
+              "option_a": "1 only", "option_b": "2 only", "option_c": "Both 1 and 2", "option_d": "Neither 1 nor 2",
+              "correct_answer": "C",
+              "explanation": "Detailed explanation citing sources or logic."
+          }}
       ]
   }},
-  "pyq_trends": "Analyze the PYQ trends for '{topic}'. Identify recurring themes, difficulty shifts, and high-yield areas.",
+
+  "pyq_trends": "Analyze the provided PYQs (or general trends if none). Identify: 1. Recurring Themes 2. Shift in difficulty 3. High-yield focus areas.",
+
   "predictions": [
-      {{ "question": "Predicted Question...", "type": "MCQ", "probability": 0.8 }} // Generate 3 predictions
+      // Generate 3 Future-Looking Questions (Foresight).
+      // Focus: Interdisciplinary (e.g., Economy + Environment).
+      {{ "question": "Predicted Question...", "type": "MCQ", "probability": 0.8 }}
   ],
+
   "socratic_dialogue": {{
+      // A 6-turn philosophical debate.
+      // Characters:
+      // - The Skeptic (Socrates): Relentless questioning, exposes contradictions.
+      // - The Idealist (Plato): Visionary, moralizing.
+      // - The Realist (Aristotle): Pragmatic, empirical.
       "dialogue": [
           {{ "speakerId": "skeptic", "text": "...", "type": "ARGUMENT" }},
-          {{ "speakerId": "idealist", "text": "...", "type": "REBUTTAL" }}
-      ], // Generate a 6-turn philosophical debate on the topic
-      "verdict": {{ "winner": "...", "synthesis": "..." }}
+          {{ "speakerId": "realist", "text": "...", "type": "REBUTTAL" }}
+      ],
+      "verdict": {{
+          "winner": "Name of Agent or 'Tie'",
+          "synthesis": "A profound synthesis of the opposing views."
+      }}
   }},
+
   "triangulation": {{
-      "synthesis": "Synthesize the topic with Theory, Precedents, and Current Affairs.",
-      "way_forward": {{ "immediate": "...", "long_term": "..." }}
+      // Source Triangulation 4.0 Analysis.
+      "synthesis": "Synthesize the topic connecting Theory (Static), Precedents (History/Law), and Current Affairs (Dynamic).",
+      "way_forward": {{
+          "immediate": "Administrative/Executive action...",
+          "long_term": "Structural/Legislative reform..."
+      }}
   }},
+
   "neural_hash": {{
+      // Deep Pattern Decoding.
       "core_themes": ["Theme 1", "Theme 2"],
-      "examiner_pattern": "What does the examiner look for?",
-      "cross_linkages": ["Link 1", "Link 2"]
+      "examiner_pattern": "What keywords or perspectives does the examiner favor for this topic?",
+      "cross_linkages": ["Link to {recent_topics[0] if recent_topics else 'Economy'}", "Link to Polity"]
   }},
-  "pitfalls": ["Pitfall 1", "Pitfall 2"], // Common mistakes students make in this topic
-  "podcast_script": "Generate a short 'Coffee Chat' script between a Host and a Guest about this topic.",
-  "essay_prompt": "Create a philosophical Essay Prompt based on this topic.",
-  "visual_prompt": "Create a text-to-image prompt to visualize this concept.",
-  "roleplay_scenario": "Create a roleplay scenario for an IAS officer dealing with this topic.",
-  "map_work": [ // ONLY if Geography/History/IR. Else empty list [].
-      {{ "name": "Location Name", "lat": 0.0, "lon": 0.0, "reason": "Significance", "question": "Locate..." }}
+
+  "pitfalls": ["Common Mistake 1 (Concept confusion)", "Common Mistake 2 (Fact error)"],
+
+  "podcast_script": "A 'Coffee Chat' style script. Host: Quick/Funny. Guest: Skeptical/Curious. Start in Media Res. Short sentences. Use analogies (Pizza, Traffic).",
+
+  "essay_prompt": "A philosophical/analytical Mains Essay Prompt. Provide the prompt and a 1-line Thesis hint.",
+
+  "visual_prompt": "A detailed text-to-image prompt (Stable Diffusion) to visually represent this concept symbolically.",
+
+  "roleplay_scenario": "A District Collector (IAS) scenario. Structure: 1. Situation 2. Dilemma 3. Decision Points.",
+
+  "map_work": [
+      // ONLY if Geography/History/IR. Else empty list [].
+      {{ "name": "Location Name", "lat": 0.0, "lon": 0.0, "reason": "Why is this significant?", "question": "Locate..." }}
   ],
-  "linkages": ["Link 1", "Link 2"], // Conceptual linkages to: {', '.join(recent_topics)}
+
+  "linkages": ["Linkage 1 (Explain connection)", "Linkage 2"],
+
   "cheat_sheet": {{
       "title": "{topic}",
       "tabs": [
           {{ "id": "facts", "label": "⚡ Quick Facts", "content": "Markdown list..." }},
-          {{ "id": "mnemonics", "label": "🧠 Mnemonics", "content": "..." }}
+          {{ "id": "mnemonics", "label": "🧠 Mnemonics", "content": "Creative mnemonic..." }},
+          {{ "id": "judgments", "label": "⚖️ Case Laws", "content": "Key Judgments/Committees..." }},
+          {{ "id": "timeline", "label": "📅 Timeline", "content": "Chronological events..." }}
       ]
   }},
-  "quote_bank": {{ "quotes": "Two impactful quotes...", "data": "Two key data points..." }},
-  "timeline": "Year - Event (Chronological list)", // ONLY if History. Else empty string.
-  "ethics_dilemma": "An ethical case study...", // ONLY if Ethics/Polity. Else empty string.
+
+  "quote_bank": {{
+      "quotes": "Two impactful quotes by scholars/leaders relevant to '{topic}'.",
+      "data": "Two key statistics/data points from official reports (World Bank, NITI Aayog, etc.)."
+  }},
+
+  "timeline": "Year - Event (Chronological list). ONLY if History/IR. Else empty string.",
+
+  "ethics_dilemma": "A realistic ethical case study ending with 'What would you do?'. ONLY if Ethics/Polity/Governance. Else empty string.",
+
   "eli5": {{
-      "eli5": "Simple explanation",
-      "eli15": "High school explanation",
-      "analogy": "Creative analogy",
-      "quiz": [ {{ "question": "...", "options": [...], "answer": "..." }} ]
+      "eli5": "Explain for a 5-year-old (Simple analogies).",
+      "eli15": "Explain for a teenager (High School level).",
+      "analogy": "A creative, distinct analogy (e.g., 'Like a traffic jam').",
+      "quiz": [ {{ "question": "Simple check question...", "options": ["A", "B"], "answer": "A" }} ]
   }}
 }}
         """
