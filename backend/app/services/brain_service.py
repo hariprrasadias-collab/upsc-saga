@@ -292,13 +292,13 @@ class BrainService:
 
     def generate_manual_completion_prompt(self, task_data: dict):
         """
-        Generates a 'GOD LEVEL' MEGA PROMPT for manual execution in Gemini.
+        Generates a 'TITAN LEVEL' MEGA PROMPT for manual execution in Gemini.
         Saves context to pending_manual_task.json.
         """
         topic = task_data.get('topic')
         subject = task_data.get('subject')
 
-        print(f"Brain: Generating 'God Level' Manual Prompt for {subject} - {topic}")
+        print(f"Brain: Generating 'Titan Level' Manual Prompt for {subject} - {topic}")
 
         # 1. Gather Context
         pyq_context = ""
@@ -333,13 +333,13 @@ class BrainService:
         # 2. Construct Prompt - Section by Section
 
         prompt = f"""
-# SYSTEM ROLE: THE OMNISCIENT UPSC ARCHITECT (GOD MODE)
+# SYSTEM ROLE: THE OMNISCIENT UPSC ARCHITECT (TITAN MODE)
 You are the "Brain" — the apex intelligence for Civil Services preparation. You combine the depth of an Oxford academic, the cynicism of a veteran UPSC examiner, and the pedagogical skill of Feynman.
 Your output must be structurally perfect, intellectually dense, and strictly compliant with the JSON schema.
 
 # MISSION PROFILE
 - **Task:** Generate the ULTIMATE Study Artifact Bundle for the topic: "{topic}" ({subject}).
-- **Standard:** "God Level" quality. Surpass standard AI. BE EXHAUSTIVE AND DETAILED.
+- **Standard:** "TITAN Level" quality. Surpass standard AI. BE EXHAUSTIVE AND DETAILED.
 - **Tone:** Authoritative, Insightful, Nuanced, and Exam-Relevant. DO NOT SUMMARIZE. EXPAND.
 
 # CRITICAL CONTEXT
@@ -365,19 +365,23 @@ Your output must be structurally perfect, intellectually dense, and strictly com
 
 # INSTRUCTION PROTOCOLS (STRICT COMPLIANCE)
 
-## A. FLASHCARDS (Active Recall - SCENARIO BASED)
+## A. META-COGNITION (Chain of Thought)
+- **Strategy:** Before generating content, explain your pedagogical strategy for this specific topic in the `_meta` field. Why did you choose these specific flashcards? What is the core difficulty here?
+
+## B. FLASHCARDS (Active Recall - SCENARIO BASED)
 - **Rule:** No simple definitions. Use "Scenario-Based" questions.
 - **Example:** Instead of "What is Article 21?", ask "If a citizen is denied travel abroad, which Case Law and Article protects them?"
 - **Examiner's Lens:** Focus on confusing pairs and subtle exceptions.
 
-## B. TRIANGULATION 4.0 (The Ultimate Synthesis)
+## C. TRIANGULATION 4.0 (The Ultimate Synthesis)
 - **Synthesis:** Write a COMPREHENSIVE and ANALYTICAL body of text (approx 250-300 words). Do not scrimp on details. Synthesize static theory with dynamic current events.
 - **Critical Axis:** Provide strong, detailed Arguments FOR and AGAINST. Use a table format if possible (Markdown).
 - **PESTLE:** Deep dive into Political, Economic, Sociological, Technological, Legal, Environmental angles.
-- **GS Linkages:** Explicitly link to GS1, GS2, GS3, and GS4 papers with specific examples.
+- **GS Linkages:** Explicitly link to GS1, GS2, GS3, and GS4 papers with specific examples. Include Optional Subject linkages (e.g., PSIR, Sociology) if relevant.
 
-## C. SOCRATIC DIALOGUE (The Arena - DRAMATIC SCRIPT)
+## D. SOCRATIC DIALOGUE (The Arena - DRAMATIC STEEL-MANNING)
 - **Simulation:** Simulate a high-stakes, multi-turn debate with **Dramatic Cues**.
+- **Technique:** Use **Steel-Manning** (attacking the strongest version of the opponent's argument).
 - **Scripting:** Use stage directions like `(slams table)`, `(whispering conspiratorially)`, `(interrupting)`.
 - **Verbosity:** Each turn must be SUBSTANTIAL (50-100 words).
 - **Personas:**
@@ -387,28 +391,19 @@ Your output must be structurally perfect, intellectually dense, and strictly com
   - **Machiavelli (The Strategist):** Focuses on power dynamics and outcome.
 - **Goal:** Reach a profound synthesis or expose a deep dilemma.
 
-## D. PODCAST SCRIPT (Coffee Chat)
-- **Style:** "In Media Res" start. No intros.
-- **Format:** Host (Cynical/Funny) vs Guest (Expert/Serious).
-- **Tone:** High energy, natural flowing conversation.
-- **Analogy:** Explain the core concept using a vivid, detailed analogy.
+## E. MOCK TEST (Trap Analysis)
+- **Requirement:** For every question, explain not just why the correct answer is right, but specifically analyze the **TRAP** in the wrong options. Why would a student choose 'B' instead of 'A'? What cognitive bias is being exploited?
 
-## E. CHEAT SHEET (The Last Minute Resort)
-- **Facts:** Detailed, high-yield definitions and explanations.
-- **Mnemonics:** Clever memory aids with context.
-- **Judgments:** Key Supreme Court cases with rulings and relevance.
-- **Examiner's View:** Detailed analysis of what keywords trigger marks.
-
-## F. ELI5 (Complexity Layering)
-- **Level 1 (5yo):** Simple analogy. Include **Sensory Details** (smell, sound, sight).
-- **Level 2 (15yo):** High school civics/science.
-- **Level 3 (Expert):** Academic nuance. DEEP DIVE.
+## F. VISUAL PROMPT (Cinematic)
+- **Style:** Request specific camera angles, lighting, and style (e.g., "Cinematic lighting, 8k, Unreal Engine 5, Macro Shot").
 
 ---
 
 # OUTPUT SCHEMA (JSON ONLY)
 
 {{
+  "_meta": "Pedagogical strategy explanation...",
+
   "flashcards": [
       {{ "front": "Scenario/Question...", "back": "Detailed Answer..." }} // 5 High Quality Cards
   ],
@@ -429,7 +424,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
               "question_text": "...",
               "option_a": "...", "option_b": "...", "option_c": "...", "option_d": "...",
               "correct_answer": "A",
-              "explanation": "Detailed explanation of WHY 'A' is right AND why B,C,D are wrong. Explain the 'Trick' used in the wrong options. Cite a source if possible."
+              "explanation": "Detailed explanation. TRAP ANALYSIS: Option B is a distractor because... Option C is incorrect due to..."
           }}
       ] // 10 Questions. UPSC Prelims 2024 Standard (Statement based, Pairs).
   }},
@@ -455,6 +450,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
       "critical_axis": {{ "arguments_for": ["..."], "arguments_against": ["..."] }},
       "pestle": {{ "political": "...", "economic": "...", "sociological": "...", "technological": "...", "legal": "...", "environmental": "..." }},
       "gs_linkages": {{ "gs1": "...", "gs2": "...", "gs3": "...", "gs4": "..." }},
+      "optional_linkages": ["Link to PSIR...", "Link to Sociology..."],
       "way_forward": {{ "immediate": "...", "long_term": "..." }}
   }},
 
@@ -470,7 +466,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
 
   "essay_prompt": "A prompt connecting {topic} to a broad philosophical theme. Include a Thesis Hint.",
 
-  "visual_prompt": "Midjourney/Stable Diffusion Prompt. Symbolic, high-contrast, detailed.",
+  "visual_prompt": "Cinematic lighting, 8k, Unreal Engine 5, Macro Shot of...",
 
   "roleplay_scenario": "You are a District Magistrate. Crisis involving {topic}. 1. Incident 2. Stakeholders 3. The Dilemma 4. Options.",
 
@@ -537,7 +533,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
             with open(json_path, 'w', encoding='utf-8') as f:
                 json.dump(pending_data, f, indent=2)
 
-            print(f"Brain: 'God Level' Manual Prompt saved to {prompt_path}")
+            print(f"Brain: 'Titan Level' Manual Prompt saved to {prompt_path}")
             print(f"Brain: Pending Task Context saved to {json_path}")
 
         except Exception as e:
