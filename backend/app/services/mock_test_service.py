@@ -62,8 +62,10 @@ class MockTestService:
             print("❌ GEMINI_API_KEY missing")
             return {"success": False, "error": "API Key missing"}
             
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-2.0-flash-001')
+        from app.services.model_manager import model_manager
+        
+        # model = genai.GenerativeModel('gemini-2.0-flash-001') # REMOVED HARDCODED
+        model = model_manager.get_model(model_type='fast') # Use centralized manager
         
         # Handle "Weak Areas" special case
         if topic.lower() == "weak areas":
