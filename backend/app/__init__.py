@@ -1,11 +1,32 @@
 from app import cgi_fix
 from flask import Flask
 from flask_cors import CORS
+from flask_compress import Compress
+from flask_caching import Cache
+
+cache = Cache()
 
 def create_app():
     app = Flask(__name__)
     app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
     CORS(app, resources={r"/*": {"origins": "*"}})
+    Compress(app) # Enable Gzip compression
+
+    # Configure Caching (Simple Local Memory Cache for speed)
+    app.config['CACHE_TYPE'] = 'SimpleCache'
+    app.config['CACHE_DEFAULT_TIMEOUT'] = 300 # 5 minutes default
+    cache.init_app(app)
+
+    # Static Asset Caching (Cache-Control Headers)
+    @app.after_request
+    def add_header(response):
+        if 'Cache-Control' not in response.headers:
+            # Cache static assets for 1 year (31536000 seconds)
+            if response.mimetype.startswith('image/') or \
+               response.mimetype.startswith('text/css') or \
+               response.mimetype.startswith('application/javascript'):
+                response.headers['Cache-Control'] = 'public, max-age=31536000'
+        return response
 
     from . import db
     db.init_app(app)
@@ -16,6 +37,7 @@ def create_app():
     from app.db_models.autonomous_brain import init_autonomous_brain_tables
     from app.db_models.gamification import init_gamification_tables
     from app.db_models.core import init_core_tables
+    from app.db_models.tasks import init_tasks_table
     from app.db_models.indexes import init_indexes
     
     # Extra modules
@@ -26,6 +48,7 @@ def create_app():
 
     with app.app_context():
         init_core_tables() # Core first (users)
+        init_tasks_table() # Ensure tasks table exists
         init_study_plan_tables()
         init_autonomous_brain_tables()
         init_gamification_tables()

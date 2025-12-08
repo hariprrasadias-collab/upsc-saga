@@ -14,7 +14,25 @@ def init_indexes():
         'CREATE INDEX IF NOT EXISTS idx_test_attempts_user_date ON test_attempts (user_id, submitted_at)',
         'CREATE INDEX IF NOT EXISTS idx_user_answers_user_date ON user_answers (user_id, submitted_at)',
         'CREATE INDEX IF NOT EXISTS idx_review_sessions_user_date ON review_sessions (user_id, reviewed_at)',
-        'CREATE INDEX IF NOT EXISTS idx_pomodoro_sessions_user_date ON pomodoro_sessions (user_id, timestamp)'
+        'CREATE INDEX IF NOT EXISTS idx_pomodoro_sessions_user_date ON pomodoro_sessions (user_id, timestamp)',
+
+        # Study Tasks Optimization
+        'CREATE INDEX IF NOT EXISTS idx_study_tasks_plan_date ON study_tasks (plan_id, date, start_time)',
+        'CREATE INDEX IF NOT EXISTS idx_study_tasks_status ON study_tasks (plan_id, status)',
+        'CREATE INDEX IF NOT EXISTS idx_study_tasks_subject ON study_tasks (plan_id, subject)',
+
+        # PYQ Optimization
+        'CREATE INDEX IF NOT EXISTS idx_pyq_subject_year ON pyq_questions (subject, year)',
+        'CREATE INDEX IF NOT EXISTS idx_pyq_topic ON pyq_questions (topic)',
+
+        # Activity Log History
+        'CREATE INDEX IF NOT EXISTS idx_activity_log_user_time ON activity_log (user_id, timestamp)',
+
+        # Study Sessions
+        'CREATE INDEX IF NOT EXISTS idx_study_sessions_user_time ON study_sessions (user_id, start_time)',
+
+        # Brain Action Log
+        'CREATE INDEX IF NOT EXISTS idx_brain_action_log_user_time ON brain_action_log (user_id, executed_at)'
     ]
 
     print("Optimization: Checking indexes...")
@@ -22,6 +40,7 @@ def init_indexes():
         try:
             cursor.execute(idx_sql)
         except Exception as e:
+            # Silent fail for missing tables (e.g. during migration)
             print(f"Warning creating index: {e}")
 
     conn.commit()

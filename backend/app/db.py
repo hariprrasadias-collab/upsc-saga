@@ -10,7 +10,11 @@ def get_db():
     db = getattr(g, '_database', None)
     if db is None:
         db = g._database = sqlite3.connect(DATABASE, timeout=30.0)
-        db.execute('PRAGMA journal_mode=WAL')
+        # Performance Optimizations
+        db.execute('PRAGMA journal_mode=WAL')   # Write-Ahead Logging for concurrency
+        db.execute('PRAGMA synchronous=NORMAL') # Faster writes, safe enough for this app
+        db.execute('PRAGMA cache_size=-64000')  # ~64MB memory cache
+        db.execute('PRAGMA temp_store=MEMORY')  # Store temp tables in RAM
         db.row_factory = sqlite3.Row
     return db
 
