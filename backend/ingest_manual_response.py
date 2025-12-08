@@ -11,18 +11,20 @@ def process_manual_response():
     app = create_app()
     with app.app_context():
         # 1. Check for Pending Task Context
-        pending_path = os.path.join(os.getcwd(), 'backend', 'pending_manual_task.json')
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        pending_path = os.path.join(base_dir, 'pending_manual_task.json')
+        
         if not os.path.exists(pending_path):
-            print("❌ No pending task found. Run a task completion first.")
+            print(f"❌ No pending task found at {pending_path}. Run a task completion first.")
             return
 
         with open(pending_path, 'r', encoding='utf-8') as f:
             task_data = json.load(f)
 
         # 2. Check for Manual Response
-        response_path = os.path.join(os.getcwd(), 'backend', 'paste_response_here.json')
+        response_path = os.path.join(base_dir, 'paste_response_here.json')
         if not os.path.exists(response_path):
-            print("❌ No response file found at backend/paste_response_here.json")
+            print(f"❌ No response file found at {response_path}")
             return
 
         try:

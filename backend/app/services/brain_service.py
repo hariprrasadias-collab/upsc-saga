@@ -486,8 +486,13 @@ You do not just generate content; you synthesize deep insights, detect hidden pa
 
         # 3. Save to Files
         try:
+            # Determine backend root directory (app/services/../..)
+            base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            prompt_path = os.path.join(base_dir, 'manual_prompt.txt')
+            json_path = os.path.join(base_dir, 'pending_manual_task.json')
+
             # Save Prompt
-            with open('backend/manual_prompt.txt', 'w', encoding='utf-8') as f:
+            with open(prompt_path, 'w', encoding='utf-8') as f:
                 f.write(prompt)
 
             # Save Context for Ingestion
@@ -499,11 +504,11 @@ You do not just generate content; you synthesize deep insights, detect hidden pa
                 "task_id": task_data.get('id'),
                 "timestamp": datetime.now().isoformat()
             }
-            with open('backend/pending_manual_task.json', 'w', encoding='utf-8') as f:
+            with open(json_path, 'w', encoding='utf-8') as f:
                 json.dump(pending_data, f, indent=2)
 
-            print(f"Brain: Manual Prompt saved to backend/manual_prompt.txt")
-            print(f"Brain: Pending Task Context saved to backend/pending_manual_task.json")
+            print(f"Brain: Manual Prompt saved to {prompt_path}")
+            print(f"Brain: Pending Task Context saved to {json_path}")
 
         except Exception as e:
             print(f"Brain: Failed to save manual prompt files: {e}")

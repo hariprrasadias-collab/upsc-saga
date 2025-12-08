@@ -19,6 +19,9 @@ def create_tasks_table():
             due_date TEXT NOT NULL,
             isCompleted INTEGER DEFAULT 0,
             is_quest INTEGER DEFAULT 0,
+            start_time TEXT,
+            end_time TEXT,
+            priority TEXT DEFAULT 'medium',
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
     ''')
