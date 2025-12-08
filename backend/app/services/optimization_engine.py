@@ -218,8 +218,8 @@ class OptimizationEngine:
         Checks for burnout risk using real bio-metrics from PanopticonService.
         """
         try:
-            from app.services.panopticon_service import PanopticonService
-            status = PanopticonService.get_current_status()
+            from app.services.panopticon_service import panopticon
+            status = panopticon.get_current_status()
             
             if status['status'] == 'CRITICAL':
                 conn = get_db()

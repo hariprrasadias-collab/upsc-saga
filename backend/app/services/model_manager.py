@@ -24,23 +24,21 @@ class ModelManager:
 
     # High Intelligence Models (Low Rate Limit, High Cost)
     PRO_MODELS = [
-        'gemini-2.5-pro',
         'gemini-2.0-pro-exp-02-05',
+        'gemini-2.5-pro',
         'gemini-2.0-pro-exp',
-        'gemini-1.5-pro',
-        'gemini-1.5-pro-latest',
+        'gemini-pro-latest'
     ]
 
     # High Speed/Volume Models (High Rate Limit, Low Cost)
-    # Expanded list to maximize availability
+    # Using multiple variants to strictly rotate across quotas
     FAST_MODELS = [
-        'gemini-2.5-flash',
-        'gemini-exp-1206', # Often very capable and high limit
-        'gemini-2.0-flash-lite-preview-02-05', # Ultra lightweight
-        'gemini-2.0-flash',
-        'gemini-1.5-flash',
-        'gemini-1.5-flash-8b',
-        'gemini-flash-latest',
+        'gemini-2.0-flash-001',      # Likely most stable
+        'gemini-2.5-flash',          # Bleeding edge
+        'gemini-exp-1206',           # High capability
+        'gemini-2.0-flash',          # Alias
+        'gemini-flash-latest',       # Generic
+        'gemini-2.0-flash-lite-preview-02-05' # Emergency fallback
     ]
 
     def __init__(self):
@@ -266,6 +264,20 @@ class ModelManager:
             return FallbackResponse(
                 "Oracle is silent (High Traffic). Please try again later."
             )
+
+    def generate_large_content(self, prompt, model_type='fast', chunk_size=30000, **kwargs):
+        """
+        Helper for very large prompts: splits input if needed (rudimentary).
+        NOTE: For proper "long context" usage, just use gemini-1.5-pro directly as it supports 2M tokens.
+        This method is mainly for structured/sequential generation if needed.
+        """
+        # For Gemini 1.5, we rely on its massive context window rather than manual chunking.
+        # But if explicit chunking is needed for logic reasons:
+        if len(prompt) > chunk_size * 10: # Rough char count approximation
+            print(f"⚠️ Prompt very large ({len(prompt)} chars). Sending directly to Pro model.")
+            return self.generate_content(prompt, model_type='pro', **kwargs)
+            
+        return self.generate_content(prompt, model_type=model_type, **kwargs)
 
 # Singleton Instance
 model_manager = ModelManager()
