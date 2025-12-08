@@ -5,8 +5,8 @@ Your output must be structurally perfect, intellectually dense, and strictly com
 
 # MISSION PROFILE
 - **Task:** Generate the ULTIMATE Study Artifact Bundle for the topic: "The Revolt of 1857" (Modern History).
-- **Standard:** Surpass all coaching materials. Create "Gold Standard" content.
-- **Tone:** Authoritative, Insightful, Nuanced, and Exam-Relevant.
+- **Standard:** "God Level" quality. Surpass standard AI. BE EXHAUSTIVE AND DETAILED.
+- **Tone:** Authoritative, Insightful, Nuanced, and Exam-Relevant. DO NOT SUMMARIZE. EXPAND.
 
 # CRITICAL CONTEXT
 ## 1. Previous Year Question (PYQ) DNA:
@@ -31,36 +31,37 @@ Your output must be structurally perfect, intellectually dense, and strictly com
 - **Examiner's Lens:** Focus on confusing pairs and subtle exceptions.
 
 ## B. TRIANGULATION 4.0 (The Ultimate Synthesis)
-- **Synthesis:** Write a high-quality 150-word body paragraph suitable for a Mains answer.
-- **Critical Axis:** Provide strong Arguments FOR and AGAINST.
-- **PESTLE:** Analyze Political, Economic, Sociological, Technological, Legal, Environmental angles.
-- **GS Linkages:** Explicitly link to GS1, GS2, GS3, and GS4 papers.
+- **Synthesis:** Write a COMPREHENSIVE and ANALYTICAL body of text (approx 250-300 words). Do not scrimp on details. Synthesize static theory with dynamic current events.
+- **Critical Axis:** Provide strong, detailed Arguments FOR and AGAINST.
+- **PESTLE:** Deep dive into Political, Economic, Sociological, Technological, Legal, Environmental angles.
+- **GS Linkages:** Explicitly link to GS1, GS2, GS3, and GS4 papers with examples.
 
 ## C. SOCRATIC DIALOGUE (The Arena)
-- **Simulation:** Simulate a 6-turn debate between specific personas.
+- **Simulation:** Simulate a high-stakes, multi-turn debate.
+- **Verbosity:** Each turn must be SUBSTANTIAL (50-100 words). Include narrative elements, internal monologues, and dramatic tension. NO ONE-LINERS.
 - **Personas:**
   - **Socrates (The Skeptic):** Questions definitions, exposes contradictions.
   - **Plato (The Idealist):** Focuses on moral 'oughts' and vision.
   - **Aristotle (The Realist):** Focuses on evidence, pragmatism, and feasibility.
   - **Machiavelli (The Strategist):** Focuses on power dynamics and outcome.
-- **Goal:** Reach a profound synthesis or expose a deep dilemma. No pleasantries.
+- **Goal:** Reach a profound synthesis or expose a deep dilemma.
 
 ## D. PODCAST SCRIPT (Coffee Chat)
 - **Style:** "In Media Res" start. No intros.
 - **Format:** Host (Cynical/Funny) vs Guest (Expert/Serious).
-- **Tone:** High energy, short sentences (max 12 words), constant reactions ("Whoa", "No way").
-- **Analogy:** Explain the core concept using a vivid analogy (Pizza, Traffic, Dating, etc.).
+- **Tone:** High energy, natural flowing conversation.
+- **Analogy:** Explain the core concept using a vivid, detailed analogy.
 
 ## E. CHEAT SHEET (The Last Minute Resort)
-- **Facts:** High-yield definitions.
-- **Mnemonics:** Clever memory aids.
-- **Judgments:** Key Supreme Court cases (if applicable).
-- **Examiner's View:** What specific keywords trigger marks?
+- **Facts:** Detailed, high-yield definitions and explanations.
+- **Mnemonics:** Clever memory aids with context.
+- **Judgments:** Key Supreme Court cases with rulings and relevance.
+- **Examiner's View:** Detailed analysis of what keywords trigger marks.
 
 ## F. ELI5 (Complexity Layering)
 - **Level 1 (5yo):** Simple analogy.
 - **Level 2 (15yo):** High school civics/science.
-- **Level 3 (Expert):** Academic nuance.
+- **Level 3 (Expert):** Academic nuance. DEEP DIVE.
 
 ---
 
@@ -68,10 +69,10 @@ Your output must be structurally perfect, intellectually dense, and strictly com
 
 {
   "flashcards": [
-      { "front": "Question...", "back": "Answer..." } // 5 High Quality Cards
+      { "front": "Question...", "back": "Detailed Answer..." } // 5 High Quality Cards
   ],
 
-  "revision_note": "A 'Micro-Note'. Max 200 words. Dense. Bullet points. Use -> arrows for logic flow. Include 1 text-based diagram description.",
+  "revision_note": "A Detailed Revision Module. Comprehensive coverage of the topic. Use bullet points, bold keywords, and explanatory text. Do not limit word count. Ensure full conceptual clarity.",
 
   "mind_map": {
       "name": "The Revolt of 1857",
@@ -87,7 +88,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
               "question_text": "...",
               "option_a": "...", "option_b": "...", "option_c": "...", "option_d": "...",
               "correct_answer": "A",
-              "explanation": "Explain WHY 'A' is right AND why B,C,D are wrong. Cite a source if possible."
+              "explanation": "Detailed explanation of WHY 'A' is right AND why B,C,D are wrong. Cite a source if possible."
           }
       ] // 10 Questions. UPSC Prelims 2024 Standard (Statement based, Pairs).
   },
@@ -102,12 +103,12 @@ Your output must be structurally perfect, intellectually dense, and strictly com
       "dialogue": [
           { "speakerId": "skeptic", "text": "...", "type": "ARGUMENT" },
           { "speakerId": "idealist", "text": "...", "type": "REBUTTAL" }
-      ], // 6 turns total. Use speakerId: skeptic, idealist, realist, strategist.
+      ], // 6 turns total. Use speakerId: skeptic, idealist, realist, strategist. ENSURE LONG, DETAILED RESPONSES.
       "verdict": { "winner": "...", "synthesis": "Hegelian Synthesis of the debate." }
   },
 
   "triangulation": {
-      "synthesis": "Mains Answer Body Paragraph...",
+      "synthesis": "Comprehensive Mains Answer Body...",
       "scholars": [ { "name": "...", "quote": "...", "context": "..." } ],
       "data_bank": [ { "statistic": "...", "source": "...", "relevance": "..." } ],
       "critical_axis": { "arguments_for": ["..."], "arguments_against": ["..."] },
@@ -141,7 +142,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
   "cheat_sheet": {
       "title": "The Revolt of 1857",
       "tabs": [
-          { "id": "facts", "label": "⚡ Facts", "content": "Markdown list" },
+          { "id": "facts", "label": "⚡ Facts", "content": "Detailed Markdown list" },
           { "id": "mnemonics", "label": "🧠 Mnemonic", "content": "..." },
           { "id": "judgments", "label": "⚖️ Law", "content": "..." },
           { "id": "timeline", "label": "📅 Time", "content": "..." },
