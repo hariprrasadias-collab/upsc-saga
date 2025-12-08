@@ -357,22 +357,29 @@ Your output must be structurally perfect, intellectually dense, and strictly com
 
 ---
 
+# GENERATION GUIDELINES & ANTI-PATTERNS (CRITICAL)
+- **NO FLUFF:** Ban words like "crucial", "pivotal", "significant role", "various". If it doesn't add marks, delete it.
+- **NO GENERIC ADVICE:** Do not say "It is important to study this...". Instead, say "Examiners target this nuance in 2019/2021...".
+- **FORMATTING:** Use Markdown bolding (**text**) for all keywords that would be underlined in an exam.
+- **DEPTH OVER BREADTH:** Do not give 10 shallow points. Give 3 points with Case Laws, Articles, and Examples.
+
 # INSTRUCTION PROTOCOLS (STRICT COMPLIANCE)
 
-## A. FLASHCARDS (Active Recall)
-- **Rule:** No "What is X?" questions. Use "Why", "How", "Compare", "Link".
-- **Rule:** Use Cloze Deletion for key facts.
+## A. FLASHCARDS (Active Recall - SCENARIO BASED)
+- **Rule:** No simple definitions. Use "Scenario-Based" questions.
+- **Example:** Instead of "What is Article 21?", ask "If a citizen is denied travel abroad, which Case Law and Article protects them?"
 - **Examiner's Lens:** Focus on confusing pairs and subtle exceptions.
 
 ## B. TRIANGULATION 4.0 (The Ultimate Synthesis)
 - **Synthesis:** Write a COMPREHENSIVE and ANALYTICAL body of text (approx 250-300 words). Do not scrimp on details. Synthesize static theory with dynamic current events.
-- **Critical Axis:** Provide strong, detailed Arguments FOR and AGAINST.
+- **Critical Axis:** Provide strong, detailed Arguments FOR and AGAINST. Use a table format if possible (Markdown).
 - **PESTLE:** Deep dive into Political, Economic, Sociological, Technological, Legal, Environmental angles.
-- **GS Linkages:** Explicitly link to GS1, GS2, GS3, and GS4 papers with examples.
+- **GS Linkages:** Explicitly link to GS1, GS2, GS3, and GS4 papers with specific examples.
 
-## C. SOCRATIC DIALOGUE (The Arena)
-- **Simulation:** Simulate a high-stakes, multi-turn debate.
-- **Verbosity:** Each turn must be SUBSTANTIAL (50-100 words). Include narrative elements, internal monologues, and dramatic tension. NO ONE-LINERS.
+## C. SOCRATIC DIALOGUE (The Arena - DRAMATIC SCRIPT)
+- **Simulation:** Simulate a high-stakes, multi-turn debate with **Dramatic Cues**.
+- **Scripting:** Use stage directions like `(slams table)`, `(whispering conspiratorially)`, `(interrupting)`.
+- **Verbosity:** Each turn must be SUBSTANTIAL (50-100 words).
 - **Personas:**
   - **Socrates (The Skeptic):** Questions definitions, exposes contradictions.
   - **Plato (The Idealist):** Focuses on moral 'oughts' and vision.
@@ -393,7 +400,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
 - **Examiner's View:** Detailed analysis of what keywords trigger marks.
 
 ## F. ELI5 (Complexity Layering)
-- **Level 1 (5yo):** Simple analogy.
+- **Level 1 (5yo):** Simple analogy. Include **Sensory Details** (smell, sound, sight).
 - **Level 2 (15yo):** High school civics/science.
 - **Level 3 (Expert):** Academic nuance. DEEP DIVE.
 
@@ -403,7 +410,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
 
 {{
   "flashcards": [
-      {{ "front": "Question...", "back": "Detailed Answer..." }} // 5 High Quality Cards
+      {{ "front": "Scenario/Question...", "back": "Detailed Answer..." }} // 5 High Quality Cards
   ],
 
   "revision_note": "A Detailed Revision Module. Comprehensive coverage of the topic. Use bullet points, bold keywords, and explanatory text. Do not limit word count. Ensure full conceptual clarity.",
@@ -422,7 +429,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
               "question_text": "...",
               "option_a": "...", "option_b": "...", "option_c": "...", "option_d": "...",
               "correct_answer": "A",
-              "explanation": "Detailed explanation of WHY 'A' is right AND why B,C,D are wrong. Cite a source if possible."
+              "explanation": "Detailed explanation of WHY 'A' is right AND why B,C,D are wrong. Explain the 'Trick' used in the wrong options. Cite a source if possible."
           }}
       ] // 10 Questions. UPSC Prelims 2024 Standard (Statement based, Pairs).
   }},
@@ -435,8 +442,8 @@ Your output must be structurally perfect, intellectually dense, and strictly com
 
   "socratic_dialogue": {{
       "dialogue": [
-          {{ "speakerId": "skeptic", "text": "...", "type": "ARGUMENT" }},
-          {{ "speakerId": "idealist", "text": "...", "type": "REBUTTAL" }}
+          {{ "speakerId": "skeptic", "text": "(Raises an eyebrow) But surely...", "type": "ARGUMENT" }},
+          {{ "speakerId": "idealist", "text": "(Passionately) You miss the point entirely!...", "type": "REBUTTAL" }}
       ], // 6 turns total. Use speakerId: skeptic, idealist, realist, strategist. ENSURE LONG, DETAILED RESPONSES.
       "verdict": {{ "winner": "...", "synthesis": "Hegelian Synthesis of the debate." }}
   }},
