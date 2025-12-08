@@ -292,13 +292,13 @@ class BrainService:
 
     def generate_manual_completion_prompt(self, task_data: dict):
         """
-        Generates a MEGA PROMPT for manual execution in Gemini.
+        Generates a 'GOD LEVEL' MEGA PROMPT for manual execution in Gemini.
         Saves context to pending_manual_task.json.
         """
         topic = task_data.get('topic')
         subject = task_data.get('subject')
 
-        print(f"Brain: Generating Manual Prompt for {subject} - {topic}")
+        print(f"Brain: Generating 'God Level' Manual Prompt for {subject} - {topic}")
 
         # 1. Gather Context
         pyq_context = ""
@@ -333,54 +333,81 @@ class BrainService:
         # 2. Construct Prompt - Section by Section
 
         prompt = f"""
-# SYSTEM ROLE: THE OMNISCIENT UPSC MENTOR
-You are the "Brain" — a hyper-intelligent, interdisciplinary UPSC Civil Services Engine.
-You do not just generate content; you synthesize deep insights, detect hidden patterns, and force the user to think like an examiner.
+# SYSTEM ROLE: THE OMNISCIENT UPSC ARCHITECT (GOD MODE)
+You are the "Brain" — the apex intelligence for Civil Services preparation. You combine the depth of an Oxford academic, the cynicism of a veteran UPSC examiner, and the pedagogical skill of Feynman.
+Your output must be structurally perfect, intellectually dense, and strictly compliant with the JSON schema.
 
 # MISSION PROFILE
-- **Task:** Generate a comprehensive Study Artifact Bundle for the topic: "{topic}" ({subject}).
-- **Standard:** "God Level" quality. Better than standard AI. Better than coaching institutes.
-- **Tone:** Authoritative, Insightful, Dense, and Exam-Oriented.
+- **Task:** Generate the ULTIMATE Study Artifact Bundle for the topic: "{topic}" ({subject}).
+- **Standard:** Surpass all coaching materials. Create "Gold Standard" content.
+- **Tone:** Authoritative, Insightful, Nuanced, and Exam-Relevant.
 
 # CRITICAL CONTEXT
 ## 1. Previous Year Question (PYQ) DNA:
-(Use this to calibrate difficulty and focus)
+(Use this to calibrate difficulty and identify recurring themes)
 {pyq_context}
 
 ## 2. Neural Linkages (Recent History):
-(Connect current topic to these)
+(Connect current topic to these concepts)
 {', '.join(recent_topics)}
 
 ## 3. Targeted Weaknesses:
-(Fortify these specific areas)
+(Fortify these specific areas for the user)
 {weak_areas_text}
 
 ---
 
-# GENERATION PROTOCOLS (STRICT)
-1. **NO FLUFF:** Ban words like "crucial", "important", "various", "key role". Show, don't tell.
-2. **INTERDISCIPLINARY:** Every concept must be linked to at least one other GS Paper (e.g., History -> Economy).
-3. **EXAMINER'S LENS:** Reveal the "trap" or "nuance" an examiner would use to trick a student.
-4. **FORMAT:** Return ONLY a valid JSON object. No markdown fences. No preamble.
+# INSTRUCTION PROTOCOLS (STRICT COMPLIANCE)
+
+## A. FLASHCARDS (Active Recall)
+- **Rule:** No "What is X?" questions. Use "Why", "How", "Compare", "Link".
+- **Rule:** Use Cloze Deletion for key facts.
+- **Examiner's Lens:** Focus on confusing pairs and subtle exceptions.
+
+## B. TRIANGULATION 4.0 (The Ultimate Synthesis)
+- **Synthesis:** Write a high-quality 150-word body paragraph suitable for a Mains answer.
+- **Critical Axis:** Provide strong Arguments FOR and AGAINST.
+- **PESTLE:** Analyze Political, Economic, Sociological, Technological, Legal, Environmental angles.
+- **GS Linkages:** Explicitly link to GS1, GS2, GS3, and GS4 papers.
+
+## C. SOCRATIC DIALOGUE (The Arena)
+- **Simulation:** Simulate a 6-turn debate between specific personas.
+- **Personas:**
+  - **Socrates (The Skeptic):** Questions definitions, exposes contradictions.
+  - **Plato (The Idealist):** Focuses on moral 'oughts' and vision.
+  - **Aristotle (The Realist):** Focuses on evidence, pragmatism, and feasibility.
+  - **Machiavelli (The Strategist):** Focuses on power dynamics and outcome.
+- **Goal:** Reach a profound synthesis or expose a deep dilemma. No pleasantries.
+
+## D. PODCAST SCRIPT (Coffee Chat)
+- **Style:** "In Media Res" start. No intros.
+- **Format:** Host (Cynical/Funny) vs Guest (Expert/Serious).
+- **Tone:** High energy, short sentences (max 12 words), constant reactions ("Whoa", "No way").
+- **Analogy:** Explain the core concept using a vivid analogy (Pizza, Traffic, Dating, etc.).
+
+## E. CHEAT SHEET (The Last Minute Resort)
+- **Facts:** High-yield definitions.
+- **Mnemonics:** Clever memory aids.
+- **Judgments:** Key Supreme Court cases (if applicable).
+- **Examiner's View:** What specific keywords trigger marks?
+
+## F. ELI5 (Complexity Layering)
+- **Level 1 (5yo):** Simple analogy.
+- **Level 2 (15yo):** High school civics/science.
+- **Level 3 (Expert):** Academic nuance.
 
 ---
 
-# OUTPUT SCHEMA (JSON)
+# OUTPUT SCHEMA (JSON ONLY)
 
 {{
   "flashcards": [
-      // 5 "Active Recall" Cards.
-      // STYLE: Cloze Deletion or Direct Interrogation.
-      // BAD: "What is X?" -> "X is Y."
-      // GOOD: "In the context of {topic}, X impacts Y primarily through [MECHANISM]..."
-      {{ "front": "...", "back": "..." }}
+      {{ "front": "Question...", "back": "Answer..." }} // 5 High Quality Cards
   ],
 
-  "revision_note": "A 'Micro-Note'. Max 200 words. Dense. Bullet points. Use -> arrows for logic flow. Include 1 diagram description (text-based).",
+  "revision_note": "A 'Micro-Note'. Max 200 words. Dense. Bullet points. Use -> arrows for logic flow. Include 1 text-based diagram description.",
 
   "mind_map": {{
-      // Deep Hierarchy (4 Levels).
-      // Root -> Core Themes -> Sub-themes -> Specific Examples/Articles/Cases.
       "name": "{topic}",
       "children": [
           {{ "name": "Theme A", "children": [ {{ "name": "Detail A1" }} ] }}
@@ -388,12 +415,6 @@ You do not just generate content; you synthesize deep insights, detect hidden pa
   }},
 
   "mock_test": {{
-      // 10 Questions. UPSC Prelims Standard (2024 Pattern).
-      // TYPES:
-      // - Statement Based (I, II, III)
-      // - Assertion/Reason
-      // - Match the Columns (Pairs)
-      // TRAPS: plausible distractors, subtle wording changes (may/shall).
       "title": "Test: {topic}",
       "questions": [
           {{
@@ -402,38 +423,34 @@ You do not just generate content; you synthesize deep insights, detect hidden pa
               "correct_answer": "A",
               "explanation": "Explain WHY 'A' is right AND why B,C,D are wrong. Cite a source if possible."
           }}
-      ]
+      ] // 10 Questions. UPSC Prelims 2024 Standard (Statement based, Pairs).
   }},
 
   "pyq_trends": "Strategic Intelligence Report. 1. Frequency Analysis 2. Thematic Evolution 3. Prediction for Next Year.",
 
   "predictions": [
-      // 3 'Black Swan' Questions. High probability, high difficulty.
-      {{ "question": "...", "type": "MCQ", "probability": 0.85, "reasoning": "Based on recent trend X..." }}
+      {{ "question": "...", "type": "MCQ", "probability": 0.85, "reasoning": "Based on recent trend X..." }} // 3 'Black Swan' Questions.
   ],
 
   "socratic_dialogue": {{
-      // A Dialectic Battle. 6 Turns.
-      // Socrates (Skeptic) vs Plato (Idealist) vs Aristotle (Realist).
-      // They must debate a controversial/complex facet of {topic}.
-      // NO pleasantries. Pure argumentation.
       "dialogue": [
-          {{ "speakerId": "skeptic", "text": "...", "type": "ARGUMENT" }}
-      ],
+          {{ "speakerId": "skeptic", "text": "...", "type": "ARGUMENT" }},
+          {{ "speakerId": "idealist", "text": "...", "type": "REBUTTAL" }}
+      ], // 6 turns total. Use speakerId: skeptic, idealist, realist, strategist.
       "verdict": {{ "winner": "...", "synthesis": "Hegelian Synthesis of the debate." }}
   }},
 
   "triangulation": {{
-      // The Ultimate Synthesis.
-      // STATIC: Core Theory/Book.
-      // DYNAMIC: Current Affairs/News.
-      // PRECEDENT: Historical/Legal backing.
-      "synthesis": "...",
+      "synthesis": "Mains Answer Body Paragraph...",
+      "scholars": [ {{ "name": "...", "quote": "...", "context": "..." }} ],
+      "data_bank": [ {{ "statistic": "...", "source": "...", "relevance": "..." }} ],
+      "critical_axis": {{ "arguments_for": ["..."], "arguments_against": ["..."] }},
+      "pestle": {{ "political": "...", "economic": "...", "sociological": "...", "technological": "...", "legal": "...", "environmental": "..." }},
+      "gs_linkages": {{ "gs1": "...", "gs2": "...", "gs3": "...", "gs4": "..." }},
       "way_forward": {{ "immediate": "...", "long_term": "..." }}
   }},
 
   "neural_hash": {{
-      // The Hidden Pattern.
       "core_themes": ["Theme 1", "Theme 2"],
       "examiner_pattern": "The specific mental model examiners use for this topic.",
       "cross_linkages": ["Link to Economy", "Link to Ethics"]
@@ -441,16 +458,15 @@ You do not just generate content; you synthesize deep insights, detect hidden pa
 
   "pitfalls": ["Trap 1 (Nuance often missed)", "Trap 2 (Common confusion)"],
 
-  "podcast_script": "A 'Coffee Chat'. Host (Cynical) & Guest (Expert). Start IN MEDIA RES. High energy. Use pop-culture analogies. Short bursts of text.",
+  "podcast_script": "Host: ... \\n Guest: ... (Follow the 'Coffee Chat' style guide strictly)",
 
-  "essay_prompt": "A prompt that connects {topic} to a broad philosophical theme (Justice, Truth, Power). Thesis Hint included.",
+  "essay_prompt": "A prompt connecting {topic} to a broad philosophical theme. Include a Thesis Hint.",
 
   "visual_prompt": "Midjourney/Stable Diffusion Prompt. Symbolic, high-contrast, detailed.",
 
   "roleplay_scenario": "You are a District Magistrate. Crisis involving {topic}. 1. Incident 2. Stakeholders 3. The Dilemma 4. Options.",
 
   "map_work": [
-      // ONLY if spatial. Strict Lat/Lon.
       {{ "name": "Place", "lat": 0.0, "lon": 0.0, "reason": "Significance...", "question": "..." }}
   ],
 
@@ -461,8 +477,11 @@ You do not just generate content; you synthesize deep insights, detect hidden pa
       "tabs": [
           {{ "id": "facts", "label": "⚡ Facts", "content": "Markdown list" }},
           {{ "id": "mnemonics", "label": "🧠 Mnemonic", "content": "..." }},
-          {{ "id": "judgments", "label": "⚖️ Law", "content": "..." }}, // If applicable
-          {{ "id": "timeline", "label": "📅 Time", "content": "..." }} // If applicable
+          {{ "id": "judgments", "label": "⚖️ Law", "content": "..." }},
+          {{ "id": "timeline", "label": "📅 Time", "content": "..." }},
+          {{ "id": "examiner", "label": "🧐 Examiner's View", "content": "..." }},
+          {{ "id": "concept_map", "label": "🗺️ Concept Map", "content": "Mermaid JS code", "type": "mermaid" }},
+          {{ "id": "quiz", "label": "❓ Active Recall", "content": "JSON Array of Quiz Objects", "type": "quiz" }}
       ]
   }},
 
@@ -471,14 +490,17 @@ You do not just generate content; you synthesize deep insights, detect hidden pa
       "data": "2 Data Points (Official Sources)."
   }},
 
-  "timeline": "Chronological list (Year - Event).", // If applicable
+  "timeline": "Chronological list (Year - Event).",
 
   "ethics_dilemma": "Case Study. Conflict of interest/duty. End with 'What is the most ethical course of action?'.",
 
   "eli5": {{
-      "eli5": "Simple analogy (e.g. 'Like a school rule').",
-      "eli15": "High School Civics level.",
-      "analogy": "A concrete metaphor.",
+      "eli5": "Simple analogy...",
+      "eli15": "High School level...",
+      "eli_expert": "Academic definition...",
+      "analogy": "Concrete metaphor...",
+      "visual_analogy_prompt": "Image prompt for the analogy...",
+      "real_world_example": "...",
       "quiz": [ {{ "question": "...", "options": ["..."], "answer": "..." }} ]
   }}
 }}
@@ -507,7 +529,7 @@ You do not just generate content; you synthesize deep insights, detect hidden pa
             with open(json_path, 'w', encoding='utf-8') as f:
                 json.dump(pending_data, f, indent=2)
 
-            print(f"Brain: Manual Prompt saved to {prompt_path}")
+            print(f"Brain: 'God Level' Manual Prompt saved to {prompt_path}")
             print(f"Brain: Pending Task Context saved to {json_path}")
 
         except Exception as e:
