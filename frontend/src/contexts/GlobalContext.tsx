@@ -166,7 +166,7 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
         }
     };
 
-    const value: GlobalContextType = {
+    const value: GlobalContextType = React.useMemo(() => ({
         userStats,
         todayTasks,
         currentTab,
@@ -186,7 +186,19 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
         toggleRituals,
         isMimirOpen,
         toggleMimir
-    };
+    }), [
+        userStats,
+        todayTasks,
+        currentTab,
+        isRageMode,
+        showLevelUp,
+        isLoading,
+        error,
+        refreshDashboard,
+        isSidebarOpen,
+        isRitualsOpen,
+        isMimirOpen
+    ]);
 
     return (
         <GlobalContext.Provider value={value}>

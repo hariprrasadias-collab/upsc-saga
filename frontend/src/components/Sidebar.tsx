@@ -1,10 +1,10 @@
 // Sidebar with Expandable Groups
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Sidebar.css';
 import { useGlobal } from '../contexts/GlobalContext';
 
-const Sidebar: React.FC = () => {
+const Sidebar: React.FC = memo(() => {
   const { currentTab, setCurrentTab, isSidebarOpen, toggleSidebar, toggleMimir } = useGlobal();
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     planning: true,
@@ -167,6 +167,6 @@ const Sidebar: React.FC = () => {
       ))}
     </div>
   );
-};
+});
 
 export default Sidebar;
