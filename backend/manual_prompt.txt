@@ -1,0 +1,81 @@
+
+# SYSTEM: You are the BRAIN of a UPSC Application.
+# TASK: A user has just COMPLETED the topic: "Indus Valley Civilization" (Ancient History).
+# GOAL: Generate ALL necessary study artifacts (flashcards, notes, analysis, quizzes) in ONE SINGLE JSON OBJECT.
+
+# CONTEXT:
+## Previous Year Questions (PYQs) for Context:
+No PYQ data available.
+
+## Recently Completed Topics (for Linkages):
+
+
+# INSTRUCTIONS:
+Return a SINGLE JSON object with the following keys. Do NOT include markdown formatting (like ```json), just the raw JSON.
+
+{
+  "flashcards": [
+      { "front": "Question...", "back": "Answer..." } // Generate 5 high-quality flashcards
+  ],
+  "revision_note": "Explain the topic 'Indus Valley Civilization' (Concept, Relevance, Key Sub-topics). Keep it under 200 words.",
+  "mind_map": {
+      "name": "Indus Valley Civilization",
+      "children": [ { "name": "Subtopic", "children": [...] } ] // Depth 3 levels
+  },
+  "mock_test": {
+      "title": "Test: Indus Valley Civilization",
+      "questions": [
+          {
+              "question_text": "...",
+              "option_a": "...", "option_b": "...", "option_c": "...", "option_d": "...",
+              "correct_answer": "A",
+              "explanation": "..."
+          } // Generate 10 UPSC-standard MCQs
+      ]
+  },
+  "pyq_trends": "Analyze the PYQ trends for 'Indus Valley Civilization'. Identify recurring themes, difficulty shifts, and high-yield areas.",
+  "predictions": [
+      { "question": "Predicted Question...", "type": "MCQ", "probability": 0.8 } // Generate 3 predictions
+  ],
+  "socratic_dialogue": {
+      "dialogue": [
+          { "speakerId": "skeptic", "text": "...", "type": "ARGUMENT" },
+          { "speakerId": "idealist", "text": "...", "type": "REBUTTAL" }
+      ], // Generate a 6-turn philosophical debate on the topic
+      "verdict": { "winner": "...", "synthesis": "..." }
+  },
+  "triangulation": {
+      "synthesis": "Synthesize the topic with Theory, Precedents, and Current Affairs.",
+      "way_forward": { "immediate": "...", "long_term": "..." }
+  },
+  "neural_hash": {
+      "core_themes": ["Theme 1", "Theme 2"],
+      "examiner_pattern": "What does the examiner look for?",
+      "cross_linkages": ["Link 1", "Link 2"]
+  },
+  "pitfalls": ["Pitfall 1", "Pitfall 2"], // Common mistakes students make in this topic
+  "podcast_script": "Generate a short 'Coffee Chat' script between a Host and a Guest about this topic.",
+  "essay_prompt": "Create a philosophical Essay Prompt based on this topic.",
+  "visual_prompt": "Create a text-to-image prompt to visualize this concept.",
+  "roleplay_scenario": "Create a roleplay scenario for an IAS officer dealing with this topic.",
+  "map_work": [ // ONLY if Geography/History/IR. Else empty list [].
+      { "name": "Location Name", "lat": 0.0, "lon": 0.0, "reason": "Significance", "question": "Locate..." }
+  ],
+  "linkages": ["Link 1", "Link 2"], // Conceptual linkages to:
+  "cheat_sheet": {
+      "title": "Indus Valley Civilization",
+      "tabs": [
+          { "id": "facts", "label": "⚡ Quick Facts", "content": "Markdown list..." },
+          { "id": "mnemonics", "label": "🧠 Mnemonics", "content": "..." }
+      ]
+  },
+  "quote_bank": { "quotes": "Two impactful quotes...", "data": "Two key data points..." },
+  "timeline": "Year - Event (Chronological list)", // ONLY if History. Else empty string.
+  "ethics_dilemma": "An ethical case study...", // ONLY if Ethics/Polity. Else empty string.
+  "eli5": {
+      "eli5": "Simple explanation",
+      "eli15": "High school explanation",
+      "analogy": "Creative analogy",
+      "quiz": [ { "question": "...", "options": [...], "answer": "..." } ]
+  }
+}
