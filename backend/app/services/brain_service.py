@@ -176,7 +176,8 @@ class BrainService:
         """
         
         try:
-            response = model_manager.generate_content(prompt)
+            # Complex reasoning requires Pro model
+            response = model_manager.generate_content(prompt, model_type='pro')
             return self._parse_response(response.text)
         except Exception as e:
             print(f"Brain Think Error: {e}")
@@ -247,8 +248,8 @@ class BrainService:
             from app.db import get_db
             conn = get_db()
             conn.execute('''
-                INSERT INTO answer_writing_prompts (question, subject, topic, difficulty, created_at)
-                VALUES (?, ?, ?, 'Hard', datetime('now'))
+                INSERT INTO answer_writing_prompts (question, subject, topic, difficulty, word_limit, created_at)
+                VALUES (?, ?, ?, 'Hard', 250, datetime('now'))
             ''', (prompt, subject, topic))
             conn.commit()
             print(f"Brain: Saved Essay Prompt for {topic}")
@@ -647,9 +648,15 @@ class BrainService:
                 # If we have structured data, use it
                 if eli5_res.get('data'):
                     data = eli5_res.get('data')
-                    content_to_save = json.dumps(data)
-                    # Create a readable flashcard
-                    flashcard_back = f"🧸 ELI5: {data.get('eli5', '')}\n\n💡 Analogy: {data.get('analogy', '')}"
+                    # Check for fallback/empty data to avoid crashing
+                    if data and isinstance(data, dict) and 'eli5' in data:
+                        content_to_save = json.dumps(data)
+                        # Create a readable flashcard
+                        flashcard_back = f"🧸 ELI5: {data.get('eli5', '')}\n\n💡 Analogy: {data.get('analogy', '')}"
+                    else:
+                        # Panic mode safe default
+                        content_to_save = "Content unavailable due to high traffic."
+                        flashcard_back = content_to_save
 
                 self._add_flashcard(
                     user_id, topic, subject,
@@ -969,7 +976,8 @@ class BrainService:
                         transcript += f"{speaker}: {text}\n"
                         
                     analysis_prompt = f"Analyze this Socratic Debate:\n{transcript}\nProvide: 1. Summary 2. Winner 3. Missing points."
-                    response = model_manager.generate_content(analysis_prompt)
+                    # Complex analysis requires Pro
+                    response = model_manager.generate_content(analysis_prompt, model_type='pro')
                     result = {"success": True, "message": "Debate Analysis Complete.", "analysis": response.text}
                 except Exception as e:
                     result = {"success": False, "message": f"Analysis Failed: {str(e)}"}
@@ -1069,7 +1077,8 @@ class BrainService:
                     
                     Format as a concise strategic briefing.
                     """
-                    response = model_manager.generate_content(analysis_prompt)
+                    # Trend analysis benefits from Pro
+                    response = model_manager.generate_content(analysis_prompt, model_type='pro')
                     result = {
                         "success": True, 
                         "message": "Trend Analysis Complete.",
@@ -1138,7 +1147,8 @@ class BrainService:
                     - complexity_score (1-10)
                     - relevance_score (1-10)
                     """
-                    response = model_manager.generate_content(decode_prompt)
+                    # Decoding nuance needs Pro
+                    response = model_manager.generate_content(decode_prompt, model_type='pro')
                     decoded_data = self._parse_response(response.text)
                     
                     result = {
@@ -1227,7 +1237,8 @@ class BrainService:
                     
                     **Goal:** Make it feel like I'm eavesdropping on two smart friends at a cafe.
                     """
-                    response = model_manager.generate_content(prompt)
+                    # Creative writing needs Pro
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     result = {
                         "success": True,
                         "message": "Podcast Script Generated.",
@@ -1263,7 +1274,7 @@ class BrainService:
                     Provide the prompt statement and a 1-line 'Thesis' hint.
                     Return ONLY the prompt and thesis. Do not include "Here is a prompt...".
                     """
-                    response = model_manager.generate_content(prompt)
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     result = {
                         "success": True,
                         "message": "Essay Prompt Generated.",
@@ -1454,7 +1465,7 @@ class BrainService:
                     End with a question: "What would you do?"
                     Start directly with the Case Study. No intro text.
                     """
-                    response = model_manager.generate_content(prompt)
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     result = {
                         "success": True,
                         "message": "Dilemma Generated.",
@@ -1484,6 +1495,20 @@ class BrainService:
                     Do NOT include markdown formatting like ```json ... ```, just the raw JSON.
                     """
                     response = model_manager.generate_content(prompt)
+                    data = self._parse_response(response.text)
+
+                    # Handle panic mode fallback
+                    if data.get('error'):
+                        data = {
+                            "eli5": "The Brain is currently overwhelmed by high traffic (Quota Limit).",
+                            "eli15": "Please review this topic manually or try again later.",
+                            "eli_expert": "Service unavailable.",
+                            "analogy": "Traffic Jam",
+                            "visual_analogy_prompt": "A busy highway",
+                            "real_world_example": "Server Overload",
+                            "quiz": []
+                        }
+
                     result = {
                         "success": True,
                         "message": "ELI5 Generated.",
@@ -1559,6 +1584,10 @@ class BrainService:
         try:
             text = response_text.strip()
             
+            # 0. Check for Oracle Silence (Panic Mode)
+            if "Oracle is silent" in text:
+                return {"error": "Quota Exceeded", "is_fallback": True}
+
             # 1. Try to find JSON code block
             import re
             json_match = re.search(r"```json\s*(.*?)\s*```", text, re.DOTALL)

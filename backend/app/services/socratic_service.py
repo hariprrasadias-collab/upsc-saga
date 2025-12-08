@@ -100,17 +100,22 @@ def generate_debate_turn(topic, history, user_input=None):
     """
     
     try:
-        mod_response = model_manager.generate_content(moderator_prompt)
+        mod_response = model_manager.generate_content(moderator_prompt, model_type='pro')
         text = mod_response.text.replace('```json', '').replace('```', '').strip()
-        start = text.find('{')
-        end = text.rfind('}')
-        if start != -1 and end != -1:
-            text = text[start:end+1]
-
-        mod_data = json.loads(text)
         
-        next_speaker_id = mod_data.get('next_speaker_id', 'skeptic')
-        strategy = mod_data.get('strategy', 'Question the premise.')
+        if "Oracle is silent" in text:
+             next_speaker_id = random.choice(list(AGENTS.keys()))
+             strategy = "Respond relevantly (Fallback)."
+        else:
+            start = text.find('{')
+            end = text.rfind('}')
+            if start != -1 and end != -1:
+                text = text[start:end+1]
+
+            mod_data = json.loads(text)
+
+            next_speaker_id = mod_data.get('next_speaker_id', 'skeptic')
+            strategy = mod_data.get('strategy', 'Question the premise.')
 
         if next_speaker_id not in AGENTS:
             next_speaker_id = random.choice(list(AGENTS.keys()))
@@ -152,8 +157,19 @@ def generate_debate_turn(topic, history, user_input=None):
     """
 
     try:
-        response = model_manager.generate_content(agent_prompt)
+        response = model_manager.generate_content(agent_prompt, model_type='pro')
         text = response.text.strip()
+
+        # Check for fallback text
+        if "Oracle is silent" in text:
+             return {
+                "speakerId": next_speaker_id,
+                "text": "(The philosopher is silent due to high mental load. Please try again later.)",
+                "type": "error",
+                "technique": "Silence",
+                "fallacies": []
+            }
+
         try:
             start_idx = text.find('{')
             end_idx = text.rfind('}')
@@ -205,7 +221,10 @@ def generate_autonomous_debate(topic, turns=6):
         starter_agent = AGENTS[starter_id]
 
         # Initial turn
-        resp = model_manager.generate_content(f"You are {starter_agent['name']}. Make a provocative opening statement about '{topic}' using a specific rhetorical technique.")
+        resp = model_manager.generate_content(
+            f"You are {starter_agent['name']}. Make a provocative opening statement about '{topic}' using a specific rhetorical technique.",
+            model_type='pro'
+        )
         history.append({
             "speakerId": starter_id,
             "text": resp.text.strip(),
@@ -303,8 +322,16 @@ def generate_debate_verdict(topic, history):
     """
 
     try:
-        response = model_manager.generate_content(judge_prompt)
+        response = model_manager.generate_content(judge_prompt, model_type='pro')
         text = response.text.replace('```json', '').replace('```', '').strip()
+
+        if "Oracle is silent" in text:
+            return {
+                "winner": "Undecided (System Busy)",
+                "key_concepts": [],
+                "synthesis": "The debate was inconclusive due to high cognitive load.",
+                "best_quote": ""
+            }
 
         start = text.find('{')
         end = text.rfind('}')
