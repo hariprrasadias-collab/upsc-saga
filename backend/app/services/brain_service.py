@@ -13,6 +13,7 @@ from app.db_models.automation_storage import (
     save_foresight_prediction, save_ai_content
 )
 from app.db_models.neural_hash import save_neural_hash_log
+from app.services.manual_prompt_generator import ManualPromptGenerator
 
 load_dotenv()
 
@@ -292,412 +293,206 @@ class BrainService:
     def process_task_completion(self, task_data: dict):
         """
         Proactively triggers Brain actions when a study task is completed.
+        Replaced automated API calls with a Manual Generation Workflow.
         """
         topic = task_data.get('topic')
         subject = task_data.get('subject')
-        user_id = task_data.get('user_id', 1) # Default to 1 if missing
 
-        print(f"Brain: Processing completion for {subject} - {topic} (User {user_id})")
+        print(f"Brain: Processing completion for {subject} - {topic} (Manual Mode)")
 
         if not topic:
             return
 
         try:
-            # 1. Create Flashcards
-            self.execute_action("CREATE_FLASHCARDS", {"topic": topic, "count": 5, "reasoning": "Task Completion Automation"})
+            # 1. Generate Mega Prompt
+            mega_prompt = ManualPromptGenerator.generate_comprehensive_prompt(task_data)
 
-            # 2. Create Revision Notes
-            explanation_res = self.execute_action("EXPLAIN_SYLLABUS_NODE", {"node": topic, "reasoning": "Task Completion Automation"})
-            if explanation_res.get('success'):
-                content = explanation_res.get('explanation')
-                self._save_revision_note(topic, f"Revision Note: {topic}", content)
-                self._add_flashcard(
-                    user_id, topic, subject,
-                    f"Revision Note: {topic}",
-                    content,
-                    'ai_generated_summary'
-                )
+            # 2. Save Prompt to File
+            with open('backend/manual_prompt.txt', 'w') as f:
+                f.write(mega_prompt)
 
-            # 3. Generate Mind Map
-            try:
-                from app.services.mindmap_service import MindMapService
-                mindmap_data = MindMapService.generate_mindmap(topic)
-                MindMapService.save_mindmap(f"{topic} Mind Map", mindmap_data)
-                print(f"Brain: Mind Map generated for {topic}")
-            except Exception as mm_e:
-                print(f"Brain: Mind Map Generation Failed: {mm_e}")
+            # 3. Save Context for Ingestion
+            with open('backend/pending_manual_task.json', 'w') as f:
+                json.dump(task_data, f)
 
-            # 4. Update Syllabus Tracker
-            try:
-                from app.services.syllabus_tracker import SyllabusTracker
-                SyllabusTracker.update_topic_progress(topic, 'Completed')
-                print(f"Brain: Syllabus status updated for {topic}")
-            except Exception as st_e:
-                print(f"Brain: Syllabus Update Failed: {st_e}")
-
-            # 5. Create Mock Test (UPSC Style)
-            self.execute_action("CREATE_MOCK_TEST", {
-                "topic": topic,
-                "reasoning": "Task Completion Automation",
-                "style": "UPSC"
-            })
-
-            # 6. Award Bonus XP
-            try:
-                from app.services.game_engine import trigger_event
-                trigger_event('TASK_COMPLETE_BONUS', user_id)
-            except Exception as ge_e:
-                print(f"Brain: XP Bonus Failed: {ge_e}")
-
-            # 7. PYQ Trend Analysis
-            pyq_res = self.execute_action("ANALYZE_PYQ_TRENDS", {"filters": {"topic": topic, "subject": subject}, "reasoning": "Task Completion Automation"})
-            if pyq_res.get('success'):
-                self._add_flashcard(
-                    user_id, topic, subject,
-                    f"PYQ Analysis: {topic}",
-                    pyq_res.get('analysis'),
-                    'ai_generated_pyq_analysis'
-                )
-
-            # 8. Foresight Predictions
-            foresight_res = self.execute_action("PREDICT_QUESTIONS", {"subject": subject, "topic": topic, "timeframe_days": 90, "reasoning": "Task Completion Automation"})
-            if foresight_res.get('success'):
-                preds = foresight_res.get('data', [])
-                if preds:
-                    self._save_prediction(topic, subject, preds)
-                    pred_text = "\n".join([f"- {p.get('question')} ({p.get('type')})" for p in preds])
-                    self._add_flashcard(
-                        user_id, topic, subject,
-                        f"Predicted Questions: {topic}",
-                        pred_text,
-                        'ai_generated_foresight'
-                    )
-
-            # 9. Current Affairs Linkage
-            try:
-                from app.services.ravens_service import RavensService
-                articles = RavensService.search_articles(topic)
-                if articles:
-                    for article in articles[:3]:
-                        front = f"Linkage: {topic} <-> {article['title']}"
-                        back = f"Summary: {article.get('summary', 'No summary available.')}\nSource: {article.get('source', 'Unknown')}"
-                        self._add_flashcard(user_id, topic, subject, front, back, 'ravens_linkage')
-                    print(f"Brain: Linked {len(articles[:3])} articles to {topic}")
-            except Exception as ravens_e:
-                print(f"Brain: Current Affairs Linkage Failed: {ravens_e}")
-
-            # 10. Schedule Retention Check (3 days later)
-            try:
-                from app.db import get_db
-                conn = get_db()
-                from datetime import timedelta
-
-                check_date = (datetime.now() + timedelta(days=3)).strftime('%Y-%m-%d')
-                check_title = f"Recall Quiz: {topic}"
-
-                exists = conn.execute('SELECT id FROM tasks WHERE title = ? AND due_date = ? AND user_id = ?', (check_title, check_date, user_id)).fetchone()
-                if not exists:
-                    conn.execute('''
-                        INSERT INTO tasks (user_id, title, due_date, xp_reward, associated_stat, isCompleted, is_quest)
-                        VALUES (?, ?, ?, ?, ?, 0, 0)
-                    ''', (user_id, check_title, check_date, 50, 'Retention'))
-                    conn.commit()
-                    print(f"Brain: Scheduled retention check for {check_date}")
-            except Exception as sched_e:
-                print(f"Brain: Retention Scheduling Failed: {sched_e}")
-
-            # 11. Socratic Debate Simulation
-            socratic_res = self.execute_action("GENERATE_SOCRATIC_DIALOGUE", {"topic": topic, "reasoning": "Task Completion Automation"})
-            if socratic_res.get('success'):
-                self._add_flashcard(
-                    user_id, topic, subject,
-                    f"Socratic Debate: {topic}",
-                    # Store plain text in flashcard, structured json in DB
-                    "See Socratic Archives for full structured debate.",
-                    'ai_generated_socratic'
-                )
-                # Parse verdict to JSON string for storage
-                verdict_json = json.dumps(socratic_res.get('verdict', {}))
-                # Now pass raw JSON string of dialogue
-                save_socratic_dialogue(user_id, topic, socratic_res.get('dialogue'), verdict_json)
-
-            # 12. Triangulation Analysis
-            triangulation_res = self.execute_action("TRIANGULATE_TOPIC", {"topic": topic, "reasoning": "Task Completion Automation"})
-            if triangulation_res.get('success'):
-                data = triangulation_res.get('data', {})
-                synthesis = data.get('synthesis', '')
-                way_forward = json.dumps(data.get('way_forward', {}), indent=2)
-                content = f"Synthesis:\n{synthesis}\n\nWay Forward:\n{way_forward}"
-
-                self._add_flashcard(
-                    user_id, topic, subject,
-                    f"Mains Strategy: {topic}",
-                    content,
-                    'ai_generated_triangulation'
-                )
-                save_triangulation(topic, synthesis, data)
-
-            # 13. Neural Hash Decoding
-            synthesis_text = ""
-            if triangulation_res.get('success'):
-                synthesis_text = triangulation_res.get('data', {}).get('synthesis', '')
-            nh_text = f"{topic} ({subject})\n{synthesis_text}"
-
-            nh_res = self.execute_action("DECODE_NEURAL_HASH", {"text": nh_text, "type": "upsc_topic", "reasoning": "Task Completion Automation"})
-            if nh_res.get('success'):
-                data = nh_res.get('data', {})
-                themes = ", ".join(data.get('core_themes', []))
-                pattern = data.get('examiner_pattern', '')
-                content = f"Core Themes: {themes}\n\nExaminer Pattern: {pattern}\n\nCross Linkages: {', '.join(data.get('cross_linkages', []))}"
-
-                self._add_flashcard(
-                    user_id, topic, subject,
-                    f"Examiner's Lens: {topic}",
-                    content,
-                    'ai_generated_neural_hash'
-                )
-                save_neural_hash_log(nh_text, "upsc_topic", data)
-
-            # 14. Mistake Pattern Detection
-            pitfall_res = self.execute_action("FIND_COMMON_PITFALLS", {"topic": topic, "subject": subject, "reasoning": "Task Completion Automation"})
-            if pitfall_res.get('success'):
-                pitfalls = pitfall_res.get('pitfalls', [])
-                if pitfalls:
-                    content = "\n".join([f"⚠️ {p}" for p in pitfalls])
-                    self._add_flashcard(
-                        user_id, topic, subject,
-                        f"Common Pitfalls: {topic}",
-                        content,
-                        'ai_generated_pitfalls'
-                    )
-                    save_ai_content('pitfalls', topic, content, {'subject': subject})
-
-            # 15. Podcast Script Generation
-            podcast_res = self.execute_action("GENERATE_PODCAST_SCRIPT", {"topic": topic, "reasoning": "Task Completion Automation"})
-            if podcast_res.get('success'):
-                self._add_flashcard(
-                    user_id, topic, subject,
-                    f"Podcast Script: {topic}",
-                    podcast_res.get('script'),
-                    'ai_generated_podcast'
-                )
-                save_ai_content('podcast', topic, podcast_res.get('script'))
-
-            # 16. Feynman Challenge
-            try:
-                from app.db import get_db
-                conn = get_db()
-                from datetime import timedelta
-                check_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
-                check_title = f"Feynman Challenge: Teach '{topic}' to AI"
-
-                exists = conn.execute('SELECT id FROM tasks WHERE title = ? AND due_date = ? AND user_id = ?', (check_title, check_date, user_id)).fetchone()
-                if not exists:
-                    conn.execute('''
-                        INSERT INTO tasks (user_id, title, due_date, xp_reward, associated_stat, isCompleted, is_quest)
-                        VALUES (?, ?, ?, ?, ?, 0, 0)
-                    ''', (user_id, check_title, check_date, 75, 'Communication'))
-                    conn.commit()
-            except Exception as feyn_e:
-                print(f"Brain: Feynman Scheduling Failed: {feyn_e}")
-
-            # 17. Essay Prompt Generation
-            essay_res = self.execute_action("GENERATE_ESSAY_PROMPT", {"topic": topic, "subject": subject, "reasoning": "Task Completion Automation"})
-            if essay_res.get('success'):
-                prompt_text = essay_res.get('prompt', '')
-                if prompt_text:
-                    self._save_essay_prompt(topic, subject, prompt_text)
-                    self._add_flashcard(
-                        user_id, topic, subject,
-                        f"Essay Prompt: {topic}",
-                        prompt_text,
-                        'ai_generated_essay'
-                    )
-                    save_ai_content('essay', topic, prompt_text, {'subject': subject})
-
-            # 18. Visual Mnemonic Prompt
-            visual_res = self.execute_action("GENERATE_VISUAL_PROMPT", {"topic": topic, "reasoning": "Task Completion Automation"})
-            if visual_res.get('success'):
-                prompt_text = visual_res.get('prompt', '')
-                if prompt_text:
-                    self._save_mnemonic(topic, prompt_text, 'visual')
-                    self._add_flashcard(
-                        user_id, topic, subject,
-                        f"Visual Mnemonic Prompt: {topic}",
-                        prompt_text,
-                        'ai_generated_visual'
-                    )
-                    save_ai_content('visual_prompt', topic, prompt_text)
-
-            # 19. Roleplay Scenario
-            roleplay_res = self.execute_action("GENERATE_ROLEPLAY_SCENARIO", {"topic": topic, "reasoning": "Task Completion Automation"})
-            if roleplay_res.get('success'):
-                scenario_text = roleplay_res.get('scenario', '')
-                if scenario_text:
-                    self._add_flashcard(
-                        user_id, topic, subject,
-                        f"Roleplay Scenario: {topic}",
-                        scenario_text,
-                        'ai_generated_roleplay'
-                    )
-                    save_ai_content('roleplay', topic, scenario_text)
-
-            # 20. Map Work
-            if subject in ["Geography", "Environment", "International Relations", "History", "Ancient History", "Medieval History", "Modern History"]:
-                map_res = self.execute_action("GENERATE_MAP_WORK", {"topic": topic, "reasoning": "Task Completion Automation"})
-                if map_res.get('success'):
-                    locations = map_res.get('locations', [])
-                    if locations:
-                        # Serialize the locations list to JSON for the 'back' content
-                        # Front card will instruct the user to check map work
-                        content = json.dumps(locations)
-                        self._add_flashcard(
-                            user_id, topic, subject,
-                            f"Map Work Challenge: {topic}",
-                            content,
-                            'ai_generated_mapwork',
-                            card_type='map_work'
-                        )
-                        save_ai_content('map_work', topic, content, {'locations': locations})
-
-            # 21. Badge Unlocking
-            try:
-                from app.services.badge_service import badge_service
-                unlocked_badges = badge_service.check_and_unlock_badges(user_id)
-                if unlocked_badges:
-                    print(f"Brain: Unlocked {len(unlocked_badges)} badges for user {user_id}!")
-            except Exception as badge_e:
-                print(f"Brain: Badge Check Failed: {badge_e}")
-
-            # 23. Topic Linkages (Connect the Dots)
-            try:
-                from app.services.syllabus_tracker import SyllabusTracker
-                recent_topics = SyllabusTracker.get_recently_completed(limit=5)
-                recent_list = [t['topic'] for t in recent_topics if t['topic'] != topic]
-
-                if recent_list:
-                    linkage_res = self.execute_action("GENERATE_TOPIC_LINKAGES", {"topic": topic, "related_topics": recent_list, "reasoning": "Task Completion Automation"})
-                    if linkage_res.get('success'):
-                        linkages = linkage_res.get('linkages', [])
-                        if linkages:
-                            content = "\n".join([f"🔗 {l}" for l in linkages])
-                            self._add_flashcard(
-                                user_id, topic, subject,
-                                f"Connect the Dots: {topic}",
-                                content,
-                                'ai_generated_linkages'
-                            )
-                            save_ai_content('topic_linkages', topic, content, {'linkages': linkages})
-            except Exception as link_e:
-                print(f"Brain: Linkage Generation Failed: {link_e}")
-
-            # 24. Cheat Sheet
-            cheat_res = self.execute_action("GENERATE_CHEAT_SHEET", {"topic": topic, "reasoning": "Task Completion Automation"})
-            if cheat_res.get('success'):
-                self._add_flashcard(
-                    user_id, topic, subject,
-                    f"Cheat Sheet: {topic}",
-                    cheat_res.get('content'),
-                    'ai_generated_cheatsheet'
-                )
-                save_ai_content('cheat_sheet', topic, cheat_res.get('content'))
-
-            # 25. Quote & Data Bank (Mains Fodder)
-            fodder_res = self.execute_action("GENERATE_QUOTE_BANK", {"topic": topic, "reasoning": "Task Completion Automation"})
-            if fodder_res.get('success'):
-                content = f"Quotes:\n{fodder_res.get('quotes')}\n\nData:\n{fodder_res.get('data')}"
-                self._add_flashcard(
-                    user_id, topic, subject,
-                    f"Mains Fodder: {topic}",
-                    content,
-                    'ai_generated_fodder'
-                )
-                save_ai_content('quote_bank', topic, content)
-
-            # 26. Timeline Generation (History)
-            if subject == 'History':
-                timeline_res = self.execute_action("GENERATE_TIMELINE", {"topic": topic, "reasoning": "Task Completion Automation"})
-                if timeline_res.get('success'):
-                    self._add_flashcard(
-                        user_id, topic, subject,
-                        f"Timeline: {topic}",
-                        timeline_res.get('timeline'),
-                        'ai_generated_timeline'
-                    )
-                    save_ai_content('timeline', topic, timeline_res.get('timeline'))
-
-            # 27. Ethics Dilemma (Ethics/Polity)
-            if subject in ['Ethics', 'Polity', 'Governance', 'Internal Security']:
-                dilemma_res = self.execute_action("GENERATE_ETHICS_DILEMMA", {"topic": topic, "reasoning": "Task Completion Automation"})
-                if dilemma_res.get('success'):
-                    self._add_flashcard(
-                        user_id, topic, subject,
-                        f"Ethical Dilemma: {topic}",
-                        dilemma_res.get('dilemma'),
-                        'ai_generated_dilemma'
-                    )
-                    save_ai_content('ethics_dilemma', topic, dilemma_res.get('dilemma'))
-
-            # 28. ELI5 (Simplification)
-            eli5_res = self.execute_action("GENERATE_ELI5", {"topic": topic, "reasoning": "Task Completion Automation"})
-            if eli5_res.get('success'):
-                # Handle new structured data or legacy string
-                content_to_save = eli5_res.get('explanation')
-                flashcard_back = content_to_save
-
-                # If we have structured data, use it
-                if eli5_res.get('data'):
-                    data = eli5_res.get('data')
-                    # Check for fallback/empty data to avoid crashing
-                    if data and isinstance(data, dict) and 'eli5' in data:
-                        content_to_save = json.dumps(data)
-                        # Create a readable flashcard
-                        flashcard_back = f"🧸 ELI5: {data.get('eli5', '')}\n\n💡 Analogy: {data.get('analogy', '')}"
-                    else:
-                        # Panic mode safe default
-                        content_to_save = "Content unavailable due to high traffic."
-                        flashcard_back = content_to_save
-
-                self._add_flashcard(
-                    user_id, topic, subject,
-                    f"ELI5: {topic}",
-                    flashcard_back,
-                    'ai_generated_eli5'
-                )
-                save_ai_content('eli5', topic, content_to_save)
-
-            # 29. Check for Book Completion -> Trigger Boss Fight
-            # Load books data to identify if a book is completed
-            book_title = self._identify_book_for_topic(subject, topic)
-            if book_title:
-                print(f"Brain: identified book '{book_title}' for topic '{topic}'")
-                # Logic: Check if all other chapters in this book are completed in syllabus_topics or study_tasks
-                # For simplicity, we stick to the study_plan pending check but refined by subject
-                # Ideally we should check if all chapters of 'book_title' are marked completed in syllabus.
-
-                # For now, we'll stick to the previous robust method: Subject-based "Unit" completion
-                # But we can customize the Boss Name
-                boss_name = f"The Guardian of {book_title}"
-            else:
-                boss_name = f"The {subject} Final Boss"
-
-            from app.db_models.study_plan import get_pending_task_count
-            plan_id = task_data.get('plan_id')
-            if plan_id:
-                pending_count = get_pending_task_count(plan_id, subject, exclude_task_id=task_data.get('id'))
-
-                if pending_count == 0:
-                    print(f"Brain: All tasks for {subject} completed. Summoning Boss: {boss_name}")
-                    self.execute_action("SUMMON_BOSS", {
-                        "filters": {"subject": subject},
-                        "name": boss_name,
-                        "reasoning": "Subject/Book Completion Event"
-                    })
+            print("🛑 AUTOMATION STOPPED. Manual Prompt Generated.")
+            print(f"👉 Please check 'backend/manual_prompt.txt', run it on Gemini, and paste result to 'backend/paste_response_here.json'.")
 
         except Exception as e:
-            print(f"Brain: Task Completion Automation Failed: {e}")
-            import traceback
+            print(f"Brain: Manual Prompt Generation Failed: {e}")
             traceback.print_exc()
+
+    def apply_manual_completion(self, task_data: dict, response_data: dict):
+        """
+        Ingests the manually generated JSON response and creates database artifacts.
+        Replaces the old 'process_task_completion' execution logic.
+        """
+        topic = task_data.get('topic')
+        subject = task_data.get('subject')
+        user_id = task_data.get('user_id', 1)
+
+        print(f"Brain: Applying manual completion for {topic}...")
+
+        # 1. Flashcards
+        if 'flashcards' in response_data:
+            for card in response_data['flashcards']:
+                self._add_flashcard(user_id, topic, subject, card.get('front'), card.get('back'), 'manual_ai')
+
+        # 2. Revision Note
+        if 'revision_note' in response_data:
+            content = response_data['revision_note']
+            self._save_revision_note(topic, f"Revision Note: {topic}", content)
+            self._add_flashcard(user_id, topic, subject, f"Revision Note: {topic}", content, 'manual_ai_summary')
+
+        # 3. Mind Map
+        if 'mindmap' in response_data:
+            try:
+                from app.services.mindmap_service import MindMapService
+                MindMapService.save_mindmap(f"{topic} Mind Map", response_data['mindmap'])
+            except Exception as e:
+                print(f"MindMap Save Error: {e}")
+
+        # 4. Mock Test
+        if 'mock_test' in response_data:
+            try:
+                test_data = response_data['mock_test']
+                from app.db import get_db
+                conn = get_db()
+                cursor = conn.execute('''
+                    INSERT INTO mock_tests (title, subject, total_questions, duration_minutes, test_type, total_marks)
+                    VALUES (?, ?, ?, ?, 'MOCK', ?)
+                ''', (test_data.get('title', f"Test: {topic}"), subject, len(test_data.get('questions', [])), len(test_data.get('questions', []))*2, len(test_data.get('questions', []))*2))
+                test_id = cursor.lastrowid
+
+                for i, q in enumerate(test_data.get('questions', []), 1):
+                    conn.execute('''
+                        INSERT INTO test_questions
+                        (test_id, question_number, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ''', (test_id, i, q.get('question_text'), q.get('option_a'), q.get('option_b'), q.get('option_c'), q.get('option_d'), q.get('correct_answer'), q.get('explanation')))
+                conn.commit()
+            except Exception as e:
+                print(f"Mock Test Save Error: {e}")
+
+        # 5. PYQ Analysis
+        if 'pyq_analysis' in response_data:
+             self._add_flashcard(user_id, topic, subject, f"PYQ Analysis: {topic}", response_data['pyq_analysis'], 'manual_ai_pyq')
+
+        # 6. Foresight
+        if 'foresight_predictions' in response_data:
+            preds = response_data['foresight_predictions']
+            self._save_prediction(topic, subject, preds)
+            pred_text = "\n".join([f"- {p.get('question')} ({p.get('type', 'MCQ')})" for p in preds])
+            self._add_flashcard(user_id, topic, subject, f"Predicted Questions: {topic}", pred_text, 'manual_ai_foresight')
+
+        # 7. Socratic Dialogue
+        if 'socratic_dialogue' in response_data:
+            soc_data = response_data['socratic_dialogue']
+            dialogue = soc_data.get('dialogue', [])
+            verdict = soc_data.get('verdict', {})
+            save_socratic_dialogue(user_id, topic, json.dumps(dialogue), json.dumps(verdict))
+            self._add_flashcard(user_id, topic, subject, f"Socratic Debate: {topic}", "See Socratic Archives.", 'manual_ai_socratic')
+
+        # 8. Triangulation
+        if 'triangulation' in response_data:
+            tri_data = response_data['triangulation']
+            synthesis = tri_data.get('synthesis', '')
+            save_triangulation(topic, synthesis, tri_data)
+            self._add_flashcard(user_id, topic, subject, f"Mains Strategy: {topic}", synthesis, 'manual_ai_triangulation')
+
+        # 9. Neural Hash
+        if 'neural_hash' in response_data:
+            nh_data = response_data['neural_hash']
+            themes = ", ".join(nh_data.get('core_themes', []))
+            content = f"Themes: {themes}\nPattern: {nh_data.get('examiner_pattern', '')}"
+            save_neural_hash_log(f"Manual: {topic}", "upsc_topic", nh_data)
+            self._add_flashcard(user_id, topic, subject, f"Examiner's Lens: {topic}", content, 'manual_ai_neural')
+
+        # 10. Pitfalls
+        if 'pitfalls' in response_data:
+            content = "\n".join([f"⚠️ {p}" for p in response_data['pitfalls']])
+            self._add_flashcard(user_id, topic, subject, f"Common Pitfalls: {topic}", content, 'manual_ai_pitfalls')
+            save_ai_content('pitfalls', topic, content, {'subject': subject})
+
+        # 11. Podcast Script
+        if 'podcast_script' in response_data:
+            save_ai_content('podcast', topic, response_data['podcast_script'])
+            self._add_flashcard(user_id, topic, subject, f"Podcast Script: {topic}", response_data['podcast_script'], 'manual_ai_podcast')
+
+        # 12. Essay Prompt
+        if 'essay_prompt' in response_data:
+            self._save_essay_prompt(topic, subject, response_data['essay_prompt'])
+            self._add_flashcard(user_id, topic, subject, f"Essay Prompt: {topic}", response_data['essay_prompt'], 'manual_ai_essay')
+
+        # 13. Visual Prompt
+        if 'visual_prompt' in response_data:
+             self._save_mnemonic(topic, response_data['visual_prompt'], 'visual')
+             self._add_flashcard(user_id, topic, subject, f"Visual Mnemonic: {topic}", response_data['visual_prompt'], 'manual_ai_visual')
+
+        # 14. Roleplay
+        if 'roleplay_scenario' in response_data:
+            save_ai_content('roleplay', topic, response_data['roleplay_scenario'])
+            self._add_flashcard(user_id, topic, subject, f"Roleplay Scenario: {topic}", response_data['roleplay_scenario'], 'manual_ai_roleplay')
+
+        # 15. Map Work
+        if 'map_work' in response_data:
+            locations = response_data['map_work']
+            if locations:
+                content = json.dumps(locations)
+                save_ai_content('map_work', topic, content, {'locations': locations})
+                self._add_flashcard(user_id, topic, subject, f"Map Work: {topic}", content, 'manual_ai_mapwork', card_type='map_work')
+
+        # 16. Linkages
+        if 'topic_linkages' in response_data:
+            content = "\n".join(response_data['topic_linkages'])
+            save_ai_content('topic_linkages', topic, content)
+            self._add_flashcard(user_id, topic, subject, f"Connect the Dots: {topic}", content, 'manual_ai_linkages')
+
+        # 17. Cheat Sheet
+        if 'cheat_sheet' in response_data:
+            content = json.dumps(response_data['cheat_sheet'])
+            save_ai_content('cheat_sheet', topic, content)
+            self._add_flashcard(user_id, topic, subject, f"Cheat Sheet: {topic}", content, 'manual_ai_cheatsheet')
+
+        # 18. Quote Bank
+        if 'quote_bank' in response_data:
+            save_ai_content('quote_bank', topic, response_data['quote_bank'])
+            self._add_flashcard(user_id, topic, subject, f"Mains Fodder: {topic}", response_data['quote_bank'], 'manual_ai_fodder')
+
+        # 19. Timeline
+        if 'timeline' in response_data and response_data['timeline'] != "N/A":
+            save_ai_content('timeline', topic, response_data['timeline'])
+            self._add_flashcard(user_id, topic, subject, f"Timeline: {topic}", response_data['timeline'], 'manual_ai_timeline')
+
+        # 20. Ethics Dilemma
+        if 'ethics_dilemma' in response_data and response_data['ethics_dilemma'] != "N/A":
+             save_ai_content('ethics_dilemma', topic, response_data['ethics_dilemma'])
+             self._add_flashcard(user_id, topic, subject, f"Ethics Dilemma: {topic}", response_data['ethics_dilemma'], 'manual_ai_dilemma')
+
+        # 21. ELI5
+        if 'eli5' in response_data:
+            data = response_data['eli5']
+            content = json.dumps(data)
+            readable = f"ELI5: {data.get('eli5')}\n\nAnalogy: {data.get('analogy')}"
+            save_ai_content('eli5', topic, content)
+            self._add_flashcard(user_id, topic, subject, f"ELI5: {topic}", readable, 'manual_ai_eli5')
+
+        # Update Syllabus Tracker
+        try:
+            from app.services.syllabus_tracker import SyllabusTracker
+            SyllabusTracker.update_topic_progress(topic, 'Completed')
+        except Exception as e:
+            print(f"Syllabus Update Error: {e}")
+
+        # Award XP
+        try:
+            from app.services.game_engine import trigger_event
+            trigger_event('TASK_COMPLETE_BONUS', user_id)
+        except Exception:
+            pass
+
+        print(f"✅ Brain: Manual Completion Applied for {topic}!")
+
 
     def _identify_book_for_topic(self, subject, topic):
         """Helper to find which book a topic belongs to."""
