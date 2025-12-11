@@ -1,6 +1,7 @@
 import os
 import traceback
 import re
+from app.services.model_manager import model_manager
 from app.db import get_db
 from app.services.model_manager import model_manager
 
@@ -16,10 +17,6 @@ class HephaestusService:
     def attempt_repair(self, error: Exception, context_file: str = None):
         """
         Main entry point for self-repair.
-        1. Analyzes the error.
-        2. Locates the culprit file.
-        3. Generates a patch.
-        4. Applies the patch.
         """
         if not model_manager: # Should never happen
             print("❌ Hephaestus Disabled: No Manager.")
@@ -88,20 +85,11 @@ class HephaestusService:
                 print("❌ Hephaestus: Generated code failed syntax check. Aborting.")
                 return False
                 
-            # 4. Apply the Fix
+            # 4. Apply the Fix (with backup)
             self._apply_patch(target_file, fix_code)
             
             # 5. Log the Repair & Learn
             self._log_repair(target_file, str(error))
-            
-            # --- HIPPOCAMPUS INTEGRATION ---
-            try:
-                from app.services.hippocampus_service import hippocampus
-                lesson = f"Fixed {str(error)} in {os.path.basename(target_file)}. Ensure syntax is correct."
-                hippocampus.remember_lesson(context=str(error), lesson=lesson)
-            except:
-                pass
-            # -------------------------------
             
             return True
             
@@ -113,7 +101,7 @@ class HephaestusService:
         """
         PROACTIVE REPAIR: Scans a file for latent bugs or optimizations.
         """
-        if not self.model: return False
+        if not model_manager.is_configured: return False
         
         print(f"🕵️ Hephaestus: Auditing {file_path}...")
         
@@ -177,18 +165,21 @@ class HephaestusService:
     def _identify_culprit_file(self, tb_str):
         """
         Parses traceback to find the most relevant project file.
+        Compatible with Windows and Linux paths.
         """
         lines = tb_str.split('\n')
-        # Look for files in our project directory, excluding venv/libraries
-        # Assuming project structure d:/upsc-second-brain/backend/app/...
         
         candidate = None
         for line in lines:
-            if 'File "' in line and 'backend\\app' in line:
-                # Extract path: File "d:\path\to\file.py", line 10
-                match = re.search(r'File "(.*?)",', line)
-                if match:
-                    candidate = match.group(1)
+            # Match "File" line with generic path separators
+            # Regex captures: File "path", line N, in func
+            match = re.search(r'File "(.*?)",', line)
+            if match:
+                path = match.group(1)
+                # Check if it's our project file (heuristic: contains 'backend' or 'app')
+                # Adjust 'backend' check based on deployment structure
+                if ('backend' in path or 'app' in path) and 'site-packages' not in path and 'lib' not in path:
+                    candidate = path
                     
         return candidate
 
@@ -210,11 +201,23 @@ class HephaestusService:
     def _apply_patch(self, file_path, new_code):
         """
         Writes the new code to the file.
+        Creates a .bak backup first.
         """
-        # Create backup first? For now, YOLO (per user request for autonomy)
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(new_code)
-        print(f"🔨 Hephaestus: Patch applied to {file_path}. Restarting system...")
+        try:
+            # Backup
+            backup_path = f"{file_path}.bak"
+            if os.path.exists(file_path):
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    original = f.read()
+                with open(backup_path, 'w', encoding='utf-8') as f:
+                    f.write(original)
+
+            # Write new
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(new_code)
+            print(f"🔨 Hephaestus: Patch applied to {file_path}. Backup saved to {backup_path}. Restarting system...")
+        except Exception as e:
+            print(f"❌ Hephaestus Patch Error: {e}")
 
     def _log_repair(self, file_path, error_msg):
         """

@@ -83,15 +83,16 @@ def analyze_topic_triangulation(text):
     
     if keywords:
         # Construct dynamic query
-        placeholders = ' OR '.join(['question_text LIKE ?'] * len(keywords))
-        query = f"SELECT * FROM pyq_questions WHERE {placeholders} LIMIT 5"
-        params = [f"%{k}%" for k in keywords]
-        
         try:
+            placeholders = ' OR '.join(['question_text LIKE ?'] * len(keywords))
+            query = f"SELECT * FROM pyq_questions WHERE {placeholders} LIMIT 5"
+            params = [f"%{k}%" for k in keywords]
+
             rows = conn.execute(query, params).fetchall()
             pyqs = [dict(row) for row in rows]
         except Exception as e:
-            print(f"PYQ Fetch Error: {e}")
+            # print(f"PYQ Fetch Error: {e}") # Reduced logs
+            pass
 
     return {
         "topic": ai_data.get('core_topic'),

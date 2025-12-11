@@ -6,41 +6,49 @@ class PomodoroService:
     def log_session(duration, xp_awarded=50):
         """Log a completed session and update XP."""
         conn = get_db()
-        c = conn.cursor()
         timestamp = datetime.now().isoformat()
         
         try:
             # Log session
-            c.execute('''
-                INSERT INTO pomodoro_sessions (timestamp, duration, xp_awarded)
-                VALUES (?, ?, ?)
+            conn.execute('''
+                INSERT INTO pomodoro_sessions (timestamp, duration, xp_awarded, user_id)
+                VALUES (?, ?, ?, 1)
             ''', (timestamp, duration, xp_awarded))
             
             # Update XP
-            c.execute('''
+            conn.execute('''
                 UPDATE user_profile 
                 SET current_xp = current_xp + ?
                 WHERE user_id = 1
             ''', (xp_awarded,))
             
             # Check Level Up
-            c.execute('SELECT current_xp, level FROM user_profile WHERE user_id = 1')
-            user = c.fetchone()
-            current_xp = user['current_xp']
-            current_level = user['level']
-            max_xp = current_level * 100
+            row = conn.execute('SELECT current_xp, level FROM user_profile WHERE user_id = 1').fetchone()
             
             level_up = False
-            new_level = current_level
+            new_level = 1
             
-            if current_xp >= max_xp:
-                new_level = current_level + 1
-                c.execute('''
-                    UPDATE user_profile 
-                    SET level = ?, current_xp = ?
-                    WHERE user_id = 1
-                ''', (new_level, current_xp - max_xp))
-                level_up = True
+            if row:
+                current_xp = row['current_xp']
+                current_level = row['level']
+                max_xp = current_level * 100
+
+                new_level = current_level
+
+                if current_xp >= max_xp:
+                    new_level = current_level + 1
+                    conn.execute('''
+                        UPDATE user_profile
+                        SET level = ?, current_xp = ?
+                        WHERE user_id = 1
+                    ''', (new_level, current_xp - max_xp))
+                    level_up = True
+            else:
+                # Handle missing user profile (create default)
+                try:
+                    conn.execute('INSERT INTO user_profile (user_id, current_xp, level) VALUES (1, 0, 1)')
+                except:
+                    pass # Ignore if exists or other error
                 
             conn.commit()
             return {
@@ -51,29 +59,28 @@ class PomodoroService:
             }
         except Exception as e:
             conn.rollback()
-            raise e
-        # finally block removed to keep connection open for request context
+            print(f"Pomodoro Logging Failed: {e}")
+            return {'success': False, 'error': str(e)}
 
     @staticmethod
     def get_stats_today():
         """Get stats for today."""
-        conn = get_db()
-        c = conn.cursor()
-        today = datetime.now().date().isoformat()
-        
-        c.execute('''
-            SELECT COUNT(*) as sessions_today, SUM(xp_awarded) as xp_today
-            FROM pomodoro_sessions
-            WHERE DATE(timestamp) = ?
-        ''', (today,))
-        
-        stats = c.fetchone()
-        # conn.close() removed
-        
-        return {
-            'sessions_today': stats['sessions_today'] or 0,
-            'xp_today': stats['xp_today'] or 0
-        }
+        try:
+            conn = get_db()
+            today = datetime.now().date().isoformat()
+
+            row = conn.execute('''
+                SELECT COUNT(*) as sessions_today, SUM(xp_awarded) as xp_today
+                FROM pomodoro_sessions
+                WHERE DATE(timestamp) = ?
+            ''', (today,)).fetchone()
+
+            return {
+                'sessions_today': row['sessions_today'] or 0,
+                'xp_today': row['xp_today'] or 0
+            }
+        except Exception:
+            return {'sessions_today': 0, 'xp_today': 0}
 
     @staticmethod
     def get_brain_context():

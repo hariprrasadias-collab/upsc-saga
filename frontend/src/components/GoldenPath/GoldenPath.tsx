@@ -35,6 +35,7 @@ const GoldenPath: React.FC = () => {
     const [optimalPath, setOptimalPath] = useState<Node[]>([]);
     const [stats, setStats] = useState({ totalYield: 0, totalEffort: 0 });
     const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
     const [filters, setFilters] = useState({
         FOCUS: true,
         ACCELERATE: true,
@@ -51,8 +52,13 @@ const GoldenPath: React.FC = () => {
     // Fetch Graph Data
     useEffect(() => {
         setLoading(true);
-        fetch('http://localhost:5000/api/golden-path/graph')
-            .then(res => res.json())
+        setError(null);
+        // Updated to use correct API URL
+        fetch('http://127.0.0.1:5000/api/golden-path/graph')
+            .then(res => {
+                if (!res.ok) throw new Error("API Network Error");
+                return res.json();
+            })
             .then(data => {
                 if (data.success) {
                     // Transform data for D3 (it mutates objects)
@@ -65,9 +71,14 @@ const GoldenPath: React.FC = () => {
                     const uniqueTopics = Array.from(new Set(nodes.map((n: any) => n.label))).sort() as string[];
                     setSubjects(uniqueSubjects);
                     setTopics(uniqueTopics);
+                } else {
+                    throw new Error(data.error || "Failed to load graph data");
                 }
             })
-            .catch(err => console.error("Failed to fetch graph:", err))
+            .catch(err => {
+                console.error("Failed to fetch graph:", err);
+                setError(err.message);
+            })
             .finally(() => setLoading(false));
     }, []);
 
@@ -246,7 +257,7 @@ const GoldenPath: React.FC = () => {
     const handleOptimize = async () => {
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:5000/api/golden-path/optimize', {
+            const res = await fetch('http://127.0.0.1:5000/api/golden-path/optimize', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -267,6 +278,7 @@ const GoldenPath: React.FC = () => {
             }
         } catch (err) {
             console.error("Optimization failed:", err);
+            setError("Optimization failed. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -439,6 +451,13 @@ const GoldenPath: React.FC = () => {
             <div className="gp-graph-area">
                 <svg ref={svgRef} style={{ width: '100%', height: '100%' }}></svg>
                 {loading && <div className="loading-overlay">Consulting the Oracle...</div>}
+
+                {error && (
+                    <div className="error-overlay">
+                        <div className="error-icon">⚠️</div>
+                        <div>{error}</div>
+                    </div>
+                )}
 
                 {tooltip && (
                     <div className="d3-tooltip" style={{ left: tooltip.x + 15, top: tooltip.y + 15 }}>

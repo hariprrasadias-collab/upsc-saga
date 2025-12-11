@@ -15,6 +15,7 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
     const [voicesLoaded, setVoicesLoaded] = useState(false);
     const [playbackRate, setPlaybackRate] = useState(1.1); // Default slightly energetic
     const [isZenMode, setIsZenMode] = useState(false);
+    const [isSupported, setIsSupported] = useState(true);
 
     // Refs
     const scriptRef = useRef<HTMLDivElement>(null);
@@ -25,6 +26,12 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
 
     // 1. Initial Setup: Parse Content & Load Voices
     useEffect(() => {
+        // Check Support
+        if (!('speechSynthesis' in window)) {
+            setIsSupported(false);
+            return;
+        }
+
         // Parse Dialogue
         const lines = content.split('\n').filter(line => line.trim().length > 0);
         const parsed: { speaker: string, text: string }[] = [];
@@ -116,41 +123,54 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
     const gainNodeRef = useRef<GainNode | null>(null);
 
     useEffect(() => {
+        if (!isSupported) return;
+
         if (isPlaying) {
             // Initialize Audio Context on user interaction
             if (!audioContextRef.current) {
-                audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+                try {
+                    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+                    if (AudioContext) audioContextRef.current = new AudioContext();
+                } catch (e) {
+                    console.error("AudioContext not supported", e);
+                }
             }
 
             const ctx = audioContextRef.current;
             if (ctx && ctx.state === 'suspended') ctx.resume();
 
-            // Create Pink Noise
-            const bufferSize = 2 * ctx.sampleRate;
-            const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-            const output = noiseBuffer.getChannelData(0);
-            let lastOut = 0;
+            if (ctx) {
+                try {
+                    // Create Pink Noise
+                    const bufferSize = 2 * ctx.sampleRate;
+                    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                    const output = noiseBuffer.getChannelData(0);
+                    let lastOut = 0;
 
-            for (let i = 0; i < bufferSize; i++) {
-                const white = Math.random() * 2 - 1;
-                output[i] = (lastOut + (0.02 * white)) / 1.02;
-                lastOut = output[i];
-                output[i] *= 3.5; // (roughly normalize to 0..1)
+                    for (let i = 0; i < bufferSize; i++) {
+                        const white = Math.random() * 2 - 1;
+                        output[i] = (lastOut + (0.02 * white)) / 1.02;
+                        lastOut = output[i];
+                        output[i] *= 3.5; // (roughly normalize to 0..1)
+                    }
+
+                    const noise = ctx.createBufferSource();
+                    noise.buffer = noiseBuffer;
+                    noise.loop = true;
+
+                    const gain = ctx.createGain();
+                    gain.gain.value = 0.008; // Very faint (Subconscious)
+
+                    noise.connect(gain);
+                    gain.connect(ctx.destination);
+                    noise.start();
+
+                    noiseNodeRef.current = noise;
+                    gainNodeRef.current = gain;
+                } catch (e) {
+                    console.error("Audio generation failed", e);
+                }
             }
-
-            const noise = ctx.createBufferSource();
-            noise.buffer = noiseBuffer;
-            noise.loop = true;
-
-            const gain = ctx.createGain();
-            gain.gain.value = 0.008; // Very faint (Subconscious)
-
-            noise.connect(gain);
-            gain.connect(ctx.destination);
-            noise.start();
-
-            noiseNodeRef.current = noise;
-            gainNodeRef.current = gain;
 
         } else {
             // Stop Noise
@@ -165,10 +185,12 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
                 try { noiseNodeRef.current.stop(); } catch (e) { }
             }
         };
-    }, [isPlaying]);
+    }, [isPlaying, isSupported]);
 
     // 2. The Director (TTS Logic)
     useEffect(() => {
+        if (!isSupported) return;
+
         if (!isPlaying) {
             window.speechSynthesis.cancel();
             return;
@@ -295,7 +317,7 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
             window.speechSynthesis.resume();
         }
 
-    }, [isPlaying, dialogue, voices, playbackRate]);
+    }, [isPlaying, dialogue, voices, playbackRate, isSupported]);
 
     useEffect(() => {
         return () => window.speechSynthesis.cancel();
@@ -321,6 +343,10 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
 
     // Progress
     const progress = dialogue.length > 0 ? (currentLineIndex / dialogue.length) * 100 : 0;
+
+    if (!isSupported) {
+        return <div className="podcast-error">⚠️ Audio features not supported in this browser.</div>;
+    }
 
     return (
         <div

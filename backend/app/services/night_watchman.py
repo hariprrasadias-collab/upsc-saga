@@ -7,6 +7,7 @@ import feedparser
 import feedparser
 from datetime import datetime
 from app.db_models.night_watchman import save_briefing
+from app.services.model_manager import model_manager
 from dotenv import load_dotenv
 from app.services.model_manager import model_manager
 
@@ -50,6 +51,8 @@ class NightWatchman:
             
         # 2. Synthesize Briefing
         briefing = self._synthesize_briefing(articles)
+        if not briefing:
+             return {"success": False, "message": "Synthesis failed."}
         
         # 3. Save Report
         briefing_id = save_briefing({
@@ -137,9 +140,20 @@ class NightWatchman:
     def _gather_intelligence(self):
         """Fetch news from RSS feeds"""
         articles = []
+        import socket
+        # Set default timeout for socket operations
+        socket.setdefaulttimeout(10)
+
         for url in self.feeds:
             try:
+                # Use feedparser with a timeout wrapper if possible, or just rely on socket timeout
                 feed = feedparser.parse(url)
+
+                # Check for bozo bit (parsing error)
+                if feed.bozo:
+                    print(f"⚠️ Feed parsing issue for {url}: {feed.bozo_exception}")
+                    # Continue anyway if entries exist
+
                 for entry in feed.entries[:5]: # Top 5 from each
                     articles.append({
                         'title': entry.title,
@@ -158,7 +172,7 @@ class NightWatchman:
         # Prepare context
         articles_text = "\n\n".join([
             f"- {a['title']} ({a['source']}): {a['summary'][:300]}..." 
-            for a in articles[:20] # Increased limit
+            for a in articles[:20] # Limit context size
         ])
         
         prompt = f"""

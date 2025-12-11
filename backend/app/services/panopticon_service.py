@@ -47,6 +47,8 @@ class PanopticonService:
         data: {date, sleep_hours, sleep_quality, mood_score, energy_level, diet_quality, exercise_minutes, notes}
         """
         conn = self.get_db_connection()
+        if not conn: return {"success": False, "message": "Database Unavailable"}
+
         cursor = conn.cursor()
         
         try:
@@ -103,6 +105,8 @@ class PanopticonService:
         Returns a dict with status, energy, and any alerts.
         """
         conn = self.get_db_connection()
+        if not conn: return {"status": "UNKNOWN", "energy": 50, "alert": "DB Error"}
+
         cursor = conn.cursor()
         
         try:
@@ -149,63 +153,71 @@ class PanopticonService:
         Analyze correlations between bio-metrics and study performance.
         """
         conn = self.get_db_connection()
+        if not conn: return
         cursor = conn.cursor()
         
-        # 1. Fetch Bio-Metrics (Last 30 days)
-        cursor.execute('''
-            SELECT date, sleep_hours, mood_score, energy_level 
-            FROM daily_biometrics 
-            ORDER BY date DESC LIMIT 30
-        ''')
-        biometrics = {row['date']: dict(row) for row in cursor.fetchall()}
-        
-        # 2. Fetch Study Performance (Quiz Scores)
-        # Assuming 'quiz_sessions' table exists with 'date' and 'score'
-        # If not, we'll mock or use a placeholder query. 
-        # Using a generic query for now, assuming a 'quiz_history' or similar.
-        # Adapting to existing schema: 'quiz_sessions' likely has 'completed_at' and 'score'
-        cursor.execute('''
-            SELECT date(submitted_at) as date, AVG(score) as avg_score 
-            FROM pyq_quiz_sessions 
-            WHERE status = 'completed' AND submitted_at IS NOT NULL
-            GROUP BY date(submitted_at) 
-            ORDER BY date DESC LIMIT 30
-        ''')
-        scores = {row['date']: row['avg_score'] for row in cursor.fetchall()}
-        
-        # 3. Align Data
-        dates = sorted(list(set(biometrics.keys()) & set(scores.keys())))
-        if len(dates) < 3:
-            conn.close()
-            return # Not enough data
-            
-        sleep_data = [biometrics[d]['sleep_hours'] for d in dates if biometrics[d]['sleep_hours'] is not None]
-        mood_data = [biometrics[d]['mood_score'] for d in dates if biometrics[d]['mood_score'] is not None]
-        score_data_sleep = [scores[d] for d in dates if biometrics[d]['sleep_hours'] is not None]
-        score_data_mood = [scores[d] for d in dates if biometrics[d]['mood_score'] is not None]
-        
-        # 4. Calculate Correlations
-        correlations = []
-        
-        if len(sleep_data) > 2:
-            r_sleep = self._calculate_pearson_correlation(sleep_data, score_data_sleep)
-            correlations.append(('sleep_hours', 'quiz_score', r_sleep))
-            
-        if len(mood_data) > 2:
-            r_mood = self._calculate_pearson_correlation(mood_data, score_data_mood)
-            correlations.append(('mood_score', 'quiz_score', r_mood))
-            
-        # 5. Generate Insights & Save
-        for metric, perf, r in correlations:
-            insight = self._generate_insight(metric, perf, r)
-            
+        try:
+            # 1. Fetch Bio-Metrics (Last 30 days)
             cursor.execute('''
-                INSERT INTO bio_correlations (metric_name, performance_metric, correlation_coefficient, insight_text)
-                VALUES (?, ?, ?, ?)
-            ''', (metric, perf, r, insight))
+                SELECT date, sleep_hours, mood_score, energy_level
+                FROM daily_biometrics
+                ORDER BY date DESC LIMIT 30
+            ''')
+            biometrics = {row['date']: dict(row) for row in cursor.fetchall()}
             
-        conn.commit()
-        conn.close()
+            # 2. Fetch Study Performance (Quiz Scores)
+            # Check if table exists first to avoid crash
+            try:
+                cursor.execute("SELECT 1 FROM pyq_quiz_sessions LIMIT 1")
+            except sqlite3.OperationalError:
+                conn.close()
+                return
+
+            cursor.execute('''
+                SELECT date(submitted_at) as date, AVG(score) as avg_score
+                FROM pyq_quiz_sessions
+                WHERE status = 'completed' AND submitted_at IS NOT NULL
+                GROUP BY date(submitted_at)
+                ORDER BY date DESC LIMIT 30
+            ''')
+            scores = {row['date']: row['avg_score'] for row in cursor.fetchall()}
+            
+            # 3. Align Data
+            dates = sorted(list(set(biometrics.keys()) & set(scores.keys())))
+            if len(dates) < 3:
+                conn.close()
+                return # Not enough data
+
+            sleep_data = [biometrics[d]['sleep_hours'] for d in dates if biometrics[d]['sleep_hours'] is not None]
+            mood_data = [biometrics[d]['mood_score'] for d in dates if biometrics[d]['mood_score'] is not None]
+            score_data_sleep = [scores[d] for d in dates if biometrics[d]['sleep_hours'] is not None]
+            score_data_mood = [scores[d] for d in dates if biometrics[d]['mood_score'] is not None]
+            
+            # 4. Calculate Correlations
+            correlations = []
+            
+            if len(sleep_data) > 2:
+                r_sleep = self._calculate_pearson_correlation(sleep_data, score_data_sleep)
+                correlations.append(('sleep_hours', 'quiz_score', r_sleep))
+
+            if len(mood_data) > 2:
+                r_mood = self._calculate_pearson_correlation(mood_data, score_data_mood)
+                correlations.append(('mood_score', 'quiz_score', r_mood))
+
+            # 5. Generate Insights & Save
+            for metric, perf, r in correlations:
+                insight = self._generate_insight(metric, perf, r)
+
+                cursor.execute('''
+                    INSERT INTO bio_correlations (metric_name, performance_metric, correlation_coefficient, insight_text)
+                    VALUES (?, ?, ?, ?)
+                ''', (metric, perf, r, insight))
+
+            conn.commit()
+        except Exception as e:
+            print(f"Panopticon Analysis Failed: {e}")
+        finally:
+            conn.close()
 
     def _generate_insight(self, metric, perf, r):
         """Use Gemini to generate a human-readable insight."""
@@ -230,23 +242,28 @@ class PanopticonService:
     def get_dashboard_data(self):
         """Get data for the frontend dashboard."""
         conn = self.get_db_connection()
+        if not conn: return {"recent_metrics": [], "correlations": []}
         cursor = conn.cursor()
         
-        # Get recent metrics
-        cursor.execute('SELECT * FROM daily_biometrics ORDER BY date DESC LIMIT 7')
-        recent_metrics = [dict(row) for row in cursor.fetchall()]
-        
-        # Get correlations
-        cursor.execute('''
-            SELECT * FROM bio_correlations 
-            WHERE id IN (SELECT MAX(id) FROM bio_correlations GROUP BY metric_name)
-        ''')
-        correlations = [dict(row) for row in cursor.fetchall()]
-        
-        conn.close()
-        return {
-            "recent_metrics": recent_metrics,
-            "correlations": correlations
-        }
+        try:
+            # Get recent metrics
+            cursor.execute('SELECT * FROM daily_biometrics ORDER BY date DESC LIMIT 7')
+            recent_metrics = [dict(row) for row in cursor.fetchall()]
+
+            # Get correlations
+            cursor.execute('''
+                SELECT * FROM bio_correlations
+                WHERE id IN (SELECT MAX(id) FROM bio_correlations GROUP BY metric_name)
+            ''')
+            correlations = [dict(row) for row in cursor.fetchall()]
+
+            return {
+                "recent_metrics": recent_metrics,
+                "correlations": correlations
+            }
+        except Exception:
+            return {"recent_metrics": [], "correlations": []}
+        finally:
+            conn.close()
 
 panopticon = PanopticonService()

@@ -1,4 +1,4 @@
-# Answer Writing AI Evaluator
+# Answer Writing AI Evaluator using Gemini Pro
 import os
 import json
 import re
@@ -15,21 +15,11 @@ class AnswerEvaluator:
     
     def evaluate_answer(self, question, answer_text, word_limit, keywords=None, model_answer=None):
         """
-        Evaluates a UPSC answer using Gemini Pro AI
-        
-        Returns:
-            dict: {
-                overall_score: float,
-                structure_score: float,
-                content_score: float,
-                relevance_score: float,
-                keyword_coverage: float,
-                strengths: list[str],
-                improvements: list[str],
-                missing_keywords: list[str]
-            }
+        Evaluates a UPSC answer using Gemini Pro AI via ModelManager
         """
-        
+        if not model_manager.is_configured:
+            return self._get_default_evaluation(0, word_limit, "AI Offline")
+
         # Count words
         word_count = len(answer_text.split())
         
@@ -80,6 +70,14 @@ Be constructive but honest. Focus on UPSC-specific requirements: multidimensiona
             response = model_manager.generate_content(evaluation_prompt, model_type='fast')
             response_text = response.text.strip()
             
+            if hasattr(response, 'text'):
+                response_text = response.text.strip()
+            else:
+                response_text = str(response)
+
+            if "Oracle is silent" in response_text:
+                 return self._get_default_evaluation(word_count, word_limit, "AI Busy")
+
             # Clean response - remove markdown code blocks if present
             response_text = re.sub(r'```json\s*', '', response_text)
             response_text = re.sub(r'```\s*', '', response_text)
@@ -109,15 +107,13 @@ Be constructive but honest. Focus on UPSC-specific requirements: multidimensiona
             
         except json.JSONDecodeError as e:
             print(f"JSON Parse Error: {e}")
-            print(f"Response: {response_text}")
-            # Return default evaluation on error
-            return self._get_default_evaluation(word_count, word_limit)
+            return self._get_default_evaluation(word_count, word_limit, "Parsing Error")
         
         except Exception as e:
             print(f"Evaluation Error: {e}")
-            return self._get_default_evaluation(word_count, word_limit)
+            return self._get_default_evaluation(word_count, word_limit, "System Error")
     
-    def _get_default_evaluation(self, word_count, word_limit):
+    def _get_default_evaluation(self, word_count, word_limit, reason="unavailable"):
         """Fallback evaluation if AI fails"""
         return {
             'overall_score': 5.0,
@@ -126,7 +122,7 @@ Be constructive but honest. Focus on UPSC-specific requirements: multidimensiona
             'relevance_score': 5.0,
             'keyword_coverage': 50.0,
             'strengths': ["Answer submitted successfully"],
-            'improvements': ["AI evaluation temporarily unavailable - try again later"],
+            'improvements': [f"AI evaluation temporarily {reason} - try again later"],
             'missing_keywords': [],
             'word_count': word_count,
             'word_limit': word_limit,
@@ -135,17 +131,3 @@ Be constructive but honest. Focus on UPSC-specific requirements: multidimensiona
 
 # Singleton instance
 evaluator = AnswerEvaluator()
-
-if __name__ == '__main__':
-    # Test the evaluator
-    test_question = "Discuss the role of local governance in strengthening democracy in India."
-    test_answer = """Local governance plays a crucial role in strengthening democracy in India through decentralization and citizen participation. The 73rd and 74th Constitutional Amendments institutionalized Panchayati Raj, creating a three-tier structure of local self-government. This enables grass-root democracy where citizens directly participate in decision-making on local issues like sanitation, education, and infrastructure. Local governance ensures better accountability and efficient resource allocation. However, challenges like inadequate funding and political interference persist. Strengthening local governance requires financial devolution and capacity building."""
-    
-    result = evaluator.evaluate_answer(
-        question=test_question,
-        answer_text=test_answer,
-        word_limit=150,
-        keywords="local governance, panchayati raj, 73rd amendment, decentralization"
-    )
-    
-    print(json.dumps(result, indent=2))

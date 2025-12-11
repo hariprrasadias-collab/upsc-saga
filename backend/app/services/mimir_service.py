@@ -1,4 +1,5 @@
 import os
+from app.services.model_manager import model_manager
 from dotenv import load_dotenv
 from app.services.model_manager import model_manager
 
@@ -17,7 +18,7 @@ class MimirService:
             from app.services.brain_service import brain_service
             
             # 1. Think (Reasoning & Decision)
-            print(f"🧠 Mimir consulting Strategos for: '{message}'")
+            # print(f"🧠 Mimir consulting Strategos for: '{message}'") # Reduced logs
             brain_response = brain_service.think(message)
             
             response_text = brain_response.get('response_text', "I am lost in thought...")
@@ -48,8 +49,6 @@ class MimirService:
 
         except Exception as e:
             print(f"ERROR generating Mimir response: {type(e).__name__}: {e}")
-            import traceback
-            traceback.print_exc()
             return f"I seem to have lost my connection to the Well of Wisdom. Error: {type(e).__name__}"
 
     def evaluate_answer(self, question, answer):

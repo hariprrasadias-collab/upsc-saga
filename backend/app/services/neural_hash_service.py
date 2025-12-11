@@ -24,7 +24,7 @@ class NeuralHashService:
         # Check Cache
         cache_key = f"{context_type}:{hash(text)}"
         if cache_key in self._cache:
-            print("⚡ Neural Hash: Cache Hit")
+            # print("⚡ Neural Hash: Cache Hit") # Reduced logs
             return {"success": True, "data": self._cache[cache_key]}
 
         prompt = self._construct_prompt(text, context_type)
@@ -91,6 +91,10 @@ class NeuralHashService:
         try:
             # Clean up markdown code blocks if present
             text = text.strip()
+
+            if "Oracle is silent" in text:
+                 return {"success": False, "error": "AI Service Unavailable"}
+
             if text.startswith("```json"):
                 text = text[7:]
             if text.endswith("```"):
@@ -109,7 +113,7 @@ class NeuralHashService:
         """
         Expands a search query into related concepts using the Neural Hash.
         """
-        if not self.model:
+        if not model_manager.is_configured:
             return [query]
 
         prompt = f"""
@@ -132,7 +136,7 @@ class NeuralHashService:
                     return list(set([query] + expanded))
             return [query]
         except Exception as e:
-            print(f"Neural Hash Expansion Failed: {e}")
+            # print(f"Neural Hash Expansion Failed: {e}")
             return [query]
 
     # Duplicate init removed
@@ -142,11 +146,11 @@ class NeuralHashService:
         """
         QUANTUM ENTANGLEMENT: Finds hidden connections between the topic and Mind Palace artifacts.
         """
-        if not self.model: return []
+        if not model_manager.is_configured: return []
         
         # Check Cache
         if topic in self._cache:
-            print(f"⚡ Neural Hash: Returning cached connections for '{topic}'")
+            # print(f"⚡ Neural Hash: Returning cached connections for '{topic}'")
             return self._cache[topic]
         
         try:
@@ -181,6 +185,10 @@ class NeuralHashService:
             response = model_manager.generate_content(prompt, model_type='pro')
             import json
             text = response.text.replace("```json", "").replace("```", "").strip()
+
+            if "Oracle is silent" in text: return []
+
+            import json
             result = json.loads(text)
             
             # Update Cache

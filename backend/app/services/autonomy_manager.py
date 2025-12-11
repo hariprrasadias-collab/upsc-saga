@@ -3,6 +3,7 @@ Autonomy Manager - Controls Brain's autonomous execution capabilities
 """
 from app.db import get_db
 import json
+from datetime import datetime
 
 class AutonomyManager:
     """Manages autonomy levels and auto-execution permissions"""
@@ -38,13 +39,16 @@ class AutonomyManager:
     @staticmethod
     def get_user_autonomy_level(user_id=1):
         """Get user's current autonomy preference"""
-        conn = get_db()
-        result = conn.execute(
-            'SELECT autonomy_level FROM brain_user_preferences WHERE user_id = ?',
-            (user_id,)
-        ).fetchone()
-        
-        return result['autonomy_level'] if result else 'manual'
+        try:
+            conn = get_db()
+            result = conn.execute(
+                'SELECT autonomy_level FROM brain_user_preferences WHERE user_id = ?',
+                (user_id,)
+            ).fetchone()
+
+            return result['autonomy_level'] if result else 'manual'
+        except Exception:
+            return 'manual'
     
     @staticmethod
     def set_user_autonomy_level(user_id, level):
@@ -52,15 +56,18 @@ class AutonomyManager:
         if level not in AutonomyManager.AUTONOMY_LEVELS:
             raise ValueError(f"Invalid autonomy level: {level}")
         
-        conn = get_db()
-        conn.execute('''
-            INSERT INTO brain_user_preferences (user_id, autonomy_level, last_updated)
-            VALUES (?, ?, CURRENT_TIMESTAMP)
-            ON CONFLICT(user_id) DO UPDATE SET
-                autonomy_level = excluded.autonomy_level,
-                last_updated = CURRENT_TIMESTAMP
-        ''', (user_id, level))
-        conn.commit()
+        try:
+            conn = get_db()
+            conn.execute('''
+                INSERT INTO brain_user_preferences (user_id, autonomy_level, last_updated)
+                VALUES (?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(user_id) DO UPDATE SET
+                    autonomy_level = excluded.autonomy_level,
+                    last_updated = CURRENT_TIMESTAMP
+            ''', (user_id, level))
+            conn.commit()
+        except Exception as e:
+            print(f"Error setting autonomy level: {e}")
     
     @staticmethod
     def can_auto_execute(action_type, user_id=1):
@@ -71,6 +78,9 @@ class AutonomyManager:
             return False
         
         autonomy_level = AutonomyManager.get_user_autonomy_level(user_id)
+        if autonomy_level not in AutonomyManager.AUTONOMY_LEVELS:
+            autonomy_level = 'manual'
+
         allowed_actions = AutonomyManager.AUTONOMY_LEVELS[autonomy_level]['auto_execute']
         
         # Full auto mode
@@ -83,67 +93,86 @@ class AutonomyManager:
     @staticmethod
     def is_action_blacklisted(action_type):
         """Check if action is temporarily blacklisted due to repeated failures"""
-        conn = get_db()
-        result = conn.execute('''
-            SELECT COUNT(*) as count FROM brain_action_blacklist
-            WHERE action_type = ?
-            AND (blacklist_until IS NULL OR blacklist_until > CURRENT_TIMESTAMP)
-        ''', (action_type,)).fetchone()
-        
-        return result['count'] > 0
+        try:
+            conn = get_db()
+            result = conn.execute('''
+                SELECT COUNT(*) as count FROM brain_action_blacklist
+                WHERE action_type = ?
+                AND (blacklist_until IS NULL OR blacklist_until > CURRENT_TIMESTAMP)
+            ''', (action_type,)).fetchone()
+
+            return result['count'] > 0
+        except Exception:
+            return False
     
     @staticmethod
     def log_action(action_type, action_payload, executed_by='manual', 
                    reasoning=None, confidence_score=1.0, user_id=1):
         """Log a Brain action for tracking and learning"""
-        conn = get_db()
-        
-        # Get current system context
-        context_snapshot = AutonomyManager._get_context_snapshot()
-        
-        cursor = conn.execute('''
-            INSERT INTO brain_action_log (
-                user_id, action_type, action_payload, action_label,
-                executed_by, reasoning, confidence_score, context_snapshot
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            user_id,
-            action_type,
-            json.dumps(action_payload),
-            action_payload.get('label', action_type),
-            executed_by,
-            reasoning,
-            confidence_score,
-            json.dumps(context_snapshot)
-        ))
-        conn.commit()
-        
-        return cursor.lastrowid
+        try:
+            conn = get_db()
+
+            # Get current system context
+            context_snapshot = AutonomyManager._get_context_snapshot()
+
+            # Ensure payload is JSON serializable
+            safe_payload = {}
+            if isinstance(action_payload, dict):
+                safe_payload = action_payload
+            else:
+                safe_payload = {"raw": str(action_payload)}
+
+            cursor = conn.execute('''
+                INSERT INTO brain_action_log (
+                    user_id, action_type, action_payload, action_label,
+                    executed_by, reasoning, confidence_score, context_snapshot
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                user_id,
+                action_type,
+                json.dumps(safe_payload, default=str),
+                safe_payload.get('label', action_type),
+                executed_by,
+                reasoning,
+                confidence_score,
+                json.dumps(context_snapshot, default=str)
+            ))
+            conn.commit()
+
+            return cursor.lastrowid
+        except Exception as e:
+            print(f"Error logging action: {e}")
+            return None
     
     @staticmethod
     def update_action_outcome(action_id, outcome_status, impact_score=None, 
                              user_feedback=None):
         """Update the outcome of a logged action"""
-        conn = get_db()
-        conn.execute('''
-            UPDATE brain_action_log
-            SET outcome_status = ?,
-                outcome_measured_at = CURRENT_TIMESTAMP,
-                impact_score = COALESCE(?, impact_score),
-                user_feedback = COALESCE(?, user_feedback)
-            WHERE id = ?
-        ''', (outcome_status, impact_score, user_feedback, action_id))
-        conn.commit()
+        if not action_id: return
+        try:
+            conn = get_db()
+            conn.execute('''
+                UPDATE brain_action_log
+                SET outcome_status = ?,
+                    outcome_measured_at = CURRENT_TIMESTAMP,
+                    impact_score = COALESCE(?, impact_score),
+                    user_feedback = COALESCE(?, user_feedback)
+                WHERE id = ?
+            ''', (outcome_status, impact_score, user_feedback, action_id))
+            conn.commit()
+        except Exception as e:
+            print(f"Error updating action outcome: {e}")
     
     @staticmethod
     def _get_context_snapshot():
         """Capture current system state for learning"""
-        from app.services.brain_service import brain_service
-        from datetime import datetime
-        
         try:
-            # Get basic context
-            status = brain_service._get_system_status_summary()
+            from app.services.brain_service import brain_service
+            # Check if brain_service is importable without circular deps or errors
+            if brain_service:
+                status = brain_service._get_system_status_summary()
+            else:
+                status = "Unknown"
             
             return {
                 'timestamp': datetime.now().isoformat(),
@@ -152,38 +181,43 @@ class AutonomyManager:
                 'system_status': status
             }
         except Exception as e:
-            print(f"Error getting context snapshot: {e}")
+            # print(f"Error getting context snapshot: {e}") # Reduce spam
             return {'timestamp': datetime.now().isoformat()}
     
     @staticmethod
     def get_autonomy_stats(user_id=1):
         """Get statistics about autonomous operations"""
-        conn = get_db()
-        
-        # Total actions
-        total = conn.execute(
-            'SELECT COUNT(*) as count FROM brain_action_log WHERE user_id = ?',
-            (user_id,)
-        ).fetchone()
-        
-        # Auto-executed actions
-        auto_executed = conn.execute(
-            'SELECT COUNT(*) as count FROM brain_action_log WHERE user_id = ? AND executed_by = "auto"',
-            (user_id,)
-        ).fetchone()
-        
-        # Success rate
-        success = conn.execute(
-            'SELECT AVG(impact_score) as avg FROM brain_action_log WHERE user_id = ? AND impact_score IS NOT NULL',
-            (user_id,)
-        ).fetchone()
-        
-        return {
-            'total_actions': total['count'],
-            'auto_executed_count': auto_executed['count'],
-            'auto_execution_rate': auto_executed['count'] / total['count'] if total['count'] > 0 else 0,
-            'average_success_score': success['avg'] if success and success['avg'] else 0
-        }
+        try:
+            conn = get_db()
+
+            # Total actions
+            total = conn.execute(
+                'SELECT COUNT(*) as count FROM brain_action_log WHERE user_id = ?',
+                (user_id,)
+            ).fetchone()
+
+            # Auto-executed actions
+            auto_executed = conn.execute(
+                'SELECT COUNT(*) as count FROM brain_action_log WHERE user_id = ? AND executed_by = "auto"',
+                (user_id,)
+            ).fetchone()
+
+            # Success rate
+            success = conn.execute(
+                'SELECT AVG(impact_score) as avg FROM brain_action_log WHERE user_id = ? AND impact_score IS NOT NULL',
+                (user_id,)
+            ).fetchone()
+
+            return {
+                'total_actions': total['count'] if total else 0,
+                'auto_executed_count': auto_executed['count'] if auto_executed else 0,
+                'auto_execution_rate': (auto_executed['count'] / total['count']) if total and total['count'] > 0 else 0,
+                'average_success_score': success['avg'] if success and success['avg'] else 0
+            }
+        except Exception as e:
+            return {
+                'total_actions': 0, 'auto_executed_count': 0, 'auto_execution_rate': 0, 'average_success_score': 0
+            }
 
 # Singleton instance
 autonomy_manager = AutonomyManager()
