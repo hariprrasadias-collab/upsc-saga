@@ -1,4 +1,5 @@
 from app.db import get_db
+import traceback
 
 class MockTestService:
     """
@@ -7,39 +8,42 @@ class MockTestService:
     @staticmethod
     def get_brain_context():
         """Standard interface for the Brain to pull context."""
-        conn = get_db()
-        
-        # Overall stats
-        stats = conn.execute('''
-            SELECT 
-                COUNT(*) as total_attempts,
-                AVG(score) as avg_score,
-                MAX(score) as best_score,
-                AVG(percentage) as avg_percentage
-            FROM test_attempts
-            WHERE user_id = 1 AND status = 'completed'
-        ''').fetchone()
-        
-        # Recent activity
-        recent = conn.execute('''
-            SELECT mt.title, ta.score, ta.percentage, ta.submitted_at
-            FROM test_attempts ta
-            JOIN mock_tests mt ON ta.test_id = mt.id
-            WHERE ta.user_id = 1 AND ta.status = 'completed'
-            ORDER BY ta.submitted_at DESC
-            LIMIT 3
-        ''').fetchall()
+        try:
+            conn = get_db()
 
-        return {
-            "status": "active",
-            "data": {
-                "total_attempts": stats['total_attempts'] if stats else 0,
-                "average_score": round(stats['avg_score'], 1) if stats and stats['avg_score'] else 0,
-                "recent_tests": [
-                    f"{r['title']} ({round(r['percentage'], 1)}%)" for r in recent
-                ] if recent else []
+            # Overall stats
+            stats = conn.execute('''
+                SELECT
+                    COUNT(*) as total_attempts,
+                    AVG(score) as avg_score,
+                    MAX(score) as best_score,
+                    AVG(percentage) as avg_percentage
+                FROM test_attempts
+                WHERE user_id = 1 AND status = 'completed'
+            ''').fetchone()
+
+            # Recent activity
+            recent = conn.execute('''
+                SELECT mt.title, ta.score, ta.percentage, ta.submitted_at
+                FROM test_attempts ta
+                JOIN mock_tests mt ON ta.test_id = mt.id
+                WHERE ta.user_id = 1 AND ta.status = 'completed'
+                ORDER BY ta.submitted_at DESC
+                LIMIT 3
+            ''').fetchall()
+
+            return {
+                "status": "active",
+                "data": {
+                    "total_attempts": stats['total_attempts'] if stats else 0,
+                    "average_score": round(stats['avg_score'], 1) if stats and stats['avg_score'] else 0,
+                    "recent_tests": [
+                        f"{r['title']} ({round(r['percentage'], 1)}%)" for r in recent
+                    ] if recent else []
+                }
             }
-        }
+        except Exception:
+            return {"status": "error", "data": {}}
 
     @staticmethod
     def create_smart_test(topic):
@@ -49,23 +53,15 @@ class MockTestService:
     @staticmethod
     def generate_from_topic(topic, count=10):
         """Generate a mock test for a topic using Gemini."""
-        import google.generativeai as genai
         import os
         import json
         import re
-        import ast
-        
-        print(f"🤖 Generating Mock Test for: {topic}")
-        
-        api_key = os.environ.get('GEMINI_API_KEY')
-        if not api_key:
-            print("❌ GEMINI_API_KEY missing")
-            return {"success": False, "error": "API Key missing"}
-            
         from app.services.model_manager import model_manager
         
-        # model = genai.GenerativeModel('gemini-2.0-flash-001') # REMOVED HARDCODED
-        model = model_manager.get_model(model_type='fast') # Use centralized manager
+        # print(f"🤖 Generating Mock Test for: {topic}") # Reduced logs
+        
+        if not model_manager.is_configured:
+            return {"success": False, "error": "API Key missing"}
         
         # Handle "Weak Areas" special case
         if topic.lower() == "weak areas":
@@ -75,11 +71,9 @@ class MockTestService:
                 weak_data = identify_weak_areas(conn, 1, limit=3)
                 if weak_data:
                     topic = ", ".join([w['subject'] for w in weak_data])
-                    print(f"📉 Resolved Weak Areas: {topic}")
                 else:
                     topic = "General Studies"
             except Exception as e:
-                print(f"⚠️ Failed to resolve weak areas: {e}")
                 topic = "General Studies"
         
         prompt = f"""
@@ -110,21 +104,21 @@ class MockTestService:
         """
         
         try:
-            response = model.generate_content(prompt)
+            response = model_manager.generate_content(prompt, model_type='fast')
             
-            # Safety Check
-            if not response.parts:
-                print("❌ Mock Test Error: Gemini returned an empty response (Safety Filter triggered?)")
-                return {"success": False, "error": "AI Safety Filter triggered. Please try a different topic."}
-                
-            text = response.text.strip()
+            if hasattr(response, 'text'):
+                text = response.text.strip()
+            else:
+                text = str(response)
             
+            if "Oracle is silent" in text:
+                 return {"success": False, "error": "AI Service Unavailable"}
+
             # Robust JSON extraction
             json_match = re.search(r"```json\s*(.*?)\s*```", text, re.DOTALL)
             if json_match:
                 text = json_match.group(1)
             else:
-                # Try to find the outermost braces
                 start = text.find('{')
                 end = text.rfind('}')
                 if start != -1 and end != -1:
@@ -137,12 +131,7 @@ class MockTestService:
             try:
                 data = json.loads(text)
             except json.JSONDecodeError:
-                print("⚠️ JSON parse failed, trying ast.literal_eval...")
-                try:
-                    data = ast.literal_eval(text)
-                except Exception as e:
-                    print(f"❌ AST parse failed: {e}")
-                    raise ValueError("Could not parse AI response as JSON or Python dict")
+                return {"success": False, "error": "Failed to parse AI response (Invalid JSON)"}
             
             conn = get_db()
             
@@ -162,11 +151,10 @@ class MockTestService:
                 ''', (test_id, i, q['question_text'], q['option_a'], q['option_b'], q['option_c'], q['option_d'], q['correct_answer'], q['explanation']))
                 
             conn.commit()
-            print(f"✅ Mock Test Created: ID {test_id}")
             return {"success": True, "message": f"Created test '{data['title']}' with {len(data['questions'])} questions.", "test_id": test_id}
             
         except Exception as e:
-            print(f"❌ Mock Test Generation Error: {e}")
+            # print(f"❌ Mock Test Generation Error: {e}") # Reduced logs
             return {"success": False, "error": str(e)}
 
 # Register Synapse

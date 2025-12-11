@@ -2,25 +2,22 @@
 The Neural Hash - Pattern Decoding Service
 """
 import os
-import google.generativeai as genai
 import json
 import re
 from functools import lru_cache
 from app.db_models.neural_hash import save_neural_hash_log
+from app.services.model_manager import model_manager
 
 class NeuralHashService:
     def __init__(self):
-        self.api_key = os.environ.get('GEMINI_API_KEY')
-        if self.api_key:
-            genai.configure(api_key=self.api_key)
-            self.model = genai.GenerativeModel('gemini-flash-latest')
+        # ModelManager handles initialization
         self._cache = {}
 
     def decode_text(self, text: str, context_type: str = 'general'):
         """
         Decodes the input text to find hidden patterns, keywords, and themes relevant to UPSC.
         """
-        if not self.model:
+        if not model_manager.is_configured:
             return {
                 "success": False,
                 "error": "Neural Hash offline. API Key missing."
@@ -29,32 +26,28 @@ class NeuralHashService:
         # Check Cache (Simple in-memory for now, could be Redis later)
         cache_key = f"{context_type}:{hash(text)}"
         if cache_key in self._cache:
-            print("⚡ Neural Hash: Cache Hit")
+            # print("⚡ Neural Hash: Cache Hit") # Reduced logs
             return {"success": True, "data": self._cache[cache_key]}
 
         prompt = self._construct_prompt(text, context_type)
         
-        retries = 3
-        for attempt in range(retries):
-            try:
-                response = self.model.generate_content(prompt)
-                result = self._parse_response(response.text)
-                
-                if result['success']:
-                    # Cache and Persist
-                    self._cache[cache_key] = result['data']
-                    save_neural_hash_log(text, context_type, result['data'])
-                    return result
-            except Exception as e:
-                print(f"⚠️ Neural Hash Attempt {attempt+1} failed: {e}")
-                if attempt == retries - 1:
-                    print(f"❌ Neural Hash Error after {retries} attempts: {e}")
-                    return {
-                        "success": False,
-                        "error": f"Failed after {retries} attempts. Last error: {str(e)}"
-                    }
-                import time
-                time.sleep(2 ** attempt) # Exponential backoff: 1s, 2s, 4s
+        try:
+            response = model_manager.generate_content(prompt, model_type='fast')
+            result = self._parse_response(response.text)
+
+            if result['success']:
+                # Cache and Persist
+                self._cache[cache_key] = result['data']
+                save_neural_hash_log(text, context_type, result['data'])
+                return result
+            else:
+                return result
+        except Exception as e:
+            print(f"⚠️ Neural Hash Failed: {e}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
 
     def _construct_prompt(self, text, context_type):
         base_prompt = """
@@ -101,6 +94,10 @@ class NeuralHashService:
         try:
             # Clean up markdown code blocks if present
             text = text.strip()
+
+            if "Oracle is silent" in text:
+                 return {"success": False, "error": "AI Service Unavailable"}
+
             if text.startswith("```json"):
                 text = text[7:]
             if text.endswith("```"):
@@ -119,7 +116,7 @@ class NeuralHashService:
         """
         Expands a search query into related concepts using the Neural Hash.
         """
-        if not self.model:
+        if not model_manager.is_configured:
             return [query]
 
         prompt = f"""
@@ -133,7 +130,7 @@ class NeuralHashService:
         """
         
         try:
-            response = self.model.generate_content(prompt)
+            response = model_manager.generate_content(prompt, model_type='fast')
             result = self._parse_response(response.text)
             if result['success']:
                 expanded = result['data']
@@ -142,25 +139,18 @@ class NeuralHashService:
                     return list(set([query] + expanded))
             return [query]
         except Exception as e:
-            print(f"Neural Hash Expansion Failed: {e}")
+            # print(f"Neural Hash Expansion Failed: {e}")
             return [query]
-
-    def __init__(self):
-        self.api_key = os.environ.get('GEMINI_API_KEY')
-        if self.api_key:
-            genai.configure(api_key=self.api_key)
-            self.model = genai.GenerativeModel('gemini-flash-latest') # Optimized model
-        self._cache = {}
 
     def find_quantum_connections(self, topic: str):
         """
         QUANTUM ENTANGLEMENT: Finds hidden connections between the topic and Mind Palace artifacts.
         """
-        if not self.model: return []
+        if not model_manager.is_configured: return []
         
         # Check Cache
         if topic in self._cache:
-            print(f"⚡ Neural Hash: Returning cached connections for '{topic}'")
+            # print(f"⚡ Neural Hash: Returning cached connections for '{topic}'")
             return self._cache[topic]
         
         try:
@@ -192,9 +182,12 @@ class NeuralHashService:
             ]
             """
             
-            response = self.model.generate_content(prompt)
-            import json
+            response = model_manager.generate_content(prompt, model_type='pro') # Pro for deep connections
             text = response.text.replace("```json", "").replace("```", "").strip()
+
+            if "Oracle is silent" in text: return []
+
+            import json
             result = json.loads(text)
             
             # Update Cache

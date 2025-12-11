@@ -1,29 +1,18 @@
-import google.generativeai as genai
 import os
 import json
 from app.db import get_db
 from dotenv import load_dotenv
+from app.services.model_manager import model_manager
 
 load_dotenv()
-
-GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-
-def get_model():
-    try:
-        return genai.GenerativeModel('gemini-flash-latest')
-    except:
-        return genai.GenerativeModel('gemini-flash')
 
 def analyze_topic_triangulation(text):
     """
     Triangulates a topic into Theory, Precedents, and PYQs.
     """
-    if not GEMINI_API_KEY:
-        return {"error": "Gemini API Key missing"}
+    if not model_manager.is_configured:
+        return {"error": "AI Service Offline"}
 
-    model = get_model()
     conn = get_db()
 
     # 1. AI Analysis (Omni-Link System)
@@ -79,8 +68,17 @@ def analyze_topic_triangulation(text):
     """
 
     try:
-        response = model.generate_content(prompt)
-        ai_data = json.loads(response.text.replace('```json', '').replace('```', '').strip())
+        response = model_manager.generate_content(prompt, model_type='pro')
+
+        if hasattr(response, 'text'):
+            text = response.text.strip()
+        else:
+            text = str(response)
+
+        if "Oracle is silent" in text:
+             return {"error": "AI Busy"}
+
+        ai_data = json.loads(text.replace('```json', '').replace('```', '').strip())
     except Exception as e:
         print(f"Triangulation AI Error: {e}")
         return {"error": str(e)}
@@ -91,15 +89,16 @@ def analyze_topic_triangulation(text):
     
     if keywords:
         # Construct dynamic query
-        placeholders = ' OR '.join(['question_text LIKE ?'] * len(keywords))
-        query = f"SELECT * FROM pyq_questions WHERE {placeholders} LIMIT 5"
-        params = [f"%{k}%" for k in keywords]
-        
         try:
+            placeholders = ' OR '.join(['question_text LIKE ?'] * len(keywords))
+            query = f"SELECT * FROM pyq_questions WHERE {placeholders} LIMIT 5"
+            params = [f"%{k}%" for k in keywords]
+
             rows = conn.execute(query, params).fetchall()
             pyqs = [dict(row) for row in rows]
         except Exception as e:
-            print(f"PYQ Fetch Error: {e}")
+            # print(f"PYQ Fetch Error: {e}") # Reduced logs
+            pass
 
     return {
         "topic": ai_data.get('core_topic'),

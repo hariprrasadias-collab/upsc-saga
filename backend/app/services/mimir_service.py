@@ -1,50 +1,14 @@
 import google.generativeai as genai
 import os
+from app.services.model_manager import model_manager
 from dotenv import load_dotenv
 
 load_dotenv()
 
 class MimirService:
     def __init__(self):
-        self.model = None
-        api_key = os.getenv("GEMINI_API_KEY")
-        
-        if not api_key:
-            print("ERROR: GEMINI_API_KEY not found in environment variables")
-            print(f"Current .env path: {os.path.join(os.getcwd(), '.env')}")
-        else:
-            print(f"SUCCESS: GEMINI_API_KEY loaded (length: {len(api_key)})")
-            try:
-                genai.configure(api_key=api_key)
-                
-                # Use models that are actually available in the API
-                # Based on genai.list_models() output
-                models_to_try = [
-                    'gemini-flash-latest',          # Stable Flash alias
-                    'gemini-pro-latest',            # Stable Pro alias
-                ]
-                
-                model_initialized = False
-                for model_name in models_to_try:
-                    try:
-                        self.model = genai.GenerativeModel(model_name)
-                        print(f"SUCCESS: Gemini model initialized (using {model_name})")
-                        model_initialized = True
-                        break
-                    except Exception as model_error:
-                        print(f"Failed to initialize {model_name}: {model_error}")
-                        continue
-                
-                if not model_initialized:
-                    print("ERROR: All Gemini models failed to initialize")
-                    print("This likely means:")
-                    print("1. Your API key is invalid or expired")
-                    print("2. You don't have access to Gemini API")
-                    print("3. Your region/quota is restricted")
-                    self.model = None
-                    
-            except Exception as e:
-                print(f"ERROR: Failed to configure Gemini: {e}")
+        # ModelManager handles initialization
+        pass
             
     def generate_response(self, message, history=[]):
         """
@@ -55,7 +19,7 @@ class MimirService:
             from app.services.brain_service import brain_service
             
             # 1. Think (Reasoning & Decision)
-            print(f"🧠 Mimir consulting Strategos for: '{message}'")
+            # print(f"🧠 Mimir consulting Strategos for: '{message}'") # Reduced logs
             brain_response = brain_service.think(message)
             
             response_text = brain_response.get('response_text', "I am lost in thought...")
@@ -86,12 +50,10 @@ class MimirService:
 
         except Exception as e:
             print(f"ERROR generating Mimir response: {type(e).__name__}: {e}")
-            import traceback
-            traceback.print_exc()
             return f"I seem to have lost my connection to the Well of Wisdom. Error: {type(e).__name__}"
 
     def evaluate_answer(self, question, answer):
-        if not self.model:
+        if not model_manager.is_configured:
             return "I am currently offline. Please check my API key configuration."
             
         try:
@@ -118,7 +80,7 @@ class MimirService:
             Do not include any markdown formatting (like ```json) in the response, just the raw JSON string.
             """
             
-            response = self.model.generate_content(prompt)
+            response = model_manager.generate_content(prompt)
             return response.text
         except Exception as e:
             print(f"Error generating evaluation: {e}")
