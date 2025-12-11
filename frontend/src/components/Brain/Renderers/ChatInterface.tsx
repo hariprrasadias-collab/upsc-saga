@@ -21,10 +21,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ content, topic }) => {
     const [userInput, setUserInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [expandedThoughts, setExpandedThoughts] = useState<number | null>(null);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     // Initial parsing of content
     useEffect(() => {
+        if (!content) return;
         const parsedMessages = content.split('\n').map(line => {
             const parts = line.split(':');
             if (parts.length > 1) {
@@ -43,13 +45,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ content, topic }) => {
     // Auto-scroll to bottom
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
+    }, [messages, loading]);
 
     const handleSend = async (autoReply = false) => {
         if (!topic) return;
         if (!autoReply && !userInput.trim()) return;
 
         setLoading(true);
+        setErrorMsg(null);
         const inputToSend = autoReply ? null : userInput;
 
         // Optimistic update for user message
@@ -69,7 +72,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ content, topic }) => {
                 history.push({ speakerId: 'user', text: inputToSend });
             }
 
-            const response = await fetch('/api/socratic/debate', {
+            const response = await fetch('http://127.0.0.1:5000/api/socratic/debate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -78,6 +81,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ content, topic }) => {
                     user_input: inputToSend
                 })
             });
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
 
             const data = await response.json();
 
@@ -91,10 +98,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ content, topic }) => {
                 };
                 setMessages(prev => [...prev, newMessage]);
             } else if (data.error) {
-                console.error("Debate error:", data.error);
+                setErrorMsg(`Debate error: ${data.error}`);
+            } else {
+                // Handle raw text fallback or empty response
+                console.warn("Unexpected response structure", data);
             }
         } catch (error) {
             console.error("Failed to send message", error);
+            setErrorMsg("Connection lost. The philosophers are silent.");
         } finally {
             setLoading(false);
         }
@@ -114,6 +125,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ content, topic }) => {
             case 'skeptic': return 'Socrates';
             case 'idealist': return 'Plato';
             case 'realist': return 'Aristotle';
+            case 'user': return 'You';
             default: return 'Unknown';
         }
     };
@@ -168,12 +180,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ content, topic }) => {
                         </div>
                     );
                 })}
+                {loading && <div className="typing-indicator">Philosophers are contemplating...</div>}
+                {errorMsg && <div className="error-message">{errorMsg}</div>}
                 <div ref={messagesEndRef} />
             </div>
 
             <div className="chat-controls glass-panel">
-                {loading && <div className="typing-indicator">Philosophers are contemplating...</div>}
-
                 <div className="input-group">
                     <input
                         type="text"

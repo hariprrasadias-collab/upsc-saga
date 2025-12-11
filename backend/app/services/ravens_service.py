@@ -1,4 +1,5 @@
-from app.db_models.current_affairs import get_saved_articles, article_exists
+from app.db_models.current_affairs import get_saved_articles
+import traceback
 
 class RavensService:
     """
@@ -7,35 +8,48 @@ class RavensService:
     @staticmethod
     def get_recent_articles(limit=5):
         """Get most recent articles for the Brain context."""
-        articles = get_saved_articles()
-        return articles[:limit]
+        try:
+            articles = get_saved_articles()
+            if not articles:
+                return []
+            return articles[:limit]
+        except Exception as e:
+            print(f"Ravens Fetch Error: {e}")
+            return []
 
     @staticmethod
     def search_articles(query):
         """Search articles by keyword."""
-        return get_saved_articles({'search': query})
+        try:
+            return get_saved_articles({'search': query})
+        except Exception:
+            return []
 
     @staticmethod
     def get_article_by_link(link):
         """Check if article exists and return it."""
-        # This is a simplified check, ideally we'd get the full object
-        # For now, we reuse the existing list fetch
-        all_articles = get_saved_articles()
-        for a in all_articles:
-            if a['link'] == link:
-                return a
-        return None
+        try:
+            all_articles = get_saved_articles()
+            for a in all_articles:
+                if a['link'] == link:
+                    return a
+            return None
+        except Exception:
+            return None
 
     @staticmethod
     def get_brain_context():
         """Standard interface for the Brain to pull context."""
-        recent = RavensService.get_recent_articles(limit=3)
-        return {
-            "status": "active",
-            "data": {
-                "recent_headlines": [a['title'] for a in recent] if recent else []
+        try:
+            recent = RavensService.get_recent_articles(limit=3)
+            return {
+                "status": "active",
+                "data": {
+                    "recent_headlines": [a['title'] for a in recent] if recent else []
+                }
             }
-        }
+        except Exception as e:
+            return {"status": "error", "data": {"recent_headlines": []}}
 
 # Register Synapse
 try:
