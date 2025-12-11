@@ -12,7 +12,7 @@ def ingest_directive():
         data = request.json
         path_data = data.get('path', [])
         
-        from app.services.brain_service import brain_service
+        # from app.services.brain_service import brain_service # Already imported
         brain_service.ingest_strategic_directive(path_data)
         
         return jsonify({"success": True, "message": "Strategic Directive Acknowledged."})
@@ -25,29 +25,38 @@ def think():
     Main endpoint for Brain interaction.
     User sends text -> Brain returns thoughts + actions.
     """
-    data = request.json
-    user_input = data.get('input', '')
-    context = data.get('context', {})
-    
-    response = brain_service.think(user_input, context)
-    return jsonify(response)
+    try:
+        data = request.json
+        user_input = data.get('input', '')
+        context = data.get('context', {})
+
+        response = brain_service.think(user_input, context)
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({"response_text": "I am currently offline.", "error": str(e)}), 500
 
 @brain_bp.route('/execute', methods=['POST'])
 def execute_action():
     """
     Endpoint to execute a specific action suggested by the Brain.
     """
-    data = request.json
-    action_type = data.get('type')
-    payload = data.get('payload', {})
-    
-    result = brain_service.execute_action(action_type, payload)
-    return jsonify(result)
+    try:
+        data = request.json
+        action_type = data.get('type')
+        payload = data.get('payload', {})
+
+        result = brain_service.execute_action(action_type, payload)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
 @brain_bp.route('/status', methods=['GET'])
 def get_status():
     """Check Brain health and connections"""
-    return jsonify(brain_service._get_system_status_summary())
+    try:
+        return jsonify(brain_service._get_system_status_summary())
+    except Exception as e:
+        return jsonify({"status": "DEGRADED", "error": str(e)}), 500
 
 @brain_bp.route('/proactive', methods=['GET'])
 def get_proactive_insights():
@@ -68,7 +77,10 @@ def get_proactive_insights():
             # Parse payload if string
             payload = opp['payload']
             if isinstance(payload, str):
-                payload = json.loads(payload)
+                try:
+                    payload = json.loads(payload)
+                except:
+                    payload = {}
                 
             insights.append({
                 'type': opp['type'].replace('_', ' ').title(),
@@ -108,7 +120,10 @@ def trigger_optimization():
             for opp in opportunities:
                 payload = opp['payload']
                 if isinstance(payload, str):
-                    payload = json.loads(payload)
+                    try:
+                        payload = json.loads(payload)
+                    except:
+                        payload = {}
                 
                 actions_taken.append({
                     'label': opp['description'],
