@@ -11,22 +11,29 @@ class HippocampusService:
     """
     
     def __init__(self):
-        self.memory_path = os.path.join(os.path.dirname(__file__), '..', '..', LESSONS_FILE)
+        # Determine backend root (assuming this file is in backend/app/services/)
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        self.memory_path = os.path.join(base_dir, LESSONS_FILE)
         self._load_memory()
         
     def _load_memory(self):
-        if os.path.exists(self.memory_path):
-            try:
-                with open(self.memory_path, 'r') as f:
-                    self.memory = json.load(f)
-            except:
+        try:
+            if os.path.exists(self.memory_path):
+                with open(self.memory_path, 'r', encoding='utf-8') as f:
+                    content = f.read().strip()
+                    if content:
+                        self.memory = json.loads(content)
+                    else:
+                        self.memory = {"lessons": []}
+            else:
                 self.memory = {"lessons": []}
-        else:
+        except Exception as e:
+            print(f"⚠️ Hippocampus Load Error: {e}")
             self.memory = {"lessons": []}
             
     def _save_memory(self):
         try:
-            with open(self.memory_path, 'w') as f:
+            with open(self.memory_path, 'w', encoding='utf-8') as f:
                 json.dump(self.memory, f, indent=2)
         except Exception as e:
             print(f"❌ Hippocampus Write Error: {e}")
@@ -35,23 +42,34 @@ class HippocampusService:
         """
         Stores a new lesson.
         """
-        entry = {
-            "timestamp": datetime.now().isoformat(),
-            "context": context, # e.g., "AttributeError in BrainService"
-            "lesson": lesson,   # e.g., "Always check if datetime is imported as class or module"
-            "source": source
-        }
-        self.memory["lessons"].append(entry)
-        self._save_memory()
-        print(f"🧠 Hippocampus: Lesson Learned -> {lesson}")
+        if not lesson: return
+
+        try:
+            entry = {
+                "timestamp": datetime.now().isoformat(),
+                "context": context,
+                "lesson": lesson,
+                "source": source
+            }
+            if "lessons" not in self.memory:
+                self.memory["lessons"] = []
+
+            self.memory["lessons"].append(entry)
+            self._save_memory()
+            # print(f"🧠 Hippocampus: Lesson Learned -> {lesson}") # Reduced spam
+        except Exception as e:
+            print(f"Hippocampus Memory Error: {e}")
 
     def recall_lessons(self, current_context: str = "") -> list:
         """
         Retrieves relevant lessons.
-        For now, returns the last 5 lessons to keep context fresh.
-        Future: Use semantic search/embeddings.
         """
-        # Return last 5 lessons
-        return [l['lesson'] for l in self.memory["lessons"][-5:]]
+        try:
+            if "lessons" not in self.memory or not self.memory["lessons"]:
+                return []
+            # Return last 5 lessons
+            return [l.get('lesson', '') for l in self.memory["lessons"][-5:]]
+        except Exception:
+            return []
 
 hippocampus = HippocampusService()
