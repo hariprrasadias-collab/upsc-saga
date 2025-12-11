@@ -1,13 +1,16 @@
 from app import cgi_fix
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_cors import CORS
 from flask_compress import Compress
 from flask_caching import Cache
+import os
 
 cache = Cache()
 
 def create_app():
-    app = Flask(__name__)
+    # Use absolute path for safety
+    frontend_dist = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../frontend/dist'))
+    app = Flask(__name__, static_folder=frontend_dist, static_url_path='/')
     app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
     CORS(app, resources={r"/*": {"origins": "*"}})
     Compress(app) # Enable Gzip compression
@@ -168,5 +171,15 @@ def create_app():
         init_panopticon_tables(DATABASE)
         init_foresight_tables()
         init_neural_hash_tables()
+
+    @app.route('/', defaults={'path': ''})
+    @app.route('/<path:path>')
+    def serve_frontend(path):
+        if path.startswith('api/'):
+            return {"error": "Not Found"}, 404
+        if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+            return send_from_directory(app.static_folder, path)
+        else:
+            return send_from_directory(app.static_folder, 'index.html')
 
     return app
