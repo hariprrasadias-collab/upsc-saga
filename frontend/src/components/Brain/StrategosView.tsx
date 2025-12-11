@@ -25,7 +25,7 @@ const StrategosView: React.FC<StrategosViewProps> = ({ onExecuteAction: _onExecu
 
     const fetchStatus = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/brain/status');
+            const res = await fetch('/api/brain/status');
             const data = await res.json();
             setStatus(data);
         } catch (err) {

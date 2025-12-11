@@ -52,7 +52,7 @@ const CompilationGenerator: React.FC = () => {
 
     const fetchMonthsAndAutoLoad = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/compilation/months');
+            const res = await fetch('/api/compilation/months');
             if (res.ok) {
                 const data = await res.json();
                 setMonths(data);
@@ -89,7 +89,7 @@ const CompilationGenerator: React.FC = () => {
         setExpandedSubjects(new Set());
 
         try {
-            const res = await fetch(`http://localhost:5000/api/compilation/${targetYear}/${targetMonth}`);
+            const res = await fetch(`/api/compilation/${targetYear}/${targetMonth}`);
             if (!res.ok) {
                 throw new Error('Failed to generate compilation');
             }

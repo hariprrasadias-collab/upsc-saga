@@ -43,7 +43,7 @@ const TimeBoxing: React.FC = () => {
 
     const fetchTimeBoxes = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/timebox/get');
+            const res = await fetch('/api/timebox/get');
             const data = await res.json();
             setTimeBoxes(data);
         } catch (err) {
@@ -53,7 +53,7 @@ const TimeBoxing: React.FC = () => {
 
     const fetchSuggestions = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/timebox/suggestions');
+            const res = await fetch('/api/timebox/suggestions');
             const data = await res.json();
             setSuggestions(data);
         } catch (err) {
@@ -71,7 +71,7 @@ const TimeBoxing: React.FC = () => {
         }
 
         try {
-            await fetch('http://localhost:5000/api/timebox/add', {
+            await fetch('/api/timebox/add', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -89,7 +89,7 @@ const TimeBoxing: React.FC = () => {
 
     const handleDelete = async (subject: string) => {
         try {
-            await fetch(`http://localhost:5000/api/timebox/delete/${encodeURIComponent(subject)}`, {
+            await fetch(`/api/timebox/delete/${encodeURIComponent(subject)}`, {
                 method: 'DELETE'
             });
             await fetchTimeBoxes();

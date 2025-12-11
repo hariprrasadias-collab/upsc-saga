@@ -52,7 +52,7 @@ const MindPalace: React.FC = () => {
 
     const fetchLocations = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/mind_palace/locations');
+            const res = await fetch('/api/mind_palace/locations');
             const data = await res.json();
             setLocations(data);
         } catch (err) {
@@ -62,7 +62,7 @@ const MindPalace: React.FC = () => {
 
     const fetchArtifacts = async (locationId: number) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/mind_palace/locations/${locationId}/artifacts`);
+            const res = await fetch(`/api/mind_palace/locations/${locationId}/artifacts`);
             const data = await res.json();
             setArtifacts(data);
         } catch (err) {
@@ -72,7 +72,7 @@ const MindPalace: React.FC = () => {
 
     const handleCreateLocation = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/mind_palace/locations', {
+            const res = await fetch('/api/mind_palace/locations', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: newName, description: newDesc })
@@ -122,7 +122,7 @@ const MindPalace: React.FC = () => {
         const y = 50;
 
         try {
-            const res = await fetch('http://localhost:5000/api/mind_palace/artifacts', {
+            const res = await fetch('/api/mind_palace/artifacts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -148,7 +148,7 @@ const MindPalace: React.FC = () => {
 
     const handleUpdateArtifactPosition = async (id: number, x: number, y: number) => {
         try {
-            await fetch(`http://localhost:5000/api/mind_palace/artifacts/${id}`, {
+            await fetch(`/api/mind_palace/artifacts/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ x_position: x, y_position: y })
@@ -306,13 +306,13 @@ const MindPalace: React.FC = () => {
                             {editingArtifact ? (
                                 <>
                                     <button className="delete-btn" onClick={async () => {
-                                        await fetch(`http://localhost:5000/api/mind_palace/artifacts/${editingArtifact.id}`, { method: 'DELETE' });
+                                        await fetch(`/api/mind_palace/artifacts/${editingArtifact.id}`, { method: 'DELETE' });
                                         fetchArtifacts(currentLocation!.id);
                                         setShowArtifactModal(false);
                                         setEditingArtifact(null);
                                     }}>Forget</button>
                                     <button className="save-btn" onClick={async () => {
-                                        await fetch(`http://localhost:5000/api/mind_palace/artifacts/${editingArtifact.id}`, {
+                                        await fetch(`/api/mind_palace/artifacts/${editingArtifact.id}`, {
                                             method: 'PUT',
                                             headers: { 'Content-Type': 'application/json' },
                                             body: JSON.stringify({ title: editingArtifact.title, content: editingArtifact.content })

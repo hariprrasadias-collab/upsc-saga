@@ -58,11 +58,11 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
 
     const fetchData = useCallback(async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/syllabus/');
+            const res = await fetch('/api/syllabus/');
             const data = await res.json();
             setTopics(data);
 
-            const analyticsRes = await fetch('http://localhost:5000/api/syllabus/analytics');
+            const analyticsRes = await fetch('/api/syllabus/analytics');
             const analyticsData = await analyticsRes.json();
             setAnalytics(analyticsData);
         } catch (err) {
@@ -81,13 +81,13 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         setTopics(prev => prev.map(t => t.id === id ? { ...t, status: newStatus } : t));
 
         try {
-            await fetch(`http://localhost:5000/api/syllabus/${id}/status`, {
+            await fetch(`/api/syllabus/${id}/status`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })
             });
             // Refresh analytics in background
-            const analyticsRes = await fetch('http://localhost:5000/api/syllabus/analytics');
+            const analyticsRes = await fetch('/api/syllabus/analytics');
             const analyticsData = await analyticsRes.json();
             setAnalytics(analyticsData);
 
@@ -102,7 +102,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
 
     const handleMarkRevised = async (id: number) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/syllabus/${id}/revise`, {
+            const res = await fetch(`/api/syllabus/${id}/revise`, {
                 method: 'POST'
             });
             const data = await res.json();
@@ -133,7 +133,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         setShowNotesModal(false);
 
         try {
-            await fetch(`http://localhost:5000/api/syllabus/${currentTopicId}/notes`, {
+            await fetch(`/api/syllabus/${currentTopicId}/notes`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ notes: notesText })

@@ -45,7 +45,7 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
     // Fetch History on Load
     useEffect(() => {
         if (isOpen) {
-            fetch('http://localhost:5000/api/mimir/history')
+            fetch('/api/mimir/history')
                 .then(res => {
                     if (!res.ok) throw new Error('Failed to fetch history');
                     return res.json();
@@ -79,7 +79,7 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
         setMessages(prev => [...prev, { id: tempId, sender: 'user', message: userMsg }]);
 
         try {
-            const res = await fetch('http://localhost:5000/api/mimir/chat', {
+            const res = await fetch('/api/mimir/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: userMsg })
@@ -107,7 +107,7 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
     const handleClear = async () => {
         if (!confirm("Clear Mimir's memory?")) return;
         try {
-            await fetch('http://localhost:5000/api/mimir/clear', { method: 'POST' });
+            await fetch('/api/mimir/clear', { method: 'POST' });
             setMessages([]);
         } catch (error) {
             console.error("Clear error:", error);

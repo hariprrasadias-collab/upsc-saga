@@ -31,7 +31,7 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onStartReview }) => {
 
     const fetchDecks = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/flashcards/decks');
+            const res = await fetch('/api/flashcards/decks');
             const data = await res.json();
             setDecks(data);
             setLoading(false);
@@ -45,7 +45,7 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onStartReview }) => {
         if (!newDeckName.trim()) return;
 
         try {
-            await fetch('http://localhost:5000/api/flashcards/decks', {
+            await fetch('/api/flashcards/decks', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -70,7 +70,7 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onStartReview }) => {
         setIsGenerating(true);
         try {
             // 1. Create Deck first
-            const deckRes = await fetch('http://localhost:5000/api/flashcards/decks', {
+            const deckRes = await fetch('/api/flashcards/decks', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -111,7 +111,7 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onStartReview }) => {
         if (!cardFront.trim() || !cardBack.trim() || !showAddCard) return;
 
         try {
-            await fetch('http://localhost:5000/api/flashcards', {
+            await fetch('/api/flashcards', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -141,7 +141,7 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onStartReview }) => {
             formData.append('file', csvFile);
             formData.append('deck_id', showCsvImport.toString());
 
-            const response = await fetch('http://localhost:5000/api/flashcards/import', {
+            const response = await fetch('/api/flashcards/import', {
                 method: 'POST',
                 body: formData
             });
@@ -278,7 +278,7 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onStartReview }) => {
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     if (window.confirm('Delete this deck and all its cards?')) {
-                                        fetch(`http://localhost:5000/api/flashcards/decks/${deck.id}`, { method: 'DELETE' })
+                                        fetch(`/api/flashcards/decks/${deck.id}`, { method: 'DELETE' })
                                             .then(() => fetchDecks());
                                     }
                                 }}
@@ -342,7 +342,7 @@ const DeckCardList: React.FC<DeckCardListProps> = ({ deckId, onClose, onUpdate }
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch(`http://localhost:5000/api/flashcards/decks/${deckId}`)
+        fetch(`/api/flashcards/decks/${deckId}`)
             .then(res => res.json())
             .then(data => {
                 setCards(data.cards);
@@ -354,7 +354,7 @@ const DeckCardList: React.FC<DeckCardListProps> = ({ deckId, onClose, onUpdate }
     const handleDeleteCard = async (cardId: number) => {
         if (!window.confirm('Delete this card?')) return;
         try {
-            await fetch(`http://localhost:5000/api/flashcards/${cardId}`, { method: 'DELETE' });
+            await fetch(`/api/flashcards/${cardId}`, { method: 'DELETE' });
             setCards(prev => prev.filter(c => c.id !== cardId));
             onUpdate();
         } catch (err) {

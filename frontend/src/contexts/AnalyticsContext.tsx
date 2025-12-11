@@ -50,7 +50,7 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
 
         try {
             setLoading(true);
-            const res = await fetch('http://localhost:5000/api/analytics/overview?timeframe=all');
+            const res = await fetch('/api/analytics/overview?timeframe=all');
 
             if (res.ok) {
                 const data = await res.json();

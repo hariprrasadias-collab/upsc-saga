@@ -55,7 +55,7 @@ const AdminDashboard: React.FC = () => {
 
     const fetchStats = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/admin/stats');
+            const res = await fetch('/api/admin/stats');
             if (res.ok) {
                 const data = await res.json();
                 setStats(data);
@@ -67,7 +67,7 @@ const AdminDashboard: React.FC = () => {
 
     const fetchQuestions = async (pageNum: number) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/admin/questions?page=${pageNum}`);
+            const res = await fetch(`/api/admin/questions?page=${pageNum}`);
             if (res.ok) {
                 const data = await res.json();
                 setQuestions(data.questions);
@@ -80,7 +80,7 @@ const AdminDashboard: React.FC = () => {
 
     const fetchArticles = async (pageNum: number) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/admin/articles?page=${pageNum}`);
+            const res = await fetch(`/api/admin/articles?page=${pageNum}`);
             if (res.ok) {
                 const data = await res.json();
                 setArticles(data.articles);
@@ -95,7 +95,7 @@ const AdminDashboard: React.FC = () => {
         if (!confirm('Are you sure you want to delete this question?')) return;
 
         try {
-            const res = await fetch(`http://localhost:5000/api/admin/questions/${id}`, {
+            const res = await fetch(`/api/admin/questions/${id}`, {
                 method: 'DELETE'
             });
 
@@ -114,7 +114,7 @@ const AdminDashboard: React.FC = () => {
         if (!confirm('Are you sure you want to delete this article?')) return;
 
         try {
-            const res = await fetch(`http://localhost:5000/api/admin/articles/${id}`, {
+            const res = await fetch(`/api/admin/articles/${id}`, {
                 method: 'DELETE'
             });
 

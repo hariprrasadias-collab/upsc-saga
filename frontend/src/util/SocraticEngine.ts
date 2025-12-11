@@ -109,7 +109,7 @@ export class SocraticEngine {
 
         // 2. Call Backend API
         try {
-            const response = await fetch('http://localhost:5000/api/socratic/debate', {
+            const response = await fetch('/api/socratic/debate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

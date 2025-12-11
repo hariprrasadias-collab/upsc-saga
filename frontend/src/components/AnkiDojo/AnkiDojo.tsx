@@ -43,7 +43,7 @@ const AnkiDojo: React.FC = () => {
     useEffect(() => {
         const fetchQueue = async () => {
             try {
-                const res = await fetch('http://localhost:5000/api/anki/queue');
+                const res = await fetch('/api/anki/queue');
                 if (!res.ok) throw new Error("Anki Connection Failed");
                 const ids = await res.json();
 
@@ -73,7 +73,7 @@ const AnkiDojo: React.FC = () => {
                 setLoading(true);
                 const nextId = queue[0];
                 try {
-                    const res = await fetch('http://localhost:5000/api/anki/card', {
+                    const res = await fetch('/api/anki/card', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ card_id: nextId })
@@ -121,7 +121,7 @@ const AnkiDojo: React.FC = () => {
         }
 
         try {
-            await fetch('http://localhost:5000/api/anki/answer', {
+            await fetch('/api/anki/answer', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ card_id: currentCard.id, ease })

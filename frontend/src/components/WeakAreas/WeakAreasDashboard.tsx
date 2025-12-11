@@ -30,7 +30,7 @@ const WeakAreasDashboard: React.FC = () => {
     const fetchDashboard = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/api/weak-areas/dashboard');
+            const response = await fetch('/api/weak-areas/dashboard');
             const data = await response.json();
 
             if (data.success) {
@@ -52,7 +52,7 @@ const WeakAreasDashboard: React.FC = () => {
 
         setGenerating(true);
         try {
-            const response = await fetch('http://localhost:5000/api/weak-areas/practice', {
+            const response = await fetch('/api/weak-areas/practice', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ count: 10 })

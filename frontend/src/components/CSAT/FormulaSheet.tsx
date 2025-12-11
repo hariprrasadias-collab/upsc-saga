@@ -15,7 +15,7 @@ const FormulaSheet: React.FC = () => {
 
     const fetchFormulas = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/csat/formulas');
+            const response = await fetch('/api/csat/formulas');
             const data = await response.json();
             setFormulas(data);
         } catch (error) {

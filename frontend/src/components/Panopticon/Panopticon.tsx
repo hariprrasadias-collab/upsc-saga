@@ -33,7 +33,7 @@ const Panopticon: React.FC = () => {
 
     const fetchDashboardData = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/panopticon/dashboard');
+            const response = await fetch('/api/panopticon/dashboard');
             const data = await response.json();
             if (data.success) {
                 setMetrics(data.data.recent_metrics);
@@ -187,7 +187,7 @@ const LogModal: React.FC<{ onClose: () => void, onSave: () => void }> = ({ onClo
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await fetch('http://localhost:5000/api/panopticon/log', {
+            await fetch('/api/panopticon/log', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)

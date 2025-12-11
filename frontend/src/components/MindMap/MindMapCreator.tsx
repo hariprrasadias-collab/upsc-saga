@@ -16,7 +16,7 @@ const MindMapCreator: React.FC = () => {
 
     const fetchSavedMaps = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/mindmap/list');
+            const res = await fetch('/api/mindmap/list');
             if (res.ok) {
                 const data = await res.json();
                 setSavedMaps(data);
@@ -34,7 +34,7 @@ const MindMapCreator: React.FC = () => {
         setMindMapData(null);
 
         try {
-            const res = await fetch('http://localhost:5000/api/mindmap/generate', {
+            const res = await fetch('/api/mindmap/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ topic })
@@ -58,7 +58,7 @@ const MindMapCreator: React.FC = () => {
         if (!mindMapData) return;
 
         try {
-            const res = await fetch('http://localhost:5000/api/mindmap/save', {
+            const res = await fetch('/api/mindmap/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -82,7 +82,7 @@ const MindMapCreator: React.FC = () => {
         setLoading(true);
         setError(null);
         try {
-            const res = await fetch(`http://localhost:5000/api/mindmap/${id}`);
+            const res = await fetch(`/api/mindmap/${id}`);
             if (res.ok) {
                 const data = await res.json();
                 setTopic(data.title);
@@ -103,7 +103,7 @@ const MindMapCreator: React.FC = () => {
         if (!confirm('Are you sure you want to delete this mind map?')) return;
 
         try {
-            const res = await fetch(`http://localhost:5000/api/mindmap/${id}`, {
+            const res = await fetch(`/api/mindmap/${id}`, {
                 method: 'DELETE'
             });
 

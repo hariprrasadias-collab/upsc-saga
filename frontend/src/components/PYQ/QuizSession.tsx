@@ -39,7 +39,7 @@ const QuizSession: React.FC = () => {
     useEffect(() => {
         const fetchSession = async () => {
             try {
-                const res = await fetch(`http://localhost:5000/api/pyq/quiz/${sessionId}`);
+                const res = await fetch(`/api/pyq/quiz/${sessionId}`);
                 const data = await res.json();
                 if (data.questions && Array.isArray(data.questions)) {
                     setQuestions(data.questions);
@@ -71,7 +71,7 @@ const QuizSession: React.FC = () => {
 
         // Save answer to backend
         const timeDiff = Math.floor((new Date().getTime() - questionStartTime.getTime()) / 1000);
-        fetch(`http://localhost:5000/api/pyq/quiz/${sessionId}/answer`, {
+        fetch(`/api/pyq/quiz/${sessionId}/answer`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -121,7 +121,7 @@ const QuizSession: React.FC = () => {
 
         setSubmitting(true);
         try {
-            const res = await fetch(`http://localhost:5000/api/pyq/quiz/${sessionId}/submit`, {
+            const res = await fetch(`/api/pyq/quiz/${sessionId}/submit`, {
                 method: 'POST'
             });
             const data = await res.json();

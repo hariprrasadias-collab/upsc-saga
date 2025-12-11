@@ -41,11 +41,11 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ onNavigate }) =
 
             // Fetch remaining analytics data in parallel
             const [subjectRes, mockRes, weakRes, predictiveRes, perfRes] = await Promise.all([
-                fetch('http://localhost:5000/api/analytics/subject-wise'),
-                fetch('http://localhost:5000/api/analytics/mock-tests'),
-                fetch('http://localhost:5000/api/analytics/weak-areas?limit=5'),
-                fetch('http://localhost:5000/api/analytics/predictive/all'),
-                fetch('http://localhost:5000/api/analytics/performance-scatter')
+                fetch('/api/analytics/subject-wise'),
+                fetch('/api/analytics/mock-tests'),
+                fetch('/api/analytics/weak-areas?limit=5'),
+                fetch('/api/analytics/predictive/all'),
+                fetch('/api/analytics/performance-scatter')
             ]);
 
             const subjectData = await subjectRes.json();

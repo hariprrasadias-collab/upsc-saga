@@ -20,7 +20,7 @@ const ArticleEditor: React.FC<ArticleEditorProps> = ({ onClose, onSave }) => {
         setSaving(true);
 
         try {
-            const res = await fetch('http://localhost:5000/api/admin/articles', {
+            const res = await fetch('/api/admin/articles', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

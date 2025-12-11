@@ -28,7 +28,7 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onSelectTemplate })
     const fetchTemplates = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/api/templates/list');
+            const response = await fetch('/api/templates/list');
             const data = await response.json();
             if (data.success) {
                 setTemplates(data.templates);

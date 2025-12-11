@@ -29,7 +29,7 @@ const EssayEditor: React.FC<EssayEditorProps> = ({ onSubmitSuccess }) => {
 
     const fetchTopics = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/essay/topics');
+            const response = await fetch('/api/essay/topics');
             const data = await response.json();
             setTopics(data);
         } catch (error) {
@@ -52,7 +52,7 @@ const EssayEditor: React.FC<EssayEditorProps> = ({ onSubmitSuccess }) => {
 
         setIsSubmitting(true);
         try {
-            const response = await fetch('http://localhost:5000/api/essay/submit', {
+            const response = await fetch('/api/essay/submit', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

@@ -62,7 +62,7 @@ const Ravens: React.FC = () => {
             if (showBookmarked) params.append('bookmarked', 'true');
             if (searchQuery) params.append('search', searchQuery);
 
-            const res = await fetch(`http://localhost:5000/api/ravens/saved?${params}`);
+            const res = await fetch(`/api/ravens/saved?${params}`);
             if (res.ok) {
                 const data = await res.json();
                 setArticles(data);
@@ -83,12 +83,12 @@ const Ravens: React.FC = () => {
 
     const updateChallengeProgress = async (type: string, increment: number = 1) => {
         try {
-            const res = await fetch('http://localhost:5000/api/challenges/daily');
+            const res = await fetch('/api/challenges/daily');
             if (res.ok) {
                 const challenge = await res.json();
                 if (challenge && challenge.type === type && !challenge.completed) {
                     const newProgress = Math.min(challenge.progress + increment, challenge.target_value);
-                    await fetch('http://localhost:5000/api/challenges/progress', {
+                    await fetch('/api/challenges/progress', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ progress: newProgress })
@@ -111,8 +111,8 @@ const Ravens: React.FC = () => {
         audioManager.play('click');
 
         try {
-            const muninRes = await fetch('http://localhost:5000/api/ravens?type=munin');
-            const huginRes = await fetch('http://localhost:5000/api/ravens?type=hugin');
+            const muninRes = await fetch('/api/ravens?type=munin');
+            const huginRes = await fetch('/api/ravens?type=hugin');
 
             const muninNews = await muninRes.json();
             const huginNews = await huginRes.json();
@@ -124,7 +124,7 @@ const Ravens: React.FC = () => {
                 const article = allNews[i];
                 setProcessingStatus(`Processing ${i + 1}/${allNews.length}: ${article.title.substring(0, 30)}...`);
 
-                await fetch('http://localhost:5000/api/ravens/process', {
+                await fetch('/api/ravens/process', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(article)
@@ -151,7 +151,7 @@ const Ravens: React.FC = () => {
         try {
             const content = `Source: ${article.source}\nPublished: ${article.published}\nLink: ${article.link}\n\nSummary:\n${article.upscSummary}\n\nKey Points:\n${article.keyPoints?.map(p => `- ${p}`).join('\n')}`;
 
-            const res = await fetch('http://localhost:5000/api/lore', {
+            const res = await fetch('/api/lore', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -175,7 +175,7 @@ const Ravens: React.FC = () => {
 
     const handleAnki = async (id: number) => {
         try {
-            await fetch(`http://localhost:5000/api/ravens/${id}/to-anki`, { method: 'POST' });
+            await fetch(`/api/ravens/${id}/to-anki`, { method: 'POST' });
             audioManager.play('success');
             addToast('Added to Anki', 'success');
             fetchArticles();
@@ -187,7 +187,7 @@ const Ravens: React.FC = () => {
 
     const handleImportance = async (id: number, importance: number) => {
         try {
-            await fetch(`http://localhost:5000/api/ravens/${id}/importance`, {
+            await fetch(`/api/ravens/${id}/importance`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ importance })
@@ -201,7 +201,7 @@ const Ravens: React.FC = () => {
 
     const handleBookmark = async (id: number) => {
         try {
-            await fetch(`http://localhost:5000/api/ravens/${id}/bookmark`, { method: 'POST' });
+            await fetch(`/api/ravens/${id}/bookmark`, { method: 'POST' });
             audioManager.play('click');
             fetchArticles();
         } catch (err) {
@@ -211,7 +211,7 @@ const Ravens: React.FC = () => {
 
     const handleNotesSave = async (id: number, notes: string) => {
         try {
-            await fetch(`http://localhost:5000/api/ravens/${id}/notes`, {
+            await fetch(`/api/ravens/${id}/notes`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ notes })
@@ -556,7 +556,7 @@ const Ravens: React.FC = () => {
 
                                     addToast('Refetching content...', 'info');
                                     try {
-                                        const res = await fetch('http://localhost:5000/api/ravens/process', {
+                                        const res = await fetch('/api/ravens/process', {
                                             method: 'POST',
                                             headers: { 'Content-Type': 'application/json' },
                                             body: JSON.stringify({ ...selectedArticle, force: true })

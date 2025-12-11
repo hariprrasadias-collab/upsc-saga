@@ -135,7 +135,7 @@ const WarMapContainer: React.FC<WarMapContainerProps> = ({ onTaskCompleted }) =>
   const fetchTasksForDate = useCallback(async () => {
     setIsLoadingTasks(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/tasks?date=${dateStr}`);
+      const response = await fetch(`/api/tasks?date=${dateStr}`);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to fetch tasks for date');
@@ -172,7 +172,7 @@ const WarMapContainer: React.FC<WarMapContainerProps> = ({ onTaskCompleted }) =>
 
   const handleTaskComplete = async (taskId: number) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/tasks/${taskId}/complete`, {
+      const response = await fetch(`/api/tasks/${taskId}/complete`, {
         method: 'POST',
       });
 

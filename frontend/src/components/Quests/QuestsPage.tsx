@@ -21,7 +21,7 @@ const QuestsPage: React.FC<QuestsPageProps> = ({ onTaskCompleted }) => {
     setError(null);
     try {
       // CRITICAL FIX: Use '/api/quests', NOT '/api/tasks'
-      const response = await fetch('http://localhost:5000/api/quests');
+      const response = await fetch('/api/quests');
 
       if (!response.ok) {
         throw new Error('Failed to fetch quests');
@@ -59,7 +59,7 @@ const QuestsPage: React.FC<QuestsPageProps> = ({ onTaskCompleted }) => {
 
   const handleQuestComplete = async (questId: number) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/quests/${questId}/complete`, {
+      const response = await fetch(`/api/quests/${questId}/complete`, {
         method: 'POST',
       });
 

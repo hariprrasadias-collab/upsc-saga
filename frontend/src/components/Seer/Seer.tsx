@@ -33,9 +33,9 @@ const Seer: React.FC = () => {
         const fetchData = async () => {
             try {
                 const [seerRes, weightRes, trendRes] = await Promise.all([
-                    fetch('http://localhost:5000/api/seer'),
-                    fetch('http://localhost:5000/api/seer/weightage'),
-                    fetch('http://localhost:5000/api/seer/trends')
+                    fetch('/api/seer'),
+                    fetch('/api/seer/weightage'),
+                    fetch('/api/seer/trends')
                 ]);
 
                 const seerData = await seerRes.json();

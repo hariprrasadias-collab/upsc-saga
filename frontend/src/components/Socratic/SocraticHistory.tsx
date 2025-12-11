@@ -67,7 +67,7 @@ const SocraticHistory: React.FC = () => {
 
     const fetchHistory = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/socratic/history');
+            const response = await fetch('/api/socratic/history');
             const data = await response.json();
             if (data.success) {
                 setHistory(data.data);
@@ -111,7 +111,7 @@ const SocraticHistory: React.FC = () => {
 
         setIsContinuing(true);
         try {
-            const response = await fetch('http://localhost:5000/api/socratic/continue', {
+            const response = await fetch('/api/socratic/continue', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
@@ -217,7 +217,7 @@ const SocraticHistory: React.FC = () => {
     const createFlashcard = async (front: string, back: string) => {
         if (!confirm("Create Flashcard from this insight?")) return;
         try {
-            await fetch('http://localhost:5000/api/flashcards', {
+            await fetch('/api/flashcards', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({

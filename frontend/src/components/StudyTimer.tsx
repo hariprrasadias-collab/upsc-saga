@@ -41,7 +41,7 @@ const StudyTimer: React.FC = () => {
 
         const minutes = Math.floor(seconds / 60);
         try {
-            const res = await fetch('http://localhost:5000/api/tasks/log-study', {
+            const res = await fetch('/api/tasks/log-study', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ minutes })

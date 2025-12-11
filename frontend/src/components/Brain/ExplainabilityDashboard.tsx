@@ -24,7 +24,7 @@ const ExplainabilityDashboard: React.FC = () => {
     const fetchOpportunities = async () => {
         setLoading(true);
     try {
-        const response = await fetch('http://localhost:5000/api/autonomy/optimizations');
+        const response = await fetch('/api/autonomy/optimizations');
         const data = await response.json();
         setOpportunities(data.opportunities || []);
     } catch (error) {
@@ -36,7 +36,7 @@ const ExplainabilityDashboard: React.FC = () => {
 
 const handleAccept = async (id: number) => {
     try {
-        const response = await fetch(`http://localhost:5000/api/autonomy/optimizations/${id}/accept`, {
+        const response = await fetch(`/api/autonomy/optimizations/${id}/accept`, {
             method: 'POST'
         });
         const result = await response.json();

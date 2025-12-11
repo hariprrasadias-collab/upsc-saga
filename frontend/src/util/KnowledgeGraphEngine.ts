@@ -34,7 +34,7 @@ export class KnowledgeGraphEngine {
 
     public async loadData(): Promise<void> {
         try {
-            const response = await fetch('http://localhost:5000/api/golden-path/graph');
+            const response = await fetch('/api/golden-path/graph');
             const result = await response.json();
 
             if (result.success && result.data) {

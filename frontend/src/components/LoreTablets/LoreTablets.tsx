@@ -21,7 +21,7 @@ const LoreTablets: React.FC = () => {
 
     const fetchNotes = useCallback(async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/lore');
+            const res = await fetch('/api/lore');
             if (res.ok) {
                 const data = await res.json();
                 setNotes(data);
@@ -54,8 +54,8 @@ const LoreTablets: React.FC = () => {
     // Save Note (Create or Update)
     const handleSave = async () => {
         const endpoint = selectedNote 
-            ? `http://localhost:5000/api/lore/${selectedNote.id}`
-            : `http://localhost:5000/api/lore`;
+            ? `/api/lore/${selectedNote.id}`
+            : `/api/lore`;
         
         const method = selectedNote ? 'PUT' : 'POST';
 
@@ -84,7 +84,7 @@ const LoreTablets: React.FC = () => {
         if (!confirm("Are you sure you want to destroy this tablet?")) return;
 
         try {
-            const res = await fetch(`http://localhost:5000/api/lore/${selectedNote.id}`, {
+            const res = await fetch(`/api/lore/${selectedNote.id}`, {
                 method: 'DELETE'
             });
             if (res.ok) {

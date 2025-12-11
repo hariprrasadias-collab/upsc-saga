@@ -94,7 +94,7 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
         // We will handle "initial load" separately.
 
         try {
-            const response = await fetch('http://localhost:5000/api/dashboard-data');
+            const response = await fetch('/api/dashboard-data');
             if (!response.ok) throw new Error('Failed to fetch dashboard data');
             const data = await response.json();
 
@@ -150,7 +150,7 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
         try {
             // Optimistic update? Maybe not needed if backend is fast.
             // But let's call API.
-            const response = await fetch(`http://localhost:5000/api/tasks/${taskId}/complete`, {
+            const response = await fetch(`/api/tasks/${taskId}/complete`, {
                 method: 'POST',
             });
 

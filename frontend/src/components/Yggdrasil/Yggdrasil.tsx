@@ -233,7 +233,7 @@ const YggdrasilTree: React.FC = () => {
     // 1. Load Progress from Backend
     const fetchProgress = useCallback(async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/codex/progress');
+            const response = await fetch('/api/codex/progress');
             if (!response.ok) return;
 
             const progressMap: Record<string, string> = await response.json();
@@ -271,7 +271,7 @@ const YggdrasilTree: React.FC = () => {
 
             // API Call to Save
             try {
-                await fetch('http://localhost:5000/api/codex/update', {
+                await fetch('/api/codex/update', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ node_id: selectedNode.id, status: newStatusStr })

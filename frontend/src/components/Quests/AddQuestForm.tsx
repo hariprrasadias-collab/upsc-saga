@@ -38,7 +38,7 @@ const AddQuestForm: React.FC<AddQuestFormProps> = ({ onQuestCreated, onCancel })
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/quests', {
+      const response = await fetch('/api/quests', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

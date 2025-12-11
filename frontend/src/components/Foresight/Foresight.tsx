@@ -32,7 +32,7 @@ const Foresight: React.FC = () => {
 
     const fetchSubjects = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/foresight/subjects');
+            const response = await fetch('/api/foresight/subjects');
             const data = await response.json();
             setSubjects(data.subjects || []);
         } catch (error) {
@@ -43,7 +43,7 @@ const Foresight: React.FC = () => {
     const fetchSavedPredictions = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/api/foresight/saved');
+            const response = await fetch('/api/foresight/saved');
             const data = await response.json();
             setPredictions(data.predictions || []);
         } catch (error) {
@@ -56,7 +56,7 @@ const Foresight: React.FC = () => {
     const triggerPrediction = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/api/foresight/predict', {
+            const response = await fetch('/api/foresight/predict', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -79,7 +79,7 @@ const Foresight: React.FC = () => {
         if (activeTab === 'saved') {
             // Unsave
             try {
-                await fetch(`http://localhost:5000/api/foresight/unsave/${pred.id}`, { method: 'DELETE' });
+                await fetch(`/api/foresight/unsave/${pred.id}`, { method: 'DELETE' });
                 setPredictions(prev => prev.filter(p => p.id !== pred.id));
             } catch (error) {
                 console.error('Failed to unsave:', error);
@@ -87,7 +87,7 @@ const Foresight: React.FC = () => {
         } else {
             // Save
             try {
-                await fetch('http://localhost:5000/api/foresight/save', {
+                await fetch('/api/foresight/save', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(pred)

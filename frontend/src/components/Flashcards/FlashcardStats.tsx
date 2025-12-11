@@ -24,7 +24,7 @@ const FlashcardStats: React.FC = () => {
 
     const fetchAnalytics = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/flashcards/analytics');
+            const res = await fetch('/api/flashcards/analytics');
             const data = await res.json();
             setAnalytics(data);
             setLoading(false);

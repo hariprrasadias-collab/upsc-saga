@@ -76,7 +76,7 @@ const AnswerWriting: React.FC<AnswerWritingProps> = ({ onTaskCompleted }) => {
 
     const fetchDailyPrompt = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/answer-writing/daily-prompt');
+            const res = await fetch('/api/answer-writing/daily-prompt');
             if (res.ok) {
                 const data = await res.json();
                 setCurrentPrompt(data);
@@ -89,7 +89,7 @@ const AnswerWriting: React.FC<AnswerWritingProps> = ({ onTaskCompleted }) => {
     const fetchHistory = async () => {
         setLoadingHistory(true);
         try {
-            const res = await fetch('http://localhost:5000/api/answer-writing/my-answers');
+            const res = await fetch('/api/answer-writing/my-answers');
             if (res.ok) {
                 const data = await res.json();
                 setHistory(data);
@@ -138,7 +138,7 @@ const AnswerWriting: React.FC<AnswerWritingProps> = ({ onTaskCompleted }) => {
         audioManager.play('click');
 
         try {
-            const res = await fetch('http://localhost:5000/api/answer-writing/submit', {
+            const res = await fetch('/api/answer-writing/submit', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

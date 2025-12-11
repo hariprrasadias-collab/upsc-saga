@@ -25,7 +25,7 @@ const ChallengeCard: React.FC = () => {
 
     const fetchChallenge = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/challenges/daily');
+            const res = await fetch('/api/challenges/daily');
             if (res.ok) {
                 const data = await res.json();
                 setChallenge(data);
@@ -39,7 +39,7 @@ const ChallengeCard: React.FC = () => {
 
     const fetchStreak = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/challenges/streak');
+            const res = await fetch('/api/challenges/streak');
             if (res.ok) {
                 const data = await res.json();
                 setStreak(data.current_streak || 0);
@@ -53,7 +53,7 @@ const ChallengeCard: React.FC = () => {
         if (!challenge || challenge.completed) return;
 
         try {
-            const res = await fetch('http://localhost:5000/api/challenges/complete', {
+            const res = await fetch('/api/challenges/complete', {
                 method: 'POST'
             });
 

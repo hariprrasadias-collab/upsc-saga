@@ -22,7 +22,7 @@ const RevisionCards: React.FC = () => {
     const fetchCards = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/api/revision/cards');
+            const response = await fetch('/api/revision/cards');
             const data = await response.json();
             if (data.success) {
                 setCards(data.cards);
@@ -45,7 +45,7 @@ const RevisionCards: React.FC = () => {
         setGenerating(true);
         try {
             console.log('Sending request to backend...');
-            const response = await fetch('http://localhost:5000/api/revision/one-liner', {
+            const response = await fetch('/api/revision/one-liner', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -89,7 +89,7 @@ const RevisionCards: React.FC = () => {
 
         console.log('Proceeding with delete...');
         try {
-            const response = await fetch(`http://localhost:5000/api/revision/cards/${cardId}`, {
+            const response = await fetch(`/api/revision/cards/${cardId}`, {
                 method: 'DELETE'
             });
 

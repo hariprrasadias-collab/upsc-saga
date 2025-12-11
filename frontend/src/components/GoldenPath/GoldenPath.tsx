@@ -51,7 +51,7 @@ const GoldenPath: React.FC = () => {
     // Fetch Graph Data
     useEffect(() => {
         setLoading(true);
-        fetch('http://localhost:5000/api/golden-path/graph')
+        fetch('/api/golden-path/graph')
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
@@ -246,7 +246,7 @@ const GoldenPath: React.FC = () => {
     const handleOptimize = async () => {
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:5000/api/golden-path/optimize', {
+            const res = await fetch('/api/golden-path/optimize', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

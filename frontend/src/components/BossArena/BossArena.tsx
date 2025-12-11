@@ -47,7 +47,7 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
 
     const fetchBattles = useCallback(async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/battles');
+            const res = await fetch('/api/battles');
             if (res.ok) {
                 const data = await res.json();
                 setBattles(data);
@@ -59,7 +59,7 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
 
     const fetchBosses = useCallback(async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/arena/bosses');
+            const res = await fetch('/api/arena/bosses');
             if (res.ok) {
                 const data = await res.json();
                 setYearBosses(data.year_bosses);
@@ -81,7 +81,7 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
     const handleFight = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://localhost:5000/api/battles/manual', {
+            const res = await fetch('/api/battles/manual', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

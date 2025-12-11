@@ -40,7 +40,7 @@ const KnowledgeGraph: React.FC = () => {
 
     const fetchGraphData = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/analytics/visualizations/knowledge-graph');
+            const res = await fetch('/api/analytics/visualizations/knowledge-graph');
             const data = await res.json();
             setGraphData(data);
             setLoading(false);

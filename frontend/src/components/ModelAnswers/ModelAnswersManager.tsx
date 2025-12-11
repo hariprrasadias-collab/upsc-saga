@@ -40,7 +40,7 @@ const ModelAnswersManager: React.FC = () => {
             if (filterType) params.append('type', filterType);
             if (filterMinScore) params.append('min_score', filterMinScore);
 
-            const response = await fetch(`http://localhost:5000/api/model-answers?${params}`);
+            const response = await fetch(`/api/model-answers?${params}`);
             const data = await response.json();
 
             if (data.success) {
@@ -60,7 +60,7 @@ const ModelAnswersManager: React.FC = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:5000/api/model-answers/search', {
+            const response = await fetch('/api/model-answers/search', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ query: searchQuery })
@@ -79,7 +79,7 @@ const ModelAnswersManager: React.FC = () => {
         if (!confirm('Are you sure you want to delete this model answer?')) return;
 
         try {
-            const response = await fetch(`http://localhost:5000/api/model-answers/${id}`, {
+            const response = await fetch(`/api/model-answers/${id}`, {
                 method: 'DELETE'
             });
             const data = await response.json();

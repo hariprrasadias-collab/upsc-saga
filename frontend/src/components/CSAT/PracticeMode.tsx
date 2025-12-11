@@ -26,7 +26,7 @@ const PracticeMode: React.FC = () => {
 
     const fetchTopics = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/csat/topics');
+            const response = await fetch('/api/csat/topics');
             const data = await response.json();
             setTopics(data);
         } catch (error) {
@@ -37,7 +37,7 @@ const PracticeMode: React.FC = () => {
     const fetchQuestions = async () => {
         if (!selectedCategory || !selectedTopic) return;
         try {
-            const response = await fetch(`http://localhost:5000/api/csat/questions?category=${selectedCategory}&topic=${selectedTopic}`);
+            const response = await fetch(`/api/csat/questions?category=${selectedCategory}&topic=${selectedTopic}`);
             const data = await response.json();
             setQuestions(data);
             setCurrentQuestionIndex(0);

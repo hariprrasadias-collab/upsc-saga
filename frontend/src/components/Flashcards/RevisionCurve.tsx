@@ -18,7 +18,7 @@ const RevisionCurve: React.FC = () => {
 
     const fetchCurveData = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/analytics/visualizations/revision-curve');
+            const res = await fetch('/api/analytics/visualizations/revision-curve');
             const data = await res.json();
 
             if (Array.isArray(data)) {

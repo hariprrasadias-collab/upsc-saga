@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Message, Synapse, Insight, Action } from './types';
 
-const API_BASE_URL = 'http://localhost:5000/api/brain';
+const API_BASE_URL = '/api/brain';
 
 export const useBrain = () => {
     const navigate = useNavigate();

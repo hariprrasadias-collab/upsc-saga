@@ -25,7 +25,7 @@ const AnswerWorkbench: React.FC = () => {
     const fetchHistory = async () => {
         setHistoryLoading(true);
         try {
-            const res = await fetch('http://localhost:5000/api/scribe/history');
+            const res = await fetch('/api/scribe/history');
             const data = await res.json();
             if (res.ok) {
                 setHistory(data);
@@ -48,7 +48,7 @@ const AnswerWorkbench: React.FC = () => {
 
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:5000/api/scribe/evaluate', {
+            const res = await fetch('/api/scribe/evaluate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ question, answer })

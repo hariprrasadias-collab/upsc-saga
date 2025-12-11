@@ -24,7 +24,7 @@ const RevisionCenter: React.FC = () => {
     const fetchDueItems = async () => {
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:5000/api/scheduler/due');
+            const res = await fetch('/api/scheduler/due');
             if (res.ok) {
                 const data = await res.json();
                 setDueItems(data);
@@ -43,7 +43,7 @@ const RevisionCenter: React.FC = () => {
         if (!currentItem) return;
 
         try {
-            const res = await fetch('http://localhost:5000/api/scheduler/review', {
+            const res = await fetch('/api/scheduler/review', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

@@ -24,7 +24,7 @@ const QuizResults: React.FC = () => {
         if (!results) {
             const fetchResults = async () => {
                 try {
-                    const res = await fetch(`http://localhost:5000/api/pyq/quiz/${sessionId}`);
+                    const res = await fetch(`/api/pyq/quiz/${sessionId}`);
                     const data = await res.json();
                     setResults({
                         score: data.session.score,
