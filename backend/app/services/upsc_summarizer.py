@@ -8,17 +8,15 @@ import os
 import json
 import re
 import time
-import google.generativeai as genai
-from google.api_core import exceptions as google_exceptions
 from dotenv import load_dotenv
+from app.services.model_manager import model_manager
 
 # Load environment variables
 load_dotenv()
 
-# Configure Gemini API
-GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
+# GEMINI_API_KEY removed here - managed by ModelManager
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '') # Keep for internal check if needed
+
 
 # UPSC Paper and Subject classifications
 PAPERS = ['GS1', 'GS2', 'GS3', 'GS4', 'Essay', 'Optional']
@@ -121,7 +119,8 @@ def summarize_for_upsc(title, content, link):
     if not GEMINI_API_KEY:
         return _simple_extraction(title, content)
     try:
-        model = genai.GenerativeModel('gemini-2.0-flash-001')
+        # model = genai.GenerativeModel('gemini-2.0-flash-001') -> Removed, using ModelManager
+        # Send FULL content to AI (no truncation)
         # Send FULL content to AI (no truncation)
         prompt = f"""You are a UPSC expert analyzer. Tag articles accurately based on content.
 
@@ -162,8 +161,8 @@ Content: {content}
 
 Return ONLY this JSON (no markdown, no explanation):
 {{"upsc_summary": "...", "key_points": ["...", "..."], "papers": ["GS_"], "subjects": ["..."], "importance": 1-3, "exam_questions": ["..."], "related_topics": ["..."]}}"""
-        # response = model.generate_content(prompt)
-        response = retry_with_backoff(model.generate_content, prompt)
+        # Call ModelManager (handles retry, rotation, rate limits)
+        response = model_manager.generate_content(prompt, model_type='fast')
         text = get_gemini_text(response)
         if not text:
             print(f"Empty or blocked response for: {title}")
@@ -365,9 +364,9 @@ SUMMARY:"""
             print("ERROR: GEMINI_API_KEY not configured in environment")
             return f"⚠️ AI service not configured. Please add GEMINI_API_KEY to backend/.env file."
         
-        model = genai.GenerativeModel('gemini-2.0-flash-001')  # Using stable latest version
+        # model = genai.GenerativeModel('gemini-2.0-flash-001')  # Using stable latest version
         # response = model.generate_content(prompt)
-        response = retry_with_backoff(model.generate_content, prompt)
+        response = model_manager.generate_content(prompt, model_type='fast')
         one_liner = get_gemini_text(response)
         if not one_liner:
              return "Summary unavailable (Safety Block)"
@@ -410,9 +409,9 @@ Requirements:
 MNEMONIC:"""
 
     try:
-        model = genai.GenerativeModel('gemini-2.0-flash-001')
+        model = None # genai.GenerativeModel('gemini-2.0-flash-001')
         # response = model.generate_content(prompt)
-        response = retry_with_backoff(model.generate_content, prompt)
+        response = model_manager.generate_content(prompt, model_type='fast')
         mnemonic = get_gemini_text(response)
         if not mnemonic:
             return "Mnemonic unavailable (Safety Block)"

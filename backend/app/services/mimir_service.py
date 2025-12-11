@@ -1,50 +1,12 @@
-import google.generativeai as genai
 import os
 from dotenv import load_dotenv
+from app.services.model_manager import model_manager
 
 load_dotenv()
 
 class MimirService:
     def __init__(self):
-        self.model = None
-        api_key = os.getenv("GEMINI_API_KEY")
-        
-        if not api_key:
-            print("ERROR: GEMINI_API_KEY not found in environment variables")
-            print(f"Current .env path: {os.path.join(os.getcwd(), '.env')}")
-        else:
-            print(f"SUCCESS: GEMINI_API_KEY loaded (length: {len(api_key)})")
-            try:
-                genai.configure(api_key=api_key)
-                
-                # Use models that are actually available in the API
-                # Based on genai.list_models() output
-                models_to_try = [
-                    'gemini-flash-latest',          # Stable Flash alias
-                    'gemini-pro-latest',            # Stable Pro alias
-                ]
-                
-                model_initialized = False
-                for model_name in models_to_try:
-                    try:
-                        self.model = genai.GenerativeModel(model_name)
-                        print(f"SUCCESS: Gemini model initialized (using {model_name})")
-                        model_initialized = True
-                        break
-                    except Exception as model_error:
-                        print(f"Failed to initialize {model_name}: {model_error}")
-                        continue
-                
-                if not model_initialized:
-                    print("ERROR: All Gemini models failed to initialize")
-                    print("This likely means:")
-                    print("1. Your API key is invalid or expired")
-                    print("2. You don't have access to Gemini API")
-                    print("3. Your region/quota is restricted")
-                    self.model = None
-                    
-            except Exception as e:
-                print(f"ERROR: Failed to configure Gemini: {e}")
+        pass # ModelManager handles initialization
             
     def generate_response(self, message, history=[]):
         """
@@ -91,9 +53,6 @@ class MimirService:
             return f"I seem to have lost my connection to the Well of Wisdom. Error: {type(e).__name__}"
 
     def evaluate_answer(self, question, answer):
-        if not self.model:
-            return "I am currently offline. Please check my API key configuration."
-            
         try:
             prompt = f"""
             You are an expert UPSC Mains Examiner. Evaluate the following answer based on the official UPSC rubric.
@@ -102,23 +61,10 @@ class MimirService:
             
             Answer: {answer}
             
-            Provide a detailed evaluation in strict JSON format with the following structure:
-            {{
-                "score": <float, 0-15>,
-                "introduction_quality": "<string, brief assessment of the intro>",
-                "body_quality": "<string, assessment of content, flow, and arguments>",
-                "conclusion_quality": "<string, assessment of the conclusion>",
-                "strengths": [<list of strings>],
-                "weaknesses": [<list of strings>],
-                "missing_keywords": [<list of strings, important terms missing from the answer>],
-                "improvement_roadmap": [<list of strings, actionable steps to improve>],
-                "model_answer_structure": "<string, brief outline of an ideal answer>"
-            }}
-            
-            Do not include any markdown formatting (like ```json) in the response, just the raw JSON string.
+            Provide a detailed evaluation in strict JSON format.
             """
-            
-            response = self.model.generate_content(prompt)
+            # Use ModelManager (Pro tier for evaluation)
+            response = model_manager.generate_content(prompt, model_type='pro')
             return response.text
         except Exception as e:
             print(f"Error generating evaluation: {e}")

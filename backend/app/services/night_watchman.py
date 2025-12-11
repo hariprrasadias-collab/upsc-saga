@@ -4,27 +4,17 @@ The Night Watchman - Autonomous Research Service
 import os
 import json
 import feedparser
-import google.generativeai as genai
+import feedparser
 from datetime import datetime
 from app.db_models.night_watchman import save_briefing
 from dotenv import load_dotenv
+from app.services.model_manager import model_manager
 
 load_dotenv()
 
 class NightWatchman:
     def __init__(self):
-        self.model = None # Initialize to None
-        self.api_key = os.environ.get('GEMINI_API_KEY')
-        
-        if self.api_key:
-            try:
-                genai.configure(api_key=self.api_key)
-                self.model = genai.GenerativeModel('gemini-2.0-flash-001')
-                print("🦉 Night Watchman: Vision Online (Model Loaded)")
-            except Exception as e:
-                print(f"Night Watchman Vision Error: {e}")
-        else:
-            print("⚠️ Night Watchman Warning: GEMINI_API_KEY not found in environment")
+        # API Config managed by model_manager
         
         self.feeds = [
             'https://www.thehindu.com/news/national/feeder/default.rss',
@@ -34,14 +24,24 @@ class NightWatchman:
             'https://www.downtoearth.org.in/rss/feed' # Environment
         ]
 
-    def perform_nightly_watch(self):
+    def perform_nightly_watch(self, force=False):
         """
         Main execution method.
-        1. Scrapes news.
-        2. Synthesizes 'Morning Briefing'.
-        3. Saves to DB.
+        1. Checks if already ran today (Idempotency).
+        2. Scrapes news.
+        3. Synthesizes 'Morning Briefing'.
+        4. Saves to DB.
         """
         print("🦉 Night Watchman: Beginning patrol...")
+        
+        if not force:
+            from app.db import get_db
+            conn = get_db()
+            today = datetime.now().strftime('%Y-%m-%d')
+            existing = conn.execute('SELECT id FROM night_watchman_briefings WHERE date = ?', (today,)).fetchone()
+            if existing:
+                print(f"🦉 Night Watchman: Briefing for {today} already exists. Standing down.")
+                return {"success": True, "briefing_id": existing['id'], "message": "Already completed today."}
         
         # 1. Gather Intelligence
         articles = self._gather_intelligence()
@@ -66,6 +66,15 @@ class NightWatchman:
         
         # 4. Trigger REM Sleep (Autonomy)
         self.perform_rem_sleep_cycle()
+
+        # 5. Weekly Self-Review (Sundays only)
+        if datetime.now().weekday() == 6: # Sunday
+            try:
+                from app.services.self_review import self_review_service
+                print("📅 Sunday Detected: Conducting Weekly Self-Review...")
+                self_review_service.perform_review(lookback_days=7)
+            except Exception as e:
+                print(f"Weekly Review Failed: {e}")
         
         return {
             "success": True, 
@@ -109,7 +118,8 @@ class NightWatchman:
             Focus on patterns (e.g., "You failed 3 mock tests today, maybe rest?").
             """
             
-            response = self.model.generate_content(prompt)
+            # Use Pro model for insight
+            response = model_manager.generate_content(prompt, model_type='pro')
             insight = response.text.strip()
             
             # 3. Store in Long-Term Memory
@@ -143,11 +153,7 @@ class NightWatchman:
 
     def _synthesize_briefing(self, articles):
         """Use AI to create a cohesive morning report with Deep Analysis"""
-        if not self.model:
-            return {
-                "summary": "AI Offline. Raw Intelligence gathered.",
-                "quote": "Knowledge is power."
-            }
+        # Manager handles availability check
             
         # Prepare context
         articles_text = "\n\n".join([
@@ -194,50 +200,36 @@ class NightWatchman:
         """
         
         
+        
         # Retry logic for rate limits
-        max_retries = 3
-        retry_delay = 2
-        
-        for attempt in range(max_retries):
-            try:
-                response = self.model.generate_content(prompt)
-                import json
-                import re
-                
-                text = response.text.strip()
-                # Extract JSON
-                json_match = re.search(r"\{.*\}", text, re.DOTALL)
-                if json_match:
-                    data = json.loads(json_match.group(0))
-                    
-                    # If flashcards are present, we could save them to the DB here
-                    # For now, we just return them in the briefing
-                    if 'flashcards' in data:
-                        self._save_auto_flashcards(data['flashcards'])
-                        
-                    return data
-                else:
-                    print(f"⚠️ Synthesis Attempt {attempt+1} Failed: No JSON found")
-                    if attempt == max_retries - 1:
-                        return {"summary": text, "quote": "Carpe Diem."}
+        try:
+            # Use Pro model for deep synthesis
+            response = model_manager.generate_content(prompt, model_type='pro')
+            import json
+            import re
             
-            except Exception as e:
-                print(f"⚠️ Synthesis Attempt {attempt+1} Error: {e}")
-                if "429" in str(e) or "ResourceExhausted" in str(e):
-                    if attempt < max_retries - 1:
-                        import time
-                        wait_time = retry_delay * (2 ** attempt)
-                        print(f"⏳ Quota exceeded. Retrying in {wait_time}s...")
-                        time.sleep(wait_time)
-                        continue
+            text = response.text.strip()
+            # Extract JSON
+            json_match = re.search(r"\{.*\}", text, re.DOTALL)
+            if json_match:
+                data = json.loads(json_match.group(0))
                 
-                if attempt == max_retries - 1:
-                    return {
-                        "summary": f"**Briefing Unavailable**\n\nThe Watchman encountered heavy interference (API Error: {str(e)}). Please try again later.",
-                        "quote": "Perseverance is key."
-                    }
+                # If flashcards are present, we could save them to the DB here
+                # For now, we just return them in the briefing
+                if 'flashcards' in data:
+                    self._save_auto_flashcards(data['flashcards'])
+                    
+                return data
+            else:
+                print(f"⚠️ Synthesis Failed: No JSON found")
+                return {"summary": text, "quote": "Carpe Diem."}
         
-        return None
+        except Exception as e:
+            print(f"⚠️ Synthesis Error: {e}")
+            return {
+                "summary": f"**Briefing Unavailable**\n\nThe Watchman encountered heavy interference (API Error: {str(e)}). Please try again later.",
+                "quote": "Perseverance is key."
+            }
 
     def _save_auto_flashcards(self, cards):
         """Save generated flashcards to the 'Current Affairs' deck"""

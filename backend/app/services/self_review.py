@@ -1,7 +1,9 @@
 from app.db import get_db
-from app.services.brain_service import brain_service
+# from app.services.brain_service import brain_service # Unused
 from datetime import datetime, timedelta
 import json
+import re
+from app.services.model_manager import model_manager
 
 class SelfReviewService:
     """
@@ -14,7 +16,7 @@ class SelfReviewService:
         Analyze performance over the last N days.
         """
         conn = get_db()
-        since = (datetime.utcnow() - timedelta(days=lookback_days)).isoformat()
+        since = (datetime.utcnow() - timedelta(days=lookback_days)).strftime('%Y-%m-%d %H:%M:%S')
         
         print(f"🧐 Starting Self-Review for last {lookback_days} days...")
 
@@ -56,6 +58,14 @@ class SelfReviewService:
         ''', (since,)).fetchall()
         
         top_successes = [dict(s) for s in successes]
+        
+        # 3.1 Identify Self-Corrections (TODO Implemented)
+        corrections = conn.execute('''
+            SELECT COUNT(*) as count
+            FROM brain_action_log
+            WHERE executed_at >= ? AND outcome_status IN ('undone', 'corrected')
+        ''', (since,)).fetchone()
+        correction_count = corrections['count'] or 0
 
         # 4. Generate Improvement Plan (using BrainService/Gemini)
         # We ask the Brain to reflect on its own stats
@@ -64,27 +74,40 @@ class SelfReviewService:
         - Total Actions: {total}
         - Success Rate: {success_rate:.1f}%
         - Average Impact: {avg_impact:.2f}
+        - Self Corrections: {correction_count}
         - Top Mistakes: {json.dumps(top_mistakes)}
         - Top Successes: {json.dumps(top_successes)}
         
         Provide a brief 3-point improvement plan for the next week.
-        Format as JSON: {{"plan": ["point 1", "point 2", "point 3"]}}
+        RETURN ONLY JSON.
+        Format: {{"plan": ["point 1", "point 2", "point 3"]}}
         """
         
         try:
-            # We use a simplified thinking process here to avoid infinite loops
-            # In a real system, we'd have a dedicated 'meta-cognition' model prompt
-            improvement_plan = {
-                "plan": [
-                    f"Focus on reducing {top_mistakes[0]['action_type']} failures" if top_mistakes else "Maintain current performance",
-                    "Increase autonomy for successful actions",
-                    "Ask for more user feedback"
-                ]
-            }
-            # TODO: Integrate actual Gemini call here for dynamic reflection
+            # Generate AI Reflection (Pro model for complex reasoning)
+            response = model_manager.generate_content(reflection_prompt, model_type='pro')
+            text = response.text.strip()
+            
+            # Robust JSON Extraction
+            json_match = re.search(r"\{.*\}", text, re.DOTALL)
+            if json_match:
+                improvement_plan = json.loads(json_match.group(0))
+            else:
+                 # Check for Panic Mode / Fallback text
+                 if "Oracle is silent" in text or "error" in text.lower():
+                     print("ℹ️ Metrics available, but AI Reflection unavailable (Panic Mode). using default plan.")
+                     improvement_plan = {"plan": ["Review metrics manually", "Check system logs", "Retry analysis later"]}
+                 else:
+                     # Try to parse raw text if no braces found
+                     improvement_plan = json.loads(text)
+
+            # Basic validation
+            if "plan" not in improvement_plan or not isinstance(improvement_plan["plan"], list):
+                 improvement_plan = {"plan": ["Refine prompt engineering", "Monitor resource usage", "Optimize feedback loops"]}
+
         except Exception as e:
-            print(f"Reflection failed: {e}")
-            improvement_plan = {"plan": ["Continue monitoring performance"]}
+            print(f"Reflection failed (Using fallback): {e}")
+            improvement_plan = {"plan": ["Continue monitoring performance", "Verify API connectivity"]}
 
         # 5. Store Review
         week_num = datetime.now().strftime("%Y-W%U")
@@ -101,7 +124,7 @@ class SelfReviewService:
             success_rate,
             avg_impact * 100, # Normalize to 0-100 roughly
             stats['failures'] or 0,
-            0, # TODO: Track correction counts
+            correction_count, # Implemented
             json.dumps(improvement_plan)
         ))
         conn.commit()

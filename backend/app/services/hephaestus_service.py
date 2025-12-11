@@ -1,8 +1,8 @@
 import os
 import traceback
-import google.generativeai as genai
 import re
 from app.db import get_db
+from app.services.model_manager import model_manager
 
 class HephaestusService:
     """
@@ -11,12 +11,7 @@ class HephaestusService:
     """
     
     def __init__(self):
-        self.api_key = os.environ.get('GEMINI_API_KEY')
-        if self.api_key:
-            genai.configure(api_key=self.api_key)
-            self.model = genai.GenerativeModel('gemini-2.0-flash-exp') # Use a smart model for code
-        else:
-            self.model = None
+        pass # ModelManager handles init
             
     def attempt_repair(self, error: Exception, context_file: str = None):
         """
@@ -26,8 +21,8 @@ class HephaestusService:
         3. Generates a patch.
         4. Applies the patch.
         """
-        if not self.model:
-            print("❌ Hephaestus Disabled: No API Key.")
+        if not model_manager: # Should never happen
+            print("❌ Hephaestus Disabled: No Manager.")
             return False
             
         print(f"🔥 Hephaestus Activated: Analyzing error '{str(error)}'...")
@@ -80,7 +75,8 @@ class HephaestusService:
         """
         
         try:
-            response = self.model.generate_content(prompt)
+            # Use Pro model for code repair
+            response = model_manager.generate_content(prompt, model_type='pro')
             fix_code = self._extract_code_block(response.text)
             
             if not fix_code:
@@ -148,7 +144,8 @@ class HephaestusService:
             NO_CHANGES
             """
             
-            response = self.model.generate_content(prompt)
+            # Use Pro model for audit
+            response = model_manager.generate_content(prompt, model_type='pro')
             
             if "NO_CHANGES" in response.text:
                 print("✅ Hephaestus: File is healthy.")

@@ -50,7 +50,7 @@ export class BayesianOracle {
         // Monte Carlo Simulation Loop
         for (let i = 0; i < this.iterations; i++) {
             let remainingTasks = totalTasks;
-            let currentDay = new Date(today);
+            const currentDay = new Date(today);
             let burnoutFactor = 0;
             const path: Point[] = [];
             let dayCount = 0;

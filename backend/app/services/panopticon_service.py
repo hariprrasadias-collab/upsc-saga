@@ -2,19 +2,41 @@ import sqlite3
 import json
 import math
 from datetime import datetime, timedelta
-import google.generativeai as genai
 from flask import current_app
 import os
 
 # Configure Gemini
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel('gemini-pro')
+from app.services.model_manager import model_manager
+
+# Configure Gemini (Removed local config)
+# genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+# model = genai.GenerativeModel('gemini-pro')
 
 class PanopticonService:
     def __init__(self):
         pass
 
-    def get_db_connection(self):
+    # ... (rest of methods until _generate_insight)
+
+    def _generate_insight(self, metric, perf, r):
+        """Use Gemini to generate a human-readable insight."""
+        prompt = f"""
+        Analyze this correlation data for a student:
+        Metric: {metric}
+        Performance: {perf}
+        Correlation Coefficient (r): {r:.2f}
+        
+        Explain what this means for their study routine in 1 short sentence.
+        If r > 0.5: Strong positive (Doing X helps Y).
+        If r < -0.5: Strong negative (Doing X hurts Y).
+        If r is near 0: No relation.
+        """
+        try:
+            # Use ModelManager for rate limiting and load balancing
+            response = model_manager.generate_content(prompt, model_type='fast')
+            return response.text.strip()
+        except:
+            return f"Correlation between {metric} and {perf} is {r:.2f}."
         conn = sqlite3.connect(current_app.config['DATABASE'])
         conn.row_factory = sqlite3.Row
         return conn
@@ -199,7 +221,8 @@ class PanopticonService:
         If r is near 0: No relation.
         """
         try:
-            response = model.generate_content(prompt)
+            # Use ModelManager for robustness
+            response = model_manager.generate_content(prompt, model_type='fast')
             return response.text.strip()
         except:
             return f"Correlation between {metric} and {perf} is {r:.2f}."

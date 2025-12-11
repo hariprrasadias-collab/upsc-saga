@@ -49,23 +49,14 @@ class MockTestService:
     @staticmethod
     def generate_from_topic(topic, count=10):
         """Generate a mock test for a topic using Gemini."""
-        import google.generativeai as genai
-        import os
         import json
         import re
         import ast
+        from app.services.model_manager import model_manager
         
         print(f"🤖 Generating Mock Test for: {topic}")
         
-        api_key = os.environ.get('GEMINI_API_KEY')
-        if not api_key:
-            print("❌ GEMINI_API_KEY missing")
-            return {"success": False, "error": "API Key missing"}
-            
-        from app.services.model_manager import model_manager
-        
-        # model = genai.GenerativeModel('gemini-2.0-flash-001') # REMOVED HARDCODED
-        model = model_manager.get_model(model_type='fast') # Use centralized manager
+        # API Check handled by manager
         
         # Handle "Weak Areas" special case
         if topic.lower() == "weak areas":
@@ -110,7 +101,8 @@ class MockTestService:
         """
         
         try:
-            response = model.generate_content(prompt)
+            # Use ModelManager for rate limiting and load balancing
+            response = model_manager.generate_content(prompt, model_type='fast')
             
             # Safety Check
             if not response.parts:

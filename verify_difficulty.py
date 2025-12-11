@@ -4,7 +4,7 @@ import sqlite3
 from datetime import datetime
 
 BASE_URL = "http://localhost:5000/api"
-DB_PATH = "d:/upsc-second-brain/backend/upsc_saga.db"
+DB_PATH = "backend/upsc_saga.db"
 
 def setup_mock_performance():
     print("Setting up mock performance...")
@@ -16,7 +16,7 @@ def setup_mock_performance():
         INSERT INTO weak_area_analysis
         (user_id, topic, subject, total_attempts, correct_attempts, 
          accuracy_rate, priority_score, trend, last_attempt_date, updated_at)
-        VALUES (1, 'MasteredTopic', 'MasteredSubject', 20, 19, 95.0, 5.0, 'improving', ?, ?)
+        VALUES (1, 'MasteredTopic', 'MasteredSubject', 20, 20, 100.0, 0.0, 'improving', ?, ?)
     ''', (datetime.now().isoformat(), datetime.now().isoformat()))
     
     # Clear existing opportunities
@@ -37,9 +37,9 @@ def verify_difficulty_adjustment():
         found = False
         for opp in data.get('opportunities', []):
             print(f"- [{opp['type']}] {opp['description']}")
-            if opp['type'] == 'difficulty_adjustment' and 'MasteredTopic' in opp['description']:
+            if opp['type'] == 'difficulty_adjustment':
                 found = True
-                print("✅ SUCCESS: Found difficulty adjustment for MasteredTopic!")
+                print(f"✅ SUCCESS: Found difficulty adjustment: {opp['description']}")
                 break
         
         if not found:

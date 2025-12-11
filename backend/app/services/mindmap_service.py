@@ -1,6 +1,6 @@
 import json
 import os
-import google.generativeai as genai
+import logging
 from app import db
 
 class MindMapService:
@@ -9,12 +9,12 @@ class MindMapService:
         """
         Generates a hierarchical JSON structure for a mind map using Gemini.
         """
-        api_key = os.getenv("GEMINI_API_KEY")
-        if not api_key:
-            raise Exception("GEMINI_API_KEY not found")
-
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-flash-latest')
+        """
+        Generates a hierarchical JSON structure for a mind map using Gemini.
+        """
+        from app.services.model_manager import model_manager
+        
+        # API Check handled by manager
 
         prompt = f"""
         Create a detailed mind map for the topic: "{topic}".
@@ -35,7 +35,7 @@ class MindMapService:
         """
 
         try:
-            response = model.generate_content(prompt)
+            response = model_manager.generate_content(prompt, model_type='fast')
             text = response.text.strip()
             # Clean up potential markdown formatting if Gemini still adds it
             if text.startswith("```json"):

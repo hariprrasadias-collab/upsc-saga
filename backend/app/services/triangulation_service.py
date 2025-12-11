@@ -1,29 +1,20 @@
-import google.generativeai as genai
 import os
 import json
 from app.db import get_db
 from dotenv import load_dotenv
+from app.services.model_manager import model_manager
 
 load_dotenv()
 
-GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-
-def get_model():
-    try:
-        return genai.GenerativeModel('gemini-flash-latest')
-    except:
-        return genai.GenerativeModel('gemini-flash')
+# GEMINI_API_KEY managed by ModelManager
 
 def analyze_topic_triangulation(text):
     """
     Triangulates a topic into Theory, Precedents, and PYQs.
     """
-    if not GEMINI_API_KEY:
-        return {"error": "Gemini API Key missing"}
+    # Check skipped (handled by manager)
 
-    model = get_model()
+    # model = get_model() -> Removed
     conn = get_db()
 
     # 1. AI Analysis (Omni-Link System)
@@ -79,7 +70,8 @@ def analyze_topic_triangulation(text):
     """
 
     try:
-        response = model.generate_content(prompt)
+        # Use ModelManager (Pro tier for deep analysis)
+        response = model_manager.generate_content(prompt, model_type='pro')
         ai_data = json.loads(response.text.replace('```json', '').replace('```', '').strip())
     except Exception as e:
         print(f"Triangulation AI Error: {e}")

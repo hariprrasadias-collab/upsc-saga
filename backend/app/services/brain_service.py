@@ -27,7 +27,7 @@ class BrainService:
         # Initialize Brain Service - Core Logic
         self.api_key = os.environ.get('GEMINI_API_KEY')
         self.is_lobotomized = False
-        self.manual_mode = True # Default to Manual Mode as requested
+        self.manual_mode = False # AUTOMATION RESTORED (Safe via ModelManager)
 
         if not self.api_key:
             print("⚠️ BrainService Warning: GEMINI_API_KEY not found. The Brain will be lobotomized (Mock Mode).")
@@ -747,7 +747,20 @@ You do not just generate content; you synthesize deep insights, detect hidden pa
             # But since I am overwriting the file, I must include it or remove it.
             # I will include it to preserve functionality if manual_mode is toggled off.
 
-            pass # Placeholder for the original logic if needed.
+            # 2. Daily Mock Test (If applicable)
+            self.execute_action("GENERATE_MOCK_TEST", {"topic": topic, "count": 10, "reasoning": "Task Completion Automation"})
+
+            # 3. Foresight (Predictions)
+            self.execute_action("PREDICT_QUESTIONS", {"topic": topic, "subject": subject, "timeframe_days": 30})
+
+            # 4. Neural Network (Linkages)
+            self.execute_action("FIND_LINKAGES", {"topic": topic, "subject": subject})
+
+            # 5. Podcast Generation (Gamification)
+            self.execute_action("GENERATE_PODCAST", {"topic": topic, "style": "humorous"})
+
+            # 6. Socratic Dialogue (Deep Learning)
+            self.execute_action("SOCRATIC_DEBATE", {"topic": topic, "subject": subject})
                  # Given the file overwrite, I am effectively disabling the old logic unless I copy-paste it all back.
                  # The user explicitly asked to "stop the api call", so removing the old logic is compliant.
                  # However, I should check if they want to revert later.
@@ -1531,6 +1544,35 @@ You do not just generate content; you synthesize deep insights, detect hidden pa
                 except Exception as e:
                     result = {"success": False, "message": f"Dilemma Gen Failed: {str(e)}"}
 
+            elif action_type == "SCHEDULE_REVISION":
+                try:
+                    # Log A/B result if applicable
+                    if 'ab_test_id' in payload:
+                        from app.services.ab_tester import ab_tester
+                        ab_tester.log_result(payload['ab_test_id'], 'action_executed', 1.0)
+                        
+                    result = {"success": True, "message": "Revision Scheduled (Mock)"}
+                except Exception as e:
+                    result = {"success": False, "message": f"Schedule Revision Failed: {str(e)}"}
+            
+            elif action_type == "COMPLETE_MOCK_TEST":
+                try:
+                    from app.services.syllabus_tracker import SyllabusTracker
+                    payload_topics = payload.get('topics', [])
+                    
+                    updated = []
+                    for t in payload_topics:
+                        SyllabusTracker.update_topic_progress(t, 'Completed')
+                        updated.append(t)
+                        
+                    result = {
+                        "success": True,
+                        "message": f"Marked {len(updated)} topics as Completed: {', '.join(updated)}",
+                        "updated_topics": updated
+                    }
+                except Exception as e:
+                    result = {"success": False, "message": f"Complete Mock Test Failed: {str(e)}"}
+
             elif action_type == "GENERATE_ELI5":
                 try:
                     topic = payload.get('topic', '')
@@ -1574,6 +1616,63 @@ You do not just generate content; you synthesize deep insights, detect hidden pa
                     }
                 except Exception as e:
                     result = {"success": False, "message": f"ELI5 Gen Failed: {str(e)}"}
+
+            elif action_type == "EXPLAIN_SYLLABUS_NODE":
+                try:
+                    topic = payload.get('topic', '')
+                    prompt = f"Explain the UPSC syllabus topic '{topic}' in concise detail. Cover key concepts."
+                    response = model_manager.generate_content(prompt)
+                    result = {"success": True, "explanation": response.text}
+                except Exception as e:
+                    result = {"success": False, "message": f"Explanation Failed: {str(e)}"}
+
+            elif action_type == "FIND_COMMON_PITFALLS":
+                try:
+                    topic = payload.get('topic', '')
+                    prompt = f"List 3 common mistakes students make when studying '{topic}' for UPSC. Be specific."
+                    response = model_manager.generate_content(prompt)
+                    result = {"success": True, "pitfalls": response.text}
+                except Exception as e:
+                    result = {"success": False, "message": f"Pitfall search Failed: {str(e)}"}
+
+            elif action_type == "ANALYZE_PYQ_TRENDS":
+                try:
+                    topic = payload.get('topic', '')
+                    prompt = f"""
+                    Analyze Previous Year Question (PYQ) trends for '{topic}' in UPSC CSE (Prelims & Mains).
+                    Highlight:
+                    1. Frequency of questions
+                    2. Nature of questions (Factual vs Analytical)
+                    3. Key sub-themes repeated
+                    """
+                    response = model_manager.generate_content(prompt, model_type='pro')
+                    result = {"success": True, "analysis": response.text}
+                except Exception as e:
+                    result = {"success": False, "message": f"Trend Analysis Failed: {str(e)}"}
+
+            elif action_type == "TRIANGULATE_TOPIC":
+                try:
+                    topic = payload.get('topic', '')
+                    prompt = f"""
+                    Triangulate '{topic}' by connecting it to 3 dimensions:
+                    1. Historical Context
+                    2. Constitutional/Legal Framework
+                    3. Current Affairs Relevance
+                    Synthesize these into a holistic view.
+                    """
+                    response = model_manager.generate_content(prompt, model_type='pro')
+                    result = {"success": True, "data": {"synthesis": response.text}}
+                except Exception as e:
+                    result = {"success": False, "message": f"Triangulation Failed: {str(e)}"}
+
+            elif action_type == "DECODE_NEURAL_HASH":
+                try:
+                    topic = payload.get('topic', '')
+                    prompt = f"Identify the core underlying themes and cross-disciplinary linkages for '{topic}'."
+                    response = model_manager.generate_content(prompt)
+                    result = {"success": True, "data": {"core_themes": [response.text]}}
+                except Exception as e:
+                    result = {"success": False, "message": f"Neural Hash Decode Failed: {str(e)}"}
 
             return result
 

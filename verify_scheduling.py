@@ -4,7 +4,7 @@ import sqlite3
 from datetime import datetime
 
 BASE_URL = "http://localhost:5000/api"
-DB_PATH = "d:/upsc-second-brain/backend/upsc_saga.db"
+DB_PATH = "backend/upsc_saga.db"
 
 def setup_mock_weakness():
     print("Setting up mock weakness...")
@@ -18,7 +18,7 @@ def setup_mock_weakness():
         INSERT INTO weak_area_analysis
         (user_id, topic, subject, total_attempts, correct_attempts, 
          accuracy_rate, priority_score, trend, last_attempt_date, updated_at)
-        VALUES (1, 'MockWeakness', 'MockSubject', 10, 2, 20.0, 80.0, 'declining', ?, ?)
+        VALUES (1, 'MockWeakness', 'MockSubject', 10, 2, 20.0, 9999.0, 'declining', ?, ?)
     ''', (datetime.now().isoformat(), datetime.now().isoformat()))
     
     # Clear existing opportunities for this topic

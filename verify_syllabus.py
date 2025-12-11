@@ -32,7 +32,7 @@ if __name__ == "__main__":
     from unittest.mock import MagicMock
     
     app = flask.Flask(__name__)
-    app.config['DATABASE'] = 'd:/upsc-second-brain/backend/upsc_saga.db'
+    app.config['DATABASE'] = os.path.join(os.getcwd(), 'backend', 'upsc_saga.db')
     
     with app.app_context():
         # 1. Reset a topic

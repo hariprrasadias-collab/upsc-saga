@@ -1,16 +1,15 @@
-import google.generativeai as genai
 import os
 import json
 from dotenv import load_dotenv
+from app.services.model_manager import model_manager
 
 load_dotenv()
 
-# Configure Gemini API
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+# Configure Gemini API (Managed by ModelManager)
 
 class EssayEvaluator:
     def __init__(self):
-        self.model = genai.GenerativeModel('gemini-flash-latest')
+        pass # ModelManager handles init
 
     def evaluate_essay(self, topic, content):
         """
@@ -48,7 +47,8 @@ class EssayEvaluator:
         """
 
         try:
-            response = self.model.generate_content(prompt)
+            # Use Pro model for essays (1250 words)
+            response = model_manager.generate_content(prompt, model_type='pro')
             response_text = response.text.strip()
             
             # Clean up potential markdown formatting

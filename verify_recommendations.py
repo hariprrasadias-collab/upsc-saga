@@ -4,7 +4,7 @@ import sqlite3
 from datetime import datetime
 
 BASE_URL = "http://localhost:5000/api"
-DB_PATH = "d:/upsc-second-brain/backend/upsc_saga.db"
+DB_PATH = "backend/upsc_saga.db"
 
 def setup_mock_data():
     print("Setting up mock data...")

@@ -3,7 +3,7 @@ import json
 import sqlite3
 
 BASE_URL = "http://localhost:5000/api"
-DB_PATH = "d:/upsc-second-brain/backend/upsc_saga.db"
+DB_PATH = "backend/upsc_saga.db"
 
 def verify_goal_suggestion():
     print("Verifying Goal Suggestion...")

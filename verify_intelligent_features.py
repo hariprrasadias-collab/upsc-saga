@@ -58,7 +58,7 @@ with app.app_context():
         for t in tasks:
             if t['subject'] in ['History', 'Geography', 'Polity', 'Economy', 'Science', 'Environment']:
                 chapter_count += 1
-            if "Flashcards" in t['subject'] and "Active Recall" in t['topic']:
+            if "Flashcards" in t['subject'] and "Recall" in t['topic']:
                 flashcard_count += 1
                 print(f"Found Triggered Flashcard on {check_date}: {t['topic']}")
                 

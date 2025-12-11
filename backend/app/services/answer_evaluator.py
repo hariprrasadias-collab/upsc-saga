@@ -1,19 +1,17 @@
-# Answer Writing AI Evaluator using Gemini Pro
-import google.generativeai as genai
+# Answer Writing AI Evaluator
 import os
 import json
 import re
 from dotenv import load_dotenv
+from app.services.model_manager import model_manager
 
 load_dotenv()
 
-# Configure Gemini API (reusing existing setup)
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
-genai.configure(api_key=GEMINI_API_KEY)
+# Configure Gemini API (Managed by ModelManager)
 
 class AnswerEvaluator:
     def __init__(self):
-        self.model = genai.GenerativeModel('gemini-flash-latest')
+        pass # ModelManager handles init
     
     def evaluate_answer(self, question, answer_text, word_limit, keywords=None, model_answer=None):
         """
@@ -78,8 +76,8 @@ Be constructive but honest. Focus on UPSC-specific requirements: multidimensiona
 """
         
         try:
-            # Call Gemini API
-            response = self.model.generate_content(evaluation_prompt)
+            # Call Gemini API via Manager
+            response = model_manager.generate_content(evaluation_prompt, model_type='fast')
             response_text = response.text.strip()
             
             # Clean response - remove markdown code blocks if present
