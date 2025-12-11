@@ -1,16 +1,26 @@
 from app import cgi_fix
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_cors import CORS
 from flask_compress import Compress
 from flask_caching import Cache
+import os
 
 cache = Cache()
 
 def create_app():
-    app = Flask(__name__)
+    # Adjust static and template folders to point to React build
+    app = Flask(__name__, static_folder='../../frontend/dist', static_url_path='/')
     app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
     CORS(app, resources={r"/*": {"origins": "*"}})
     Compress(app) # Enable Gzip compression
+
+    @app.route('/', defaults={'path': ''})
+    @app.route('/<path:path>')
+    def serve(path):
+        if path != "" and os.path.exists(app.static_folder + '/' + path):
+            return send_from_directory(app.static_folder, path)
+        else:
+            return send_from_directory(app.static_folder, 'index.html')
 
     # Configure Caching (Simple Local Memory Cache for speed)
     app.config['CACHE_TYPE'] = 'SimpleCache'
