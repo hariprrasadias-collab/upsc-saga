@@ -15,3 +15,4 @@ networkx
 scipy
 numpy
 thefuzz
+gunicorn
