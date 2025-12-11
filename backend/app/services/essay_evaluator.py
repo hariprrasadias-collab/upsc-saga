@@ -1,16 +1,13 @@
-import google.generativeai as genai
 import os
 import json
 from dotenv import load_dotenv
+from app.services.model_manager import model_manager
 
 load_dotenv()
 
-# Configure Gemini API
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-
 class EssayEvaluator:
     def __init__(self):
-        self.model = genai.GenerativeModel('gemini-flash-latest')
+        pass # ModelManager handles initialization
 
     def evaluate_essay(self, topic, content):
         """
@@ -48,14 +45,14 @@ class EssayEvaluator:
         """
 
         try:
-            response = self.model.generate_content(prompt)
-            response_text = response.text.strip()
+            response = model_manager.generate_content(prompt)
+            if hasattr(response, 'text'):
+                response_text = response.text.strip()
+            else:
+                response_text = str(response)
             
             # Clean up potential markdown formatting
-            if response_text.startswith("```json"):
-                response_text = response_text[7:]
-            if response_text.endswith("```"):
-                response_text = response_text[:-3]
+            response_text = response_text.replace('```json', '').replace('```', '').strip()
                 
             return json.loads(response_text)
         except Exception as e:

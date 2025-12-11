@@ -94,29 +94,34 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
         // We will handle "initial load" separately.
 
         try {
-            const response = await fetch('http://localhost:5000/api/dashboard-data');
+            const response = await fetch('http://127.0.0.1:5000/api/dashboard-data');
             if (!response.ok) throw new Error('Failed to fetch dashboard data');
             const data = await response.json();
 
-            setUserStats((prev) => {
-                const newStats = data.stats;
-                if (prev && newStats.level > prev.level) {
-                    audioManager.play('levelup');
-                    setShowLevelUp(true);
-                }
-                return newStats;
-            });
+            if (data.stats) {
+                setUserStats((prev) => {
+                    const newStats = data.stats;
+                    if (prev && newStats.level > prev.level) {
+                        audioManager.play('levelup');
+                        setShowLevelUp(true);
+                    }
+                    return newStats;
+                });
+            }
 
-            const tasksWithBooleanCompletion: Task[] = data.tasks.map((task: RawTaskFromAPI) => ({
-                id: task.id,
-                title: task.title,
-                isCompleted: task.isCompleted === 1,
-                xp_reward: task.xp_reward,
-                associated_stat: task.associated_stat,
-                due_date: task.due_date,
-            }));
-
-            setTodayTasks(tasksWithBooleanCompletion);
+            if (data.tasks && Array.isArray(data.tasks)) {
+                const tasksWithBooleanCompletion: Task[] = data.tasks.map((task: RawTaskFromAPI) => ({
+                    id: task.id,
+                    title: task.title,
+                    isCompleted: task.isCompleted === 1,
+                    xp_reward: task.xp_reward,
+                    associated_stat: task.associated_stat,
+                    due_date: task.due_date,
+                }));
+                setTodayTasks(tasksWithBooleanCompletion);
+            } else {
+                 setTodayTasks([]);
+            }
         } catch (err) {
             console.error("Error refreshing dashboard:", err);
             setError(err instanceof Error ? err.message : "Unknown error");
@@ -131,6 +136,12 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
             setIsLoading(false);
         };
         init();
+
+        // Restore Rage Mode from local storage
+        const savedRage = localStorage.getItem('isRageMode');
+        if (savedRage === 'true') {
+            setIsRageMode(true);
+        }
     }, [refreshDashboard]);
 
     // --- AUDIO & VISUAL EFFECTS FOR RAGE MODE ---
@@ -138,9 +149,11 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
         if (isRageMode) {
             document.body.classList.add('rage-mode');
             audioManager.startLoop('rage');
+            localStorage.setItem('isRageMode', 'true');
         } else {
             document.body.classList.remove('rage-mode');
             audioManager.stopLoop('rage');
+            localStorage.setItem('isRageMode', 'false');
         }
     }, [isRageMode]);
 
@@ -148,10 +161,13 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
 
     const completeTask = async (taskId: number) => {
         try {
-            // Optimistic update? Maybe not needed if backend is fast.
-            // But let's call API.
-            const response = await fetch(`http://localhost:5000/api/tasks/${taskId}/complete`, {
-                method: 'POST',
+            // Updated to correct route based on verification
+            const response = await fetch(`http://127.0.0.1:5000/api/planner/task/${taskId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status: 'Completed' })
             });
 
             if (!response.ok) {
