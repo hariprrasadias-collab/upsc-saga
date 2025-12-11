@@ -4,7 +4,7 @@ from app.services.essay_evaluator import EssayEvaluator
 import json
 
 essay_bp = Blueprint('essay', __name__)
-evaluator = EssayEvaluator()
+evaluator = EssayEvaluator() # ModelManager handles internal init
 
 @essay_bp.route('/api/essay/submit', methods=['POST'])
 def submit_essay():
@@ -73,8 +73,11 @@ def get_essay_detail(id):
             
         result = dict(submission)
         # Parse JSON string back to object
-        if result['evaluation_json']:
-            result['evaluation'] = json.loads(result['evaluation_json'])
+        if result.get('evaluation_json'):
+            try:
+                result['evaluation'] = json.loads(result['evaluation_json'])
+            except json.JSONDecodeError:
+                result['evaluation'] = {}
             
         return jsonify(result)
     except Exception as e:
@@ -83,14 +86,17 @@ def get_essay_detail(id):
 @essay_bp.route('/api/essay/topics', methods=['GET'])
 def get_essay_topics():
     """Get list of sample essay topics (PYQs)"""
-    topics = [
-        "The process of self-discovery has now been technologically outsourced.",
-        "Your perception of me is a reflection of you; my reaction to you is an awareness of me.",
-        "Philosophy of wantlessness is Utopian, while materialism is a chimera.",
-        "The real is rational and the rational is real.",
-        "Hand that rocks the cradle rules the world.",
-        "Technology cannot replace manpower.",
-        "Crisis of conscience in public administration.",
-        "Digital economy: A leveller or a source of economic inequality."
-    ]
-    return jsonify(topics)
+    try:
+        topics = [
+            "The process of self-discovery has now been technologically outsourced.",
+            "Your perception of me is a reflection of you; my reaction to you is an awareness of me.",
+            "Philosophy of wantlessness is Utopian, while materialism is a chimera.",
+            "The real is rational and the rational is real.",
+            "Hand that rocks the cradle rules the world.",
+            "Technology cannot replace manpower.",
+            "Crisis of conscience in public administration.",
+            "Digital economy: A leveller or a source of economic inequality."
+        ]
+        return jsonify(topics)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

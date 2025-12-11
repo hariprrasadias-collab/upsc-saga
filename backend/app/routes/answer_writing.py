@@ -126,10 +126,15 @@ def submit_answer():
         conn.commit()
         
         # Award XP
-        overall_score = evaluation_result['overall_score']
-        xp_earned = 50 + int(overall_score * 10)
-        hacksilver_earned = int(overall_score * 5)
-        award_xp(user_id, xp_earned, hacksilver_earned)
+        try:
+            overall_score = evaluation_result['overall_score']
+            xp_earned = 50 + int(overall_score * 10)
+            hacksilver_earned = int(overall_score * 5)
+            award_xp(user_id, xp_earned, hacksilver_earned)
+        except Exception as e:
+            print(f"XP Award Error: {e}")
+            xp_earned = 0
+            hacksilver_earned = 0
         
         return jsonify({
             'answer_id': answer_id,

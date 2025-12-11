@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 from flask_cors import CORS
 from app.db import get_db
+import json
+from datetime import datetime
 
 bp = Blueprint('pyq', __name__, url_prefix='/api/pyq')
 CORS(bp)
@@ -8,196 +10,209 @@ CORS(bp)
 @bp.route('/questions', methods=['GET'])
 def get_questions():
     """Get questions with optional filters (supports multi-select)"""
-    conn = get_db()
-    
-    # Filter parameters - support both single and multi-select
-    years = request.args.getlist('years') or ([request.args.get('year')] if request.args.get('year') else [])
-    subjects = request.args.getlist('subjects') or ([request.args.get('subject')] if request.args.get('subject') else [])
-    topics = request.args.getlist('topics') or ([request.args.get('topic')] if request.args.get('topic') else [])
-    difficulty = request.args.get('difficulty')
-    search = request.args.get('search')
-    is_favorite = request.args.get('is_favorite')
-    
-    query = "SELECT * FROM pyq_questions WHERE 1=1"
-    params = []
-    
-    # Multi-select support for years
-    if years:
-        placeholders = ','.join(['?'] * len(years))
-        query += f" AND year IN ({placeholders})"
-        params.extend(years)
-    
-    # Multi-select support for subjects
-    if subjects:
-        placeholders = ','.join(['?'] * len(subjects))
-        query += f" AND subject IN ({placeholders})"
-        params.extend(subjects)
+    try:
+        conn = get_db()
+
+        # Filter parameters - support both single and multi-select
+        years = request.args.getlist('years') or ([request.args.get('year')] if request.args.get('year') else [])
+        subjects = request.args.getlist('subjects') or ([request.args.get('subject')] if request.args.get('subject') else [])
+        topics = request.args.getlist('topics') or ([request.args.get('topic')] if request.args.get('topic') else [])
+        difficulty = request.args.get('difficulty')
+        search = request.args.get('search')
+        is_favorite = request.args.get('is_favorite')
+
+        query = "SELECT * FROM pyq_questions WHERE 1=1"
+        params = []
+
+        # Multi-select support for years
+        if years:
+            placeholders = ','.join(['?'] * len(years))
+            query += f" AND year IN ({placeholders})"
+            params.extend(years)
+
+        # Multi-select support for subjects
+        if subjects:
+            placeholders = ','.join(['?'] * len(subjects))
+            query += f" AND subject IN ({placeholders})"
+            params.extend(subjects)
+
+        # Multi-select support for topics
+        if topics:
+            placeholders = ','.join(['?'] * len(topics))
+            query += f" AND topic IN ({placeholders})"
+            params.extend(topics)
+
+        if difficulty:
+            query += " AND difficulty = ?"
+            params.append(difficulty)
+
+        if is_favorite == 'true':
+            query += " AND is_favorite = 1"
+
+        if search:
+            # Optimization: Use FTS5 match if available
+            try:
+                # We join with FTS table for speed
+                # Note: We can't just join easily in one query if we want to keep all filters
+                # So we use the rowid from FTS to filter the main table
+                fts_query = "SELECT rowid FROM pyq_questions_fts WHERE pyq_questions_fts MATCH ? ORDER BY rank"
+                fts_rows = conn.execute(fts_query, (search,)).fetchall()
+                if fts_rows:
+                    ids = [str(r['rowid']) for r in fts_rows]
+                    query += f" AND id IN ({','.join(ids)})"
+                else:
+                    # No matches found in FTS
+                    query += " AND 1=0"
+            except Exception as e:
+                # Fallback to LIKE if FTS fails or table doesn't exist
+                print(f"FTS Search failed, falling back to LIKE: {e}")
+                query += " AND (question_text LIKE ? OR explanation LIKE ?)"
+                search_term = f"%{search}%"
+                params.append(search_term)
+                params.append(search_term)
+
+        query += " ORDER BY year DESC, id ASC"
         
-    # Multi-select support for topics
-    if topics:
-        placeholders = ','.join(['?'] * len(topics))
-        query += f" AND topic IN ({placeholders})"
-        params.extend(topics)
-        
-    if difficulty:
-        query += " AND difficulty = ?"
-        params.append(difficulty)
-        
-    if is_favorite == 'true':
-        query += " AND is_favorite = 1"
-        
-    if search:
-        # Optimization: Use FTS5 match if available
-        # First check if FTS table exists (safe check)
-        try:
-            # We join with FTS table for speed
-            # Note: We can't just join easily in one query if we want to keep all filters
-            # So we use the rowid from FTS to filter the main table
-            fts_query = "SELECT rowid FROM pyq_questions_fts WHERE pyq_questions_fts MATCH ? ORDER BY rank"
-            fts_rows = conn.execute(fts_query, (search,)).fetchall()
-            if fts_rows:
-                ids = [str(r['rowid']) for r in fts_rows]
-                query += f" AND id IN ({','.join(ids)})"
-            else:
-                # No matches found in FTS
-                query += " AND 1=0"
-        except Exception as e:
-            # Fallback to LIKE if FTS fails or table doesn't exist
-            print(f"FTS Search failed, falling back to LIKE: {e}")
-            query += " AND (question_text LIKE ? OR explanation LIKE ?)"
-            search_term = f"%{search}%"
-            params.append(search_term)
-            params.append(search_term)
-        
-    query += " ORDER BY year DESC, id ASC"
-    
-    questions = conn.execute(query, params).fetchall()
-    return jsonify([dict(q) for q in questions])
+        questions = conn.execute(query, params).fetchall()
+        return jsonify([dict(q) for q in questions])
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @bp.route('/filters', methods=['GET'])
 def get_filters():
     """Get available filter options"""
-    conn = get_db()
-    
-    years = conn.execute("SELECT DISTINCT year FROM pyq_questions ORDER BY year DESC").fetchall()
-    subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
-    topics = conn.execute("SELECT DISTINCT topic FROM pyq_questions WHERE topic IS NOT NULL ORDER BY topic").fetchall()
-    
-    return jsonify({
-        'years': [row['year'] for row in years],
-        'subjects': [row['subject'] for row in subjects],
-        'topics': [row['topic'] for row in topics]
-    })
+    try:
+        conn = get_db()
+
+        years = conn.execute("SELECT DISTINCT year FROM pyq_questions ORDER BY year DESC").fetchall()
+        subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
+        topics = conn.execute("SELECT DISTINCT topic FROM pyq_questions WHERE topic IS NOT NULL ORDER BY topic").fetchall()
+
+        return jsonify({
+            'years': [row['year'] for row in years],
+            'subjects': [row['subject'] for row in subjects],
+            'topics': [row['topic'] for row in topics]
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @bp.route('/topics', methods=['GET'])
 def get_topics():
     """Get topics filtered by selected subject(s)"""
-    conn = get_db()
-    subjects = request.args.getlist('subjects')
-    
-    if subjects:
-        # Get topics for selected subjects
-        placeholders = ','.join(['?'] * len(subjects))
-        query = f"""
-            SELECT DISTINCT topic, subject
-            FROM pyq_questions 
-            WHERE subject IN ({placeholders}) AND topic IS NOT NULL
-            ORDER BY subject, topic
-        """
-        topics = conn.execute(query, subjects).fetchall()
-    else:
-        # Get all topics if no subject selected
-        query = """
-            SELECT DISTINCT topic, subject
-            FROM pyq_questions 
-            WHERE topic IS NOT NULL
-            ORDER BY subject, topic
-        """
-        topics = conn.execute(query).fetchall()
-    
-    return jsonify([{'topic': row['topic'], 'subject': row['subject']} for row in topics])
+    try:
+        conn = get_db()
+        subjects = request.args.getlist('subjects')
+
+        if subjects:
+            # Get topics for selected subjects
+            placeholders = ','.join(['?'] * len(subjects))
+            query = f"""
+                SELECT DISTINCT topic, subject
+                FROM pyq_questions
+                WHERE subject IN ({placeholders}) AND topic IS NOT NULL
+                ORDER BY subject, topic
+            """
+            topics = conn.execute(query, subjects).fetchall()
+        else:
+            # Get all topics if no subject selected
+            query = """
+                SELECT DISTINCT topic, subject
+                FROM pyq_questions
+                WHERE topic IS NOT NULL
+                ORDER BY subject, topic
+            """
+            topics = conn.execute(query).fetchall()
+
+        return jsonify([{'topic': row['topic'], 'subject': row['subject']} for row in topics])
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @bp.route('/<int:id>/favorite', methods=['POST'])
 def toggle_favorite(id):
     """Toggle favorite status of a question"""
-    conn = get_db()
-    
-    # Check current status
-    curr = conn.execute("SELECT is_favorite FROM pyq_questions WHERE id = ?", (id,)).fetchone()
-    if not curr:
-        return jsonify({'error': 'Question not found'}), 404
-        
-    new_status = not curr['is_favorite']
-    
-    conn.execute("UPDATE pyq_questions SET is_favorite = ? WHERE id = ?", (new_status, id))
-    conn.commit()
-    
-    return jsonify({'id': id, 'is_favorite': new_status})
+    try:
+        conn = get_db()
+
+        # Check current status
+        curr = conn.execute("SELECT is_favorite FROM pyq_questions WHERE id = ?", (id,)).fetchone()
+        if not curr:
+            return jsonify({'error': 'Question not found'}), 404
+
+        new_status = not curr['is_favorite']
+
+        conn.execute("UPDATE pyq_questions SET is_favorite = ? WHERE id = ?", (new_status, id))
+        conn.commit()
+
+        return jsonify({'id': id, 'is_favorite': new_status})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @bp.route('/analytics', methods=['GET'])
 def get_analytics():
     """Get analytics with optional filters"""
-    conn = get_db()
-    
-    # Base query filters
-    filters_sql = "WHERE 1=1"
-    params = []
+    try:
+        conn = get_db()
 
-    subjects = request.args.getlist('subjects')
-    if subjects:
-        placeholders = ','.join(['?'] * len(subjects))
-        filters_sql += f" AND subject IN ({placeholders})"
-        params.extend(subjects)
+        # Base query filters
+        filters_sql = "WHERE 1=1"
+        params = []
 
-    years = request.args.getlist('years')
-    if years:
-        placeholders = ','.join(['?'] * len(years))
-        filters_sql += f" AND year IN ({placeholders})"
-        params.extend(years)
+        subjects = request.args.getlist('subjects')
+        if subjects:
+            placeholders = ','.join(['?'] * len(subjects))
+            filters_sql += f" AND subject IN ({placeholders})"
+            params.extend(subjects)
 
-    # Subject distribution (Filtered)
-    subject_counts = conn.execute(f'''
-        SELECT subject, COUNT(*) as count 
-        FROM pyq_questions 
-        {filters_sql}
-        GROUP BY subject
-    ''', params).fetchall()
-    
-    # Year-wise distribution (Filtered)
-    year_counts = conn.execute(f'''
-        SELECT year, COUNT(*) as count 
-        FROM pyq_questions 
-        {filters_sql}
-        GROUP BY year 
-        ORDER BY year
-    ''', params).fetchall()
-    
-    # Topic distribution (Top 20 Filtered)
-    topic_counts = conn.execute(f'''
-        SELECT topic, COUNT(*) as count 
-        FROM pyq_questions 
-        {filters_sql} AND topic IS NOT NULL
-        GROUP BY topic
-        ORDER BY count DESC
-        LIMIT 20
-    ''', params).fetchall()
+        years = request.args.getlist('years')
+        if years:
+            placeholders = ','.join(['?'] * len(years))
+            filters_sql += f" AND year IN ({placeholders})"
+            params.extend(years)
 
-    # Difficulty Trends (Filtered)
-    # Returns: year, difficulty, count
-    difficulty_trends = conn.execute(f'''
-        SELECT year, difficulty, COUNT(*) as count
-        FROM pyq_questions
-        {filters_sql}
-        GROUP BY year, difficulty
-        ORDER BY year
-    ''', params).fetchall()
-    
-    return jsonify({
-        'by_subject': [dict(row) for row in subject_counts],
-        'by_year': [dict(row) for row in year_counts],
-        'by_topic': [dict(row) for row in topic_counts],
-        'difficulty_trend': [dict(row) for row in difficulty_trends]
-    })
+        # Subject distribution (Filtered)
+        subject_counts = conn.execute(f'''
+            SELECT subject, COUNT(*) as count
+            FROM pyq_questions
+            {filters_sql}
+            GROUP BY subject
+        ''', params).fetchall()
+
+        # Year-wise distribution (Filtered)
+        year_counts = conn.execute(f'''
+            SELECT year, COUNT(*) as count
+            FROM pyq_questions
+            {filters_sql}
+            GROUP BY year
+            ORDER BY year
+        ''', params).fetchall()
+
+        # Topic distribution (Top 20 Filtered)
+        topic_counts = conn.execute(f'''
+            SELECT topic, COUNT(*) as count
+            FROM pyq_questions
+            {filters_sql} AND topic IS NOT NULL
+            GROUP BY topic
+            ORDER BY count DESC
+            LIMIT 20
+        ''', params).fetchall()
+
+        # Difficulty Trends (Filtered)
+        difficulty_trends = conn.execute(f'''
+            SELECT year, difficulty, COUNT(*) as count
+            FROM pyq_questions
+            {filters_sql}
+            GROUP BY year, difficulty
+            ORDER BY year
+        ''', params).fetchall()
+
+        return jsonify({
+            'by_subject': [dict(row) for row in subject_counts],
+            'by_year': [dict(row) for row in year_counts],
+            'by_topic': [dict(row) for row in topic_counts],
+            'difficulty_trend': [dict(row) for row in difficulty_trends]
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # In-memory rate limiter (Simple Dictionary)
 # Key: IP Address, Value: timestamp of last request
@@ -387,10 +402,9 @@ def start_quiz():
             return jsonify({'error': 'No questions found matching filters'}), 400
         
         # Create quiz session
-        import json
         cursor = conn.execute('''
-            INSERT INTO pyq_quiz_sessions (title, total_questions, filters, status)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO pyq_quiz_sessions (title, total_questions, filters, status, user_id)
+            VALUES (?, ?, ?, ?, 1)
         ''', (title, len(questions), json.dumps(filters), 'in_progress'))
         
         session_id = cursor.lastrowid
@@ -473,7 +487,6 @@ def submit_quiz(session_id):
         total_time = sum(a['time_spent'] or 0 for a in answers)
         
         # Update session
-        from datetime import datetime
         conn.execute('''
             UPDATE pyq_quiz_sessions 
             SET submitted_at = ?, duration_seconds = ?, score = ?, 
@@ -647,7 +660,6 @@ def get_similar_questions(question_id):
         return jsonify([dict(q) for q in similar])
 
     except Exception as e:
-        print(f"Error finding similar questions: {e}")
         # Fallback to subject-based random
         try:
              conn = get_db()
