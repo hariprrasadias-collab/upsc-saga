@@ -1,14 +1,13 @@
-import google.generativeai as genai
 import os
 from app.services.model_manager import model_manager
 from dotenv import load_dotenv
+from app.services.model_manager import model_manager
 
 load_dotenv()
 
 class MimirService:
     def __init__(self):
-        # ModelManager handles initialization
-        pass
+        pass # ModelManager handles initialization
             
     def generate_response(self, message, history=[]):
         """
@@ -53,9 +52,6 @@ class MimirService:
             return f"I seem to have lost my connection to the Well of Wisdom. Error: {type(e).__name__}"
 
     def evaluate_answer(self, question, answer):
-        if not model_manager.is_configured:
-            return "I am currently offline. Please check my API key configuration."
-            
         try:
             prompt = f"""
             You are an expert UPSC Mains Examiner. Evaluate the following answer based on the official UPSC rubric.
@@ -64,23 +60,10 @@ class MimirService:
             
             Answer: {answer}
             
-            Provide a detailed evaluation in strict JSON format with the following structure:
-            {{
-                "score": <float, 0-15>,
-                "introduction_quality": "<string, brief assessment of the intro>",
-                "body_quality": "<string, assessment of content, flow, and arguments>",
-                "conclusion_quality": "<string, assessment of the conclusion>",
-                "strengths": [<list of strings>],
-                "weaknesses": [<list of strings>],
-                "missing_keywords": [<list of strings, important terms missing from the answer>],
-                "improvement_roadmap": [<list of strings, actionable steps to improve>],
-                "model_answer_structure": "<string, brief outline of an ideal answer>"
-            }}
-            
-            Do not include any markdown formatting (like ```json) in the response, just the raw JSON string.
+            Provide a detailed evaluation in strict JSON format.
             """
-            
-            response = model_manager.generate_content(prompt)
+            # Use ModelManager (Pro tier for evaluation)
+            response = model_manager.generate_content(prompt, model_type='pro')
             return response.text
         except Exception as e:
             print(f"Error generating evaluation: {e}")

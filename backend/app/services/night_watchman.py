@@ -4,16 +4,19 @@ The Night Watchman - Autonomous Research Service
 import os
 import json
 import feedparser
+import feedparser
 from datetime import datetime
 from app.db_models.night_watchman import save_briefing
 from app.services.model_manager import model_manager
 from dotenv import load_dotenv
+from app.services.model_manager import model_manager
 
 load_dotenv()
 
 class NightWatchman:
     def __init__(self):
-        # ModelManager handles keys and configuration
+        # API Config managed by model_manager
+        
         self.feeds = [
             'https://www.thehindu.com/news/national/feeder/default.rss',
             'https://pib.gov.in/RSS/RssFeed.aspx?ModId=2',
@@ -22,14 +25,24 @@ class NightWatchman:
             'https://www.downtoearth.org.in/rss/feed' # Environment
         ]
 
-    def perform_nightly_watch(self):
+    def perform_nightly_watch(self, force=False):
         """
         Main execution method.
-        1. Scrapes news.
-        2. Synthesizes 'Morning Briefing'.
-        3. Saves to DB.
+        1. Checks if already ran today (Idempotency).
+        2. Scrapes news.
+        3. Synthesizes 'Morning Briefing'.
+        4. Saves to DB.
         """
         print("🦉 Night Watchman: Beginning patrol...")
+        
+        if not force:
+            from app.db import get_db
+            conn = get_db()
+            today = datetime.now().strftime('%Y-%m-%d')
+            existing = conn.execute('SELECT id FROM night_watchman_briefings WHERE date = ?', (today,)).fetchone()
+            if existing:
+                print(f"🦉 Night Watchman: Briefing for {today} already exists. Standing down.")
+                return {"success": True, "briefing_id": existing['id'], "message": "Already completed today."}
         
         # 1. Gather Intelligence
         articles = self._gather_intelligence()
@@ -42,29 +55,34 @@ class NightWatchman:
              return {"success": False, "message": "Synthesis failed."}
         
         # 3. Save Report
-        try:
-            briefing_id = save_briefing({
-                'date': datetime.now().strftime('%Y-%m-%d'),
-                'summary': briefing.get('summary', 'Analysis failed.'),
-                'quote': briefing.get('quote', 'The early bird catches the worm.'),
-                'articles_count': len(articles),
-                'mind_map': briefing.get('mind_map', ''),
-                'static_linkage': briefing.get('static_linkage', ''),
-                'quiz': briefing.get('quiz', [])
-            })
+        briefing_id = save_briefing({
+            'date': datetime.now().strftime('%Y-%m-%d'),
+            'summary': briefing.get('summary', 'Analysis failed.'),
+            'quote': briefing.get('quote', 'The early bird catches the worm.'),
+            'articles_count': len(articles),
+            'mind_map': briefing.get('mind_map', ''),
+            'static_linkage': briefing.get('static_linkage', ''),
+            'quiz': briefing.get('quiz', [])
+        })
+        
+        print(f"🦉 Night Watchman: Patrol complete. Briefing #{briefing_id} filed.")
+        
+        # 4. Trigger REM Sleep (Autonomy)
+        self.perform_rem_sleep_cycle()
 
-            print(f"🦉 Night Watchman: Patrol complete. Briefing #{briefing_id} filed.")
-
-            # 4. Trigger REM Sleep (Autonomy)
-            self.perform_rem_sleep_cycle()
-
-            return {
-                "success": True,
-                "briefing_id": briefing_id
-            }
-        except Exception as e:
-            print(f"Night Watchman Save Error: {e}")
-            return {"success": False, "message": str(e)}
+        # 5. Weekly Self-Review (Sundays only)
+        if datetime.now().weekday() == 6: # Sunday
+            try:
+                from app.services.self_review import self_review_service
+                print("📅 Sunday Detected: Conducting Weekly Self-Review...")
+                self_review_service.perform_review(lookback_days=7)
+            except Exception as e:
+                print(f"Weekly Review Failed: {e}")
+        
+        return {
+            "success": True, 
+            "briefing_id": briefing_id
+        }
 
     def perform_rem_sleep_cycle(self):
         """
@@ -103,7 +121,8 @@ class NightWatchman:
             Focus on patterns (e.g., "You failed 3 mock tests today, maybe rest?").
             """
             
-            response = model_manager.generate_content(prompt)
+            # Use Pro model for insight
+            response = model_manager.generate_content(prompt, model_type='pro')
             insight = response.text.strip()
             
             # 3. Store in Long-Term Memory
@@ -148,6 +167,8 @@ class NightWatchman:
 
     def _synthesize_briefing(self, articles):
         """Use AI to create a cohesive morning report with Deep Analysis"""
+        # Manager handles availability check
+            
         # Prepare context
         articles_text = "\n\n".join([
             f"- {a['title']} ({a['source']}): {a['summary'][:300]}..." 
@@ -192,16 +213,16 @@ class NightWatchman:
         }}
         """
         
+        
+        
+        # Retry logic for rate limits
         try:
-            response = model_manager.generate_content(prompt)
-            if hasattr(response, 'text'):
-                text = response.text.strip()
-            else:
-                text = str(response)
-
+            # Use Pro model for deep synthesis
+            response = model_manager.generate_content(prompt, model_type='pro')
             import json
             import re
             
+            text = response.text.strip()
             # Extract JSON
             json_match = re.search(r"\{.*\}", text, re.DOTALL)
             if json_match:
@@ -211,7 +232,7 @@ class NightWatchman:
                 # For now, we just return them in the briefing
                 if 'flashcards' in data:
                     self._save_auto_flashcards(data['flashcards'])
-
+                    
                 return data
             else:
                 print(f"⚠️ Synthesis Failed: No JSON found")

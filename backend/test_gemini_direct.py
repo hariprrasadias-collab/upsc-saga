@@ -1,17 +1,10 @@
-import google.generativeai as genai
-import os
-from dotenv import load_dotenv
+from app.services.model_manager import model_manager
 
-load_dotenv()
+print(f"ModelManager Configured: {model_manager.is_configured}")
 
-api_key = os.getenv("GEMINI_API_KEY")
-print(f"API Key found: {bool(api_key)}")
-
-if api_key:
-    genai.configure(api_key=api_key)
+if model_manager.is_configured:
     try:
-        model = genai.GenerativeModel('gemini-2.0-flash')
-        response = model.generate_content("Hello")
+        response = model_manager.generate_content("Hello", model_type='fast')
         print(f"Success! Response: {response.text}")
     except Exception as e:
         print(f"Error: {e}")

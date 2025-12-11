@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import './RevisionCards.css';
 
 interface RevisionCard {
@@ -36,7 +38,7 @@ const RevisionCards: React.FC = () => {
 
     const handleGenerateCard = async () => {
         console.log('Generate button clicked!', { title: newCard.title, content: newCard.content });
-        
+
         if (!newCard.title.trim()) {
             alert('⚠️ Please enter a topic in the TITLE field (the first input box above)');
             return;
@@ -57,7 +59,7 @@ const RevisionCards: React.FC = () => {
             console.log('Response status:', response.status);
             const data = await response.json();
             console.log('Response data:', data);
-            
+
             if (data.success) {
                 console.log('Card created successfully!', data.card);
                 setCards([data.card, ...cards]);
@@ -77,11 +79,11 @@ const RevisionCards: React.FC = () => {
 
     const handleDeleteCard = async (cardId: number) => {
         console.log('Delete button clicked for card:', cardId);
-        
+
         // Use window.confirm explicitly and log the result
         const confirmDelete = window.confirm('🗑️ Delete this revision card?\n\nThis action cannot be undone.');
         console.log('Confirm dialog result:', confirmDelete);
-        
+
         if (!confirmDelete) {
             console.log('Delete cancelled by user');
             return;
@@ -165,7 +167,7 @@ const RevisionCards: React.FC = () => {
                                         <span className="card-date">
                                             {new Date(card.created_at).toLocaleDateString()}
                                         </span>
-                                        <button 
+                                        <button
                                             className="delete-card-btn"
                                             onClick={(e) => {
                                                 e.stopPropagation();
@@ -177,8 +179,8 @@ const RevisionCards: React.FC = () => {
                                         </button>
                                     </div>
                                 </div>
-                                <div className="card-content">
-                                    <p className="one-liner">{card.one_liner}</p>
+                                <div className="card-content markdown-body">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{card.one_liner}</ReactMarkdown>
                                 </div>
                             </div>
                         ))}

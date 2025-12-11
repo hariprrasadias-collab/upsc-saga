@@ -34,7 +34,7 @@ def test_mock_test_service():
 
 def test_database_schema():
     print("\n🔍 Testing Database Schema...")
-    db_path = os.path.join(os.getcwd(), 'instance', 'upsc_saga.sqlite')
+    db_path = os.path.join(os.getcwd(), 'upsc_saga.db')
     if not os.path.exists(db_path):
         print(f"❌ FAILED: Database not found at {db_path}")
         return

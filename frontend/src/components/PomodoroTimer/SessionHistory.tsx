@@ -37,7 +37,7 @@ export const SessionHistory: React.FC = () => {
         let bestStreak = 0;
         let tempStreak = 0;
         const today = new Date().toDateString();
-        let checkDate = new Date();
+        const checkDate = new Date();
 
         // Current streak
         while (true) {

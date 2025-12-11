@@ -1,4 +1,3 @@
-import google.generativeai as genai
 import os
 import json
 import random
@@ -7,8 +6,6 @@ from dotenv import load_dotenv
 from app.services.model_manager import model_manager
 
 load_dotenv()
-
-GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
 
 AGENTS = {
     'skeptic': {
@@ -50,14 +47,7 @@ AGENTS = {
 }
 
 def generate_debate_turn(topic, history, user_input=None):
-    if not GEMINI_API_KEY:
-        return {
-            "speakerId": "skeptic",
-            "text": "My connection to the Muses is severed (Missing API Key).",
-            "type": "error",
-            "technique": "Silence",
-            "fallacies": []
-        }
+    # Manager handles auth
 
     # model = get_model() # Removed in favor of model_manager
     
@@ -209,8 +199,7 @@ def generate_autonomous_debate(topic, turns=6):
     2. Raw history list
     3. Verdict dict
     """
-    if not GEMINI_API_KEY:
-        return json.dumps([{"text": "System Offline", "speakerId": "skeptic"}]), [], {}
+    # Manager handles auth
 
     history = []
 
@@ -255,8 +244,7 @@ def continue_autonomous_debate(topic, current_history, additional_turns=3):
     Continues an existing debate for more turns.
     Returns: updated JSON string, updated history, new verdict.
     """
-    if not GEMINI_API_KEY:
-         return json.dumps(current_history), current_history, {}
+    # Manager handles auth
 
     # Ensure history is list
     if isinstance(current_history, str):
@@ -285,8 +273,7 @@ def generate_debate_verdict(topic, history):
     """
     Analyzes a full debate history and provides a structured verdict.
     """
-    if not GEMINI_API_KEY:
-        return {}
+    # API key managed by model_manager
 
     # model = get_model()
 

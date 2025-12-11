@@ -3,6 +3,7 @@ import traceback
 import re
 from app.services.model_manager import model_manager
 from app.db import get_db
+from app.services.model_manager import model_manager
 
 class HephaestusService:
     """
@@ -11,15 +12,14 @@ class HephaestusService:
     """
     
     def __init__(self):
-        # ModelManager handles initialization
-        pass
+        pass # ModelManager handles init
             
     def attempt_repair(self, error: Exception, context_file: str = None):
         """
         Main entry point for self-repair.
         """
-        if not model_manager.is_configured:
-            print("❌ Hephaestus Disabled: No API Key.")
+        if not model_manager: # Should never happen
+            print("❌ Hephaestus Disabled: No Manager.")
             return False
             
         print(f"🔥 Hephaestus Activated: Analyzing error '{str(error)}'...")
@@ -72,7 +72,7 @@ class HephaestusService:
         """
         
         try:
-            # Use smart model for code repair
+            # Use Pro model for code repair
             response = model_manager.generate_content(prompt, model_type='pro')
             fix_code = self._extract_code_block(response.text)
             
@@ -132,6 +132,7 @@ class HephaestusService:
             NO_CHANGES
             """
             
+            # Use Pro model for audit
             response = model_manager.generate_content(prompt, model_type='pro')
             
             if "NO_CHANGES" in response.text:

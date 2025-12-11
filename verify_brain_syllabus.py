@@ -42,7 +42,7 @@ if __name__ == "__main__":
     # Need app context for DB
     import flask
     app = flask.Flask(__name__)
-    app.config['DATABASE'] = 'd:/upsc-second-brain/backend/upsc_saga.db'
+    app.config['DATABASE'] = os.path.join(os.getcwd(), 'backend', 'upsc_saga.db')
     
     with app.app_context():
         verify_integration()

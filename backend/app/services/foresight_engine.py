@@ -4,7 +4,7 @@ Analyzes PYQs and current affairs to predict probable future questions
 """
 
 from typing import List, Dict
-import google.generativeai as genai
+from typing import List, Dict
 import os
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
@@ -23,13 +23,8 @@ class ForesightEngine:
     """
     
     def __init__(self):
-        self.api_key = os.environ.get('GEMINI_API_KEY')
-        if not self.api_key:
-            print("⚠️ ForesightEngine Warning: GEMINI_API_KEY not found")
-        elif model_manager.is_configured:
-            print("🔮 ForesightEngine Online: Oracle Activated via ModelManager")
-        else:
-            print("❌ ForesightEngine Error: ModelManager not configured")
+        # Config managed by model_manager
+        pass
     
     def predict_questions(
         self, 
@@ -195,7 +190,8 @@ class ForesightEngine:
         """
         
         try:
-            response = model_manager.generate_content(prompt, model_type='pro')
+            # Use FAST model for critique to save quota and speed up the loop
+            response = model_manager.generate_content(prompt, model_type='fast')
             text = response.text.strip()
 
             if "Oracle is silent" in text:

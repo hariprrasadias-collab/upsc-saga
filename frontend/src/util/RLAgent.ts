@@ -217,7 +217,7 @@ export class RLAgent {
     // --- Meta-Cognitive Control ---
     public getSchedulerParams() {
         // Default Config
-        let config = {
+        const config = {
             workStartHour: 6,
             workEndHour: 23,
             maxDailySlots: 6,

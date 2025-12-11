@@ -6,13 +6,15 @@ from app.services.model_manager import model_manager
 
 load_dotenv()
 
+# GEMINI_API_KEY managed by ModelManager
+
 def analyze_topic_triangulation(text):
     """
     Triangulates a topic into Theory, Precedents, and PYQs.
     """
-    if not model_manager.is_configured:
-        return {"error": "AI Service Offline"}
+    # Check skipped (handled by manager)
 
+    # model = get_model() -> Removed
     conn = get_db()
 
     # 1. AI Analysis (Omni-Link System)
@@ -68,17 +70,9 @@ def analyze_topic_triangulation(text):
     """
 
     try:
+        # Use ModelManager (Pro tier for deep analysis)
         response = model_manager.generate_content(prompt, model_type='pro')
-
-        if hasattr(response, 'text'):
-            text = response.text.strip()
-        else:
-            text = str(response)
-
-        if "Oracle is silent" in text:
-             return {"error": "AI Busy"}
-
-        ai_data = json.loads(text.replace('```json', '').replace('```', '').strip())
+        ai_data = json.loads(response.text.replace('```json', '').replace('```', '').strip())
     except Exception as e:
         print(f"Triangulation AI Error: {e}")
         return {"error": str(e)}

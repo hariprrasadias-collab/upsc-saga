@@ -30,6 +30,14 @@ def verify_ab_loop():
     
     # 2. Generate Suggestion (Triggers Test Creation)
     print("Generating suggestions...")
+    # Insert a fake "old" log to trigger schedule gap logic
+    import datetime
+    five_hours_ago = (datetime.datetime.now() - datetime.timedelta(hours=5)).isoformat()
+    # Ensure there are no recent logs
+    conn.execute("DELETE FROM brain_action_log WHERE date(executed_at) = date('now')")
+    conn.execute("INSERT INTO brain_action_log (executed_at, action_type) VALUES (?, 'TEST_ACTION')", (five_hours_ago,))
+    conn.commit()
+
     opportunities = oe._check_schedule_gaps()
     
     if not opportunities:
@@ -81,7 +89,7 @@ def verify_ab_loop():
 
 if __name__ == "__main__":
     app = flask.Flask(__name__)
-    app.config['DATABASE'] = 'd:/upsc-second-brain/backend/upsc_saga.db'
+    app.config['DATABASE'] = os.path.join(os.getcwd(), 'backend', 'upsc_saga.db')
     
     with app.app_context():
         verify_ab_loop()

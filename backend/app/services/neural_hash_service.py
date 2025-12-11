@@ -2,6 +2,7 @@
 The Neural Hash - Pattern Decoding Service
 """
 import os
+import os
 import json
 import re
 from functools import lru_cache
@@ -10,20 +11,17 @@ from app.services.model_manager import model_manager
 
 class NeuralHashService:
     def __init__(self):
-        # ModelManager handles initialization
+        # API Key check handled by ModelManager
         self._cache = {}
 
     def decode_text(self, text: str, context_type: str = 'general'):
         """
         Decodes the input text to find hidden patterns, keywords, and themes relevant to UPSC.
         """
-        if not model_manager.is_configured:
-            return {
-                "success": False,
-                "error": "Neural Hash offline. API Key missing."
-            }
-
-        # Check Cache (Simple in-memory for now, could be Redis later)
+        # No strict check needed as manager handles it
+        # if not self.model: ...
+        
+        # Check Cache
         cache_key = f"{context_type}:{hash(text)}"
         if cache_key in self._cache:
             # print("⚡ Neural Hash: Cache Hit") # Reduced logs
@@ -31,19 +29,18 @@ class NeuralHashService:
 
         prompt = self._construct_prompt(text, context_type)
         
+        # Manager handles retries
         try:
             response = model_manager.generate_content(prompt, model_type='fast')
             result = self._parse_response(response.text)
-
+            
             if result['success']:
                 # Cache and Persist
                 self._cache[cache_key] = result['data']
                 save_neural_hash_log(text, context_type, result['data'])
                 return result
-            else:
-                return result
         except Exception as e:
-            print(f"⚠️ Neural Hash Failed: {e}")
+            print(f"❌ Neural Hash Error: {e}")
             return {
                 "success": False,
                 "error": str(e)
@@ -142,6 +139,9 @@ class NeuralHashService:
             # print(f"Neural Hash Expansion Failed: {e}")
             return [query]
 
+    # Duplicate init removed
+
+
     def find_quantum_connections(self, topic: str):
         """
         QUANTUM ENTANGLEMENT: Finds hidden connections between the topic and Mind Palace artifacts.
@@ -182,7 +182,8 @@ class NeuralHashService:
             ]
             """
             
-            response = model_manager.generate_content(prompt, model_type='pro') # Pro for deep connections
+            response = model_manager.generate_content(prompt, model_type='pro')
+            import json
             text = response.text.replace("```json", "").replace("```", "").strip()
 
             if "Oracle is silent" in text: return []

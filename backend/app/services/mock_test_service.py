@@ -53,15 +53,14 @@ class MockTestService:
     @staticmethod
     def generate_from_topic(topic, count=10):
         """Generate a mock test for a topic using Gemini."""
-        import os
         import json
         import re
+        import ast
         from app.services.model_manager import model_manager
         
         # print(f"🤖 Generating Mock Test for: {topic}") # Reduced logs
         
-        if not model_manager.is_configured:
-            return {"success": False, "error": "API Key missing"}
+        # API Check handled by manager
         
         # Handle "Weak Areas" special case
         if topic.lower() == "weak areas":
@@ -104,6 +103,7 @@ class MockTestService:
         """
         
         try:
+            # Use ModelManager for rate limiting and load balancing
             response = model_manager.generate_content(prompt, model_type='fast')
             
             if hasattr(response, 'text'):

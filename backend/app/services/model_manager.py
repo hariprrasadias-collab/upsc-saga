@@ -23,22 +23,22 @@ class ModelManager:
     """
 
     # High Intelligence Models (Low Rate Limit, High Cost)
+    # High Intelligence Models (Low Rate Limit, High Cost)
     PRO_MODELS = [
-        'gemini-2.0-pro-exp-02-05',
-        'gemini-2.5-pro',
-        'gemini-2.0-pro-exp',
-        'gemini-pro-latest'
+        'gemini-1.5-pro-latest',
+        'gemini-2.0-flash-exp', 
+        'gemini-1.5-pro' 
     ]
 
     # High Speed/Volume Models (High Rate Limit, Low Cost)
-    # Using multiple variants to strictly rotate across quotas
+    # Using specific versions to ensure distinct quota buckets where possible
     FAST_MODELS = [
-        'gemini-2.0-flash-001',      # Likely most stable
-        'gemini-2.5-flash',          # Bleeding edge
-        'gemini-exp-1206',           # High capability
-        'gemini-2.0-flash',          # Alias
-        'gemini-flash-latest',       # Generic
-        'gemini-2.0-flash-lite-preview-02-05' # Emergency fallback
+        'gemini-2.5-flash',          # Primary
+        'gemini-2.5-flash-lite',     # Secondary
+        'gemma-3-27b-it',            # Verified Text Model (30 RPM)
+        'gemma-3-12b-it',            # Verified Text Model (30 RPM)
+        'gemini-flash-latest',       # Backup
+        'gemini-2.0-flash-exp'       # Experimental
     ]
 
     def __init__(self):
@@ -59,6 +59,14 @@ class ModelManager:
 
         # Circuit Breaker / Panic Mode
         self._panic_mode_until = None
+
+        # Quota Governance
+        self.DAILY_LIMIT = 1450 # Stay under 1500 free tier limit
+        self.TPM_LIMIT = 900000 # 900k tokens/min (Buffer below 1M)
+        self.quota_file = "backend/daily_quota.json"
+        
+        # In-Memory TPM Tracker (Reset every minute)
+        self.tpm_state = {'timestamp': time.time(), 'tokens': 0}
 
         if self.api_key:
             self._configure()
@@ -137,6 +145,80 @@ class ModelManager:
         self._panic_mode_until = datetime.now() + timedelta(seconds=duration_seconds)
         print(f"🛑 PANIC MODE ACTIVATED: Skipping API calls for {duration_seconds}s")
 
+    def _check_tpm_limit(self, prompt_len):
+        """Throttle requests if approaching 1M TPM limit."""
+        est_tokens = prompt_len // 4
+        now = time.time()
+        
+        # Reset if minute passed
+        if now - self.tpm_state['timestamp'] > 60:
+            self.tpm_state = {'timestamp': now, 'tokens': 0}
+            
+        # Check Limit
+        if self.tpm_state['tokens'] + est_tokens > self.TPM_LIMIT:
+            wait_time = 60 - (now - self.tpm_state['timestamp'])
+            wait_time = max(1, wait_time) # Ensure positive
+            print(f"⏳ TPM Limit Reached ({self.tpm_state['tokens']} tokens). Throttling for {wait_time:.1f}s...")
+            time.sleep(wait_time)
+            # Reset after sleep
+            self.tpm_state = {'timestamp': time.time(), 'tokens': 0}
+            
+        self.tpm_state['tokens'] += est_tokens
+
+    def _check_daily_quota(self):
+        """Ensure we don't exceed daily hard cap (RPD). Persists via JSON. Resets at Pacific Midnight."""
+        try:
+            import json
+            # Sync with Google Quota Reset (Midnight Pacific Time = UTC-8)
+            today_str = (datetime.utcnow() - timedelta(hours=8)).strftime("%Y-%m-%d")
+            
+            if not os.path.exists(self.quota_file):
+                return True # Fresh start
+                
+            with open(self.quota_file, 'r') as f:
+                data = json.load(f)
+                
+            if data.get('date') != today_str:
+                return True # New day (Pacific), new quota
+                
+            current_usage = data.get('count', 0)
+            if current_usage >= self.DAILY_LIMIT:
+                print(f"🛑 DAILY QUOTA EXHAUSTED ({current_usage}/{self.DAILY_LIMIT}). Blocking request.")
+                return False
+                
+            return True
+        except Exception as e:
+            print(f"⚠️ Quota Check Error: {e}")
+            return True # Fail open
+
+    def _increment_daily_usage(self):
+        """Increment the daily usage counter."""
+        try:
+            import json
+            # Sync with Google Quota Reset (Midnight Pacific Time = UTC-8)
+            today_str = (datetime.utcnow() - timedelta(hours=8)).strftime("%Y-%m-%d")
+            data = {'date': today_str, 'count': 0}
+            
+            if os.path.exists(self.quota_file):
+                try:
+                    with open(self.quota_file, 'r') as f:
+                        existing = json.load(f)
+                        if existing.get('date') == today_str:
+                            data = existing
+                except:
+                    pass
+            
+            data['count'] += 1
+            
+            with open(self.quota_file, 'w') as f:
+                json.dump(data, f)
+                
+            if data['count'] % 10 == 0:
+                print(f"📉 Daily Usage: {data['count']}/{self.DAILY_LIMIT}")
+                
+        except Exception as e:
+            print(f"⚠️ Quota Check Error: {e}")
+
     def switch_model(self, model_type='fast'):
         """Rotate to the next available healthy model within the tier."""
         rotation = self._get_model_list(model_type)
@@ -201,6 +283,13 @@ class ModelManager:
 
         # 1. Check Cache
         cache_key = self._get_cache_key(prompt, model_type, kwargs)
+        
+        # DEBUG: Log estimated token usage
+        est_tokens = len(prompt) // 4
+        print(f"📊 Request to {model_type} | Est. Tokens: {est_tokens} | Prompt Len: {len(prompt)}")
+        if est_tokens > 30000:
+            print("⚠️ WARNING: Massive Prompt detected! Risk of Quota Exhaustion.")
+
         if cache_key in self.response_cache:
             return self.response_cache[cache_key]
 
@@ -223,7 +312,17 @@ class ModelManager:
                         continue
 
                 try:
+                    # RPD Check
+                    if not self._check_daily_quota():
+                        return FallbackResponse("Daily Quota Limit Reached. Come back tomorrow.")
+
+                    # TPM Check (Throttling)
+                    self._check_tpm_limit(len(prompt))
+
                     response = model.generate_content(prompt, **kwargs)
+                    
+                    # Track Usage
+                    self._increment_daily_usage()
 
                     # Cache successful response
                     self.response_cache[cache_key] = response
@@ -231,10 +330,25 @@ class ModelManager:
 
                 except (ResourceExhausted, ServiceUnavailable, InternalServerError) as e:
                     print(f"⚠️ API Error ({type(e).__name__}) with {current_model_name}: {e}")
-                    self._mark_cooldown(current_model_name, duration_seconds=60)
+                    
+                    # EXTRACT RETRY DELAY
+                    retry_seconds = 60 # Default
+                    try:
+                        # Try parsing 'Please retry in X s' if present in string
+                        import re
+                        match = re.search(r"retry in (\d+(\.\d+)?)s", str(e))
+                        if match:
+                            retry_seconds = float(match.group(1)) + 1 # Add buffer
+                        # Also check standard attributes if available
+                        # elif hasattr(e, 'retry_delay') ... (Not reliable in current lib version?)
+                    except:
+                        pass
+                        
+                    self._mark_cooldown(current_model_name, duration_seconds=int(retry_seconds))
 
-                    # Cap sleep to 8s max to prevent sticking, but give enough time for minor glitches
-                    sleep_time = min(2 ** attempts, 8) + random.uniform(0, 1)
+                    # Smart Sleep: If rotating, we don't necessarily need to sleep full duration IF we have other healthy models.
+                    # But if we just hit a rate limit, slight pause is good.
+                    sleep_time = min(attempts + 2, 10) # 2s, 3s, 4s... capped at 10s for rotation
                     print(f"📉 Rotating & Sleeping {sleep_time:.2f}s...")
 
                     self.switch_model(model_type)

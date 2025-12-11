@@ -4,7 +4,7 @@ import sqlite3
 import json
 
 BASE_URL = "http://localhost:5000/api/planner"
-DB_PATH = "d:/upsc-second-brain/backend/upsc_saga.db"
+DB_PATH = "backend/upsc_saga.db"
 
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
@@ -15,6 +15,10 @@ def setup_test_data():
     conn = get_db_connection()
     cursor = conn.cursor()
     
+    # Clear existing tasks to ensure test isolation
+    cursor.execute("DELETE FROM study_tasks")
+    conn.commit()
+
     # Get active plan ID
     plan = cursor.execute("SELECT id FROM study_plans WHERE is_active = 1").fetchone()
     if not plan:

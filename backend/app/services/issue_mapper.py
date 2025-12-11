@@ -5,12 +5,12 @@ Maps current affairs articles to UPSC syllabus topics using Gemini
 import os
 import json
 import sqlite3
-import google.generativeai as genai
 from typing import Dict, List, Optional
 from datetime import datetime
+from app.services.model_manager import model_manager
 
 DB_PATH = os.path.join(os.path.dirname(__file__), '..', '..', 'upsc_saga.db')
-genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
+# Config managed by ModelManager
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)
@@ -69,8 +69,8 @@ Provide 2-4 most relevant mappings. Be specific and exam-focused.
 """
     
     try:
-        model = genai.GenerativeModel('gemini-flash-latest')
-        response = model.generate_content(prompt)
+        # model = genai.GenerativeModel('gemini-flash-latest') -> REMOVED
+        response = model_manager.generate_content(prompt, model_type='fast')
         
         # Parse AI response
         response_text = response.text.strip()

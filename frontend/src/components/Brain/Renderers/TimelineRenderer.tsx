@@ -125,7 +125,7 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
     }, [allEvents]);
 
     const filteredEvents = useMemo(() => {
-        let processed = allEvents.filter(e => {
+        const processed = allEvents.filter(e => {
             const matchesSearch =
                 e.event.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 e.year.toLowerCase().includes(searchTerm.toLowerCase()) ||

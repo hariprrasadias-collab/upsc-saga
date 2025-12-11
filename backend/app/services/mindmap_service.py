@@ -1,6 +1,6 @@
 import json
 import os
-from app.services.model_manager import model_manager
+import logging
 from app import db
 
 class MindMapService:
@@ -9,6 +9,13 @@ class MindMapService:
         """
         Generates a hierarchical JSON structure for a mind map using Gemini.
         """
+        """
+        Generates a hierarchical JSON structure for a mind map using Gemini.
+        """
+        from app.services.model_manager import model_manager
+        
+        # API Check handled by manager
+
         prompt = f"""
         Create a detailed mind map for the topic: "{topic}".
         Return ONLY a valid JSON object representing the tree structure.
@@ -28,14 +35,13 @@ class MindMapService:
         """
 
         try:
-            response = model_manager.generate_content(prompt)
-            if hasattr(response, 'text'):
-                text = response.text.strip()
-            else:
-                text = str(response)
-
-            # Clean up potential markdown formatting
-            text = text.replace('```json', '').replace('```', '').strip()
+            response = model_manager.generate_content(prompt, model_type='fast')
+            text = response.text.strip()
+            # Clean up potential markdown formatting if Gemini still adds it
+            if text.startswith("```json"):
+                text = text[7:]
+            if text.endswith("```"):
+                text = text[:-3]
             
             # Handle empty response
             if not text:

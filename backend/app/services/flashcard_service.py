@@ -64,16 +64,10 @@ class FlashcardService:
     @staticmethod
     def generate_from_topic(topic, count=5):
         """Generate flashcards for a topic using Gemini."""
-        import google.generativeai as genai
-        import os
+        from app.services.model_manager import model_manager
         import json
         
-        api_key = os.environ.get('GEMINI_API_KEY')
-        if not api_key:
-            return {"success": False, "error": "API Key missing"}
-            
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-flash-latest')
+        # API Check handled by manager
         
         prompt = f"""
         Create {count} high-quality flashcards for the topic: "{topic}".
@@ -86,7 +80,7 @@ class FlashcardService:
         """
         
         try:
-            response = model.generate_content(prompt)
+            response = model_manager.generate_content(prompt, model_type='fast')
             text = response.text.replace('```json', '').replace('```', '').strip()
             cards = json.loads(text)
             

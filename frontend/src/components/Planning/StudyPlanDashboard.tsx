@@ -699,7 +699,7 @@ const StudyPlanDashboard: React.FC = () => {
                     const futureStart = new Date();
                     futureStart.setDate(futureStart.getDate() + 61);
 
-                    let currentFutureDate = new Date(futureStart);
+                    const currentFutureDate = new Date(futureStart);
                     let slotsInDay = 0;
 
                     blockedSlots.forEach(task => {

@@ -113,7 +113,10 @@
     padding: 1.5rem;
     transition: all 0.3s ease;
     position: relative;
-    overflow: hidden;
+    /* overflow: hidden; Removed to allow tooltip/popups if any, but mainly fixed via card-content scrolling */
+    display: flex;
+    flex-direction: column;
+    max-height: 400px; /* Prevent cards from becoming too massive */
 }
 
 .revision-card::before {
@@ -177,13 +180,56 @@
 }
 
 .card-content {
-    color: #aaa;
+    color: #e0e0e0;
     font-size: 0.95rem;
     line-height: 1.6;
+    overflow-y: auto; /* Enable scrolling for long content */
+    padding-right: 0.5rem; /* Space for scrollbar */
 }
 
-.one-liner {
-    margin: 0;
+/* Custom Scrollbar for card content */
+.card-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.card-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.card-content::-webkit-scrollbar-thumb {
+    background: rgba(212, 165, 116, 0.3);
+    border-radius: 3px;
+}
+
+.card-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(212, 165, 116, 0.5);
+}
+
+/* Markdown Styles within Card */
+.markdown-body p {
+    margin-bottom: 0.8rem;
+}
+
+.markdown-body strong {
+    color: #d4a574;
+    font-weight: 600;
+}
+
+.markdown-body ul, .markdown-body ol {
+    margin-left: 1.2rem;
+    margin-bottom: 0.8rem;
+}
+
+.markdown-body li {
+    margin-bottom: 0.3rem;
+}
+
+.markdown-body h1, .markdown-body h2, .markdown-body h3 {
+    color: #d4a574;
+    font-size: 1.1em;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(212, 165, 116, 0.1);
 }
 
 /* States */

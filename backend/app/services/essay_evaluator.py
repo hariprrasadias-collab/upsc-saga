@@ -5,9 +5,11 @@ from app.services.model_manager import model_manager
 
 load_dotenv()
 
+# Configure Gemini API (Managed by ModelManager)
+
 class EssayEvaluator:
     def __init__(self):
-        pass # ModelManager handles initialization
+        pass # ModelManager handles init
 
     def evaluate_essay(self, topic, content):
         """
@@ -45,11 +47,9 @@ class EssayEvaluator:
         """
 
         try:
-            response = model_manager.generate_content(prompt)
-            if hasattr(response, 'text'):
-                response_text = response.text.strip()
-            else:
-                response_text = str(response)
+            # Use Pro model for essays (1250 words)
+            response = model_manager.generate_content(prompt, model_type='pro')
+            response_text = response.text.strip()
             
             # Clean up potential markdown formatting
             response_text = response_text.replace('```json', '').replace('```', '').strip()

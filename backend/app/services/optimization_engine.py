@@ -88,13 +88,17 @@ class OptimizationEngine:
                 
                 if hours_since > 4:
                     # Found a gap!
+                    # Start/Get A/B Test
+                    ab_tester.create_test("OptimalStudyTime", "Immediate", "Delayed")
+                    
                     return [self._create_opportunity(
                         type='schedule',
                         description=f"You've been inactive for {int(hours_since)} hours. Good time for a quick revision?",
                         payload={
                             'action': 'SCHEDULE_REVISION', 
                             'time': 'Now',
-                            'duration': 30
+                            'duration': 30,
+                            'ab_test_id': 'OptimalStudyTime'
                         }
                     )]
         except Exception:
@@ -327,21 +331,50 @@ class OptimizationEngine:
         Adjusts difficulty based on performance.
         """
         # Get performance stats (Weak + Strong)
-        weak_stats = WeakAreaAnalyzer.analyze_user_performance(1)
-        strong_stats = WeakAreaAnalyzer.analyze_strong_areas(1)
-        
-        # Combine unique topics
-        stats = weak_stats + strong_stats
-        
-        opportunities = []
-        conn = get_db()
-        
-        processed_topics = set()
-        
-        # 2. Check for At-Risk Goals (Mock logic for now)
-        # Real logic would check progress vs time remaining
-        
-        return opportunities
+        try:
+            weak_stats = WeakAreaAnalyzer.analyze_user_performance(1)
+            strong_stats = WeakAreaAnalyzer.analyze_strong_areas(1)
+            
+            # Combine unique topics
+            stats = weak_stats + strong_stats
+            
+            opportunities = []
+            conn = get_db()
+            
+            processed_topics = set()
+            
+            for stat in stats:
+                topic = stat['topic']
+                if topic in processed_topics:
+                    continue
+                processed_topics.add(topic)
+                
+                accuracy = stat['accuracy_rate']
+                attempts = stat.get('total_attempts', 0)
+                
+                # Check for High Proficiency -> Increase Difficulty
+                if accuracy > 85 and attempts >= 5:
+                    existing = conn.execute('''
+                        SELECT COUNT(*) as count FROM brain_optimization_opportunities
+                        WHERE type = 'difficulty_adjustment' AND status = 'pending'
+                        AND payload LIKE ?
+                    ''', (f'%{topic}%',)).fetchone()
+                    
+                    if existing['count'] == 0:
+                        opportunities.append(self._create_opportunity(
+                            type='difficulty_adjustment',
+                            description=f"You're crushing '{topic}' ({int(accuracy)}%). Switch to Hard mode?",
+                            payload={
+                                'action': 'INCREASE_DIFFICULTY',
+                                'topic': topic,
+                                'subject': stat.get('subject', 'General')
+                            }
+                        ))
+
+            return opportunities
+        except Exception as e:
+            print(f"Adaptive Difficulty Check Error: {e}")
+            return []
 
     def _check_goals(self):
         """

@@ -7,10 +7,11 @@ from app.services.model_manager import model_manager
 
 load_dotenv()
 
+# Configure Gemini API (Managed by ModelManager)
+
 class AnswerEvaluator:
     def __init__(self):
-        # ModelManager handles initialization
-        pass
+        pass # ModelManager handles init
     
     def evaluate_answer(self, question, answer_text, word_limit, keywords=None, model_answer=None):
         """
@@ -65,8 +66,9 @@ Be constructive but honest. Focus on UPSC-specific requirements: multidimensiona
 """
         
         try:
-            # Call Gemini API via ModelManager
-            response = model_manager.generate_content(evaluation_prompt)
+            # Call Gemini API via Manager
+            response = model_manager.generate_content(evaluation_prompt, model_type='fast')
+            response_text = response.text.strip()
             
             if hasattr(response, 'text'):
                 response_text = response.text.strip()

@@ -2,12 +2,12 @@ from flask import Blueprint, jsonify, request
 import sqlite3
 import os
 import json
-import google.generativeai as genai
+from app.services.model_manager import model_manager
 
 bp = Blueprint('model_answers', __name__, url_prefix='/api/model-answers')
 
 DB_PATH = os.path.join(os.path.dirname(__file__), '..', '..', 'upsc_saga.db')
-GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
+# Config managed by ModelManager
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)
@@ -262,15 +262,6 @@ def search_model_answers():
     
     # AI-powered search
     try:
-        model = genai.GenerativeModel('gemini-pro')
-        
-        # Get all model answers
-        conn = get_db()
-        cursor = conn.cursor()
-        cursor.execute('SELECT id, title, question_text, tags, paper, question_type FROM model_answers')
-        all_answers = cursor.fetchall()
-        conn.close()
-        
         # Use AI to find relevant answers
         prompt = f"""Given this search query: "{query}"
 
@@ -280,7 +271,8 @@ Find the most relevant answers from this list:
 Return a JSON array of answer IDs in order of relevance (most relevant first), max 5 IDs.
 Format: {{"answer_ids": [1, 2, 3]}}"""
         
-        response = model.generate_content(prompt)
+        # Use ModelManager (Pro model for search reasoning)
+        response = model_manager.generate_content(prompt, model_type='pro')
         text = response.text.strip().replace('```json', '').replace('```', '').strip()
         
         result = json.loads(text)
