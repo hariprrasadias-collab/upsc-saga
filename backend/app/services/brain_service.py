@@ -975,8 +975,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                             {"id": "mnemonics", "label": "🧠 Mnemonics", "content": "- ABCDE for something"},
                             {"id": "examiner", "label": "🧐 Examiner's View", "content": "**High Yield Keywords:**\n- Secularism\n- Basic Structure\n\n**Focus Areas:**\n- Preamble as part of Constitution"},
                             {"id": "concept_map", "label": "🗺️ Concept Map", "content": "graph TD; A[Constitution] --> B[Preamble]; B --> C[Justice]; B --> D[Liberty];", "type": "mermaid"},
-                            {"id": "quiz", "label": "❓ Active Recall", "content": json.dumps([{"q": "Who is the custodian of the Constitution?", "a": "Supreme Court"}, {"q": "Article 32?", "a": "Right to Constitutional Remedies"}]), "type": "quiz"}
-                        ]
+                            {"id": "quiz", "label": "❓ Active Recall", "content": json.dumps([{"q": "Who is the custodian of the Constitution?", "a": "Supreme Court"}, {"q": "Article 32?", "a": "Right to Constitutional Remedies"}]), "type": "quiz"}]
                     })
                 }
             elif action_type == "GENERATE_QUOTE_BANK":
@@ -1087,7 +1086,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 try:
                     question_text = payload.get('question', '')
                     analysis_prompt = f"Analyze this UPSC Question: '{question_text}'. Break it down into Key Demand, Structure, and Keywords."
-                    response = model_manager.generate_content(analysis_prompt)
+                    response = model_manager.generate_content(analysis_prompt, model_type='pro')
                     result = {"success": True, "message": "Analysis Complete", "analysis": response.text}
                 except Exception as e:
                     result = {"success": False, "message": f"Analysis Failed: {str(e)}"}
@@ -1157,7 +1156,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     location_id = cursor.lastrowid
                     
                     brainstorm_prompt = f"Generate 5 key concepts for '{topic}' to store in a Mind Palace. Return JSON: [{{'title': '...', 'content': '...', 'icon': '...'}}]"
-                    response = model_manager.generate_content(brainstorm_prompt)
+                    response = model_manager.generate_content(brainstorm_prompt, model_type='pro')
                     artifacts_data = self._parse_response(response.text)
                     
                     if isinstance(artifacts_data, list):
@@ -1182,7 +1181,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     topics_list = [{"id": t['id'], "topic": t['topic'], "subject": t['subject']} for t in topics]
                     
                     prioritize_prompt = f"From this list: {json.dumps(topics_list[:50])}, identify Top 5 High Yield topics. Return JSON: {{ 'priority_ids': [1, 2...] }}"
-                    response = model_manager.generate_content(prioritize_prompt)
+                    response = model_manager.generate_content(prioritize_prompt, model_type='pro')
                     data = self._parse_response(response.text)
                     priority_ids = data.get('priority_ids', [])
                     
@@ -1264,7 +1263,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     
                     Keep it concise (under 200 words).
                     """
-                    response = model_manager.generate_content(explanation_prompt)
+                    response = model_manager.generate_content(explanation_prompt, model_type='pro')
                     result = {
                         "success": True, 
                         "message": "Explanation Generated.",
@@ -1464,7 +1463,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     Example: "A hyper-realistic marble statue of Justice wearing a blindfold, holding a constitution, dramatic lighting..."
                     Return ONLY the raw prompt text. Do NOT include any intro/outro.
                     """
-                    response = model_manager.generate_content(prompt)
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     result = {
                         "success": True,
                         "message": "Visual Prompt Generated.",
@@ -1485,7 +1484,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     4. Decision Points (Options A, B, C)
                     Start directly with "Situation:". Do NOT include "Here is a scenario".
                     """
-                    response = model_manager.generate_content(prompt)
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     result = {
                         "success": True,
                         "message": "Roleplay Scenario Generated.",
@@ -1508,7 +1507,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     }}]
                     Ensure coordinates are accurate.
                     """
-                    response = model_manager.generate_content(prompt)
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     data = self._parse_response(response.text)
 
                     locations = []
@@ -1532,7 +1531,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     Explain the connection in 1 sentence per topic.
                     Example: "Monsoon impacts Inflation via food prices."
                     """
-                    response = model_manager.generate_content(prompt)
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     # Simple text split by newline
                     linkages = [line.strip() for line in response.text.strip().split('\n') if line.strip()]
 
@@ -1565,7 +1564,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     }}
                     Ensure content is concise Markdown. For the concept_map, provide ONLY the valid Mermaid code string. For quiz, ensure valid JSON string in content field.
                     """
-                    response = model_manager.generate_content(prompt)
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     # Use _parse_response to handle JSON extraction safely
                     json_content = self._parse_response(response.text)
 
@@ -1587,7 +1586,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     Quotes: ...
                     Data: ...
                     """
-                    response = model_manager.generate_content(prompt)
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     # Simple splitting to separate quotes and data is hard without structured output
                     # Just return full text
                     text = response.text
@@ -1620,7 +1619,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     Format: Year - Event. Keep it concise.
                     Start directly with the first event. No intro text.
                     """
-                    response = model_manager.generate_content(prompt)
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     result = {
                         "success": True,
                         "message": "Timeline Generated.",
@@ -1695,7 +1694,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     }}
                     Do NOT include markdown formatting like ```json ... ```, just the raw JSON.
                     """
-                    response = model_manager.generate_content(prompt)
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     data = self._parse_response(response.text)
 
                     # Handle panic mode fallback
@@ -1723,7 +1722,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 try:
                     topic = payload.get('topic', '')
                     prompt = f"Explain the UPSC syllabus topic '{topic}' in concise detail. Cover key concepts."
-                    response = model_manager.generate_content(prompt)
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     result = {"success": True, "explanation": response.text}
                 except Exception as e:
                     result = {"success": False, "message": f"Explanation Failed: {str(e)}"}
@@ -1732,7 +1731,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 try:
                     topic = payload.get('topic', '')
                     prompt = f"List 3 common mistakes students make when studying '{topic}' for UPSC. Be specific."
-                    response = model_manager.generate_content(prompt)
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     result = {"success": True, "pitfalls": response.text}
                 except Exception as e:
                     result = {"success": False, "message": f"Pitfall search Failed: {str(e)}"}
@@ -1771,7 +1770,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 try:
                     topic = payload.get('topic', '')
                     prompt = f"Identify the core underlying themes and cross-disciplinary linkages for '{topic}'."
-                    response = model_manager.generate_content(prompt)
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     result = {"success": True, "data": {"core_themes": [response.text]}}
                 except Exception as e:
                     result = {"success": False, "message": f"Neural Hash Decode Failed: {str(e)}"}
