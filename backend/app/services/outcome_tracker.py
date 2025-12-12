@@ -317,5 +317,32 @@ class OutcomeTracker:
         # No patterns yet - neutral
         return (True, 0.5, "No prior data - suggesting with caution")
 
+    @staticmethod
+    def analyze_prediction_accuracy(prediction_id, actual_outcome):
+        """
+        PHASE 16: THE POST-MORTEM
+        Analyzes why a Foresight prediction was right or wrong.
+        """
+        from app.services.model_manager import model_manager
+        if not model_manager.is_configured:
+            return "Analysis Unavailable"
+
+        prompt = f"""
+        # MISSION: PREDICTION POST-MORTEM
+        **Prediction ID:** {prediction_id}
+        **Actual Outcome:** {actual_outcome}
+
+        **DIRECTIVE:**
+        Analyze the gap. Did the AI miss a variable? Was it a Black Swan?
+
+        **OUTPUT:**
+        A 1-sentence analytical verdict.
+        """
+        try:
+            response = model_manager.generate_content(prompt, model_type='pro')
+            return response.text.strip()
+        except:
+            return "Analysis Failed."
+
 # Singleton instance
 outcome_tracker = OutcomeTracker()

@@ -105,6 +105,7 @@ class PanopticonService:
         """
         Get the latest bio-status from the database.
         Returns a dict with status, energy, and any alerts.
+        PHASE 16: SYSTEM METAPHOR
         """
         conn = self.get_db_connection()
         if not conn: return {"status": "UNKNOWN", "energy": 50, "alert": "DB Error"}
@@ -136,11 +137,30 @@ class PanopticonService:
             elif energy < 70 or sleep < 6.5:
                 status = "FATIGUED"
                 alert = "Recovery Recommended"
-                
+
+            # Generate Metaphor
+            metaphor = "Systems Nominal."
+            if model_manager.is_configured:
+                try:
+                    meta_prompt = f"""
+                    # MISSION: SYSTEM HEALTH METAPHOR
+                    **Status:** {status}
+                    **Energy:** {energy}/100
+
+                    **DIRECTIVE:**
+                    Describe the user's biological state as a Sci-Fi Ship System report.
+                    Example: "Reactor core critical. Cooling systems offline."
+                    """
+                    resp = model_manager.generate_content(meta_prompt, model_type='fast')
+                    metaphor = resp.text.strip()
+                except:
+                    pass
+
             return {
                 "status": status,
                 "energy": energy,
                 "alert": alert,
+                "metaphor": metaphor,
                 "last_updated": data.get('date')
             }
             

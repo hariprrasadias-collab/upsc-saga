@@ -18,6 +18,31 @@ class ShopService:
             return [dict(row) for row in items]
         except Exception:
             return []
+
+    def generate_dynamic_flavor_text(self, item_name, user_weakness):
+        """
+        PHASE 17: THE BAZAAR (DYNAMIC SHOP)
+        Generates custom flavor text for items based on user's weak area.
+        """
+        from app.services.model_manager import model_manager
+
+        if not model_manager.is_configured:
+            return "A powerful artifact."
+
+        prompt = f"""
+        # MISSION: ITEM LORE GENERATION
+        **Item:** {item_name}
+        **User Weakness:** {user_weakness}
+
+        **DIRECTIVE:**
+        Write a 1-sentence mystical description of this item that promises to fix the weakness.
+        Example: "This amulet hums with the forgotten laws of Polity."
+        """
+        try:
+            response = model_manager.generate_content(prompt, model_type='fast')
+            return response.text.strip()
+        except:
+            return "A mysterious artifact."
     
     def get_user_balance(self, user_id):
         """Get user's XP and Hacksilver balance."""
