@@ -93,6 +93,8 @@ def calculate_and_apply_rewards(user_id, base_xp, base_hs, tags=[]):
     luck = user['luck_stat']
     
     leveled_up = False
+    lore_message = None
+
     while current_xp >= max_xp:
         level += 1
         current_xp -= max_xp
@@ -105,6 +107,29 @@ def calculate_and_apply_rewards(user_id, base_xp, base_hs, tags=[]):
         vitality += 1
         luck += 1
         
+    if leveled_up:
+        # Generate Dynamic Lore using AI
+        from app.services.model_manager import model_manager
+        if model_manager.is_configured:
+            try:
+                lore_prompt = f"""
+                # MISSION: LEVEL UP LORE GENERATION
+                **User:** Level {level-1} -> Level {level}
+                **Class:** UPSC Aspirant / Civil Servant
+
+                **DIRECTIVE:**
+                Write a 1-sentence "RPG Level Up" message.
+                - Low Level (1-10): "You have evolved from a Village Clerk to a Tehsil Assistant."
+                - Mid Level (11-50): "Your administrative grasp tightens. You are now a District Magistrate."
+                - High Level (50+): "Cabinet Secretary status achieved. The PMO awaits."
+
+                **OUTPUT:** Just the sentence.
+                """
+                response = model_manager.generate_content(lore_prompt, model_type='fast')
+                lore_message = response.text.strip()
+            except:
+                lore_message = f"Level {level} Reached! Power Overwhelming!"
+
     # 6. Save to DB
     cursor.execute('''
         UPDATE users 
@@ -120,5 +145,6 @@ def calculate_and_apply_rewards(user_id, base_xp, base_hs, tags=[]):
         "hs_gained": final_hs,
         "is_crit": is_crit,
         "leveled_up": leveled_up,
+        "lore": lore_message,
         "new_balance": current_hs
     }

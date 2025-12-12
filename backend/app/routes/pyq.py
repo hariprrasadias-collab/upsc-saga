@@ -242,14 +242,49 @@ def ask_strategos(question_id):
         from app.services.brain_service import brain_service
 
         # Prepare payload
+        # PHASE 7: STRATEGOS UPGRADE (REAL-TIME TACTICAL ADVICE)
+        prompt_text = f"""
+        # MISSION: REAL-TIME BATTLEFIELD ADVICE (STRATEGOS)
+        **Context:** The user is staring at this question right now.
+        **Question:** "{question['question_text']}"
+        **Options:**
+        A) {question['option_a']}
+        B) {question['option_b']}
+        C) {question['option_c']}
+        D) {question['option_d']}
+
+        **DIRECTIVE:**
+        Don't solve it yet. Give a TACTICAL HINT.
+        - "Look at Option B. Is 'drastically' a safe word?"
+        - "Recall the timeline of 1942."
+
+        **OUTPUT:**
+        Just the hint text. Short and urgent.
+        """
+
+        # We invoke ModelManager directly for speed/custom prompt here, or use BrainService with a new action.
+        # Let's stick to BrainService for consistency but upgrade the payload intent.
         payload = {
-            "question": f"{question['question_text']}\nOptions:\nA) {question['option_a']}\nB) {question['option_b']}\nC) {question['option_c']}\nD) {question['option_d']}",
-            "reasoning": "User requested Strategos breakdown"
+            "question": prompt_text,
+            "reasoning": "Strategos Tactical Intercept"
         }
 
         # Execute Action
-        result = brain_service.execute_action("ANALYZE_QUESTION", payload)
-        return jsonify(result)
+        # We reuse ANALYZE_QUESTION but the prompt injected above overrides standard analysis effectively
+        # if the BrainService logic supported raw prompts.
+        # Actually, BrainService wraps it. Let's create a new Action type for this specific feature to be clean.
+        # But to avoid touching BrainService again in this step, we will use ANALYZE_QUESTION
+        # and rely on the fact that we improved ANALYZE_QUESTION to be "Surgical".
+        # However, "Surgical" gives the answer. Strategos should give a HINT.
+        # Let's do a direct call here for Phase 7 uniqueness.
+        from app.services.model_manager import model_manager
+        response = model_manager.generate_content(prompt_text, model_type='fast')
+
+        return jsonify({
+            "success": True,
+            "tactical_hint": response.text.strip(),
+            "analysis": "Full analysis available after submission."
+        })
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500

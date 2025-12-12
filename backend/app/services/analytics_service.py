@@ -294,3 +294,53 @@ def get_streak_days(conn, user_id):
     except Exception as e:
         print(f"Error calculating streak: {e}")
         return 0
+
+def generate_weekly_performance_review(conn, user_id):
+    """
+    PHASE 7: THE WAR ROOM
+    Generates a corporate-style 'Weekly Appraisal' for the aspirant.
+    """
+    from app.services.model_manager import model_manager
+    if not model_manager.is_configured:
+        return {"error": "AI Offline"}
+
+    end_date = datetime.now().strftime('%Y-%m-%d')
+    start_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
+
+    study_hours = calculate_study_hours(conn, user_id, start_date, end_date)
+    streak = get_streak_days(conn, user_id)
+
+    # Get Weak Areas
+    weak_areas = identify_weak_areas(conn, user_id, limit=3)
+    weak_str = ", ".join([w['topic'] for w in weak_areas])
+
+    prompt = f"""
+    # MISSION: WEEKLY PERFORMANCE REVIEW
+    **Role:** The High-Command (Military/Corporate Hybrid).
+
+    **METRICS:**
+    - Hours Logged: {study_hours}
+    - Streak: {streak} Days
+    - Critical Weaknesses: {weak_str}
+
+    **DIRECTIVE:**
+    Write a brutal but motivating review.
+    - If hours > 40: Commend the discipline.
+    - If hours < 20: Issue a 'Show Cause Notice'.
+    - If streak broken: Express disappointment.
+
+    **OUTPUT SCHEMA (JSON):**
+    {{
+        "verdict": "Exemplary / Needs Improvement / Critical",
+        "message": "The narrative review...",
+        "action_plan": ["Specific Task 1", "Specific Task 2"]
+    }}
+    """
+
+    try:
+        response = model_manager.generate_content(prompt, model_type='pro')
+        import json
+        text = response.text.strip().replace('```json', '').replace('```', '')
+        return json.loads(text)
+    except Exception as e:
+        return {"error": str(e)}
