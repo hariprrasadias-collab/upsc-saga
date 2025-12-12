@@ -9,6 +9,7 @@ from google.api_core.exceptions import ResourceExhausted, ServiceUnavailable, In
 from dotenv import load_dotenv
 from cachetools import TTLCache
 import openai
+from openai import OpenAI
 
 load_dotenv()
 

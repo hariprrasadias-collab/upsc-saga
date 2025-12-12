@@ -67,25 +67,24 @@ def generate_debate_turn(topic, history, user_input=None):
     agent_descriptions = "\n".join([f"{k}: {v['name']} ({v['role']})" for k, v in AGENTS.items()])
 
     moderator_prompt = f"""
-    You are the Moderator of a high-stakes philosophical debate on "{topic}".
+    # MISSION: MODERATE A CLASH OF PHILOSOPHERS
+    **Topic:** "{topic}"
     
-    AGENTS:
+    **AGENTS:**
     {agent_descriptions}
 
-    CONVERSATION SO FAR:
+    **TRANSCRIPT:**
     {context_str}
 
-    TASK:
-    1. Analyze the Last Argument.
-    2. Decide WHO should speak next.
-       - Select the agent whose philosophy most directly CONFLICTS with the last point.
-       - Do not let the same person speak twice in a row.
-    3. Provide a "Secret Strategy" for the selected agent.
+    **DIRECTIVE:**
+    1. **Conflict Engine:** Who vehemently disagrees with the last point? Pick them.
+    2. **Avoid Echo Chambers:** Never pick the same person twice.
+    3. **Strategy Injection:** Don't just say "Respond". Give a specific tactical order (e.g., "Attack the underlying definition of Justice", "Use a reductio ad absurdum").
 
-    Return JSON:
+    **OUTPUT SCHEMA (JSON):**
     {{
         "next_speaker_id": "skeptic" | "idealist" | "realist" | "iconoclast" | "sage" | "strategist",
-        "strategy": "..."
+        "strategy": "Your secret tactical instruction to the agent."
     }}
     """
     
@@ -118,29 +117,28 @@ def generate_debate_turn(topic, history, user_input=None):
     agent = AGENTS[next_speaker_id]
     
     agent_prompt = f"""
-    You are {agent['name']} ({agent['role']}).
-    Topic: {topic}
+    # MISSION: EXECUTE PHILOSOPHICAL COMBAT
+    **Role:** {agent['name']} ({agent['role']})
+    **Style:** {agent['style']}
+    **Orders:** {strategy}
     
-    YOUR PERSONA: {agent['style']}
-    YOUR FOCUS: {agent['focus']}
-    
-    MODERATOR'S INSTRUCTION: {strategy}
-    
-    CONVERSATION:
+    **CONTEXT:**
     {context_str}
     
-    TASK:
-    Generate your response.
-    1. THINK: Identify fallacies or weak points in the previous speaker's argument (if any).
-    2. TECHNIQUE: Name the rhetorical device you will use (e.g., Elenchus, Ad Hominem, Syllogism, Analogy, Aphorism, Dialectic).
-    3. SPEAK: Keep it under 3 sentences. Be profound, challenging, and in-character.
+    **EXECUTION:**
+    1. **Deconstruct:** Identify the hidden premise or fallacy in the last turn.
+    2. **Attack:** Use your specific rhetorical style.
+       - Socrates: Ask a trap question.
+       - Nietzsche: Mock the morality.
+       - Machiavelli: Focus on utility.
+    3. **Output:** Short, punchy, profound. Max 50 words. No "I think". Just the argument.
     
-    Return JSON:
+    **OUTPUT SCHEMA (JSON):**
     {{
-        "thought_process": "I observe that...",
-        "rhetorical_technique": "Name of technique",
-        "detected_fallacies_in_prev_turn": ["Strawman", "Ad Hominem"] (or empty list),
-        "text": "...",
+        "thought_process": "Internal monologue analyzing the opponent's weakness.",
+        "rhetorical_technique": "The specific device used (e.g., 'Socratic Irony').",
+        "detected_fallacies_in_prev_turn": ["Fallacy Name"],
+        "text": "Your actual spoken line.",
         "type": "ARGUMENT" | "QUESTION" | "REBUTTAL"
     }}
     """
