@@ -70,17 +70,29 @@ class FlashcardService:
         # API Check handled by manager
         
         prompt = f"""
-        Create {count} high-quality flashcards for the topic: "{topic}".
-        Focus on UPSC relevant facts, dates, and concepts.
-        Return ONLY a JSON array of objects:
+        # MISSION: ACTIVE RECALL ARSENAL
+        **Topic:** {topic}
+        **Count:** {count}
+
+        **DIRECTIVE:**
+        Create "Scenario-Based" flashcards. Avoid simple definitions.
+
+        **BAD:**
+        Front: What is Article 21?
+        Back: Right to Life.
+
+        **GOOD:**
+        Front: A citizen is denied a passport to travel abroad. Which SC judgment and Article protects this right?
+        Back: **Maneka Gandhi vs Union of India (1978)**. Expanded **Article 21** to include the right to travel abroad and "Due Process of Law".
+
+        **OUTPUT SCHEMA (JSON Array):**
         [
-            {{"front": "Question...", "back": "Answer..."}},
-            ...
+            {{"front": "The Scenario/Tricky Question", "back": "The Specific Answer + Context"}}
         ]
         """
         
         try:
-            response = model_manager.generate_content(prompt, model_type='fast')
+            response = model_manager.generate_content(prompt, model_type='pro')
             text = response.text.strip()
             
             # Robust Extraction

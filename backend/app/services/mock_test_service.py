@@ -76,27 +76,34 @@ class MockTestService:
                 topic = "General Studies"
         
         prompt = f"""
-        Create a {count}-question multiple choice test for: "{topic}".
-        Strict UPSC standard.
+        # MISSION: DESIGN A 'TITAN LEVEL' PRELIMS TEST
+        **Topic:** "{topic}"
+        **Count:** {count} Questions
         
-        CRITICAL OUTPUT RULES:
-        1. Return ONLY a valid JSON object.
-        2. Use DOUBLE QUOTES for all keys and strings.
-        3. NO trailing commas.
-        4. NO comments.
+        **DIRECTIVE:**
+        You are the Chief Examiner for UPSC. Your goal is to filter out the non-serious candidates.
         
-        Structure:
+        **QUESTION ARCHITECTURE:**
+        1. **The Statement Trap:** Use "Only", "All", "Drastically" to trick guessers.
+        2. **The Chronology Twist:** Mix up events by just 1 year.
+        3. **The Current Affairs Camouflage:** Wrap a static concept in a recent news headline.
+
+        **EXPLANATION (CRITICAL):**
+        - Do not just say "A is correct".
+        - Explain **WHY B, C, and D are wrong**. (e.g., "Option B is incorrect because Article 32 applies to SC, not HC").
+
+        **OUTPUT SCHEMA (JSON ONLY):**
         {{
             "title": "Test: {topic}",
             "questions": [
                 {{
-                    "question_text": "...",
-                    "option_a": "...",
-                    "option_b": "...",
-                    "option_c": "...",
-                    "option_d": "...",
-                    "correct_answer": "A",
-                    "explanation": "..."
+                    "question_text": "Consider the following statements about [Sub-topic]...\\n1. Statement A\\n2. Statement B\\nWhich are correct?",
+                    "option_a": "1 only",
+                    "option_b": "2 only",
+                    "option_c": "Both 1 and 2",
+                    "option_d": "Neither 1 nor 2",
+                    "correct_answer": "C",
+                    "explanation": "Statement 1 is correct because... Statement 2 is correct because... \\n\\n**TRAP ANALYSIS:** Students often confuse X with Y."
                 }}
             ]
         }}
@@ -104,7 +111,7 @@ class MockTestService:
         
         try:
             # Use ModelManager for rate limiting and load balancing
-            response = model_manager.generate_content(prompt, model_type='fast')
+            response = model_manager.generate_content(prompt, model_type='pro')
             
             if hasattr(response, 'text'):
                 text = response.text.strip()
