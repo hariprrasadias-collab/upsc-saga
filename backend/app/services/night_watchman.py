@@ -111,14 +111,20 @@ class NightWatchman:
             
             # 2. Dream / Analyze
             prompt = f"""
-            Analyze the user's activity today to generate a strategic insight.
+            # MISSION: REM SLEEP ANALYSIS (META-COGNITION)
+            **Role:** The Subconscious Strategist.
             
-            ACTIVITY LOG:
+            **DAY'S ACTIVITY LOG:**
             {action_summary}
             
-            TASK:
-            Generate ONE high-value insight or lesson for the user.
-            Focus on patterns (e.g., "You failed 3 mock tests today, maybe rest?").
+            **DIRECTIVE:**
+            Synthesize a 'Lesson Learned' or 'Strategic Adjustment' based on performance.
+            - If failures > successes: Suggest rest or foundational revision.
+            - If rapid success: Suggest increasing difficulty level.
+            - If idle: Suggest a motivation kick.
+
+            **OUTPUT:**
+            A concise, actionable insight (max 2 sentences).
             """
             
             # Use Pro model for insight

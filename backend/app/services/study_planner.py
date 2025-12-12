@@ -188,6 +188,15 @@ def generate_study_plan(start_date_str, force_new=False):
     
     tasks_buffer = []
     
+    # --- PHASE 4: ADAPTIVE SCHEDULE INJECTION ---
+    # Fetch Golden Path to prioritize high-yield topics
+    from app.services.golden_path_service import golden_path
+    from app.services.model_manager import model_manager
+
+    # Generate an "Ideal Sequence" using AI + Graph
+    # We ask the AI to re-order books/chapters based on ROI
+    # For now, we stick to the queue but we could re-sort 'all_books_queue' here.
+
     while current_date < end_date:
         slots = get_smart_slots(current_date)
         date_iso = current_date.isoformat()
@@ -373,6 +382,10 @@ def check_and_reschedule_pending():
     tomorrow = (today + timedelta(days=1)).isoformat()
     buffer_slots = get_future_buffer_slots(tomorrow)
     
+    # PHASE 4: INTELLIGENT RESCHEDULING (BIO-AWARE)
+    # Don't just dump tasks. Check if the buffer slot matches the task intensity.
+    # For now, we assume buffers are generic.
+
     for task in pending_tasks:
         if not buffer_slots:
             break # No more slots available

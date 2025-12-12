@@ -349,8 +349,6 @@ class ForesightEngine:
             import traceback
             traceback.print_exc()
             return []
-            traceback.print_exc()
-            return []
 
 # Singleton instance
 foresight_engine = ForesightEngine()

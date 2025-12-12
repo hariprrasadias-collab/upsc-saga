@@ -13,3 +13,5 @@ requests
 feedparser
 google-auth-oauthlib
 openai
+thefuzz
+google-api-python-client
