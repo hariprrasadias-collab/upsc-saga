@@ -51,6 +51,40 @@ class RavensService:
         except Exception as e:
             return {"status": "error", "data": {"recent_headlines": []}}
 
+    @staticmethod
+    def generate_upsc_summary(article_content):
+        """
+        Uses AI to convert raw news into a high-yield UPSC summary.
+        """
+        from app.services.model_manager import model_manager
+
+        prompt = f"""
+        # MISSION: CURRENT AFFAIRS FILTER (THE HINDU/IE)
+        **Input:**
+        "{article_content[:3000]}..."
+
+        **DIRECTIVE:**
+        Extract ONLY what matters for UPSC. Disregard political gossip.
+
+        **OUTPUT SCHEMA (JSON):**
+        {{
+            "headline": "Punchy Title",
+            "gs_mapping": ["GS2 (Polity)", "GS3 (Economy)"],
+            "prelims_facts": ["Fact 1 (Data/Committee)", "Fact 2"],
+            "mains_arguments": {{
+                "pros": ["Arg 1"],
+                "cons": ["Arg 2"],
+                "way_forward": ["Committee Recommendation"]
+            }},
+            "keywords": ["Keyword1", "Keyword2"]
+        }}
+        """
+        try:
+            response = model_manager.generate_content(prompt, model_type='fast')
+            return response.text
+        except Exception:
+            return "{}"
+
 # Register Synapse
 try:
     from app.services.synapse_registry import SynapseRegistry
