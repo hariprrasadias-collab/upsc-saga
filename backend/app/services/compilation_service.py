@@ -155,3 +155,57 @@ class CompilationService:
             
         return months
 
+    @staticmethod
+    def generate_subject_book(subject):
+        """
+        PHASE 10: THE ARCHIVIST
+        Compiles disparate notes into a cohesive 'Book Chapter'.
+        """
+        from app.services.model_manager import model_manager
+
+        if not model_manager.is_configured:
+            return {"error": "AI Offline"}
+
+        conn = get_db()
+
+        # 1. Gather Raw Material (Flashcards, News, Syllabus)
+        flashcards = conn.execute("SELECT front, back FROM flashcards WHERE tags LIKE ?", (f"%{subject}%",)).fetchall()
+        news = conn.execute("SELECT title, upsc_summary FROM current_affairs WHERE subjects LIKE ? LIMIT 5", (f"%{subject}%",)).fetchall()
+
+        context_str = ""
+        for f in flashcards[:10]:
+            context_str += f"Note: {f['front']} -> {f['back']}\n"
+        for n in news:
+            context_str += f"News: {n['title']} - {n['upsc_summary'][:200]}\n"
+
+        # 2. Synthesize Chapter
+        prompt = f"""
+        # MISSION: GENERATE SUBJECT BOOKLET
+        **Subject:** {subject}
+
+        **RAW MATERIAL:**
+        {context_str[:10000]}
+
+        **DIRECTIVE:**
+        Synthesize this scattered info into a coherent 'Mains Ready' chapter.
+
+        **OUTPUT SCHEMA (JSON):**
+        {{
+            "title": "{subject}: The Definitive Guide",
+            "introduction": "...",
+            "core_themes": [
+                {{ "title": "Theme 1", "content": "..." }},
+                {{ "title": "Theme 2", "content": "..." }}
+            ],
+            "case_studies": ["..."],
+            "conclusion": "..."
+        }}
+        """
+
+        try:
+            response = model_manager.generate_content(prompt, model_type='pro')
+            import json
+            text = response.text.strip().replace('```json', '').replace('```', '')
+            return json.loads(text)
+        except Exception as e:
+            return {"error": str(e)}

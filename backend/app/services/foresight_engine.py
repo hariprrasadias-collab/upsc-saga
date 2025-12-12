@@ -344,6 +344,16 @@ class ForesightEngine:
                 print(f"Extraction Error: {e}")
                 return []
                 
+                # Add metadata
+                for pred in final_predictions:
+                    pred['generated_at'] = datetime.now().isoformat()
+                    pred['id'] = hash(pred['question']) % 10000
+
+                return final_predictions
+            else:
+                print("No JSON found in response")
+                return []
+
         except Exception as e:
             print(f"Prediction Generation Error: {e}")
             import traceback

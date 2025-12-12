@@ -38,6 +38,41 @@ class MistakeDetector:
         except:
             return "Diagnosis Failed"
 
+    def detect_cognitive_bias(self, answer_text):
+        """
+        PHASE 12: THE SHADOW (BIAS DETECTION)
+        Scans student answers for ideological bias or lack of neutrality.
+        """
+        if not model_manager.is_configured:
+            return None
+
+        prompt = f"""
+        # MISSION: NEUTRALITY CHECK (CIVIL SERVANT STANDARD)
+        **Answer:** "{answer_text}"
+
+        **DIRECTIVE:**
+        Analyze for:
+        1. **Political Bias:** Is it anti/pro-government instead of analytical?
+        2. **Emotional Language:** Is it inflammatory?
+        3. **Constitutional Morality:** Does it violate core democratic principles?
+
+        **OUTPUT SCHEMA (JSON):**
+        {{
+            "is_biased": true/false,
+            "bias_type": "Political / Religious / Emotional",
+            "warning": "You used the word 'disaster' for a policy. Use 'implementation gap' instead.",
+            "neutral_rewrite": "..."
+        }}
+        """
+
+        try:
+            response = model_manager.generate_content(prompt, model_type='pro')
+            import json
+            text = response.text.strip().replace('```json', '').replace('```', '')
+            return json.loads(text)
+        except Exception:
+            return None
+
     def detect_mistakes(self, lookback_hours=24):
         """
         Analyzes action logs from the last N hours to find mistakes.

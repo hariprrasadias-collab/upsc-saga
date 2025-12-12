@@ -104,6 +104,54 @@ class AutonomyManager:
             return result['count'] > 0
         except Exception:
             return False
+
+    @staticmethod
+    def self_heal_prompts(action_type):
+        """
+        PHASE 15: THE ARCHITECT (SELF-HEALING)
+        If an action keeps failing, the AI rewrites its own instruction template.
+        """
+        from app.services.mistake_detector import MistakeDetector
+        from app.services.model_manager import model_manager
+
+        md = MistakeDetector()
+
+        # 1. Check if action is problematic
+        # We look for 'Prompt Issue' diagnosis in recent logs
+        logs = [] # Need to fetch recent failure logs for this action_type
+        # Assuming we can get logs: logs = get_logs(action_type, 'failure')
+
+        # Simulating fetching logs
+        conn = get_db()
+        logs_rows = conn.execute("SELECT action_payload, outcome_status FROM brain_action_log WHERE action_type = ? AND outcome_status = 'failure' ORDER BY created_at DESC LIMIT 3", (action_type,)).fetchall()
+
+        if len(logs_rows) < 3:
+            return None # Not enough failures to warrant rewrite
+
+        diagnosis = md.analyze_root_cause(action_type, [dict(r) for r in logs_rows])
+
+        if "Prompt Issue" in diagnosis or "JSON" in diagnosis:
+            # 2. Architect rewrites the prompt strategy
+            prompt = f"""
+            # MISSION: PROMPT ARCHITECTURE REPAIR
+            **Action:** {action_type}
+            **Diagnosis:** {diagnosis}
+
+            **DIRECTIVE:**
+            The current prompt logic for this action is causing JSON/Format errors.
+            Suggest a robust prompt template structure to fix this.
+
+            **OUTPUT:**
+            A Python F-String template.
+            """
+
+            try:
+                response = model_manager.generate_content(prompt, model_type='pro')
+                return response.text.strip()
+            except:
+                pass
+
+        return None
     
     @staticmethod
     def log_action(action_type, action_payload, executed_by='manual', 
