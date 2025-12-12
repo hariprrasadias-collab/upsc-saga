@@ -72,7 +72,19 @@ def analyze_topic_triangulation(text):
     try:
         # Use ModelManager (Pro tier for deep analysis)
         response = model_manager.generate_content(prompt, model_type='pro')
-        ai_data = json.loads(response.text.replace('```json', '').replace('```', '').strip())
+        text = response.text.strip()
+        
+        # Robust Scan for { ... }
+        if text.startswith("```"):
+             text = text.replace('```json', '').replace('```', '').strip()
+
+        start = text.find('{')
+        end = text.rfind('}')
+        if start != -1 and end != -1:
+            json_str = text[start:end+1]
+            ai_data = json.loads(json_str)
+        else:
+             raise ValueError("No JSON object found in response")
     except Exception as e:
         print(f"Triangulation AI Error: {e}")
         return {"error": str(e)}

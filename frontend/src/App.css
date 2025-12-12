@@ -156,7 +156,17 @@
 
 /* Responsive Adjustments */
 @media (max-width: 1400px) {
-  .app-container {
+
+  /* Adjust sidebar widths for smaller desktop screens, BUT keep 0px if closed */
+  .app-container.left-open {
+    grid-template-columns: 200px 1fr 0px;
+  }
+
+  .app-container.right-open {
+    grid-template-columns: 0px 1fr 250px;
+  }
+
+  .app-container.left-open.right-open {
     grid-template-columns: 200px 1fr 250px;
   }
 }

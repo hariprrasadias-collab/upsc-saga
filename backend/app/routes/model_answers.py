@@ -242,40 +242,41 @@ def search_model_answers():
     if not query:
         return jsonify({'success': False, 'error': 'Query is required'}), 400
     
-    if not GEMINI_API_KEY:
-        # Fallback to simple text search
+    # Try AI-powered search first, fallback to text search if it fails
+    try:
+        # Fetch all answers to send to context (Limit to 100 for token limits)
         conn = get_db()
-        cursor = conn.cursor()
-        cursor.execute('''
-            SELECT * FROM model_answers 
-            WHERE question_text LIKE ? OR answer_text LIKE ? OR title LIKE ?
-            LIMIT 10
-        ''', (f'%{query}%', f'%{query}%', f'%{query}%'))
-        results = cursor.fetchall()
+        all_answers = conn.execute('SELECT id, title, question_text, tags FROM model_answers ORDER BY created_at DESC LIMIT 100').fetchall()
         conn.close()
         
-        return jsonify({
-            'success': True,
-            'answers': [dict(r) for r in results],
-            'method': 'text_search'
-        })
-    
-    # AI-powered search
-    try:
+        if not all_answers:
+             return jsonify({'success': True, 'answers': [], 'method': 'ai_search_empty'})
+
         # Use AI to find relevant answers
         prompt = f"""Given this search query: "{query}"
 
 Find the most relevant answers from this list:
-{json.dumps([dict(a) for a in all_answers[:50]], indent=2)}
+{json.dumps([dict(a) for a in all_answers], indent=2)}
 
 Return a JSON array of answer IDs in order of relevance (most relevant first), max 5 IDs.
 Format: {{"answer_ids": [1, 2, 3]}}"""
         
         # Use ModelManager (Pro model for search reasoning)
         response = model_manager.generate_content(prompt, model_type='pro')
-        text = response.text.strip().replace('```json', '').replace('```', '').strip()
         
-        result = json.loads(text)
+        # Robust Parsing
+        text = response.text.strip()
+        if text.startswith("```"):
+            text = text.replace('```json', '').replace('```', '').strip()
+            
+        start = text.find('{')
+        end = text.rfind('}')
+        
+        if start != -1 and end != -1:
+            result = json.loads(text[start:end+1])
+        else:
+            raise ValueError("No JSON found in search response")
+            
         answer_ids = result.get('answer_ids', [])
         
         # Fetch full details for relevant answers

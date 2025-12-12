@@ -197,6 +197,10 @@ class ForesightEngine:
             if "Oracle is silent" in text:
                 return candidates[:10]
 
+            # Clean Markdown if present
+            if text.startswith("```"):
+                text = text.replace("```json", "").replace("```", "").strip()
+
             json_match = re.search(r'\[.*\]', text, re.DOTALL)
             
             if json_match:
@@ -293,6 +297,7 @@ class ForesightEngine:
         If a specific TOPIC FOCUS is provided, ensure at least 50% of questions relate to it.
         
         OUTPUT FORMAT (JSON Array):
+        IMPORTANT: Return ONLY valid RAW JSON. Do not include markdown formatting (```json) or introductory text.
         [
             {{
                 "question": "...",
@@ -309,21 +314,40 @@ class ForesightEngine:
         
         try:
             # Predictions require deep analysis
-            response = model_manager.generate_content(prompt, model_type='pro')
+            response = model_manager.generate_content(prompt, model_type='pro', max_output_tokens=4096)
             
             text = response.text.strip()
+            
+            # Clean Markdown
+            if text.startswith("```"):
+                text = text.replace("```json", "").replace("```", "").strip()
+
+            print(f"DEBUG FORESIGHT RAW TEXT: {text[:200]}...")
 
             if "Oracle is silent" in text:
-                print("Oracle fallback active")
                 return []
 
-            json_match = re.search(r'\[.*\]', text, re.DOTALL)
-            
-            if json_match:
-                candidates = json.loads(json_match.group(0))
+            # Robust JSON Extractor (Find first [ and last ])
+            try:
+                start = text.find('[')
+                end = text.rfind(']')
                 
-                # Phase 2: The Critic (High Rigor)
-                final_predictions = self._critic_review(candidates)
+                if start != -1 and end != -1 and end > start:
+                    json_str = text[start : end + 1]
+                    candidates = json.loads(json_str)
+                    
+                    # Phase 2: The Critic (High Rigor)
+                    final_predictions = self._critic_review(candidates)
+                    return final_predictions
+                else:
+                    print("No JSON array found (brackets missing)")
+                    return []
+            except json.JSONDecodeError as e:
+                print(f"JSON Decode Failed: {e}")
+                return []
+            except Exception as e:
+                print(f"Extraction Error: {e}")
+                return []
                 
                 # Add metadata
                 for pred in final_predictions:

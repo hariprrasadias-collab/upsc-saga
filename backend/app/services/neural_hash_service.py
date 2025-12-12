@@ -91,17 +91,28 @@ class NeuralHashService:
         try:
             # Clean up markdown code blocks if present
             text = text.strip()
+            
+            # Remove markdown fences
+            if text.startswith("```"):
+                text = text.replace("```json", "").replace("```", "").strip()
 
             if "Oracle is silent" in text:
                  return {"success": False, "error": "AI Service Unavailable"}
 
-            if text.startswith("```json"):
-                text = text[7:]
-            if text.endswith("```"):
-                text = text[:-3]
+            # Robust Scan for { ... }
+            start = text.find('{')
+            end = text.rfind('}')
             
-            data = json.loads(text)
-            return {"success": True, "data": data}
+            if start != -1 and end != -1:
+                text = text[start:end+1]
+                data = json.loads(text)
+                return {"success": True, "data": data}
+            else:
+                return {
+                    "success": False, 
+                    "error": "No JSON object found in response",
+                    "raw_output": text
+                }
         except json.JSONDecodeError:
             return {
                 "success": False, 

@@ -90,14 +90,19 @@ class NeuralHashService:
     def _parse_response(self, text):
         try:
             # Clean up markdown code blocks if present
+            # Clean up markdown code blocks if present
             text = text.strip()
-            if text.startswith("```json"):
-                text = text[7:]
-            if text.endswith("```"):
-                text = text[:-3]
+            if text.startswith("```"):
+                text = text.replace('```json', '').replace('```', '').strip()
             
-            data = json.loads(text)
-            return {"success": True, "data": data}
+            start = text.find('{')
+            end = text.rfind('}')
+            
+            if start != -1 and end != -1:
+                data = json.loads(text[start:end+1])
+                return {"success": True, "data": data}
+            else:
+                raise ValueError("No JSON found")
         except json.JSONDecodeError:
             return {
                 "success": False, 

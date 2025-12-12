@@ -1,7 +1,7 @@
 import os
+import json
 from app.services.model_manager import model_manager
 from dotenv import load_dotenv
-from app.services.model_manager import model_manager
 
 load_dotenv()
 
@@ -64,9 +64,28 @@ class MimirService:
             """
             # Use ModelManager (Pro tier for evaluation)
             response = model_manager.generate_content(prompt, model_type='pro')
-            return response.text
+            text = response.text.strip()
+            
+            if text.startswith("```"):
+                text = text.replace('```json', '').replace('```', '').strip()
+
+            start = text.find('{')
+            end = text.rfind('}')
+            
+            if start != -1 and end != -1:
+                return json.loads(text[start:end+1])
+            else:
+                 raise ValueError("No JSON found in Mimir evaluation")
         except Exception as e:
             print(f"Error generating evaluation: {e}")
-            return str(e)
+            import traceback
+            traceback.print_exc()
+            # Return safe fallback structure
+            return {
+                "score": 0,
+                "feedback": f"Error: {str(e)}", 
+                "strengths": [], 
+                "weaknesses": []
+            }
 
 mimir_service = MimirService()

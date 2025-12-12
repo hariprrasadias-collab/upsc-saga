@@ -52,9 +52,19 @@ class EssayEvaluator:
             response_text = response.text.strip()
             
             # Clean up potential markdown formatting
-            response_text = response_text.replace('```json', '').replace('```', '').strip()
+            # Clean up potential markdown formatting
+            response_text = response_text.strip()
+            if response_text.startswith("```"):
+                response_text = response_text.replace('```json', '').replace('```', '').strip()
                 
-            return json.loads(response_text)
+            start = response_text.find('{')
+            end = response_text.rfind('}')
+            
+            if start != -1 and end != -1:
+                response_text = response_text[start:end+1]
+                return json.loads(response_text)
+            else:
+                raise json.JSONDecodeError("No JSON found", response_text, 0)
         except Exception as e:
             print(f"Error evaluating essay: {e}")
             # Return fallback structure in case of error

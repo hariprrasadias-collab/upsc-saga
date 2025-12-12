@@ -16,23 +16,14 @@ def evaluate_answer():
         if not question_text or not answer_text:
             return jsonify({'error': 'Question and Answer are required'}), 400
 
-        # Call AI Service
-        evaluation_json_str = mimir_service.evaluate_answer(question_text, answer_text)
+        # Call AI Service (Returns Dict now)
+        evaluation_data = mimir_service.evaluate_answer(question_text, answer_text)
         
-        # Parse JSON (Handle Markdown formatting)
-        try:
-            clean_json_str = evaluation_json_str
-            if "```json" in clean_json_str:
-                clean_json_str = clean_json_str.split("```json")[1].split("```")[0].strip()
-            elif "```" in clean_json_str:
-                clean_json_str = clean_json_str.split("```")[1].split("```")[0].strip()
-                
-            evaluation_data = json.loads(clean_json_str)
-            score = evaluation_data.get('score', 0)
-        except Exception as e:
-            # Fallback if AI returns bad JSON
-            print(f"Failed to parse AI response: {evaluation_json_str} Error: {e}")
-            return jsonify({'error': 'Failed to generate valid evaluation', 'raw_response': evaluation_json_str}), 500
+        # Check if error fallback occurred
+        if isinstance(evaluation_data, str): # Should not happen with new fix, but safety first
+             evaluation_data = {"score": 0, "feedback": evaluation_data}
+
+        score = evaluation_data.get('score', 0)
 
         # Save to Database
         conn = get_db()

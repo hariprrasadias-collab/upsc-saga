@@ -74,12 +74,17 @@ Provide 2-4 most relevant mappings. Be specific and exam-focused.
         
         # Parse AI response
         response_text = response.text.strip()
-        if response_text.startswith('```json'):
-            response_text = response_text[7:]
-        if response_text.endswith('```'):
-            response_text = response_text[:-3]
+        if response_text.startswith("```"):
+            response_text = response_text.replace('```json', '').replace('```', '').strip()
+            
+        start = response_text.find('[')
+        end = response_text.rfind(']')
         
-        mappings = json.loads(response_text.strip())
+        if start != -1 and end != -1:
+             mappings = json.loads(response_text[start:end+1])
+        else:
+             mappings = []
+             print("IssueMapper: No JSON array found.")
         
         # Save mappings to database
         saved_mappings = []

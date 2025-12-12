@@ -187,15 +187,21 @@ class HephaestusService:
         """
         Extracts python code from markdown response.
         """
-        match = re.search(r'```python\n(.*?)```', text, re.DOTALL)
+        # Try generic code block matcher
+        # Matches ```(python/py|nothing)\n(CODE)\n``` in a robust way
+        match = re.search(r"```(?:python|py)?\s*\n(.*?)\n```", text, re.DOTALL | re.IGNORECASE)
         if match:
-            return match.group(1)
+             return match.group(1).strip()
+             
+        # Fallback: Just look for any fences
+        match = re.search(r"```(.*?)```", text, re.DOTALL)
+        if match:
+             return match.group(1).strip()
         
-        # Fallback: maybe just ```
-        match = re.search(r'```\n(.*?)```', text, re.DOTALL)
-        if match:
-            return match.group(1)
-            
+        # Super Fallback: If the entire response looks like code (no fences, just def/import)
+        if "def " in text or "import " in text:
+             return text.strip()
+
         return None
 
     def _apply_patch(self, file_path, new_code):

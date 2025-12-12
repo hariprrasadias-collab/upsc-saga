@@ -89,17 +89,22 @@ class SelfReviewService:
             text = response.text.strip()
             
             # Robust JSON Extraction
-            json_match = re.search(r"\{.*\}", text, re.DOTALL)
-            if json_match:
-                improvement_plan = json.loads(json_match.group(0))
+            text = text.strip()
+            if text.startswith("```"):
+                text = text.replace('```json', '').replace('```', '').strip()
+
+            start = text.find('{')
+            end = text.rfind('}')
+            
+            if start != -1 and end != -1:
+                 improvement_plan = json.loads(text[start:end+1])
             else:
                  # Check for Panic Mode / Fallback text
                  if "Oracle is silent" in text or "error" in text.lower():
                      print("ℹ️ Metrics available, but AI Reflection unavailable (Panic Mode). using default plan.")
                      improvement_plan = {"plan": ["Review metrics manually", "Check system logs", "Retry analysis later"]}
                  else:
-                     # Try to parse raw text if no braces found
-                     improvement_plan = json.loads(text)
+                     raise ValueError("No JSON found")
 
             # Basic validation
             if "plan" not in improvement_plan or not isinstance(improvement_plan["plan"], list):

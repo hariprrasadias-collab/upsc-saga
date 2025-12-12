@@ -89,7 +89,7 @@ def create_app():
     print("🦉 Registering Night Watchman Blueprint...")
     app.register_blueprint(watchman.watchman_bp, url_prefix='/night-watchman')
     
-    app.register_blueprint(mock_tests.mock_tests)
+    app.register_blueprint(mock_tests.mock_tests_bp)
     app.register_blueprint(pyq.bp)
     app.register_blueprint(syllabus.bp)
     app.register_blueprint(flashcards.flashcards)

@@ -81,8 +81,20 @@ class FlashcardService:
         
         try:
             response = model_manager.generate_content(prompt, model_type='fast')
-            text = response.text.replace('```json', '').replace('```', '').strip()
-            cards = json.loads(text)
+            text = response.text.strip()
+            
+            # Robust Extraction
+            if text.startswith("```"):
+                 text = text.replace('```json', '').replace('```', '').strip()
+
+            start = text.find('[')
+            end = text.rfind(']')
+            
+            if start != -1 and end != -1:
+                text = text[start:end+1]
+                cards = json.loads(text)
+            else:
+                raise Exception("No JSON array found in response")
             
             # Save to DB
             conn = get_db()

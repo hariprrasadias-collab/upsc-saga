@@ -79,12 +79,20 @@ Be constructive but honest. Focus on UPSC-specific requirements: multidimensiona
                  return self._get_default_evaluation(word_count, word_limit, "AI Busy")
 
             # Clean response - remove markdown code blocks if present
-            response_text = re.sub(r'```json\s*', '', response_text)
-            response_text = re.sub(r'```\s*', '', response_text)
             response_text = response_text.strip()
             
-            # Parse JSON
-            evaluation = json.loads(response_text)
+            # Robust Extraction
+            if response_text.startswith("```"):
+                 response_text = response_text.replace('```json', '').replace('```', '').strip()
+
+            start = response_text.find('{')
+            end = response_text.rfind('}')
+            
+            if start != -1 and end != -1:
+                response_text = response_text[start:end+1]
+                evaluation = json.loads(response_text)
+            else:
+                raise json.JSONDecodeError("No JSON object found", response_text, 0)
             
             # Validate and set defaults
             evaluation['overall_score'] = float(evaluation.get('overall_score', 5.0))

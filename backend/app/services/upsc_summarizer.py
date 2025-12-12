@@ -169,14 +169,21 @@ Return ONLY this JSON (no markdown, no explanation):
             return _simple_extraction(title, content)
             
         # Clean possible code fences
-        text = text.replace('```json', '').replace('```', '').strip()
+        text = text.strip()
+        if text.startswith("```"):
+            text = text.replace('```json', '').replace('```', '').strip()
+            
         start = text.find('{')
-        end = text.rfind('}') + 1
-        if start == -1 or end == 0:
+        end = text.rfind('}')
+        
+        if start != -1 and end != -1:
+            json_str = text[start : end + 1]
+            result = json.loads(json_str)
+        else:
             print(f"No JSON found in Gemini response for: {title}")
             return _simple_extraction(title, content)
-        json_str = text[start:end]
-        result = json.loads(json_str)
+            
+        # result = json.loads(json_str) # Removed duplicate Load
         # Detect generic fallback from Gemini (only GS2 & Current Affairs)
         if result.get('papers') == ['GS2'] and result.get('subjects') == ['Current Affairs']:
             print(f"Generic tags detected for {title}, applying keyword fallback")

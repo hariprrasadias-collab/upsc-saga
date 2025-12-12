@@ -91,21 +91,20 @@ def generate_debate_turn(topic, history, user_input=None):
     
     try:
         mod_response = model_manager.generate_content(moderator_prompt, model_type='pro')
-        text = mod_response.text.replace('```json', '').replace('```', '').strip()
-        
-        if "Oracle is silent" in text:
-             next_speaker_id = random.choice(list(AGENTS.keys()))
-             strategy = "Respond relevantly (Fallback)."
-        else:
-            start = text.find('{')
-            end = text.rfind('}')
-            if start != -1 and end != -1:
-                text = text[start:end+1]
+        # Robust Extraction
+        text = mod_response.text.strip()
+        if text.startswith("```"):
+             text = text.replace('```json', '').replace('```', '').strip()
 
+        start = text.find('{')
+        end = text.rfind('}')
+        if start != -1 and end != -1:
+            text = text[start:end+1]
             mod_data = json.loads(text)
-
             next_speaker_id = mod_data.get('next_speaker_id', 'skeptic')
             strategy = mod_data.get('strategy', 'Question the premise.')
+        else:
+             raise Exception("No JSON found")
 
         if next_speaker_id not in AGENTS:
             next_speaker_id = random.choice(list(AGENTS.keys()))
@@ -161,6 +160,10 @@ def generate_debate_turn(topic, history, user_input=None):
             }
 
         try:
+            # Robust Extraction
+            if text.startswith("```"):
+                text = text.replace("```json", "").replace("```", "").strip()
+
             start_idx = text.find('{')
             end_idx = text.rfind('}')
             
@@ -168,9 +171,10 @@ def generate_debate_turn(topic, history, user_input=None):
                 json_str = text[start_idx:end_idx+1]
                 result = json.loads(json_str)
             else:
-                result = {"text": text, "type": "ARGUMENT", "thought_process": "", "rhetorical_technique": "Direct Assertion", "detected_fallacies_in_prev_turn": []}
+                 # Fallback Structure
+                 result = {"text": text, "type": "ARGUMENT", "thought_process": "Raw Output", "rhetorical_technique": "Direct Assertion"}
         except json.JSONDecodeError:
-             result = {"text": text, "type": "ARGUMENT", "thought_process": "", "rhetorical_technique": "Direct Assertion", "detected_fallacies_in_prev_turn": []}
+             result = {"text": text, "type": "ARGUMENT", "thought_process": "Decode Error", "rhetorical_technique": "Direct Assertion"}
         
         return {
             "speakerId": next_speaker_id,
@@ -310,22 +314,31 @@ def generate_debate_verdict(topic, history):
 
     try:
         response = model_manager.generate_content(judge_prompt, model_type='pro')
-        text = response.text.replace('```json', '').replace('```', '').strip()
+        
+        # Robust JSON Extraction
+        text = response.text.strip()
+        if text.startswith("```"):
+            text = text.replace("```json", "").replace("```", "").strip()
 
-        if "Oracle is silent" in text:
+        # Try to find valid JSON object
+        try:
+            start = text.find('{')
+            end = text.rfind('}')
+            if start != -1 and end != -1:
+                json_str = text[start : end + 1]
+                return json.loads(json_str)
+            else:
+                raise json.JSONDecodeError("No brackets found", text, 0)
+        except json.JSONDecodeError as e:
+            print(f"Verdict JSON Decode Error: {e} | Text fragment: {text[:100]}")
+            # Fallback
             return {
-                "winner": "Undecided (System Busy)",
+                "winner": "Undecided (Parsing Error)",
                 "key_concepts": [],
-                "synthesis": "The debate was inconclusive due to high cognitive load.",
+                "synthesis": "The debate concluded, but the verdict could not be parsed.",
                 "best_quote": ""
             }
 
-        start = text.find('{')
-        end = text.rfind('}')
-        if start != -1 and end != -1:
-            text = text[start:end+1]
-
-        return json.loads(text)
     except Exception as e:
         print(f"Verdict Generation Error: {e}")
         return {

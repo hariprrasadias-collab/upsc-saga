@@ -223,10 +223,16 @@ class NightWatchman:
             import re
             
             text = response.text.strip()
+            
+            if text.startswith("```"):
+                text = text.replace('```json', '').replace('```', '').strip()
+                
             # Extract JSON
-            json_match = re.search(r"\{.*\}", text, re.DOTALL)
-            if json_match:
-                data = json.loads(json_match.group(0))
+            start = text.find('{')
+            end = text.rfind('}')
+            
+            if start != -1 and end != -1:
+                data = json.loads(text[start:end+1])
                 
                 # If flashcards are present, we could save them to the DB here
                 # For now, we just return them in the briefing

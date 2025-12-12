@@ -762,35 +762,103 @@ Your output must be structurally perfect, intellectually dense, and strictly com
             return
 
         # ... Existing Automation Logic (Legacy) ...
-        # (Keeping the original logic here would be redundant if we switch strictly to manual,
-        # but good for fallback if manual_mode=False)
         try:
-            # 1. Create Flashcards
-            self.execute_action("CREATE_FLASHCARDS", {"topic": topic, "count": 5, "reasoning": "Task Completion Automation"})
+            import concurrent.futures
+            from flask import current_app
+            
+            # Capture app context for worker threads
+            app = current_app._get_current_object()
+            
+            def run_action_safe(action, payload):
+                """Helper to run action in app context"""
+                try:
+                    with app.app_context():
+                        print(f"Brain: ⚡ Parallel Start -> {action}")
+                        self.execute_action(action, payload)
+                        print(f"Brain: ✅ Parallel Done -> {action}")
+                except Exception as e:
+                    print(f"Brain: ❌ Parallel Action {action} Failed: {e}")
 
-            # ... [Rest of original process_task_completion logic omitted for brevity as manual_mode is True] ...
-            # To ensure cleanliness, I will allow the rest of the original function to exist if manual_mode is False.
-            # But since I am overwriting the file, I must include it or remove it.
-            # I will include it to preserve functionality if manual_mode is toggled off.
+            # Define all actions to run
+            actions = [
+                ("CREATE_FLASHCARDS", {"topic": topic, "count": 5, "reasoning": "Task Completion Automation"}),
+                ("CREATE_MOCK_TEST", {"topic": topic, "count": 10, "reasoning": "Task Completion Automation"}),
+                ("PREDICT_QUESTIONS", {"topic": topic, "subject": subject, "timeframe_days": 30}),
+                ("GENERATE_TOPIC_LINKAGES", {"topic": topic, "subject": subject}),
+                ("GENERATE_PODCAST_SCRIPT", {"topic": topic, "style": "humorous"}),
+                ("GENERATE_SOCRATIC_DIALOGUE", {"topic": topic, "subject": subject})
+            ]
 
-            # 2. Daily Mock Test (If applicable)
-            self.execute_action("GENERATE_MOCK_TEST", {"topic": topic, "count": 10, "reasoning": "Task Completion Automation"})
+            print(f"Brain: 🚀 Launching {len(actions)} parallel automation tasks for {topic}")
+            
+            def run_action_safe(action, payload):
+                """Helper to run action in app context and SAVE RESULTS"""
+                try:
+                    with app.app_context():
+                        from app.db import get_db
+                        conn = get_db()
+                        
+                        print(f"Brain: ⚡ Parallel Start -> {action}")
+                        result = self.execute_action(action, payload)
+                        
+                        # PERSISTENCE LOGIC
+                        if result and result.get('success'):
+                            if action == "PREDICT_QUESTIONS":
+                                # Save Predictions
+                                data = result.get('data', [])
+                                if data:
+                                    print(f"Brain: Saving {len(data)} predictions...")
+                                    for p in data:
+                                        conn.execute('INSERT INTO foresight_predictions (topic, question, type, probability, reasoning) VALUES (?, ?, ?, ?, ?)',
+                                                    (topic, p.get('question'), p.get('type'), p.get('probability'), p.get('reasoning')))
+                                    conn.commit()
+                            
+                            elif action == "GENERATE_SOCRATIC_DIALOGUE":
+                                # Save Dialogue
+                                dialogue = result.get('dialogue')
+                                verdict = result.get('verdict')
+                                if dialogue:
+                                    print(f"Brain: Saving Socratic Dialogue...")
+                                    cursor = conn.execute('INSERT INTO socratic_conversations (topic, user_id, dialogue, insight) VALUES (?, ?, ?, ?)',
+                                                (topic, 1, dialogue, json.dumps(verdict)))
+                                    # Create notification
+                                    conn.execute('INSERT INTO notifications (user_id, title, message, type) VALUES (?, ?, ?, ?)',
+                                                (1, "New Socratic Debate", f"A debate on {topic} is ready.", "debate"))
+                                    conn.commit()
 
-            # 3. Foresight (Predictions)
-            self.execute_action("PREDICT_QUESTIONS", {"topic": topic, "subject": subject, "timeframe_days": 30})
+                            elif action == "GENERATE_TOPIC_LINKAGES":
+                                # Save Linkages (Neural Hash)
+                                linkages_data = result.get('data') # It returns {'success': True, 'data': {...}}
+                                if linkages_data:
+                                    print(f"Brain: Saving Neural Linkages...")
+                                    # We need to extract fields safely
+                                    core_themes = json.dumps(linkages_data.get('core_themes', []))
+                                    examiner_pattern = linkages_data.get('examiner_pattern', '')
+                                    cross_linkages = json.dumps(linkages_data.get('cross_linkages', []))
+                                    
+                                    conn.execute('INSERT INTO neural_hashes (topic, core_themes, examiner_pattern, cross_linkages) VALUES (?, ?, ?, ?)',
+                                                (topic, core_themes, examiner_pattern, cross_linkages))
+                                    conn.commit()
 
-            # 4. Neural Network (Linkages)
-            self.execute_action("FIND_LINKAGES", {"topic": topic, "subject": subject})
+                            elif action == "GENERATE_PODCAST_SCRIPT":
+                                # Save Podcast Script
+                                script = result.get('script')
+                                if script:
+                                    print(f"Brain: Saving Podcast Script...")
+                                    conn.execute('INSERT INTO ai_generated_content (content_type, topic, content, metadata) VALUES (?, ?, ?, ?)',
+                                                ('podcast', topic, script, json.dumps({'style': payload.get('style')})))
+                                    conn.commit()
 
-            # 5. Podcast Generation (Gamification)
-            self.execute_action("GENERATE_PODCAST", {"topic": topic, "style": "humorous"})
+                        print(f"Brain: ✅ Parallel Done & Saved -> {action}")
+                except Exception as e:
+                    print(f"Brain: ❌ Parallel Action {action} Failed: {e}")
 
-            # 6. Socratic Dialogue (Deep Learning)
-            self.execute_action("SOCRATIC_DEBATE", {"topic": topic, "subject": subject})
-                 # Given the file overwrite, I am effectively disabling the old logic unless I copy-paste it all back.
-                 # The user explicitly asked to "stop the api call", so removing the old logic is compliant.
-                 # However, I should check if they want to revert later.
-                 # For now, I'll stick to the new Manual Mode.
+            # Execute in parallel
+            with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
+                futures = [executor.submit(run_action_safe, action, payload) for action, payload in actions]
+                concurrent.futures.wait(futures)
+                
+            print(f"Brain: 🏁 All parallel tasks completed for {topic}")
 
         except Exception as e:
             print(f"Brain: Task Completion Automation Failed: {e}")
@@ -1335,10 +1403,18 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     """
                     # Creative writing needs Pro
                     response = model_manager.generate_content(prompt, model_type='pro')
+                    text = response.text.strip()
+                    if text.startswith("```"):
+                        text = text.replace("```json", "").replace("```", "").strip() # Remove main fences if any
+                    
+                    # Remove common chat prefixes
+                    if text.lower().startswith("here is a"): 
+                        text = text.split("\n", 1)[-1].strip()
+
                     result = {
                         "success": True,
                         "message": "Podcast Script Generated.",
-                        "script": response.text
+                        "script": text
                     }
                 except Exception as e:
                     result = {"success": False, "message": f"Podcast Gen Failed: {str(e)}"}
@@ -1771,16 +1847,18 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 return {"error": "Quota Exceeded", "is_fallback": True}
 
             # 1. Try to find JSON code block
-            import re
-            json_match = re.search(r"```json\s*(.*?)\s*```", text, re.DOTALL)
-            if json_match:
-                text = json_match.group(1)
+            # 1. Robust JSON Scanner
+            if text.startswith("```"):
+                text = text.replace('```json', '').replace('```', '').strip()
+
+            start = text.find('{')
+            end = text.rfind('}')
+            
+            if start != -1 and end != -1:
+                text = text[start:end+1]
             else:
-                # 2. If no code block, try to find the first '{' and last '}'
-                start = text.find('{')
-                end = text.rfind('}')
-                if start != -1 and end != -1:
-                    text = text[start:end+1]
+                 # Fallback for strict regex if scanner fails (unlikely but safe)
+                 pass 
             
             return json.loads(text)
         except (json.JSONDecodeError, Exception) as e:

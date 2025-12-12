@@ -37,6 +37,8 @@ class PanopticonService:
             return response.text.strip()
         except:
             return f"Correlation between {metric} and {perf} is {r:.2f}."
+
+    def get_db_connection(self):
         conn = sqlite3.connect(current_app.config['DATABASE'])
         conn.row_factory = sqlite3.Row
         return conn
