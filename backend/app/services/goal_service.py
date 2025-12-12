@@ -71,3 +71,40 @@ class GoalService:
                     # Mark as failed? Or just overdue?
                     
         return alerts
+
+    @staticmethod
+    def break_down_goal(goal_text):
+        """
+        Uses AI to deconstruct a vague goal into a SMART checklist.
+        """
+        from app.services.model_manager import model_manager
+
+        if not model_manager.is_configured:
+            return {"error": "AI Offline"}
+
+        prompt = f"""
+        # MISSION: GOAL DECONSTRUCTION (SMARTIFY)
+        **Input Goal:** "{goal_text}"
+
+        **DIRECTIVE:**
+        Break this down into a 4-week execution plan for a UPSC aspirant.
+
+        **OUTPUT SCHEMA (JSON):**
+        {{
+            "refined_title": "Specific SMART Goal Title",
+            "milestones": [
+                {{ "week": 1, "task": "..." }},
+                {{ "week": 2, "task": "..." }},
+                {{ "week": 3, "task": "..." }},
+                {{ "week": 4, "task": "..." }}
+            ]
+        }}
+        """
+
+        try:
+            response = model_manager.generate_content(prompt, model_type='pro')
+            import json
+            text = response.text.strip().replace('```json', '').replace('```', '')
+            return json.loads(text)
+        except Exception as e:
+            return {"error": str(e)}
