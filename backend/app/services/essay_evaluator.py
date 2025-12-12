@@ -17,37 +17,43 @@ class EssayEvaluator:
         Returns a JSON object with score, strengths, weaknesses, and model structure.
         """
         prompt = f"""
-        You are an expert UPSC Civil Services Exam evaluator. Evaluate the following essay based on official UPSC criteria:
-        1. Relevance to the topic
-        2. Coherence and flow
-        3. Critical thinking and multi-dimensional analysis
-        4. Effective use of examples/facts
-        5. Structure (Intro, Body, Conclusion)
+        # MISSION: UPSC ESSAY EVALUATION (CHIEF EXAMINER MODE)
+        **Role:** Retired UPSC Chairperson & Lead Essay Evaluator.
+        **Standards:** Strict adherence to UPSC rubric (Relevance, Coherence, Critical Analysis, Concise Expression).
 
-        Topic: "{topic}"
+        **Topic:** "{topic}"
         
-        Essay Content:
+        **CANDIDATE ESSAY:**
         "{content}"
 
-        Provide your evaluation in the following STRICT JSON format:
+        **DIRECTIVE:**
+        1. **Ruthless Scoring:** Don't be generous. Average is 100-125. 140+ is exceptional.
+        2. **Dimensional Check:** Did they cover PESTLE (Political, Economic, Social, Tech, Legal, Env)?
+        3. **Thesis Tracking:** Did the intro promise a thesis that the conclusion delivered?
+        4. **Micro-Editing:** Quote specific bad sentences and rewrite them.
+
+        **OUTPUT SCHEMA (JSON ONLY):**
         {{
-            "score": <integer_between_0_and_250>,
-            "strengths": ["point 1", "point 2", ...],
-            "weaknesses": ["point 1", "point 2", ...],
-            "suggestions": ["suggestion 1", "suggestion 2", ...],
+            "score": <integer_0_to_250>,
+            "strengths": ["Specific point 1", "Specific point 2"],
+            "weaknesses": ["Specific point 1", "Specific point 2"],
+            "suggestions": ["Actionable advice 1", "Actionable advice 2"],
+            "micro_edits": [
+                {{ "original": "Bad sentence...", "improved": "Better sentence..." }}
+            ],
+            "dimensions_covered": ["Polity", "Economy", "Ethics"],
+            "dimensions_missed": ["International Relations", "Technology"],
             "model_structure": {{
-                "introduction": "Brief description of an ideal intro",
-                "body_paragraphs": ["Key argument 1", "Key argument 2", "Key argument 3"],
-                "conclusion": "Brief description of an ideal conclusion"
+                "introduction": "How the perfect intro would hook the reader.",
+                "body_flow": ["Theme 1", "Theme 2", "Theme 3"],
+                "conclusion": "The philosophical ending."
             }},
-            "overall_feedback": "A short summary paragraph."
+            "overall_feedback": "The final verdict."
         }}
-        
-        Do not include markdown formatting (```json). Just return the raw JSON string.
         """
 
         try:
-            # Use Pro model for essays (1250 words)
+            # Use Pro model for essays (1250 words) - Essential for large context analysis
             response = model_manager.generate_content(prompt, model_type='pro')
             response_text = response.text.strip()
             

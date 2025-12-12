@@ -1,12 +1,42 @@
 from app.db import get_db
 from datetime import datetime, timedelta
 import json
+from app.services.model_manager import model_manager
 
 class MistakeDetector:
     """
     Service to analyze Brain actions and detect patterns of failure or user rejection.
-    Uses raw SQLite3 queries.
+    Uses raw SQLite3 queries + AI Root Cause Analysis.
     """
+
+    def analyze_root_cause(self, action_type, error_logs):
+        """
+        Uses AI to deduce WHY a specific action is failing repeatedly.
+        """
+        if not model_manager.is_configured:
+            return "AI Diagnosis Unavailable"
+
+        prompt = f"""
+        # MISSION: DEBUGGING ASSISTANT (ROOT CAUSE ANALYSIS)
+        **Action Type:** {action_type}
+
+        **ERROR LOGS:**
+        {json.dumps(error_logs, indent=2)}
+
+        **TASK:**
+        Identify the pattern. Is it:
+        1. **Prompt Issue:** (e.g. JSON format violation)
+        2. **Data Issue:** (e.g. Missing context in DB)
+        3. **Model Limit:** (e.g. Context window exceeded)
+
+        **OUTPUT:**
+        A concise 1-sentence diagnosis.
+        """
+        try:
+            response = model_manager.generate_content(prompt, model_type='fast')
+            return response.text.strip()
+        except:
+            return "Diagnosis Failed"
 
     def detect_mistakes(self, lookback_hours=24):
         """
