@@ -64,15 +64,18 @@ class RavensService:
         "{article_content[:15000]}..."
 
         **DIRECTIVE:**
-        You are the UNIVERSAL WEAVER. Transmute this text into an Omega Tier study module.
+        You are "THE TIME-SPACE ORACLE". Map this news across dimensions.
 
-        **ARCHITECTURAL DIRECTIVES:**
-        1. **Deep Analysis:** STEEPLE Framework.
-        2. **Facts:** Prelims Armory (Data/Reports).
-        3. **Visuals:** Mermaid.js Mindmap & Data Viz (Chart).
-        4. **Audio:** Podcast Script (Host/Expert).
-        5. **Simulation:** Interview Questions & Ethics Scenario.
-        6. **Chronology:** Timeline of events.
+        **DIMENSIONS:**
+        1. **Core:** STEEPLE, Facts, Maps, Quiz.
+        2. **Visuals:** Mindmap, Charts, Timeline.
+        3. **Simulation:** Podcast, Interview, Ethics.
+        4. **Omni-Existence:**
+           - *Future Scenarios* (Best/Worst/Realist).
+           - *History* (Past parallels).
+           - *Geography* (Locations).
+           - *Philosophy* (Socratic Debate).
+           - *Memory* (Mnemonics).
 
         **OUTPUT SCHEMA (JSON):**
         {{
@@ -81,18 +84,23 @@ class RavensService:
             "prelims_facts": ["Fact 1", "Fact 2"],
             "mains_arguments": {{ "pros": ["..."], "cons": ["..."], "way_forward": ["..."] }},
             "keywords": ["K1", "K2"],
-            "summary": "Deep summary (200 words)...",
-            "steeple_analysis": {{ "social": "...", "economic": "..." }},
-            "inter_linkages": ["GS2: ...", "GS3: ..."],
+            "summary": "Deep summary...",
+            "steeple_analysis": {{ "social": "..." }},
+            "inter_linkages": ["GS2: ..."],
             "mind_map": "graph TD; ...",
             "quiz": [ {{ "question": "...", "options": [], "answer": "...", "explanation": "..." }} ],
             "answer_framework": {{ "intro": "...", "body_points": [], "conclusion": "..." }},
             "essay_fodder": {{ "quote": "...", "statistic": "..." }},
-            "timeline": [ {{ "date": "...", "event": "..." }} ],
-            "data_visualization": {{ "type": "bar", "data": [] }},
-            "podcast_script": "Host: ... Expert: ...",
-            "interview_questions": [ {{ "question": "...", "context": "..." }} ],
-            "simulation_scenario": {{ "scenario": "...", "options": [] }}
+            "timeline": [],
+            "data_visualization": {{}},
+            "podcast_script": "...",
+            "interview_questions": [],
+            "simulation_scenario": {{}},
+            "future_scenarios": {{ "best_case": "...", "worst_case": "...", "realist_case": "..." }},
+            "historical_analogies": [{{ "event": "...", "year": "...", "parallel": "..." }}],
+            "locations": [{{ "name": "...", "lat": 0.0, "lng": 0.0, "context": "..." }}],
+            "socratic_clash": [{{ "speaker": "...", "text": "..." }}],
+            "mnemonics": [{{ "phrase": "...", "context": "..." }}]
         }}
         """
         try:

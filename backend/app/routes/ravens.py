@@ -105,7 +105,13 @@ def run_background_fetch(app):
                             'data_visualization': ai_result.get('data_visualization', {}),
                             'podcast_script': ai_result.get('podcast_script', ''),
                             'interview_questions': ai_result.get('interview_questions', []),
-                            'simulation_scenario': ai_result.get('simulation_scenario', {})
+                            'simulation_scenario': ai_result.get('simulation_scenario', {}),
+                            # Omniverse Mode Metadata
+                            'future_scenarios': ai_result.get('future_scenarios', {}),
+                            'historical_analogies': ai_result.get('historical_analogies', []),
+                            'locations': ai_result.get('locations', []),
+                            'socratic_clash': ai_result.get('socratic_clash', []),
+                            'mnemonics': ai_result.get('mnemonics', [])
                         }
                         
                         save_article(article_data)
@@ -237,7 +243,13 @@ def process_article():
             'data_visualization': ai_result.get('data_visualization', {}),
             'podcast_script': ai_result.get('podcast_script', ''),
             'interview_questions': ai_result.get('interview_questions', []),
-            'simulation_scenario': ai_result.get('simulation_scenario', {})
+            'simulation_scenario': ai_result.get('simulation_scenario', {}),
+            # Omniverse Mode Metadata
+            'future_scenarios': ai_result.get('future_scenarios', {}),
+            'historical_analogies': ai_result.get('historical_analogies', []),
+            'locations': ai_result.get('locations', []),
+            'socratic_clash': ai_result.get('socratic_clash', []),
+            'mnemonics': ai_result.get('mnemonics', [])
         }
         
         # Save or Update
@@ -267,7 +279,12 @@ def process_article():
                 'dataVisualization': ai_result.get('data_visualization', {}),
                 'podcastScript': ai_result.get('podcast_script', ''),
                 'interviewQuestions': ai_result.get('interview_questions', []),
-                'simulationScenario': ai_result.get('simulation_scenario', {})
+                'simulationScenario': ai_result.get('simulation_scenario', {}),
+                'futureScenarios': ai_result.get('future_scenarios', {}),
+                'historicalAnalogies': ai_result.get('historical_analogies', []),
+                'locations': ai_result.get('locations', []),
+                'socraticClash': ai_result.get('socratic_clash', []),
+                'mnemonics': ai_result.get('mnemonics', [])
             }
         })
         

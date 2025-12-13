@@ -41,7 +41,12 @@ def init_current_affairs_table():
             data_visualization TEXT,
             podcast_script TEXT,
             interview_questions TEXT,
-            simulation_scenario TEXT
+            simulation_scenario TEXT,
+            future_scenarios TEXT,
+            historical_analogies TEXT,
+            locations TEXT,
+            socratic_clash TEXT,
+            mnemonics TEXT
         )
     ''')
 
@@ -104,6 +109,28 @@ def init_current_affairs_table():
     except sqlite3.OperationalError:
         pass
 
+    # Omniverse Mode Metadata v4
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN future_scenarios TEXT')
+    except sqlite3.OperationalError:
+        pass
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN historical_analogies TEXT')
+    except sqlite3.OperationalError:
+        pass
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN locations TEXT')
+    except sqlite3.OperationalError:
+        pass
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN socratic_clash TEXT')
+    except sqlite3.OperationalError:
+        pass
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN mnemonics TEXT')
+    except sqlite3.OperationalError:
+        pass
+
     conn.commit()
 
 def article_exists(link):
@@ -123,8 +150,9 @@ def save_article(article_data):
                 papers, subjects, importance, image_url, related_pyqs,
                 prelims_pointers, mains_dimensions, steeple_analysis, inter_linkages,
                 mind_map, quiz, answer_framework, essay_fodder,
-                timeline, data_visualization, podcast_script, interview_questions, simulation_scenario
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                timeline, data_visualization, podcast_script, interview_questions, simulation_scenario,
+                future_scenarios, historical_analogies, locations, socratic_clash, mnemonics
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             article_data['title'],
             article_data['link'],
@@ -150,7 +178,12 @@ def save_article(article_data):
             json.dumps(article_data.get('data_visualization', {})),
             article_data.get('podcast_script', ''),
             json.dumps(article_data.get('interview_questions', [])),
-            json.dumps(article_data.get('simulation_scenario', {}))
+            json.dumps(article_data.get('simulation_scenario', {})),
+            json.dumps(article_data.get('future_scenarios', {})),
+            json.dumps(article_data.get('historical_analogies', [])),
+            json.dumps(article_data.get('locations', [])),
+            json.dumps(article_data.get('socratic_clash', [])),
+            json.dumps(article_data.get('mnemonics', []))
         ))
         conn.commit()
         return cursor.lastrowid
@@ -223,7 +256,13 @@ def get_saved_articles(filters=None):
             'dataVisualization': json.loads(row['data_visualization'] or '{}') if 'data_visualization' in row.keys() else {},
             'podcastScript': row['podcast_script'] if 'podcast_script' in row.keys() else '',
             'interviewQuestions': json.loads(row['interview_questions'] or '[]') if 'interview_questions' in row.keys() else [],
-            'simulationScenario': json.loads(row['simulation_scenario'] or '{}') if 'simulation_scenario' in row.keys() else {}
+            'simulationScenario': json.loads(row['simulation_scenario'] or '{}') if 'simulation_scenario' in row.keys() else {},
+            # Omniverse Mode fields
+            'futureScenarios': json.loads(row['future_scenarios'] or '{}') if 'future_scenarios' in row.keys() else {},
+            'historicalAnalogies': json.loads(row['historical_analogies'] or '[]') if 'historical_analogies' in row.keys() else [],
+            'locations': json.loads(row['locations'] or '[]') if 'locations' in row.keys() else [],
+            'socraticClash': json.loads(row['socratic_clash'] or '[]') if 'socratic_clash' in row.keys() else [],
+            'mnemonics': json.loads(row['mnemonics'] or '[]') if 'mnemonics' in row.keys() else []
         })
     
     return articles
@@ -317,6 +356,11 @@ def update_article_content_by_link(link, article_data):
             podcast_script = ?,
             interview_questions = ?,
             simulation_scenario = ?,
+            future_scenarios = ?,
+            historical_analogies = ?,
+            locations = ?,
+            socratic_clash = ?,
+            mnemonics = ?,
             fetch_date = CURRENT_TIMESTAMP
         WHERE original_link = ?
     ''', (
@@ -340,6 +384,11 @@ def update_article_content_by_link(link, article_data):
         article_data.get('podcast_script', ''),
         json.dumps(article_data.get('interview_questions', [])),
         json.dumps(article_data.get('simulation_scenario', {})),
+        json.dumps(article_data.get('future_scenarios', {})),
+        json.dumps(article_data.get('historical_analogies', [])),
+        json.dumps(article_data.get('locations', [])),
+        json.dumps(article_data.get('socratic_clash', [])),
+        json.dumps(article_data.get('mnemonics', [])),
         link
     ))
     conn.commit()
