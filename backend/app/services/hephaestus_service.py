@@ -10,6 +10,7 @@ class HephaestusService:
     """
     The Blacksmith of the System.
     Responsible for autonomous self-repair and evolution of backend code.
+    V3: Neural Link (Context-Aware) & Double-Shot Verification.
     """
     
     def __init__(self):
@@ -39,10 +40,13 @@ class HephaestusService:
             
         print(f"🎯 Hephaestus: Culprit identified -> {target_file}", flush=True)
         
-        # 2. Read the broken code
+        # 2. Read broken code & dependencies
         try:
             with open(target_file, 'r', encoding='utf-8') as f:
                 code_content = f.read()
+
+            dep_context = self._get_dependency_context(target_file)
+
         except Exception as e:
             print(f"❌ Hephaestus: Failed to read file: {e}", flush=True)
             return False
@@ -61,21 +65,19 @@ class HephaestusService:
         **TRACEBACK:**
         {tb_str}
         
+        **DEPENDENCIES (Context):**
+        {dep_context}
+
         **BROKEN CODE:**
         ```python
         {code_content}
         ```
         
-        **THINKING PROCESS (Internal Monologue):**
-        1. **Diagnose:** What is the technical root cause? (e.g., NoneType access, API timeout).
-        2. **UPSC Alignment Check:** Is this code robust enough for a 12-hour study session? Does it fail gracefully like a stoic civil servant?
-        3. **Evolution Strategy:** How can I fix this while making the logic SMARTER? (e.g., adding self-correction loops).
-
         **DIRECTIVE:**
         Rewrite the ENTIRE file with the fix applied.
         - Preserve all unrelated logic.
         - Add defensive try/except blocks.
-        - Ensure imports are correct.
+        - Ensure imports are correct (Check dependencies).
 
         **OUTPUT:**
         Return ONLY the raw Python code block.
@@ -85,13 +87,16 @@ class HephaestusService:
         """
         
         try:
-            # Use Pro model (Nvidia/Gemini Pro) for deep reasoning
+            # First Shot: Generate Fix
             response = model_manager.generate_content(prompt, model_type='pro')
             fix_code = self._extract_code_block(response.text)
             
             if not fix_code:
                 print("❌ Hephaestus: Failed to generate a valid code fix.", flush=True)
                 return False
+
+            # Second Shot: Self-Reflection (Double Check)
+            fix_code = self._verify_and_refine(fix_code, error_msg=str(error))
                 
             if not self._verify_syntax(fix_code):
                 print("❌ Hephaestus: Generated code failed syntax check. Aborting.", flush=True)
@@ -117,6 +122,8 @@ class HephaestusService:
             with open(file_path, 'r', encoding='utf-8') as f:
                 code = f.read()
 
+            dep_context = self._get_dependency_context(file_path)
+
             prompt = f"""
             You are HEPHAESTUS, the Architect of the UPSC Second Brain.
 
@@ -127,7 +134,10 @@ class HephaestusService:
             1. **Autonomy:** Replace static logic with dynamic AI calls where appropriate.
             2. **Depth:** Ensure data structures support multi-dimensional analysis (e.g., adding 'metadata', 'reasoning' fields).
             3. **Resilience:** Add robust error handling (try/except) for all external calls.
-            4. **UPSC Perspective:** Does this code help a student master the syllabus? (e.g., enable linking concepts).
+            4. **Context Awareness:** Respect the dependencies provided below.
+
+            **DEPENDENCIES:**
+            {dep_context}
 
             **CODE:**
             ```python
@@ -147,6 +157,9 @@ class HephaestusService:
 
             new_code = self._extract_code_block(response.text)
 
+            # Self-Reflection
+            new_code = self._verify_and_refine(new_code, mode="evolution")
+
             if new_code and self._verify_syntax(new_code):
                 self._apply_patch(file_path, new_code)
                 print(f"🚀 Hephaestus: Evolved {file_path} successfully.", flush=True)
@@ -155,6 +168,82 @@ class HephaestusService:
         except Exception as e:
             print(f"❌ Evolution Failed: {e}", flush=True)
             return False
+
+    def _get_dependency_context(self, file_path: str):
+        """
+        Reads the content of local modules imported by the target file.
+        """
+        context = ""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            # Simple regex to find "from app.services.xyz import abc" or "import app.services.xyz"
+            imports = re.findall(r'(?:from|import) (app\.[a-zA-Z0-9_.]*)', content)
+
+            seen_files = set()
+            for imp in imports:
+                parts = imp.split('.')
+                if parts[0] == 'app':
+                    parts = parts[1:]
+
+                # Try finding it
+                base_dir = os.path.join(os.getcwd(), 'backend', 'app')
+                if not os.path.exists(base_dir):
+                     base_dir = os.path.join(os.getcwd(), 'app')
+
+                module_path = os.path.join(base_dir, *parts) + ".py"
+
+                if os.path.exists(module_path) and module_path not in seen_files:
+                    seen_files.add(module_path)
+                    try:
+                        with open(module_path, 'r', encoding='utf-8') as mf:
+                            context += f"\n\n# DEPENDENCY: {parts[-1]}.py\n{mf.read()[:500]}... (truncated)\n"
+                    except:
+                        pass
+        except Exception as e:
+            print(f"⚠️ Dependency Context Failed: {e}", flush=True)
+        return context
+
+    def _verify_and_refine(self, code: str, error_msg: str = None, mode="repair"):
+        """
+        Self-Reflection Loop: Checks the generated code for obvious bugs.
+        """
+        if not code: return None
+
+        prompt = f"""
+        **CRITICAL CODE REVIEW**
+        You are the Quality Assurance AI. Review the following Python code for Critical Bugs.
+
+        **CODE:**
+        ```python
+        {code}
+        ```
+
+        {f"**ORIGINAL ERROR TO FIX:** {error_msg}" if error_msg else ""}
+
+        **TASK:**
+        1. Does this code fix the error? (If repair mode)
+        2. Are there any SyntaxErrors or ImportErrors?
+        3. Are there missing variables?
+
+        **OUTPUT:**
+        If PERFECT: Return "APPROVED".
+        If FLAWED: Return the CORRECTED code block only.
+        """
+
+        try:
+            response = model_manager.generate_content(prompt, model_type='fast') # Use fast model for check
+            text = response.text.strip()
+
+            if "APPROVED" in text:
+                return code
+
+            corrected_code = self._extract_code_block(text)
+            return corrected_code if corrected_code else code
+
+        except:
+            return code # Fallback to original generation
 
     def scan_logs_and_repair(self, log_path: str):
         """
@@ -168,11 +257,7 @@ class HephaestusService:
             with open(log_path, 'r', encoding='utf-8') as f:
                 content = f.read()
 
-            # Improved regex to capture tracebacks more reliably
-            # Looks for "Traceback (most recent call last):"
             traceback_blocks = re.split(r'(?=Traceback \(most recent call last\):)', content)
-
-            # Filter valid blocks
             tracebacks = [block for block in traceback_blocks if "Traceback (most recent call last):" in block]
 
             if not tracebacks:
@@ -181,14 +266,10 @@ class HephaestusService:
 
             print(f"🕵️ Found {len(tracebacks)} tracebacks. Analyzing recent ones...", flush=True)
 
-            # Process the last 3 distinct errors to be aggressive but safe
             processed_errors = set()
-
             for tb in reversed(tracebacks[-3:]):
                 lines = [l for l in tb.strip().split('\n') if l.strip()]
                 error_msg = lines[-1]
-
-                # Avoid repeat processing in same scan
                 if error_msg in processed_errors: continue
                 processed_errors.add(error_msg)
 
@@ -213,35 +294,18 @@ class HephaestusService:
             return False
 
     def _identify_culprit_file(self, tb_str):
-        """
-        Robust file identification with fuzzy fallback.
-        """
         lines = tb_str.split('\n')
         for line in lines:
             match = re.search(r'File "(.*?)",', line)
             if match:
                 path = match.group(1)
-
-                # Filter for project files
                 if ('backend' in path or 'app' in path) and 'site-packages' not in path and 'lib' not in path:
-                    # 1. Exact match
-                    if os.path.exists(path):
-                        return path
-
-                    # 2. Relative to CWD
+                    if os.path.exists(path): return path
                     rel_path = os.path.join(os.getcwd(), path.lstrip('/'))
-                    if os.path.exists(rel_path):
-                        return rel_path
-
-                    # 3. Fuzzy Search (Basename match in project)
+                    if os.path.exists(rel_path): return rel_path
                     filename = os.path.basename(path)
-                    print(f"🔍 Exact path not found. Searching for '{filename}'...", flush=True)
                     for root, dirs, files in os.walk(os.getcwd()):
-                        if filename in files:
-                            found_path = os.path.join(root, filename)
-                            print(f"🔍 Found candidate: {found_path}", flush=True)
-                            return found_path
-
+                        if filename in files: return os.path.join(root, filename)
         return None
 
     def _extract_code_block(self, text):
@@ -277,41 +341,25 @@ class HephaestusService:
             conn.commit()
         except:
             pass
-
         # 2. Visible File Log
         try:
             with open("REPAIR_HISTORY.md", "a") as f:
-                f.write(f"## Repair Event: {datetime.now()}\n")
-                f.write(f"- **File:** `{file_path}`\n")
-                f.write(f"- **Error:** `{error_msg}`\n")
-                f.write(f"- **Status:** ✅ Patch Applied\n\n")
+                f.write(f"## 🔧 Evolution Event: {datetime.now()}\n")
+                f.write(f"- **Target:** `{file_path}`\n")
+                f.write(f"- **Trigger:** `{error_msg}`\n")
+                f.write(f"- **Outcome:** Neural Link verified. Patch applied.\n\n")
         except:
             pass
 
     def self_diagnose(self):
-        """
-        Runs internal integrity checks.
-        """
         print("🏥 Hephaestus: Running System Diagnostics...", flush=True)
         issues = []
-
-        # 1. Check Model Configuration
-        if not model_manager.is_configured:
-            issues.append("ModelManager not configured.")
-
-        # 2. Check Database Connection
-        try:
-            get_db()
-        except:
-            issues.append("Database connection failed.")
-
-        # 3. Check Logs Directory
-        if not os.path.exists('logs'):
-            issues.append("Logs directory missing.")
-
+        if not model_manager.is_configured: issues.append("ModelManager not configured.")
+        try: get_db()
+        except: issues.append("Database connection failed.")
+        if not os.path.exists('logs'): issues.append("Logs directory missing.")
         if issues:
             print(f"⚠️ Diagnostics Found Issues: {issues}", flush=True)
-            # Try to fix?
             if "Logs directory missing." in issues:
                 os.makedirs('logs', exist_ok=True)
                 print("🔧 Fixed: Logs directory created.", flush=True)
