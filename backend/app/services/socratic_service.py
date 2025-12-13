@@ -300,7 +300,9 @@ def generate_debate_verdict(topic, history):
     4. Select the "Best Quote".
     5. Identify 1-2 "Mental Models" or "Frameworks" used.
 
-    Return strictly valid JSON. Do not use Markdown code blocks.
+    Return strictly valid JSON. 
+    IMPORTANT: Escape all double quotes within strings (e.g. "John's" -> "John\\'s").
+    Do not use Markdown code blocks.
     Structure:
     {{
         "winner": "Name of Agent",
@@ -339,18 +341,38 @@ def generate_debate_verdict(topic, history):
                 return json.loads(json_str)
             except json.JSONDecodeError as e:
                 print(f"JSON Decode Error: {e} | Content: {json_str[:50]}...")
-                # Fallback: Try strict=False (allows control chars)
+                
+                # ATTEMPT REPAIR
                 try:
-                    return json.loads(json_str, strict=False)
-                except:
+                    # 1. Fix unescaped quotes in strings? (Risky but common for "John's")
+                    # Naive: Replace "s with 's where it might be a contraction
                     pass
+                except: pass
+
+                # Fallback: Recover partial data manually if JSON fails
+                # If "winner" exists, try to grab it via regex
+                import re
+                winner_match = re.search(r'"winner"\s*:\s*"([^"]+)"', json_str)
+                synthesis_match = re.search(r'"synthesis"\s*:\s*"((?:[^"\\]|\\.)*)"', json_str)
+                
+                winner = winner_match.group(1) if winner_match else "Undecided (Parsing Error)"
+                synthesis = synthesis_match.group(1) if synthesis_match else response.text
+
+                # Construct a valid object from partial success
+                return {
+                    "winner": winner,
+                    "key_concepts": ["Debate Analysis"], # Hard to regex list safely
+                    "synthesis": synthesis,
+                    "best_quote": "N/A",
+                    "mental_models": []
+                }
         
         # Fallback if parsing completely fails
         print(f"Verdict Parsing Failed. Raw Text: {text[:100]}...")
         return {
             "winner": "Undecided (Parsing Error)",
             "key_concepts": ["Debate Analysis"],
-            "synthesis": response.text, # Use raw text as synthesis
+            "synthesis": response.text, 
             "best_quote": "N/A",
             "mental_models": []
         }
