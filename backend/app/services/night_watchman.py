@@ -80,6 +80,13 @@ class NightWatchman:
         except Exception as e:
             print(f"Oracle Update Failed: {e}")
 
+        # 4.7 The Architect (Meta-Strategy Review)
+        try:
+            from app.services.architect_service import architect_service
+            architect_service.review_system_performance()
+        except Exception as e:
+            print(f"Architect Review Failed: {e}")
+
         # 5. Weekly Self-Review (Sundays only)
         if datetime.now().weekday() == 6: # Sunday
             try:

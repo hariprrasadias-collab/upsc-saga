@@ -242,6 +242,23 @@ def trigger_correction(mistake_action_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@autonomy_bp.route('/scholar/author', methods=['POST'])
+def author_micro_book():
+    """Trigger The Scholar to write a book"""
+    try:
+        from app.services.scholar_service import scholar_service
+        data = request.json or {}
+        topic = data.get('topic')
+        subject = data.get('subject', 'General')
+
+        if not topic:
+            return jsonify({'error': 'Topic is required'}), 400
+
+        result = scholar_service.generate_micro_book(topic, subject)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @autonomy_bp.route('/newsroom/sync', methods=['POST'])
 def trigger_newsroom():
     """Trigger The Newsroom to update static notes"""
