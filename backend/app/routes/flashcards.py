@@ -1,5 +1,5 @@
 # Flashcards API Routes
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from app.db import get_db
 from datetime import datetime, timedelta
 from app.services.ebisu_srs import (
@@ -17,11 +17,15 @@ flashcards = Blueprint('flashcards', __name__)
 
 # ==================== DECK MANAGEMENT ====================
 
+def get_user_id():
+    """Helper to get user ID from session or default to 1"""
+    return session.get('user_id', 1)
+
 @flashcards.route('/api/flashcards/decks', methods=['GET'])
 def get_decks():
     """Get all decks with card counts"""
     try:
-        user_id = 1  # TODO: Get from session
+        user_id = get_user_id()
         conn = get_db()
         
         decks = conn.execute('''
@@ -43,7 +47,7 @@ def get_decks():
 def create_deck():
    """Create a new deck"""
    try:
-        user_id = 1
+        user_id = get_user_id()
         data = request.get_json()
         
         conn = get_db()
@@ -65,7 +69,7 @@ def create_deck():
 def get_deck(deck_id):
     """Get deck with all its cards"""
     try:
-        user_id = 1
+        user_id = get_user_id()
         conn = get_db()
         
         deck = conn.execute(
@@ -101,7 +105,7 @@ def get_deck(deck_id):
 def delete_deck(deck_id):
     """Delete deck and all its cards"""
     try:
-        user_id = 1
+        user_id = get_user_id()
         conn = get_db()
         
         # Check ownership
@@ -128,6 +132,7 @@ def delete_deck(deck_id):
 def create_flashcard():
     """Create a new flashcard"""
     try:
+        user_id = get_user_id()
         data = request.get_json()
         
         if 'deck_id' not in data:
@@ -153,7 +158,7 @@ def create_flashcard():
         
         # Award 2 XP for creating a card (handle failure gracefully)
         try:
-            award_xp(1, 2, 0)
+            award_xp(user_id, 2, 0)
         except Exception as xp_error:
             print(f"Failed to award XP for flashcard creation: {xp_error}")
         
@@ -202,7 +207,7 @@ def delete_flashcard(card_id):
 def get_due_cards():
     """Get cards due for review"""
     try:
-        user_id = 1
+        user_id = get_user_id()
         deck_id = request.args.get('deck_id', type=int)
         limit = request.args.get('limit', 20, type=int)
         
@@ -268,7 +273,7 @@ def get_due_cards():
 def review_flashcard(card_id):
     """Record a review result"""
     try:
-        user_id = 1
+        user_id = get_user_id()
         data = request.get_json()
         rating = data['rating']  # 1=Again, 2=Hard, 3=Good, 4=Easy
         time_taken = data.get('time_taken', 0)
@@ -332,7 +337,7 @@ def review_flashcard(card_id):
 def award_review_xp():
     """Award XP after completing review session"""
     try:
-        user_id = 1
+        user_id = get_user_id()
         data = request.get_json()
         cards_reviewed = data.get('cards_reviewed', 0)
         
@@ -355,7 +360,7 @@ def award_review_xp():
 def get_analytics():
     """Get review statistics"""
     try:
-        user_id = 1
+        user_id = get_user_id()
         conn = get_db()
         
         # Total cards
