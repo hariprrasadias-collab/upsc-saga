@@ -24,7 +24,7 @@ def get_all_badges():
     Get all badges with unlock status for the current user.
     """
     try:
-        user_id = get_current_user_id()
+        user_id = session.get('user_id')
         if not user_id:
             return jsonify({'error': 'Unauthorized'}), 401
 
@@ -40,7 +40,7 @@ def get_user_badges():
     Get only unlocked badges for the current user.
     """
     try:
-        user_id = get_current_user_id()
+        user_id = session.get('user_id')
         if not user_id:
             return jsonify({'error': 'Unauthorized'}), 401
 
@@ -57,7 +57,7 @@ def check_badges():
     Returns list of newly unlocked badge IDs.
     """
     try:
-        user_id = get_current_user_id()
+        user_id = session.get('user_id')
         if not user_id:
             return jsonify({'error': 'Unauthorized'}), 401
 
@@ -96,7 +96,7 @@ def get_badge_progress():
     Get progress toward locked badges.
     """
     try:
-        user_id = get_current_user_id()
+        user_id = session.get('user_id')
         if not user_id:
             return jsonify({'error': 'Unauthorized'}), 401
         
