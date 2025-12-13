@@ -118,41 +118,67 @@ def summarize_for_upsc(title, content, link):
     """
     try:
         # Use ModelManager for AI generation
-        prompt = f"""You are the CHIEF EXAMINER for UPSC Civil Services. Your task is to analyze this news article and extract a "Titan Level" summary suitable for Mains Answer Writing.
+        prompt = f"""You are the OMNISCIENT UPSC ARCHITECT (GOD MODE). Your task is to deconstruct this news article into a comprehensive study artifact.
 
 **STRICT OUTPUT FORMAT:**
-You must return valid JSON only. No markdown formatting (no ```json ... ```), no introductory text.
+You must return valid JSON only. No markdown formatting (no ```json ... ```).
 
 **ARTICLE:**
 Title: {title}
 Content: {content}
 
-**ANALYSIS FRAMEWORK (STEEPLE):**
-Analyze using Social, Technological, Economic, Environmental, Political, Legal, and Ethical dimensions where applicable.
+**ARCHITECTURAL DIRECTIVES:**
 
-**ANALYSIS INSTRUCTIONS:**
-1.  **UPSC Summary:** Write a high-yield summary (approx 200 words) using the STEEPLE framework implicitly. Focus on "Why", "What", "Implications", and "Way Forward".
-2.  **Prelims Pointers:** Extract distinct, fact-based points (Data, Committees, Constitutional Articles, Species names, Reports).
-3.  **Mains Dimensions:** Extract analytical arguments (Pros, Cons, Institutional Challenges, Ethical Concerns).
-4.  **Tagging:** Assign relevant GS Papers (GS1-GS4) and Subjects.
-5.  **Inter-linkages:** Connect this topic to other syllabus areas (e.g., Polity linking to Internal Security).
-6.  **Importance:** Rate relevance 1 (Low) to 3 (Critical).
+1.  **THEORY OF EVERYTHING (STEEPLE Analysis):**
+    Analyze using Social, Technological, Economic, Environmental, Political, Legal, and Ethical dimensions. Deep dive into the *nuance*.
+
+2.  **PRELIMS ARMORY (Facts):**
+    Extract high-value facts: Committees, Reports, Data Points, Articles, Species, Locations.
+
+3.  **MAINS STRATEGY (Framework):**
+    Construct a skeleton answer for a potential question on this topic:
+    - *Introduction:* Definition/Context/Data.
+    - *Body:* Arguments/Dimensions/Issues.
+    - *Conclusion:* Way Forward/Sustainable Solution (SDGs).
+
+4.  **VISUAL SYNTHESIS (Mind Map):**
+    Create a MERMAID.JS graph syntax string representing the topic's causal links.
+    Format: `graph TD; A[Node] --> B[Node];`
+
+5.  **ACTIVE RECALL (Quiz):**
+    Create 5 High-Quality MCQs with options and correct answers.
+
+6.  **ESSAY FODDER:**
+    Extract or Generate:
+    - A relevant Quote (by a thinker/leader).
+    - An Anecdote/Case Study.
+    - A "Data Nuke" (Shocking statistic).
 
 **JSON SCHEMA:**
 {{
-  "upsc_summary": "Comprehensive summary text...",
-  "prelims_pointers": ["Fact 1", "Fact 2 (Committee Name)", "Fact 3 (Article X)"],
-  "mains_dimensions": ["Argument 1 (Federalism issue)", "Argument 2 (Economic impact)"],
-  "steeple_analysis": {{
-    "social": "Impact on society...",
-    "economic": "Fiscal burden...",
-    "legal": "Supreme Court judgement..."
+  "upsc_summary": "High-yield summary (200 words) integrating STEEPLE...",
+  "prelims_pointers": ["Fact 1", "Fact 2"],
+  "mains_dimensions": ["Arg 1", "Arg 2"],
+  "steeple_analysis": {{ "social": "...", "economic": "..." }},
+  "inter_linkages": ["GS2: Polity", "GS3: Economy"],
+  "mind_map": "graph TD; ...",
+  "quiz": [
+    {{ "question": "...", "options": ["A", "B", "C", "D"], "answer": "A", "explanation": "..." }}
+  ],
+  "answer_framework": {{
+    "intro": "Start with...",
+    "body_points": ["Dimension 1", "Dimension 2"],
+    "conclusion": "Conclude with..."
   }},
-  "inter_linkages": ["GS2: Federalism", "GS3: Fiscal Deficit"],
-  "papers": ["GS2", "GS3"],
-  "subjects": ["Polity & Governance", "Economy"],
+  "essay_fodder": {{
+    "quote": "...",
+    "statistic": "...",
+    "example": "..."
+  }},
+  "papers": ["GS1", "GS2"],
+  "subjects": ["Subject 1"],
   "importance": 3,
-  "exam_questions": ["Discuss the implications of...", "Critically analyze..."]
+  "exam_questions": ["Q1...", "Q2..."]
 }}"""
 
         # Call ModelManager with 'pro' model for peak performance

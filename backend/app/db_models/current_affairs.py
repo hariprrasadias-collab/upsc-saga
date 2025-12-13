@@ -32,28 +32,48 @@ def init_current_affairs_table():
             prelims_pointers TEXT,
             mains_dimensions TEXT,
             steeple_analysis TEXT,
-            inter_linkages TEXT
+            inter_linkages TEXT,
+            mind_map TEXT,
+            quiz TEXT,
+            answer_framework TEXT,
+            essay_fodder TEXT
         )
     ''')
 
     # Attempt to add new columns for existing databases
+    # Enhanced Metadata v1
     try:
         conn.execute('ALTER TABLE current_affairs ADD COLUMN prelims_pointers TEXT')
     except sqlite3.OperationalError:
         pass
-
     try:
         conn.execute('ALTER TABLE current_affairs ADD COLUMN mains_dimensions TEXT')
     except sqlite3.OperationalError:
         pass
-
     try:
         conn.execute('ALTER TABLE current_affairs ADD COLUMN steeple_analysis TEXT')
     except sqlite3.OperationalError:
         pass
-
     try:
         conn.execute('ALTER TABLE current_affairs ADD COLUMN inter_linkages TEXT')
+    except sqlite3.OperationalError:
+        pass
+
+    # God Mode Metadata v2
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN mind_map TEXT')
+    except sqlite3.OperationalError:
+        pass
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN quiz TEXT')
+    except sqlite3.OperationalError:
+        pass
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN answer_framework TEXT')
+    except sqlite3.OperationalError:
+        pass
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN essay_fodder TEXT')
     except sqlite3.OperationalError:
         pass
 
@@ -74,8 +94,9 @@ def save_article(article_data):
                 title, original_link, source, published_date,
                 original_summary, upsc_summary, key_points,
                 papers, subjects, importance, image_url, related_pyqs,
-                prelims_pointers, mains_dimensions, steeple_analysis, inter_linkages
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                prelims_pointers, mains_dimensions, steeple_analysis, inter_linkages,
+                mind_map, quiz, answer_framework, essay_fodder
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             article_data['title'],
             article_data['link'],
@@ -92,7 +113,11 @@ def save_article(article_data):
             json.dumps(article_data.get('prelims_pointers', [])),
             json.dumps(article_data.get('mains_dimensions', [])),
             json.dumps(article_data.get('steeple_analysis', {})),
-            json.dumps(article_data.get('inter_linkages', []))
+            json.dumps(article_data.get('inter_linkages', [])),
+            article_data.get('mind_map', ''),
+            json.dumps(article_data.get('quiz', [])),
+            json.dumps(article_data.get('answer_framework', {})),
+            json.dumps(article_data.get('essay_fodder', {}))
         ))
         conn.commit()
         return cursor.lastrowid
@@ -154,7 +179,12 @@ def get_saved_articles(filters=None):
             'prelimsPointers': json.loads(row['prelims_pointers'] or '[]') if 'prelims_pointers' in row.keys() else [],
             'mainsDimensions': json.loads(row['mains_dimensions'] or '[]') if 'mains_dimensions' in row.keys() else [],
             'steepleAnalysis': json.loads(row['steeple_analysis'] or '{}') if 'steeple_analysis' in row.keys() else {},
-            'interLinkages': json.loads(row['inter_linkages'] or '[]') if 'inter_linkages' in row.keys() else []
+            'interLinkages': json.loads(row['inter_linkages'] or '[]') if 'inter_linkages' in row.keys() else [],
+            # God Mode fields
+            'mindMap': row['mind_map'] if 'mind_map' in row.keys() else '',
+            'quiz': json.loads(row['quiz'] or '[]') if 'quiz' in row.keys() else [],
+            'answerFramework': json.loads(row['answer_framework'] or '{}') if 'answer_framework' in row.keys() else {},
+            'essayFodder': json.loads(row['essay_fodder'] or '{}') if 'essay_fodder' in row.keys() else {}
         })
     
     return articles
@@ -239,6 +269,10 @@ def update_article_content_by_link(link, article_data):
             mains_dimensions = ?,
             steeple_analysis = ?,
             inter_linkages = ?,
+            mind_map = ?,
+            quiz = ?,
+            answer_framework = ?,
+            essay_fodder = ?,
             fetch_date = CURRENT_TIMESTAMP
         WHERE original_link = ?
     ''', (
@@ -253,6 +287,10 @@ def update_article_content_by_link(link, article_data):
         json.dumps(article_data.get('mains_dimensions', [])),
         json.dumps(article_data.get('steeple_analysis', {})),
         json.dumps(article_data.get('inter_linkages', [])),
+        article_data.get('mind_map', ''),
+        json.dumps(article_data.get('quiz', [])),
+        json.dumps(article_data.get('answer_framework', {})),
+        json.dumps(article_data.get('essay_fodder', {})),
         link
     ))
     conn.commit()

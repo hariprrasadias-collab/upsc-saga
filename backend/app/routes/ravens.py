@@ -94,7 +94,12 @@ def run_background_fetch(app):
                             'prelims_pointers': ai_result.get('prelims_pointers', []),
                             'mains_dimensions': ai_result.get('mains_dimensions', []),
                             'steeple_analysis': ai_result.get('steeple_analysis', {}),
-                            'inter_linkages': ai_result.get('inter_linkages', [])
+                            'inter_linkages': ai_result.get('inter_linkages', []),
+                            # God Mode Metadata
+                            'mind_map': ai_result.get('mind_map', ''),
+                            'quiz': ai_result.get('quiz', []),
+                            'answer_framework': ai_result.get('answer_framework', {}),
+                            'essay_fodder': ai_result.get('essay_fodder', {})
                         }
                         
                         save_article(article_data)
@@ -215,7 +220,12 @@ def process_article():
             'prelims_pointers': ai_result.get('prelims_pointers', []),
             'mains_dimensions': ai_result.get('mains_dimensions', []),
             'steeple_analysis': ai_result.get('steeple_analysis', {}),
-            'inter_linkages': ai_result.get('inter_linkages', [])
+            'inter_linkages': ai_result.get('inter_linkages', []),
+            # God Mode Metadata
+            'mind_map': ai_result.get('mind_map', ''),
+            'quiz': ai_result.get('quiz', []),
+            'answer_framework': ai_result.get('answer_framework', {}),
+            'essay_fodder': ai_result.get('essay_fodder', {})
         }
         
         # Save or Update
@@ -236,7 +246,11 @@ def process_article():
                 'examQuestions': ai_result.get('exam_questions', []),
                 'relatedTopics': ai_result.get('related_topics', []),
                 'steepleAnalysis': ai_result.get('steeple_analysis', {}),
-                'interLinkages': ai_result.get('inter_linkages', [])
+                'interLinkages': ai_result.get('inter_linkages', []),
+                'mindMap': ai_result.get('mind_map', ''),
+                'quiz': ai_result.get('quiz', []),
+                'answerFramework': ai_result.get('answer_framework', {}),
+                'essayFodder': ai_result.get('essay_fodder', {})
             }
         })
         

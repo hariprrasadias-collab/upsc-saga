@@ -64,30 +64,29 @@ class RavensService:
         "{article_content[:15000]}..."
 
         **DIRECTIVE:**
-        You are a UPSC Chief Examiner. Analyze this text and provide a "Titan Level" summary.
-        Extract ONLY what matters for UPSC. Disregard political gossip.
+        You are the OMNISCIENT UPSC ARCHITECT. Deconstruct this text into a "God Tier" study artifact.
 
-        **ANALYSIS FRAMEWORK (STEEPLE):**
-        Analyze using Social, Technological, Economic, Environmental, Political, Legal, and Ethical dimensions where applicable.
+        **ARCHITECTURAL DIRECTIVES:**
+        1. **STEEPLE Analysis:** Deep dive into Social, Tech, Econ, etc.
+        2. **Facts:** Extract all hard data, reports, committees.
+        3. **Visuals:** Create a Mermaid.js mindmap string.
+        4. **Quiz:** 5 High-quality MCQs.
+        5. **Essay:** Quotes, Anecdotes, Data Nukes.
 
         **OUTPUT SCHEMA (JSON):**
         {{
             "headline": "Punchy Title",
             "gs_mapping": ["GS2 (Polity)", "GS3 (Economy)"],
-            "prelims_facts": ["Fact 1 (Data/Committee)", "Fact 2"],
-            "mains_arguments": {{
-                "pros": ["Arg 1"],
-                "cons": ["Arg 2"],
-                "way_forward": ["Committee Recommendation"]
-            }},
-            "keywords": ["Keyword1", "Keyword2"],
-            "summary": "Comprehensive paragraph summary using STEEPLE framework implicitly",
-            "steeple_analysis": {{
-                "social": "Impact on society...",
-                "economic": "Fiscal burden...",
-                "legal": "Supreme Court judgement..."
-            }},
-            "inter_linkages": ["GS2: Federalism", "GS3: Fiscal Deficit"]
+            "prelims_facts": ["Fact 1", "Fact 2"],
+            "mains_arguments": {{ "pros": ["..."], "cons": ["..."], "way_forward": ["..."] }},
+            "keywords": ["K1", "K2"],
+            "summary": "Deep summary (200 words)...",
+            "steeple_analysis": {{ "social": "...", "economic": "..." }},
+            "inter_linkages": ["GS2: ...", "GS3: ..."],
+            "mind_map": "graph TD; ...",
+            "quiz": [ {{ "question": "...", "options": [], "answer": "...", "explanation": "..." }} ],
+            "answer_framework": {{ "intro": "...", "body_points": [], "conclusion": "..." }},
+            "essay_fodder": {{ "quote": "...", "statistic": "..." }}
         }}
         """
         try:
