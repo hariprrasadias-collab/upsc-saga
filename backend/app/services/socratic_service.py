@@ -300,11 +300,10 @@ def generate_debate_verdict(topic, history):
     4. Select the "Best Quote".
     5. Identify 1-2 "Mental Models" or "Frameworks" used.
 
-    Return strictly valid JSON. Do not use Markdown code blocks.
-    Structure:
+    Return JSON:
     {{
         "winner": "Name of Agent",
-        "key_concepts": ["concept1", "concept2"],
+        "key_concepts": ["concept1", "concept2", ...],
         "synthesis": "...",
         "best_quote": "...",
         "mental_models": ["model1", "model2"]
@@ -315,39 +314,34 @@ def generate_debate_verdict(topic, history):
         response = model_manager.generate_content(judge_prompt, model_type='pro')
         
         # Robust JSON Extraction
-        text = response.text.replace('\n', ' ').strip()
-        
-        # Clean markdown
-        if "```" in text:
-             text = text.replace("```json", "").replace("```", "")
-        
-        # Extract JSON object
-        start = text.find('{')
-        end = text.rfind('}')
-        
-        if start != -1 and end != -1:
-            json_str = text[start : end + 1]
-            try:
+        text = response.text.strip()
+        if text.startswith("```"):
+            text = text.replace("```json", "").replace("```", "").strip()
+
+        # Try to find valid JSON object
+        try:
+            start = text.find('{')
+            end = text.rfind('}')
+            if start != -1 and end != -1:
+                json_str = text[start : end + 1]
                 return json.loads(json_str)
-            except json.JSONDecodeError:
-                # Try simple fix for common issues (e.g. trailing commas)
-                pass
-        
-        # Fallback if parsing completely fails
-        print(f"Verdict Parsing Failed. Raw Text: {text[:100]}...")
-        return {
-            "winner": "Undecided (Parsing Error)",
-            "key_concepts": ["Debate Analysis"],
-            "synthesis": response.text[:500], # Use raw text as synthesis
-            "best_quote": "N/A",
-            "mental_models": []
-        }
+            else:
+                raise json.JSONDecodeError("No brackets found", text, 0)
+        except json.JSONDecodeError as e:
+            print(f"Verdict JSON Decode Error: {e} | Text fragment: {text[:100]}")
+            # Fallback
+            return {
+                "winner": "Undecided (Parsing Error)",
+                "key_concepts": [],
+                "synthesis": "The debate concluded, but the verdict could not be parsed.",
+                "best_quote": ""
+            }
 
     except Exception as e:
         print(f"Verdict Generation Error: {e}")
         return {
             "winner": "Undecided",
             "key_concepts": [],
-            "synthesis": "An error occurred during analysis.",
+            "synthesis": "Analysis failed.",
             "best_quote": ""
         }

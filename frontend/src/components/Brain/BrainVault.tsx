@@ -11,6 +11,10 @@ import ELI5Renderer from './Renderers/ELI5Renderer';
 import CheatSheetRenderer from './Renderers/CheatSheetRenderer';
 import PitfallRenderer from './Renderers/PitfallRenderer';
 import QuoteBankRenderer from './Renderers/QuoteBankRenderer';
+import SubjectBookRenderer from './Renderers/SubjectBookRenderer';
+import InterviewSimulator from './Renderers/InterviewSimulator';
+import HeatmapRenderer from './Renderers/HeatmapRenderer';
+import SelfReviewRenderer from './Renderers/SelfReviewRenderer';
 
 interface AIContent {
     id: number;
@@ -30,7 +34,8 @@ const BrainVault: React.FC = () => {
 
     const contentTypes = [
         'all', 'podcast', 'essay', 'visual_prompt', 'roleplay',
-        'cheat_sheet', 'timeline', 'eli5', 'pitfalls', 'quote_bank', 'map_work'
+        'cheat_sheet', 'timeline', 'eli5', 'pitfalls', 'quote_bank', 'map_work',
+        'subject_book', 'interview_sim', 'heatmap', 'self_review'
     ];
 
     useEffect(() => {
@@ -122,6 +127,16 @@ const BrainVault: React.FC = () => {
                 return <PitfallRenderer content={item.content} />;
             case 'quote_bank':
                 return <QuoteBankRenderer content={item.content} />;
+            case 'subject_book':
+            case 'book_chapter':
+                return <SubjectBookRenderer content={item.content} />;
+            case 'interview_sim':
+                return <InterviewSimulator content={item.content} topic={item.topic} />;
+            case 'heatmap':
+            case 'heatmap_analysis':
+                return <HeatmapRenderer content={item.content} title={item.topic} />;
+            case 'self_review':
+                return <SelfReviewRenderer content={item.content} />;
             default:
                 return (
                     <div>
