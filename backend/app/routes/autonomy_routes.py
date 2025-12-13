@@ -294,6 +294,16 @@ def trigger_evolution():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@autonomy_bp.route('/director/check', methods=['POST'])
+def check_director():
+    """Trigger The Director to check user velocity"""
+    try:
+        from app.services.director_service import director_service
+        result = director_service.check_user_velocity(user_id=1)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @autonomy_bp.route('/review/now', methods=['POST'])
 def trigger_self_review():
     """Trigger an immediate self-review"""

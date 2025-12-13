@@ -63,6 +63,16 @@ def get_all_predictive_analytics():
         print(f"Error calculating predictive analytics: {e}")
         return jsonify({'error': str(e)}), 500
 
+@predictive_bp.route('/api/analytics/predictive/simulate-outcome', methods=['GET'])
+def simulate_exam():
+    """Run Monte Carlo simulation for Prelims"""
+    try:
+        from app.services.foresight_engine import foresight_engine
+        result = foresight_engine.simulate_exam_outcome(user_id=1)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 # Enhanced Visualizations Endpoints
 from app.services.visualizations import (
     get_daily_activity_heatmap,

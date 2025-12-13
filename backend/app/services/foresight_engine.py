@@ -360,5 +360,74 @@ class ForesightEngine:
             traceback.print_exc()
             return []
 
+    def simulate_exam_outcome(self, user_id=1):
+        """
+        SIMULATION: Runs a Monte Carlo simulation of the Prelims Exam based on current stats.
+        """
+        try:
+            from app.services.weak_area_service import WeakAreaAnalyzer
+
+            # 1. Get Subject Mastery Levels (Mock/Estimated)
+            # Example: {'Polity': 0.8, 'History': 0.4, ...}
+            weak_areas = WeakAreaAnalyzer.analyze_user_performance(user_id, 30)
+            mastery = {
+                "Polity": 0.7, "History": 0.6, "Geography": 0.5,
+                "Economy": 0.5, "Environment": 0.6, "Science": 0.4, "Current Affairs": 0.5
+            }
+
+            # Adjust mastery based on actual weak areas found
+            if weak_areas:
+                for w in weak_areas:
+                    subj = w.get('subject', 'General')
+                    if subj in mastery:
+                        # Normalize accuracy to 0-1
+                        acc = w.get('accuracy_rate', 50)
+                        mastery[subj] = max(0.2, acc / 100.0)
+
+            # 2. Simulate 1000 Exams (Monte Carlo)
+            import numpy as np
+
+            scores = []
+
+            # Standard UPSC Weightage (Approx Questions count out of 100)
+            weightage = {
+                "Polity": 15, "History": 15, "Geography": 10, "Economy": 15,
+                "Environment": 15, "Science": 10, "Current Affairs": 20
+            }
+
+            for _ in range(1000):
+                score = 0
+                for subj, count in weightage.items():
+                    # For each question, probability of correct answer = mastery[subj]
+                    # Correct = +2, Wrong = -0.66
+                    # We assume user attempts 85% of questions
+
+                    attempts = int(count * 0.85)
+                    correct_prob = mastery.get(subj, 0.5)
+
+                    # Binomial distribution for correct answers
+                    correct = np.random.binomial(attempts, correct_prob)
+                    wrong = attempts - correct
+
+                    score += (correct * 2) - (wrong * 0.66)
+
+                scores.append(score)
+
+            # 3. Analyze Results
+            avg_score = sum(scores) / len(scores)
+            # 88 is approx cutoff for General
+            p_clearance = sum(1 for s in scores if s > 88) / len(scores) * 100
+
+            return {
+                "projected_score": round(avg_score, 2),
+                "probability_of_clearing": round(p_clearance, 1),
+                "mastery_profile": mastery,
+                "verdict": "SAFE" if avg_score > 100 else "RISKY" if avg_score > 85 else "DANGER"
+            }
+
+        except Exception as e:
+            print(f"Simulation Failed: {e}")
+            return {"error": str(e)}
+
 # Singleton instance
 foresight_engine = ForesightEngine()
