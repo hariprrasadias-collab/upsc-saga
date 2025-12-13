@@ -25,49 +25,42 @@ class AnswerEvaluator:
         
         # Build evaluation prompt
         evaluation_prompt = f"""
-You are an expert UPSC Mains examiner with 20+ years of experience. Evaluate this answer strictly according to UPSC standards.
+        # MISSION: UPSC MAINS ANSWER EVALUATION (GS1/GS2/GS3/GS4)
+        **Role:** Strict Mains Examiner.
 
-QUESTION:
-{question}
+        **QUESTION:** "{question}"
+        **DIRECTIVE WORD:** (Identify if it is Discuss, Critically Analyze, Elucidate, etc. and score adherence).
+        **WORD LIMIT:** {word_limit} (Actual: {word_count})
 
-WORD LIMIT: {word_limit} words
-ACTUAL WORDS: {word_count} words
+        **CANDIDATE ANSWER:**
+        "{answer_text}"
 
-EXPECTED KEYWORDS:
-{keywords or 'Not provided'}
+        **EVALUATION PROTOCOL:**
+        1. **Intro/Conclusion Check:** Does it define terms? Is the conclusion forward-looking?
+        2. **Sub-heading Scan:** Are there clear sub-headings?
+        3. **Data/Auth Check:** Did they cite a Report, Index, Article, or Case Law? If not, penalize Content Score.
+        4. **Diagram Check:** Suggest where a diagram/flowchart could have been used.
 
-STUDENT'S ANSWER:
-{answer_text}
-
-{"MODEL ANSWER (for reference):" + model_answer if model_answer else ""}
-
-Evaluate the answer on the following criteria:
-
-1. STRUCTURE (0-10): Introduction, logical flow, paragraph organization, conclusion
-2. CONTENT (0-10): Factual accuracy, depth of analysis, examples, critical thinking, dimensions covered
-3. RELEVANCE (0-10): Direct answer to question, no deviation, balanced approach
-4. KEYWORD COVERAGE (0-100%): Percentage of expected keywords present
-
-Provide your evaluation in STRICT JSON format (NO markdown, NO code blocks, ONLY valid JSON):
-
-{{
-  "overall_score": <float 0-10>,
-  "structure_score": <float 0-10>,
-  "content_score": <float 0-10>,
-  "relevance_score": <float 0-10>,
-  "keyword_coverage": <float 0-100>,
-  "strengths": ["specific strength 1", "specific strength 2", "specific strength 3"],
-  "improvements": ["specific improvement 1", "specific improvement 2", "specific improvement 3"],
-  "missing_keywords": ["keyword1", "keyword2"],
-  "word_limit_feedback": "comment on word count adherence"
-}}
-
-Be constructive but honest. Focus on UPSC-specific requirements: multidimensional analysis, factual accuracy, balanced perspective, and answer framework.
-"""
+        **OUTPUT SCHEMA (JSON ONLY):**
+        {{
+            "overall_score": <float 0-10>,
+            "structure_score": <float 0-10>,
+            "content_score": <float 0-10>,
+            "relevance_score": <float 0-10>,
+            "keyword_coverage": <float 0-100>,
+            "directive_word_adherence": "Did they 'Discuss' or just 'List'?",
+            "strengths": ["Strength 1", "Strength 2"],
+            "improvements": ["Weakness 1", "Weakness 2"],
+            "value_additions": ["Add: NITI Aayog Report X", "Add: Article Y"],
+            "diagram_suggestion": "Draw a Hub-and-Spoke model for...",
+            "missing_keywords": ["Keyword 1", "Keyword 2"],
+            "model_answer_structure": ["Intro", "Body 1", "Body 2", "Conclusion"]
+        }}
+        """
         
         try:
-            # Call Gemini API via Manager
-            response = model_manager.generate_content(evaluation_prompt, model_type='fast')
+            # Call Gemini API via Manager - Pro for deep analysis
+            response = model_manager.generate_content(evaluation_prompt, model_type='pro')
             response_text = response.text.strip()
             
             if hasattr(response, 'text'):

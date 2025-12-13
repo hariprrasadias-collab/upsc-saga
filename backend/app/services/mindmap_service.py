@@ -13,25 +13,41 @@ class MindMapService:
         # API Check handled by manager
 
         prompt = f"""
-        Create a detailed mind map for the topic: "{topic}".
-        Return ONLY a valid JSON object representing the tree structure.
-        The structure must be:
+        # MISSION: UPSC STRUCTURAL BLUEPRINT (MIND MAP)
+        **Topic:** "{topic}"
+
+        **DIRECTIVE:**
+        Structure this strictly for a UPSC Mains Answer (Introduction -> Body -> Conclusion).
+
+        **HIERARCHY RULES:**
+        1. **Root:** The Topic.
+        2. **Level 1 (The Framework):**
+           - **Definition/Context** (Article No, Origin)
+           - **Dimensions** (Social, Economic, Political)
+           - **Issues/Challenges**
+           - **Solutions/Way Forward** (Committees, Best Practices)
+        3. **Level 2 (The Meat):** Specific points.
+        4. **Level 3 (The Edge):** Data, Case Laws, Examples.
+
+        **OUTPUT SCHEMA (JSON ONLY):**
         {{
             "name": "{topic}",
             "children": [
                 {{
-                    "name": "Subtopic 1",
-                    "children": [ ... ]
+                    "name": "🏛️ Constitutional Basis",
+                    "children": [ {{ "name": "Article X" }} ]
                 }},
-                ...
+                {{
+                    "name": "📉 Challenges",
+                    "children": [ {{ "name": "Structural Bottlenecks", "children": [ {{ "name": "Data Point: 45% vacancy" }} ] }} ]
+                }}
             ]
         }}
-        Ensure the depth is at least 3 levels.
-        Do not include any markdown formatting (like ```json), just the raw JSON string.
         """
 
         try:
-            response = model_manager.generate_content(prompt, model_type='fast')
+            # Use Pro model for better structural reasoning
+            response = model_manager.generate_content(prompt, model_type='pro')
             text = response.text.strip()
             # Clean up potential markdown formatting if Gemini still adds it
             # Clean up potential markdown formatting if Gemini still adds it

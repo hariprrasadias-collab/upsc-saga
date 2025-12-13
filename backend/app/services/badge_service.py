@@ -64,6 +64,30 @@ class BadgeService:
             return [dict(row) for row in badges]
         except Exception:
             return []
+
+    def generate_badge_tale(self, badge_name):
+        """
+        PHASE 17: EPIC TALES
+        Generates a short mythic story for an earned badge.
+        """
+        from app.services.model_manager import model_manager
+
+        if not model_manager.is_configured:
+            return "A badge of honor."
+
+        prompt = f"""
+        # MISSION: BADGE LORE GENERATION
+        **Badge:** {badge_name}
+
+        **DIRECTIVE:**
+        Write a 2-sentence micro-story about how this badge was forged in the fires of discipline.
+        Style: Elden Ring / Dark Souls item description.
+        """
+        try:
+            response = model_manager.generate_content(prompt, model_type='fast')
+            return response.text.strip()
+        except:
+            return "Worn by those who have conquered the syllabus."
     
     def check_and_unlock_badges(self, user_id):
         """

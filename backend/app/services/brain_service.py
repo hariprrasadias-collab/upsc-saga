@@ -1061,8 +1061,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                             {"id": "mnemonics", "label": "🧠 Mnemonics", "content": "- ABCDE for something"},
                             {"id": "examiner", "label": "🧐 Examiner's View", "content": "**High Yield Keywords:**\n- Secularism\n- Basic Structure\n\n**Focus Areas:**\n- Preamble as part of Constitution"},
                             {"id": "concept_map", "label": "🗺️ Concept Map", "content": "graph TD; A[Constitution] --> B[Preamble]; B --> C[Justice]; B --> D[Liberty];", "type": "mermaid"},
-                            {"id": "quiz", "label": "❓ Active Recall", "content": json.dumps([{"q": "Who is the custodian of the Constitution?", "a": "Supreme Court"}, {"q": "Article 32?", "a": "Right to Constitutional Remedies"}]), "type": "quiz"}
-                        ]
+                            {"id": "quiz", "label": "❓ Active Recall", "content": json.dumps([{"q": "Who is the custodian of the Constitution?", "a": "Supreme Court"}, {"q": "Article 32?", "a": "Right to Constitutional Remedies"}]), "type": "quiz"}]
                     })
                 }
             elif action_type == "GENERATE_QUOTE_BANK":
@@ -1172,8 +1171,21 @@ Your output must be structurally perfect, intellectually dense, and strictly com
             elif action_type == "ANALYZE_QUESTION":
                 try:
                     question_text = payload.get('question', '')
-                    analysis_prompt = f"Analyze this UPSC Question: '{question_text}'. Break it down into Key Demand, Structure, and Keywords."
-                    response = model_manager.generate_content(analysis_prompt)
+                    analysis_prompt = f"""
+                    # MISSION: SURGICAL QUESTION DISSECTION
+                    **Question:** "{question_text}"
+
+                    **OUTPUT:**
+                    1. **The Core Demand:** What is the examiner *actually* asking? (Decode the directive word: Discuss vs Critically Analyze).
+                    2. **The Micro-Syllabus:** Which specific sub-topics must be touched?
+                    3. **Structure Blueprint:**
+                       - Intro: [What to define/cite]
+                       - Body Paragraph 1: [Theme]
+                       - Body Paragraph 2: [Theme]
+                       - Conclusion: [Way Forward]
+                    4. **Value Addition:** Suggest 1 Data point, 1 Committee, or 1 Article to drop in.
+                    """
+                    response = model_manager.generate_content(analysis_prompt, model_type='pro')
                     result = {"success": True, "message": "Analysis Complete", "analysis": response.text}
                 except Exception as e:
                     result = {"success": False, "message": f"Analysis Failed: {str(e)}"}
@@ -1242,8 +1254,24 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                                         (f"The Hall of {topic}", f"A dedicated space for remembering {topic}", "hall"))
                     location_id = cursor.lastrowid
                     
-                    brainstorm_prompt = f"Generate 5 key concepts for '{topic}' to store in a Mind Palace. Return JSON: [{{'title': '...', 'content': '...', 'icon': '...'}}]"
-                    response = model_manager.generate_content(brainstorm_prompt)
+                    brainstorm_prompt = f"""
+                    # MISSION: MIND PALACE ARCHITECTURE
+                    **Topic:** {topic}
+
+                    **TASK:**
+                    Create 5 vivid, bizarre, and memorable memory pegs (artifacts) for this topic.
+                    Use the 'Loci Method' principles: Exaggeration, Absurdity, and Spatial Memory.
+
+                    **OUTPUT SCHEMA (JSON Array):**
+                    [
+                        {{
+                            "title": "Concept Name",
+                            "content": "The vivid visual story. (e.g., 'A giant elephant eating the Constitution to represent Article 1...')",
+                            "icon": "🐘"
+                        }}
+                    ]
+                    """
+                    response = model_manager.generate_content(brainstorm_prompt, model_type='pro')
                     artifacts_data = self._parse_response(response.text)
                     
                     if isinstance(artifacts_data, list):
@@ -1268,7 +1296,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     topics_list = [{"id": t['id'], "topic": t['topic'], "subject": t['subject']} for t in topics]
                     
                     prioritize_prompt = f"From this list: {json.dumps(topics_list[:50])}, identify Top 5 High Yield topics. Return JSON: {{ 'priority_ids': [1, 2...] }}"
-                    response = model_manager.generate_content(prioritize_prompt)
+                    response = model_manager.generate_content(prioritize_prompt, model_type='pro')
                     data = self._parse_response(response.text)
                     priority_ids = data.get('priority_ids', [])
                     
@@ -1294,6 +1322,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     from app.db import get_db
                     conn = get_db()
                     filters = payload.get('filters', {})
+                    topic_fallback = payload.get('topic')
                     
                     # Construct query based on filters
                     query = "SELECT year, subject, topic, question_text FROM pyq_questions WHERE 1=1"
@@ -1310,6 +1339,9 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     if filters.get('topic'):
                         query += " AND topic LIKE ?"
                         params.append(f"%{filters['topic']}%")
+                    elif topic_fallback:
+                        query += " AND topic LIKE ?"
+                        params.append(f"%{topic_fallback}%")
                         
                     query += " ORDER BY year DESC LIMIT 50" # Analyze last 50 questions matching criteria
                     
@@ -1317,15 +1349,28 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     questions_text = "\n".join([f"[{q['year']}] {q['topic']}: {q['question_text']}" for q in questions])
                     
                     analysis_prompt = f"""
-                    Analyze these UPSC Previous Year Questions (PYQs) for trends:
+                    # MISSION: STRATEGIC INTELLIGENCE REPORT (SIR)
+                    **Subject/Topic:** {filters.get('topic') or topic_fallback or 'General'}
+
+                    **DATASET (PYQs):**
                     {questions_text}
                     
-                    Identify:
-                    1. Recurring Themes/Topics.
-                    2. Shift in difficulty or style over years.
-                    3. High-yield areas to focus on.
+                    **DIRECTIVE:**
+                    You are the Chief Strategy Officer for a UPSC aspirant.
+                    Decode the "Mind of the Examiner".
+
+                    **OUTPUT FORMAT:**
+                    **1. Thematic Heatmap:**
+                    - List top 3 recurring micro-themes (e.g., "Not just Inflation, but specifically 'Headline vs Core Inflation'").
                     
-                    Format as a concise strategic briefing.
+                    **2. Evolution Vector:**
+                    - How has the question style changed? (e.g., "2015 was factual, 2023 is purely conceptual application").
+
+                    **3. The 'Trap' Pattern:**
+                    - Identify how they trick students (e.g., "Confusing Ministry X with Ministry Y").
+
+                    **4. Next Year Prediction:**
+                    - Based on this trajectory, what is the *exact* type of question likely to appear next?
                     """
                     # Trend analysis benefits from Pro
                     response = model_manager.generate_content(analysis_prompt, model_type='pro')
@@ -1350,7 +1395,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     
                     Keep it concise (under 200 words).
                     """
-                    response = model_manager.generate_content(explanation_prompt)
+                    response = model_manager.generate_content(explanation_prompt, model_type='pro')
                     result = {
                         "success": True, 
                         "message": "Explanation Generated.",
@@ -1363,13 +1408,20 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 try:
                     metrics = payload.get('metrics', {})
                     bio_prompt = f"""
-                    Analyze these bio-metrics:
-                    Sleep: {metrics.get('sleep', 7)}h
-                    Energy: {metrics.get('energy', 50)}/100
-                    Mood: {metrics.get('mood', 5)}/10
+                    # MISSION: PERFORMANCE OPTIMIZATION (NEURO-HACKING)
+                    **Metrics:**
+                    - Sleep: {metrics.get('sleep', 7)}h
+                    - Energy: {metrics.get('energy', 50)}/100
+                    - Mood: {metrics.get('mood', 5)}/10
                     
-                    Suggest 1 specific, actionable biohack or protocol to improve performance right now.
-                    Keep it scientific but concise.
+                    **DIRECTIVE:**
+                    Act as a high-performance coach (Huberman style).
+                    Prescribe ONE immediate, science-backed protocol.
+
+                    **OUTPUT:**
+                    **Protocol:** [Name, e.g., 'NSDR' or 'Cold Exposure']
+                    **Why:** [Mechanism of action, e.g., 'Dopamine baseline reset']
+                    **Action:** [Step-by-step instruction, max 2 sentences]
                     """
                     response = model_manager.generate_content(bio_prompt)
                     result = {
@@ -1469,23 +1521,24 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 try:
                     topic = payload.get('topic', '')
                     prompt = f"""
-                    Generate a 'Coffee Chat' style dialogue about {topic}.
+                    # MISSION: GENERATE A 'TITAN LEVEL' PODCAST SCRIPT
+                    **Topic:** {topic}
                     
-                    **Cast:**
-                    1. **Host**: Quick, smart, funny.
-                    2. **Guest**: Skeptical, asks "Wait, what?" often.
+                    **PERSONAS:**
+                    1. **The Host (Ravi):** Witty, high-energy, uses pop-culture metaphors (Netflix, Cricket, Bangalore Traffic).
+                    2. **The Expert (Dr. Iyer):** Cynical but brilliant. A veteran UPSC mentor who hates jargon.
 
-                    **Refined Style Guide:**
-                    - **Start In Media Res**: Jump straight into the gossip/hook. No "Welcome to the podcast".
-                    - **Super Short Sentences**: People speak in bursts. Max 12 words per line.
-                    - **Reactions**: Use "Whoa", "No way", "Crazy", "Right?" constantly.
-                    - **Analogy First**: Explain complex things using pizza, traffic, or dating analogies.
+                    **STYLE GUIDE (STRICT):**
+                    - **NO INTROS:** Start *In Media Res*. (e.g., "So, you're telling me the Governor is basically a sleeper agent?")
+                    - **THE 'WAIT, WHAT?' MOMENT:** Every 4 lines, the Host must be confused. The Expert explains with a KILLER ANALOGY.
+                    - **HUMOR:** Use dry wit. Poke fun at the complexity of the topic.
+                    - **LENGTH:** 400-600 words. Deep dive, don't skim.
                     
-                    **Format:**
-                    Host: [Text]
-                    Guest: [Text]
+                    **FORMAT:**
+                    Ravi: ...
+                    Dr. Iyer: ...
                     
-                    **Goal:** Make it feel like I'm eavesdropping on two smart friends at a cafe.
+                    **GOAL:** Explain {topic} so clearly that a sleep-deprived aspirant laughs and learns.
                     """
                     # Creative writing needs Pro
                     response = model_manager.generate_content(prompt, model_type='pro')
@@ -1527,10 +1580,18 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     topic = payload.get('topic', '')
                     subject = payload.get('subject', '')
                     prompt = f"""
-                    Create a philosophical or analytical UPSC Mains Essay Prompt based on '{topic}' ({subject}).
-                    Connect it to a broader theme (e.g., Democracy, Justice, Environment).
-                    Provide the prompt statement and a 1-line 'Thesis' hint.
-                    Return ONLY the prompt and thesis. Do not include "Here is a prompt...".
+                    # MISSION: DESIGN A 'TRAP' ESSAY PROMPT (UPSC MAINS LEVEL)
+                    **Topic:** {topic} ({subject})
+
+                    **REQUIREMENTS:**
+                    1. **The Prompt:** Must be abstract, philosophical, or multi-dimensional. Connect {topic} to Justice, Technology, or Human Nature.
+                    2. **The Trap:** It should look simple but require deep nuance to score high.
+                    3. **The Thesis Hint:** A 1-sentence "Golden Thread" argument.
+
+                    **OUTPUT FORMAT:**
+                    **Prompt:** "[The Prompt]"
+                    **Thesis Hint:** [The specific angle to take]
+                    **Micro-Syllabus:** [3 Bullet points on what to include]
                     """
                     response = model_manager.generate_content(prompt, model_type='pro')
                     result = {
@@ -1555,7 +1616,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     
                     Return ONLY the prompt text.
                     """
-                    response = model_manager.generate_content(prompt)
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     result = {
                         "success": True,
                         "message": "Visual Infographic Prompt Generated.",
@@ -1568,18 +1629,20 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 try:
                     topic = payload.get('topic', '')
                     prompt = f"""
-                    Create an 'Interactive Case Study' for a District Collector (IAS) regarding '{topic}'.
-                    Format as a High-Stakes Decision Game.
-                    Structure:
-                    1. **The Crisis**: A detailed, realistic scenario involving this topic.
-                    2. **The Pressure**: Specific stakeholders (Ministers, Media, Protestors) pushing conflicting demands.
-                    3. **The Options**:
-                       - Option A: (Popular but maybe illegal/unethical)
-                       - Option B: (Strictly legal but unpopular/risky)
-                       - Option C: (Innovative but difficult execution)
-                    4. **The Question**: "You are the DM. Which option do you choose and why?"
-                    
-                    Return formatted Markdown.
+                    # MISSION: DISTRICT COLLECTOR CRISIS SIMULATION
+                    **Context:** {topic}
+
+                    **SCENARIO:**
+                    You are the District Magistrate. A crisis related to {topic} has exploded.
+
+                    **OUTPUT FORMAT:**
+                    **🚨 THE INCIDENT:** [Visceral description of the event. High stakes.]
+                    **👥 STAKEHOLDERS:** [Who is screaming at you? Politicians, Media, Mob, Victims.]
+                    **⚖️ THE ETHICAL DILEMMA:** [Conflict between Rule of Law vs. Public Sentiment vs. Political Pressure.]
+                    **⚡ DECISION MATRIX:**
+                    - **Option A (The Bureaucrat):** Safe but slow.
+                    - **Option B (The Cowboy):** Fast but illegal.
+                    - **Option C (The Statesman):** The balanced (difficult) path.
                     """
                     response = model_manager.generate_content(prompt, model_type='pro')
                     result = {
@@ -1623,17 +1686,24 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 try:
                     topic = payload.get('topic', '')
                     prompt = f"""
-                    Identify 3-5 key geographical locations related to '{topic}' for map pointing.
-                    Return JSON list: [{{
-                        "name": "Name of Place",
-                        "lat": 0.0,
-                        "lon": 0.0,
-                        "reason": "Historical/Geographical significance",
-                        "question": "Question to ask user to find this place (e.g. 'Locate the capital of...')"
-                    }}]
-                    Ensure coordinates are accurate.
+                    # MISSION: GEOGRAPHICAL INTELLIGENCE
+                    **Topic:** {topic}
+
+                    Identify 5 CRITICAL locations associated with this topic.
+                    Focus on: Strategic choke points, Resource deposits, Historical capitals, or Environmental hotspots.
+
+                    **OUTPUT SCHEMA (JSON ONLY):**
+                    [
+                        {{
+                            "name": "Name",
+                            "lat": 0.0,
+                            "lon": 0.0,
+                            "reason": "Deep geographical/historical significance. Why does this place matter geopolitically?",
+                            "question": "A challenging clue-based question (e.g., 'The gateway to the Red Sea...')"
+                        }}
+                    ]
                     """
-                    response = model_manager.generate_content(prompt)
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     data = self._parse_response(response.text)
 
                     locations = []
@@ -1653,11 +1723,20 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     topic = payload.get('topic', '')
                     related_topics = payload.get('related_topics', [])
                     prompt = f"""
-                    Find conceptual linkages between '{topic}' and these recently studied topics: {', '.join(related_topics)}.
-                    Explain the connection in 1 sentence per topic.
-                    Example: "Monsoon impacts Inflation via food prices."
+                    # MISSION: INTERDISCIPLINARY SYNTHESIS (NEURAL HASH)
+                    **Node A:** {topic}
+                    **Node B List:** {', '.join(related_topics)}
+
+                    **TASK:**
+                    Connect {topic} to the list above using "First Principles".
+                    Uncover hidden causal chains (Economy -> Society -> Polity).
+
+                    **OUTPUT:**
+                    - **Direct Link:** How X directly affects Y.
+                    - **Second-Order Effect:** The unintended consequence.
+                    - **UPSC Relevance:** Why this linkage matters for Mains GS1/2/3.
                     """
-                    response = model_manager.generate_content(prompt)
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     # Simple text split by newline
                     linkages = [line.strip() for line in response.text.strip().split('\n') if line.strip()]
 
@@ -1673,24 +1752,56 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 try:
                     topic = payload.get('topic', '')
                     prompt = f"""
-                    Create a structured 'Cheat Sheet' for '{topic}' for last minute revision.
-                    Return a JSON object with this structure:
+                    # MISSION: ULTIMATE REVISION SHEET (LMR)
+                    **Topic:** {topic}
+
+                    **OBJECTIVE:** Create a high-density, low-fluff revision aid.
+
+                    **OUTPUT SCHEMA (JSON):**
                     {{
                         "title": "{topic}",
                         "tabs": [
-                            {{ "id": "facts", "label": "⚡ Quick Facts", "content": "Markdown list of key definitions and facts" }},
-                            {{ "id": "articles", "label": "📜 Articles/Sections", "content": "Markdown list of relevant legal articles" }},
-                            {{ "id": "dates", "label": "📅 Timeline", "content": "Markdown chronological list" }},
-                            {{ "id": "judgments", "label": "⚖️ Case Laws", "content": "Markdown of 3 key judgments/committees" }},
-                            {{ "id": "mnemonics", "label": "🧠 Mnemonics", "content": "1 clever mnemonic to remember this topic" }},
-                            {{ "id": "examiner", "label": "🧐 Examiner's View", "content": "Markdown: What keywords/themes does the examiner look for? High yield areas." }},
-                            {{ "id": "concept_map", "label": "🗺️ Concept Map", "content": "Mermaid JS diagram code (graph TD or mindmap) illustrating the concept", "type": "mermaid" }},
-                            {{ "id": "quiz", "label": "❓ Active Recall", "content": "JSON Array of 5 objects: [ { 'q': 'Question?', 'a': 'Short Answer' } ]", "type": "quiz" }}
+                            {{
+                                "id": "facts",
+                                "label": "⚡ Core DNA",
+                                "content": "**Definitions**: Precise.\n**Data**: Latest stats.\n**Origin**: Historical context."
+                            }},
+                            {{
+                                "id": "articles",
+                                "label": "📜 Law & Consti",
+                                "content": "Relevant Articles, Schedules, and Acts. Don't just list numbers, give the *essence*."
+                            }},
+                            {{
+                                "id": "judgments",
+                                "label": "⚖️ Jurisprudence",
+                                "content": "Landmark SC Judgments (Case Name + Ratio Decidendi)."
+                            }},
+                            {{
+                                "id": "examiner",
+                                "label": "🧐 Examiner's Lens",
+                                "content": "**Trap Areas**: Where students get confused.\n**High Yield Keywords**: Terms that fetch marks (e.g., 'Cooperative Federalism')."
+                            }},
+                            {{
+                                "id": "interdisciplinary",
+                                "label": "🌐 Linkages",
+                                "content": "Connect {topic} to Economy, Ethics, and IR."
+                            }},
+                            {{
+                                "id": "concept_map",
+                                "label": "🗺️ Neural Map",
+                                "content": "graph TD; A[{topic}] --> B[Key Concept]; B --> C[Nuance];",
+                                "type": "mermaid"
+                            }},
+                            {{
+                                "id": "quiz",
+                                "label": "❓ Active Recall",
+                                "content": "JSON Array of 5 Objects: [{{ 'q': 'Scenario/Question', 'a': 'Specific Answer' }}]",
+                                "type": "quiz"
+                            }}
                         ]
                     }}
-                    Ensure content is concise Markdown. For the concept_map, provide ONLY the valid Mermaid code string. For quiz, ensure valid JSON string in content field.
                     """
-                    response = model_manager.generate_content(prompt)
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     # Use _parse_response to handle JSON extraction safely
                     json_content = self._parse_response(response.text)
 
@@ -1716,8 +1827,21 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     Format nicely with Markdown. 
                     """
                     response = model_manager.generate_content(prompt, model_type='pro')
-                    
-                    # Store the rich markdown directly
+                    # Simple splitting to separate quotes and data is hard without structured output
+                    # Just return full text
+                    text = response.text
+                    quotes_part = "See below"
+                    data_part = "See below"
+
+                    # Try to split if labeled
+                    if "Data:" in text:
+                        parts = text.split("Data:")
+                        quotes_part = parts[0].replace("Quotes:", "").strip()
+                        data_part = parts[1].strip()
+                    else:
+                        quotes_part = text
+                        data_part = ""
+
                     result = {
                         "success": True,
                         "message": "Quote Bank Generated.",
@@ -1731,12 +1855,20 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 try:
                     topic = payload.get('topic', '')
                     prompt = f"""
-                    Create a chronological timeline of key events related to '{topic}'.
-                    Format: "Year/Era - **Event Name**: Brief significance (1 sentence)."
-                    Cover at least 5-7 major milestones.
-                    Start directly with the timeline.
+                    # MISSION: NARRATIVE CHRONOLOGY
+                    **Topic:** {topic}
+
+                    **DIRECTIVE:**
+                    Don't just list dates. Tell the *story* of cause and effect.
+
+                    **FORMAT:**
+                    **[Year]**: **[Event Name]**
+                    -> *The Catalyst:* Why did this happen?
+                    -> *The Aftermath:* What did it lead to?
+
+                    Limit to 7-10 pivotal moments.
                     """
-                    response = model_manager.generate_content(prompt)
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     result = {
                         "success": True,
                         "message": "Timeline Generated.",
@@ -1749,9 +1881,20 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 try:
                     topic = payload.get('topic', '')
                     prompt = f"""
-                    Create a realistic ethical dilemma or case study related to '{topic}' for a civil servant.
-                    End with a question: "What would you do?"
-                    Start directly with the Case Study. No intro text.
+                    # MISSION: ETHICAL CASE STUDY GENERATION
+                    **Theme:** {topic}
+
+                    **SCENARIO:**
+                    Create a complex, grey-area case study for GS4 (Ethics).
+                    - **Conflict:** Duty vs. Conscience vs. Law.
+                    - **Stakes:** High (Life, death, or riot).
+                    - **Nuance:** No easy answer. Both choices have negative consequences.
+
+                    **OUTPUT:**
+                    **Case:** [The Narrative]
+                    **Ethical Issues:** [List of values in conflict]
+                    **Options:** [Course of Action A vs B]
+                    **Question:** "As the officer in charge, justify your course of action."
                     """
                     response = model_manager.generate_content(prompt, model_type='pro')
                     result = {
@@ -1795,23 +1938,24 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 try:
                     topic = payload.get('topic', '')
                     prompt = f"""
-                    Explain the concept of '{topic}' at multiple levels of complexity.
-                    Return strictly valid JSON with this structure:
+                    # MISSION: MULTI-LEVEL CONCEPT DECONSTRUCTION
+                    **Topic:** {topic}
+
+                    **OUTPUT SCHEMA (JSON ONLY):**
                     {{
-                        "eli5": "Explanation for a 5-year-old using simple analogies",
-                        "eli15": "Explanation for a teenager (high school level)",
-                        "eli_expert": "Academic/Professional definition with technical nuance",
-                        "analogy": "A creative, distinct analogy to help visualize it",
-                        "visual_analogy_prompt": "A detailed text-to-image prompt to visualize the analogy (e.g. 'A digital painting of...')",
-                        "real_world_example": "A concrete real-world application or example",
+                        "eli5": "Explain like I'm 5. Use a physical analogy (Lego, Pizza, Water).",
+                        "eli15": "Explain like I'm 15. Connect to school subjects. No jargon.",
+                        "eli_expert": "Explain to a PhD. Nuance, exceptions, and theoretical underpinnings.",
+                        "analogy": "The 'Aha!' Moment Analogy. Totally distinct from the ELI5.",
+                        "visual_analogy_prompt": "Midjourney Prompt: 'A surrealist painting of... --v 6.0'",
+                        "real_world_example": "Where do we see {topic} in daily life? (Not a textbook example).",
                         "quiz": [
-                            {{ "question": "Simple check question 1", "options": ["Option A", "Option B", "Option C"], "answer": "Option A" }},
-                            {{ "question": "Simple check question 2", "options": ["Option A", "Option B", "Option C"], "answer": "Option B" }}
+                            {{ "question": "Concept Check 1", "options": ["A", "B", "C"], "answer": "Correct Option" }},
+                            {{ "question": "Concept Check 2", "options": ["A", "B", "C"], "answer": "Correct Option" }}
                         ]
                     }}
-                    Do NOT include markdown formatting like ```json ... ```, just the raw JSON.
                     """
-                    response = model_manager.generate_content(prompt)
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     data = self._parse_response(response.text)
 
                     # Handle panic mode fallback
@@ -1839,7 +1983,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 try:
                     topic = payload.get('topic', '')
                     prompt = f"Explain the UPSC syllabus topic '{topic}' in concise detail. Cover key concepts."
-                    response = model_manager.generate_content(prompt)
+                    response = model_manager.generate_content(prompt, model_type='pro')
                     result = {"success": True, "explanation": response.text}
                 except Exception as e:
                     result = {"success": False, "message": f"Explanation Failed: {str(e)}"}
@@ -1848,12 +1992,16 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 try:
                     topic = payload.get('topic', '')
                     prompt = f"""
-                    Identify 3-5 common conceptual mistakes or "Pitfalls" students make when Answer Writing or Studying '{topic}'.
-                    For each pitfall:
-                    1. The Mistake
-                    2. The Correction/Nuance
-                    
-                    Format as a concise Markdown list.
+                    # MISSION: IDENTIFY LETHAL MISTAKES
+                    **Topic:** {topic}
+
+                    Identify 3 subtle but dangerous mistakes top students make in this topic.
+                    Focus on: Nuance errors, Misinterpretation of terms, or Over-generalization.
+
+                    **OUTPUT:**
+                    1. **The Confusion:** [What they think] vs [What is true].
+                    2. **The Example:** [A specific case/article].
+                    3. **The Fix:** [How to remember correctly].
                     """
                     response = model_manager.generate_content(prompt, model_type='pro')
                     result = {"success": True, "pitfalls": response.text}
@@ -1879,11 +2027,27 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 try:
                     topic = payload.get('topic', '')
                     prompt = f"""
-                    Triangulate '{topic}' by connecting it to 3 dimensions:
-                    1. Historical Context
-                    2. Constitutional/Legal Framework
-                    3. Current Affairs Relevance
-                    Synthesize these into a holistic view.
+                    # MISSION: 360-DEGREE TRIANGULATION
+                    **Target:** {topic}
+
+                    **OBJECTIVE:**
+                    Create a holistic "Theory of Everything" for this topic by connecting 3 distinct dimensions.
+
+                    **OUTPUT SCHEMA (JSON-like text or Structured Markdown):**
+
+                    **Dimension 1: The Anchor (Static Theory)**
+                    - Historical origin or Constitutional Article.
+                    - *Key Scholar/Judgment:* (e.g., "K.C. Wheare" or "Kesavananda Bharati").
+
+                    **Dimension 2: The Pulse (Dynamic Current Affairs)**
+                    - Why is this in news *right now*? (Last 12 months).
+                    - Link to a specific report/index/event.
+
+                    **Dimension 3: The Bridge (Interdisciplinary)**
+                    - Connect it to a totally different GS paper (e.g., If Polity, link to Economy or Ethics).
+
+                    **SYNTHESIS (The Golden Thread):**
+                    - A powerful concluding paragraph merging all three.
                     """
                     response = model_manager.generate_content(prompt, model_type='pro')
                     result = {"success": True, "data": {"synthesis": response.text}}
@@ -1893,9 +2057,27 @@ Your output must be structurally perfect, intellectually dense, and strictly com
             elif action_type == "DECODE_NEURAL_HASH":
                 try:
                     topic = payload.get('topic', '')
-                    prompt = f"Identify the core underlying themes and cross-disciplinary linkages for '{topic}'."
-                    response = model_manager.generate_content(prompt)
-                    result = {"success": True, "data": {"core_themes": [response.text]}}
+                    prompt = f"""
+                    # MISSION: DECODE THE NEURAL HASH
+                    **Input:** {topic}
+
+                    **TASK:**
+                    Extract the "Hidden Syllabus" - the concepts examiners test but don't explicitly list.
+
+                    **OUTPUT SCHEMA (JSON):**
+                    {{
+                        "core_themes": ["Theme 1 (The Obvious)", "Theme 2 (The Hidden)"],
+                        "high_yield_keywords": ["Keyword 1", "Keyword 2"],
+                        "examiner_pattern": "The mental model used to set questions on this (e.g. 'Focuses on exceptions to the rule').",
+                        "potential_questions": [
+                            {{ "type": "Conceptual", "question": "..." }},
+                            {{ "type": "Applied", "question": "..." }}
+                        ]
+                    }}
+                    """
+                    response = model_manager.generate_content(prompt, model_type='pro')
+                    data = self._parse_response(response.text)
+                    result = {"success": True, "message": "Neural Hash Decoded.", "data": data}
                 except Exception as e:
                     result = {"success": False, "message": f"Neural Hash Decode Failed: {str(e)}"}
 

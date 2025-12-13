@@ -32,12 +32,10 @@ class AutoCorrector:
 
     def _handle_execution_failure(self, mistake):
         """
-        Strategy: Retry with backoff or simplified parameters.
+        Strategy: Use AI to analyze the error and modify the payload before retry.
         """
-        # Simple retry for now
-        # In a real system, we'd check the error message to decide strategy
+        from app.services.model_manager import model_manager
         
-        # Fetch original action payload
         conn = get_db()
         action = conn.execute('SELECT * FROM brain_action_log WHERE id = ?', (mistake['action_id'],)).fetchone()
         
@@ -45,24 +43,50 @@ class AutoCorrector:
             return {'success': False, 'message': 'Original action not found'}
             
         payload = json.loads(action['action_payload']) if action['action_payload'] else {}
-        
-        # Retry logic
-        print(f"🔄 Retrying {action['action_type']}...")
-        
+        error_msg = mistake.get('reason', 'Unknown Error')
+
+        new_payload = payload
+        strategy = "Direct Retry"
+
+        if model_manager.is_configured:
+            try:
+                # AI Correction Strategy
+                prompt = f"""
+                # MISSION: AUTO-CORRECT PAYLOAD
+                **Action:** {action['action_type']}
+                **Error:** {error_msg}
+                **Original Payload:** {json.dumps(payload)}
+
+                **DIRECTIVE:**
+                Modify the payload to fix the error.
+                - If "Context Window", reduce content size.
+                - If "Invalid JSON", fix structure.
+                - If "Topic Unknown", simplify topic.
+
+                **OUTPUT:** JSON only (Modified Payload)
+                """
+                response = model_manager.generate_content(prompt, model_type='fast')
+                import re
+                text = response.text.strip().replace('```json', '').replace('```', '')
+                new_payload = json.loads(text)
+                strategy = "AI Adjusted Payload"
+            except:
+                pass # Fallback to direct retry
+
         # Log the correction attempt
         autonomy_manager.log_action(
             action_type=f"RETRY_{action['action_type']}",
-            action_payload=payload,
+            action_payload=new_payload,
             executed_by='auto_corrector',
-            reasoning=f"Retrying after failure: {mistake['reason']}"
+            reasoning=f"Correction Strategy: {strategy} | Error: {error_msg}"
         )
         
         # Execute via BrainService
-        result = brain_service.execute_action(action['action_type'], payload)
+        result = brain_service.execute_action(action['action_type'], new_payload)
         
         return {
             'success': result['success'],
-            'message': f"Retry result: {result['message']}",
+            'message': f"Retry ({strategy}) result: {result.get('message', 'Done')}",
             'new_action_id': result.get('action_id')
         }
 

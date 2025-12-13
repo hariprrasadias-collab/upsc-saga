@@ -177,3 +177,49 @@ def get_topic_connections():
         'nodes': nodes,
         'edges': edges
     }
+
+def get_predictive_heatmap(user_id=1):
+    """
+    PHASE 13: THE CARTOGRAPHER
+    Generates a 'Predictive Heatmap' using AI.
+    It predicts where the user needs to focus based on Weak Areas vs. High Yield Trends.
+    """
+    from app.services.model_manager import model_manager
+    if not model_manager.is_configured:
+        return {"error": "AI Offline"}
+
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    # 1. Gather Data
+    weak_areas = c.execute('SELECT topic, priority_score FROM weak_area_analysis WHERE user_id = ? ORDER BY priority_score DESC LIMIT 10', (user_id,)).fetchall()
+    trends = c.execute('SELECT topic, question_count FROM trending_topics ORDER BY question_count DESC LIMIT 10').fetchall()
+
+    weak_str = ", ".join([f"{w['topic']} ({w['priority_score']})" for w in weak_areas])
+    trend_str = ", ".join([f"{t['topic']} ({t['question_count']})" for t in trends])
+
+    # 2. AI Synthesis
+    prompt = f"""
+    # MISSION: GENERATE PREDICTIVE HEATMAP DATA
+    **User Weaknesses:** {weak_str}
+    **Global Trends:** {trend_str}
+
+    **DIRECTIVE:**
+    Identify 5 "Hotspots" where User Weakness overlaps with Global Trends (High Yield).
+
+    **OUTPUT SCHEMA (JSON):**
+    [
+        {{ "topic": "Name", "urgency": 0-100, "reason": "High Trend + Low Accuracy" }}
+    ]
+    """
+
+    try:
+        response = model_manager.generate_content(prompt, model_type='fast')
+        import json
+        text = response.text.strip().replace('```json', '').replace('```', '')
+        data = json.loads(text)
+        return data
+    except Exception as e:
+        return [{"topic": "Error generating heatmap", "urgency": 0, "reason": str(e)}]
+    finally:
+        conn.close()

@@ -159,32 +159,29 @@ class ForesightEngine:
             return []
             
         prompt = f"""
-        You are the 'Devil's Advocate', a ruthless UPSC Examiner.
-        Review these {len(candidates)} candidate questions.
+        # MISSION: THE RUTHLESS SELECTION (DEVIL'S ADVOCATE)
+        **Role:** Chief UPSC Examiner (Retired).
+        **Task:** Filter and Polish these {len(candidates)} raw predictions.
         
-        CRITERIA FOR SELECTION:
-        1. **Ambiguity**: Is the question clear? (Reject if vague)
-        2. **Difficulty**: Is it too easy? (Reject if trivial)
-        3. **Relevance**: Is it actually examinable? (Reject if niche/irrelevant)
-        4. **Structure**: Does it follow UPSC format? (Multi-statement preferred)
-        
-        CANDIDATES:
+        **CANDIDATES:**
         {json.dumps(candidates, indent=2)}
         
-        TASK:
-        Select the Top 10 questions that strictly meet the criteria.
-        Refine their wording if necessary to increase difficulty.
+        **CRITERIA:**
+        1. **Kill the Trivial:** If a Google search answers it in 1 second, DELETE IT.
+        2. **Fix the Vague:** "What is democracy?" -> "Critically analyze the role of 'Constitutional Morality' in sustaining Indian Democracy."
+        3. **Interdisciplinary:** Prioritize questions connecting multiple subjects (e.g., Environment + IR).
+        4. **Black Swans:** Keep 2 "Wildcard" questions that are low probability but high impact.
         
-        OUTPUT FORMAT (JSON Array):
+        **OUTPUT SCHEMA (JSON):**
         [
             {{
-                "question": "Refined Question...",
-                "type": "MCQ",
-                "probability": 0.9,
-                "reasoning": "Strong correlation with [Topic]",
-                "subject": "Polity",
-                "topic": "Fundamental Rights",
-                "preparation_tip": "Study [Source]"
+                "question": "Refined Question (Multi-statement/Analytical)",
+                "type": "MCQ" or "Mains",
+                "probability": 0.1 to 0.9,
+                "reasoning": "Why this? (e.g., 'Matches 2023 Trend of randomized options')",
+                "subject": "Core Subject",
+                "topic": "Sub-topic",
+                "preparation_tip": "Specific source (e.g., 'ARC Report 2, Chapter 4')"
             }}
         ]
         """
@@ -276,38 +273,36 @@ class ForesightEngine:
 
         # Phase 1: Generator (High Creativity)
         prompt = f"""
-        You are Project Foresight - a predictive oracle for UPSC exam questions.
+        # MISSION: PREDICT THE FUTURE (PROJECT FORESIGHT)
+        **Role:** An AI Oracle analyzing patterns in the chaos.
         
-        SUBJECT FOCUS: {subject}
-        {topic_directive}
+        **CONTEXT:**
+        - **Subject:** {subject}
+        - **Focus:** {topic_directive}
+        - **Weaknesses:** {weak_area_text}
+        - **PYQ Patterns:** {pyq_patterns}
+        - **News:** {current_affairs}
         
-        HISTORICAL PATTERNS (PYQs):
-        {pyq_patterns}
+        **DIRECTIVE:**
+        Generate 20 "Black Swan" Candidate Questions.
+        - **Avoid Obviousness:** No "Who is the President?" questions.
+        - **Target:** "Grey Areas" where static syllabus meets dynamic current events.
+        - **Structure:**
+          - 50% Conceptual (Deep Theory).
+          - 30% Applied (Current Affairs Linkage).
+          - 20% "Bouncer" (Unexpected interdisciplinary connections).
         
-        RECENT CURRENT AFFAIRS:
-        {current_affairs}
-        
-        {weak_area_text}
-        
-        {examples_text}
-        
-        Generate 20 CANDIDATE questions for UPSC Prelims/Mains.
-        Focus on "Interdisciplinary" questions (e.g., Economy + Environment).
-        Prioritize topics listed in USER WEAK AREAS.
-        If a specific TOPIC FOCUS is provided, ensure at least 50% of questions relate to it.
-        
-        OUTPUT FORMAT (JSON Array):
-        IMPORTANT: Return ONLY valid RAW JSON. Do not include markdown formatting (```json) or introductory text.
+        **OUTPUT SCHEMA (JSON):**
         [
             {{
-                "question": "...",
-                "type": "MCQ",
-                "probability": 0.8,
-                "reasoning": "...",
-                "subject": "...",
-                "topic": "...",
-                "preparation_tip": "...",
-                "source_citation": "The Hindu (24th Nov) / NCERT Class XI"
+                "question": "The Raw Question Candidate",
+                "type": "MCQ" or "Mains",
+                "probability": 0.7,
+                "reasoning": "Derived from Pattern X + News Y",
+                "subject": "Primary Subject",
+                "topic": "Specific Topic",
+                "preparation_tip": "Read X to solve this",
+                "source_citation": "The Hindu / Yojana / NCERT"
             }}
         ]
         """
@@ -353,12 +348,12 @@ class ForesightEngine:
                 for pred in final_predictions:
                     pred['generated_at'] = datetime.now().isoformat()
                     pred['id'] = hash(pred['question']) % 10000
-                
+
                 return final_predictions
             else:
                 print("No JSON found in response")
                 return []
-                
+
         except Exception as e:
             print(f"Prediction Generation Error: {e}")
             import traceback

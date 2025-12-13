@@ -1,5 +1,6 @@
 import os
 import time
+import json
 import random
 import hashlib
 from datetime import datetime, timedelta
@@ -8,84 +9,67 @@ from google.api_core.exceptions import ResourceExhausted, ServiceUnavailable, In
 from dotenv import load_dotenv
 from cachetools import TTLCache
 import openai
+from openai import OpenAI
 
 load_dotenv()
 
 class FallbackResponse:
     """A safe, mock response object mimicking genai.GenerateContentResponse"""
-    def __init__(self, text):
+    def __init__(self, text, candidates=None):
         self.text = text
+        self.candidates = candidates or []
 
 class ModelManager:
     """
     Centralized manager for Multi-Provider AI models (Gemini, OpenRouter, Chutes, Nvidia).
-    Supports automatic fallback, rotation, caching, and cool-down logic.
+    Supports automatic fallback, rotation, caching, and persistent quota tracking.
     """
 
     # --- GOOGLE GEMINI MODELS ---
     GEMINI_PRO_MODELS = [
-        'gemini-2.5-pro',
-        'gemini-pro-latest'
+        'gemini-2.0-pro-exp-02-05',
+        'gemini-1.5-pro',
+        'gemini-pro'
     ]
     GEMINI_FAST_MODELS = [
-        'gemini-2.5-flash',
-        'gemini-2.0-flash-exp'
+        'gemini-2.0-flash',
+        'gemini-2.0-flash-lite-preview-02-05',
+        'gemini-1.5-flash'
     ]
 
     # --- OPENROUTER MODELS (Tiered for Efficiency) ---
-    
-    # 1. FREE (Use for testing, simple echo, or when budget is 0)
-    # Extensive list to handle rate limits via rotation
     OPENROUTER_FREE = [
-        "google/gemini-2.0-flash-exp:free",
+        "google/gemini-2.0-flash-lite-preview-02-05:free",
+        "google/gemini-2.0-pro-exp-02-05:free",
         "meta-llama/llama-3.3-70b-instruct:free",
+        "deepseek/deepseek-r1:free",
+        "deepseek/deepseek-chat:free",
         "microsoft/phi-3-medium-128k-instruct:free",
-        "google/gemma-3-27b-it:free",
+        "google/gemma-2-9b-it:free",
         "mistralai/mistral-7b-instruct:free",
         "openchat/openchat-7b:free",
         "nousresearch/hermes-3-llama-3.1-405b:free",
         "qwen/qwen-2-7b-instruct:free",
-        "huggingfaceh4/zephyr-7b-beta:free",
         "nvidia/llama-3.1-nemotron-70b-instruct:free",
-        "alibaba/tongyi-deepresearch-30b-a3b:free",
-        "allenai/olmo-3-32b-think:free",
-        "amazon/nova-2-lite-v1:free",
-        "arcee-ai/trinity-mini:free",
-        "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
-        "kwaipilot/kat-coder-pro:free",
-        "meituan/longcat-flash-chat:free",
-        "meta-llama/llama-3.2-3b-instruct:free",
-        "mistralai/devstral-2512:free",
-        "qwen/qwen3-coder:free",
-        "z-ai/glm-4.5-air:free"
     ]
 
-    # 2. ECONOMY (Best Value - High Intelligence / Low Cost)
-    # Llama 3.1 70B is ~$0.40/M tokens, Haiku is ~$0.25/M
-    OPENROUTER_ECONOMY = [
-        "meta-llama/llama-3.1-70b-instruct",
-        "anthropic/claude-3-haiku",
-        "openai/gpt-4o-mini"
-    ]
-
-    # 3. PREMIUM (Maximum Intelligence - Higher Cost)
-    # Use for complex reasoning, coding, or critical analysis.
     OPENROUTER_PREMIUM = [
+        "anthropic/claude-3.7-sonnet",
         "anthropic/claude-3.5-sonnet",
         "openai/gpt-4o",
         "google/gemini-pro-1.5",
-        "anthropic/claude-3.7-sonnet"
     ]
 
-    # Combined list for rotation if needed (prefer specific tiers)
-    # DEFAULTING TO FREE TIER AS REQUESTED
-    OPENROUTER_MODELS = OPENROUTER_FREE + OPENROUTER_ECONOMY
-
     # --- NVIDIA NIM MODELS ---
-    NVIDIA_MODELS = [
+    NVIDIA_MODELS_PRO = [
         'meta/llama-3.1-405b-instruct',
-        'meta/llama-3.1-70b-instruct',
         'nvidia/nemotron-4-340b-instruct'
+    ]
+
+    NVIDIA_MODELS_FAST = [
+        'meta/llama-3.1-70b-instruct',
+        'meta/llama-3.1-8b-instruct',
+        'mistralai/mixtral-8x22b-instruct-v0.1'
     ]
 
     def __init__(self):
@@ -103,7 +87,7 @@ class ModelManager:
                 base_url="https://openrouter.ai/api/v1",
                 api_key=or_key,
                 default_headers={
-                    "HTTP-Referer": "https://github.com/hariprrasadias", 
+                    "HTTP-Referer": "https://github.com/hariprrasadias/upsc-saga",
                     "X-Title": "UPSC Second Brain"
                 }
             )
@@ -117,17 +101,12 @@ class ModelManager:
             )
 
         # State Management
-        self.current_indices = {'google_pro': 0, 'google_fast': 0, 'openrouter': 0, 'nvidia': 0}
-        self.models_cache = {} 
-        self.cooldowns = {}
-        self.response_cache = TTLCache(maxsize=100, ttl=3600)
+        self.response_cache = TTLCache(maxsize=200, ttl=3600)
         self._panic_mode_until = None
 
-        # Quota Governance
-        self.DAILY_LIMIT = 1450
-        self.TPM_LIMIT = 900000 
-        self.quota_file = "backend/daily_quota.json"
-        self.tpm_state = {'timestamp': time.time(), 'tokens': 0}
+        # Quota Persistence
+        self.quota_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'services', 'quota_status.json')
+        self.quota_status = self._load_quota_status()
 
         if self.google_api_key:
             self._configure_google()
@@ -138,7 +117,7 @@ class ModelManager:
 
     @property
     def is_configured(self):
-        """Legacy property to check if ANY provider is configured."""
+        """Check if ANY provider is configured."""
         return self.google_configured or bool(self.clients)
 
     def _configure_google(self):
@@ -148,86 +127,64 @@ class ModelManager:
         except Exception as e:
             print(f"❌ Google Configuration Failed: {e}")
 
-    def _get_provider_for_model(self, model_name):
-        """Determine which provider handles a given model."""
-        if not model_name: return 'google'
-        if model_name.startswith('gemini'): return 'google'
-        if '/' in model_name: return 'openrouter' # Convention for OpenRouter
-        if model_name in self.NVIDIA_MODELS: return 'nvidia'
-        return 'openrouter' # Default fallback for non-gemini
+    # --- QUOTA MANAGEMENT ---
 
-    def get_model(self, model_name=None, model_type='fast'):
-        """
-        Legacy support for Gemini object retrieval. 
-        For new providers, we stick to the client object.
-        """
-        if model_type == 'pro' or (model_name and model_name in self.GEMINI_PRO_MODELS):
-             # Logic to return Gemini model object
-             pass
-        return None # Simplified for now, logic moved to generate_content
+    def _load_quota_status(self):
+        try:
+            if os.path.exists(self.quota_file):
+                with open(self.quota_file, 'r') as f:
+                    return json.load(f)
+        except Exception as e:
+            print(f"Failed to load quota file: {e}")
+        return {}
 
-    def _is_in_cooldown(self, model_name):
-        if model_name in self.cooldowns:
-            if datetime.now() < self.cooldowns[model_name]:
+    def _save_quota_status(self):
+        try:
+            # Clean up expired entries before saving
+            now = datetime.now().isoformat()
+            self.quota_status = {k: v for k, v in self.quota_status.items() if v > now}
+
+            with open(self.quota_file, 'w') as f:
+                json.dump(self.quota_status, f)
+        except Exception as e:
+            print(f"Failed to save quota file: {e}")
+
+    def _is_quota_exceeded(self, provider, model_name):
+        key = f"{provider}:{model_name}"
+        if key in self.quota_status:
+            unlock_time_str = self.quota_status[key]
+            unlock_time = datetime.fromisoformat(unlock_time_str)
+            if datetime.now() < unlock_time:
+                # print(f"⏳ Model {key} is on cooldown until {unlock_time}")
                 return True
             else:
-                del self.cooldowns[model_name]
+                del self.quota_status[key]
+                self._save_quota_status()
         return False
 
-    def _mark_cooldown(self, model_name, duration_seconds=60):
-        self.cooldowns[model_name] = datetime.now() + timedelta(seconds=duration_seconds)
-        print(f"❄️ Model {model_name} in cool-down for {duration_seconds}s")
-
-    def _check_panic_mode(self):
-        if self._panic_mode_until:
-            if datetime.now() < self._panic_mode_until:
-                return True
-            else:
-                self._panic_mode_until = None
-        return False
-
-    def _trigger_panic_mode(self, duration_seconds=10):
-        self._panic_mode_until = datetime.now() + timedelta(seconds=duration_seconds)
-        print(f"🛑 PANIC MODE ACTIVATED: Skipping API calls for {duration_seconds}s")
-
-    def _check_tpm_limit(self, prompt_len):
-        est_tokens = prompt_len // 4
-        now = time.time()
-        if now - self.tpm_state['timestamp'] > 60:
-            self.tpm_state = {'timestamp': now, 'tokens': 0}
-        
-        if self.tpm_state['tokens'] + est_tokens > self.TPM_LIMIT:
-            wait_time = max(1, 60 - (now - self.tpm_state['timestamp']))
-            print(f"⏳ TPM Limit. Throttling {wait_time:.1f}s...")
-            time.sleep(wait_time)
-            self.tpm_state = {'timestamp': time.time(), 'tokens': 0}
-        self.tpm_state['tokens'] += est_tokens
-
-    def _check_daily_quota(self):
-        # Implementation similar to before, specifically for Google Free Tier
-        # For paid APIS (OpenRouter/Nvidia), we generally skip this unless budget tracking is added
-        return True 
+    def _mark_quota_exceeded(self, provider, model_name):
+        """Marks a model as quota exceeded for 24 hours."""
+        key = f"{provider}:{model_name}"
+        unlock_time = datetime.now() + timedelta(hours=24)
+        self.quota_status[key] = unlock_time.isoformat()
+        self._save_quota_status()
+        print(f"⛔ Model {key} marked as QUOTA EXCEEDED until {unlock_time}")
 
     def _get_cache_key(self, prompt, model_name, kwargs):
         content = f"{prompt}|{model_name}|{str(sorted(kwargs.items()))}"
         return hashlib.md5(content.encode('utf-8')).hexdigest()
 
-        return FallbackResponse("No response generated.")
-
     def generate_content(self, prompt, model_type='fast', model_name=None, provider=None, **kwargs):
         """
-        Unified generation method with ROBUST FALLBACKS.
+        Unified generation method with ROBUST FALLBACKS and QUOTA MANAGEMENT.
         """
-        # Circuit Breaker
-        if self._check_panic_mode(): 
-            return FallbackResponse("System Offline (Panic Mode).")
-
-        # 1. Determine Primary Strategy
+        # 1. Determine Strategy and Build Candidates List
         candidates = []
 
         # Helper to add candidate
         def add_candidate(prov, mod):
-            candidates.append({'provider': prov, 'model': mod})
+            if not self._is_quota_exceeded(prov, mod):
+                candidates.append({'provider': prov, 'model': mod})
 
         # A. Explicit Request
         if provider and model_name:
@@ -235,26 +192,42 @@ class ModelManager:
         
         # B. Automatic Strategy based on Type
         elif model_type == 'pro':
-            # Priority 1: Google Pro
-            add_candidate('google', self.GEMINI_PRO_MODELS[0])
-            # Priority 2: Nvidia High-End (Free Trial)
-            add_candidate('nvidia', 'meta/llama-3.1-405b-instruct')
-            # Priority 3: OpenRouter Premium (if configured) or Top Free
-            add_candidate('openrouter', self.OPENROUTER_MODELS[0])
+            # Priority 1: Nvidia High-End (Complex Tasks)
+            for m in self.NVIDIA_MODELS_PRO:
+                add_candidate('nvidia', m)
+
+            # Priority 2: Google Pro
+            for m in self.GEMINI_PRO_MODELS:
+                add_candidate('google', m)
+
+            # Priority 3: OpenRouter Premium/Free Top Tier
+            for m in self.OPENROUTER_PREMIUM: # Only if user pays, but list exists
+                 add_candidate('openrouter', m)
+            for m in self.OPENROUTER_FREE:
+                if '405b' in m or 'deepseek-r1' in m: # Prioritize smarter free models
+                    add_candidate('openrouter', m)
             
         else: # 'fast'
-            # Priority 1: Google Fast
-            add_candidate('google', self.GEMINI_FAST_MODELS[0])
-            # Priority 2: Nvidia 70B
-            add_candidate('nvidia', 'meta/llama-3.1-70b-instruct') 
-            # Priority 3: OpenRouter Free/Economy
-            add_candidate('openrouter', self.OPENROUTER_FREE[0])
+            # Priority 1: Nvidia Fast
+            for m in self.NVIDIA_MODELS_FAST:
+                add_candidate('nvidia', m)
 
-        # Always add a final "Hail Mary" fallback
-        add_candidate('google', 'gemini-2.5-flash')
-        add_candidate('openrouter', 'google/gemini-2.0-flash-exp:free')
+            # Priority 2: OpenRouter Free (Top ones)
+            for m in self.OPENROUTER_FREE:
+                 add_candidate('openrouter', m)
 
-        # Deduplicate candidates
+            # Priority 3: Google Fast
+            for m in self.GEMINI_FAST_MODELS:
+                add_candidate('google', m)
+
+        # Fallback: Always ensure at least some models are in the list if everything else is exhausted
+        if not candidates:
+             # Force add base models even if "quota exceeded" check failed (desperate measure) or just add if list empty
+             print("⚠️ Warning: All preferred models seem exhausted. Attempting Hail Mary.")
+             candidates.append({'provider': 'google', 'model': 'gemini-2.0-flash'})
+             candidates.append({'provider': 'openrouter', 'model': 'google/gemini-2.0-flash-exp:free'})
+
+        # Deduplicate candidates while preserving order
         seen = set()
         unique_candidates = []
         for c in candidates:
@@ -264,66 +237,87 @@ class ModelManager:
                 unique_candidates.append(c)
 
         # 2. Execution Loop
-        cache_key = self._get_cache_key(prompt, unique_candidates[0]['model'], kwargs)
-        if cache_key in self.response_cache:
-            return self.response_cache[cache_key]
+        # Check cache for the primary candidate (best effort cache key)
+        if unique_candidates:
+             cache_key = self._get_cache_key(prompt, unique_candidates[0]['model'], kwargs)
+             if cache_key in self.response_cache:
+                 print("⚡ Returning cached response.")
+                 return self.response_cache[cache_key]
 
         errors = []
         for candidate in unique_candidates:
             tgt_prov = candidate['provider']
             tgt_model = candidate['model']
             
+            # Skip if provider not configured
+            if tgt_prov != 'google' and tgt_prov not in self.clients:
+                continue
+            if tgt_prov == 'google' and not self.google_configured:
+                continue
+
             print(f"🚀 Attempting with {tgt_prov} :: {tgt_model}...")
 
             try:
                 response = None
+                start_time = time.time()
+
                 if tgt_prov == 'google':
                      response = self._generate_google(prompt, tgt_model, **kwargs)
                 elif tgt_prov in self.clients:
                      response = self._generate_openai_compat(prompt, tgt_model, tgt_prov, **kwargs)
                 
                 if response:
-                    print(f"✅ Success with {tgt_prov}")
-                    self.response_cache[cache_key] = response
+                    duration = time.time() - start_time
+                    print(f"✅ Success with {tgt_prov} ({duration:.2f}s)")
+
+                    # Cache successful response
+                    if unique_candidates:
+                         cache_key = self._get_cache_key(prompt, unique_candidates[0]['model'], kwargs)
+                         self.response_cache[cache_key] = response
+
                     return response
             
             except Exception as e:
-                err_msg = f"{tgt_prov} failed: {str(e)}"
-                print(f"⚠️ {err_msg}")
-                errors.append(err_msg)
+                err_str = str(e).lower()
+                print(f"⚠️ {tgt_prov} ({tgt_model}) failed: {str(e)}")
+
+                # Intelligent Quota Handling
+                if "429" in err_str or "quota" in err_str or "resource exhausted" in err_str or "credit" in err_str:
+                    self._mark_quota_exceeded(tgt_prov, tgt_model)
+
+                errors.append(f"{tgt_prov}:{tgt_model} -> {str(e)}")
                 continue # Try next candidate
 
         # 3. Final Failure
         print("❌ All Fallbacks Failed.")
-        return FallbackResponse(f"All providers failed. Errors: {'; '.join(errors)}")
+        return FallbackResponse(f"Oracle is silent. All providers failed. Errors: {'; '.join(errors)}")
 
     def _generate_google(self, prompt, model_name, **kwargs):
         if not self.google_configured: raise Exception("Google not configured")
         
-        self._check_tpm_limit(len(prompt))
+        # Map generic kwargs to Gemini specific if needed
+        gen_config = genai.types.GenerationConfig(
+            temperature=kwargs.get('temperature', 0.7),
+            max_output_tokens=kwargs.get('max_output_tokens', 2048)
+        )
         
-        # Simple rotation logic could be re-added here, keeping it simple for now
         model = genai.GenerativeModel(model_name)
-        return model.generate_content(prompt, **kwargs)
+        response = model.generate_content(prompt, generation_config=gen_config)
+        return FallbackResponse(response.text)
 
     def _generate_openai_compat(self, prompt, model_name, provider_key, **kwargs):
         client = self.clients.get(provider_key)
         if not client: raise Exception(f"Client for {provider_key} not ready")
-        
-        # Convert internal kwargs to OpenAI format if needed
-        # Mapping 'generation_config' etc. 
         
         completion = client.chat.completions.create(
             model=model_name,
             messages=[
                 {"role": "user", "content": prompt}
             ],
-            # Default params
             temperature=kwargs.get('temperature', 0.7),
-            max_tokens=kwargs.get('max_output_tokens', 1024)
+            max_tokens=kwargs.get('max_output_tokens', 2048)
         )
         
-        # Wrap response to mimic Google's object for backward compatibility
         text_content = completion.choices[0].message.content
         return FallbackResponse(text_content)
 

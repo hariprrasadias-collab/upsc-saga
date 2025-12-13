@@ -205,7 +205,6 @@ Return ONLY this JSON (no markdown, no explanation):
         result.setdefault('related_topics', [])
         result.setdefault('upsc_summary', content)  # NO TRUNCATION
         result.setdefault('key_points', [title])
-        result.setdefault('key_points', [title])
         print(f"✓ Processed: {title[:50]}... → {result['papers']} | {result['subjects']}")
         return result
     except Exception as e:

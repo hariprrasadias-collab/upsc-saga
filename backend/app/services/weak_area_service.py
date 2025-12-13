@@ -260,4 +260,39 @@ class WeakAreaAnalyzer:
         
         return [dict(s) for s in sets]
 
+    @staticmethod
+    def generate_recovery_plan(topic, subject):
+        """
+        PHASE 14: THE SCOUT
+        Generates a 3-Day Recovery Plan for a weak topic.
+        """
+        from app.services.model_manager import model_manager
+
+        if not model_manager.is_configured:
+            return {"error": "AI Offline"}
+
+        prompt = f"""
+        # MISSION: WEAK AREA RECOVERY PROTOCOL
+        **Target:** {topic} ({subject})
+
+        **DIRECTIVE:**
+        Create a surgical 3-Day Recovery Plan.
+
+        **OUTPUT SCHEMA (JSON):**
+        {{
+            "diagnosis": "Why this topic is hard (e.g. confusion between terms).",
+            "day_1": "Concept Clarity (Source + Activity)",
+            "day_2": "Application (PYQ Analysis)",
+            "day_3": "Testing (Active Recall)"
+        }}
+        """
+
+        try:
+            response = model_manager.generate_content(prompt, model_type='pro')
+            import json
+            text = response.text.strip().replace('```json', '').replace('```', '')
+            return json.loads(text)
+        except Exception as e:
+            return {"error": str(e)}
+
 weak_area_analyzer = WeakAreaAnalyzer()

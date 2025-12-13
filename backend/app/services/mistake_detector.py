@@ -1,12 +1,77 @@
 from app.db import get_db
 from datetime import datetime, timedelta
 import json
+from app.services.model_manager import model_manager
 
 class MistakeDetector:
     """
     Service to analyze Brain actions and detect patterns of failure or user rejection.
-    Uses raw SQLite3 queries.
+    Uses raw SQLite3 queries + AI Root Cause Analysis.
     """
+
+    def analyze_root_cause(self, action_type, error_logs):
+        """
+        Uses AI to deduce WHY a specific action is failing repeatedly.
+        """
+        if not model_manager.is_configured:
+            return "AI Diagnosis Unavailable"
+
+        prompt = f"""
+        # MISSION: DEBUGGING ASSISTANT (ROOT CAUSE ANALYSIS)
+        **Action Type:** {action_type}
+
+        **ERROR LOGS:**
+        {json.dumps(error_logs, indent=2)}
+
+        **TASK:**
+        Identify the pattern. Is it:
+        1. **Prompt Issue:** (e.g. JSON format violation)
+        2. **Data Issue:** (e.g. Missing context in DB)
+        3. **Model Limit:** (e.g. Context window exceeded)
+
+        **OUTPUT:**
+        A concise 1-sentence diagnosis.
+        """
+        try:
+            response = model_manager.generate_content(prompt, model_type='fast')
+            return response.text.strip()
+        except:
+            return "Diagnosis Failed"
+
+    def detect_cognitive_bias(self, answer_text):
+        """
+        PHASE 12: THE SHADOW (BIAS DETECTION)
+        Scans student answers for ideological bias or lack of neutrality.
+        """
+        if not model_manager.is_configured:
+            return None
+
+        prompt = f"""
+        # MISSION: NEUTRALITY CHECK (CIVIL SERVANT STANDARD)
+        **Answer:** "{answer_text}"
+
+        **DIRECTIVE:**
+        Analyze for:
+        1. **Political Bias:** Is it anti/pro-government instead of analytical?
+        2. **Emotional Language:** Is it inflammatory?
+        3. **Constitutional Morality:** Does it violate core democratic principles?
+
+        **OUTPUT SCHEMA (JSON):**
+        {{
+            "is_biased": true/false,
+            "bias_type": "Political / Religious / Emotional",
+            "warning": "You used the word 'disaster' for a policy. Use 'implementation gap' instead.",
+            "neutral_rewrite": "..."
+        }}
+        """
+
+        try:
+            response = model_manager.generate_content(prompt, model_type='pro')
+            import json
+            text = response.text.strip().replace('```json', '').replace('```', '')
+            return json.loads(text)
+        except Exception:
+            return None
 
     def detect_mistakes(self, lookback_hours=24):
         """

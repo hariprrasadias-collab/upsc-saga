@@ -46,33 +46,40 @@ class HephaestusService:
             
         # 3. Consult the Oracle (Gemini)
         prompt = f"""
-        CRITICAL SYSTEM FAILURE DETECTED.
-        You are Hephaestus, the AI Repair Engineer.
+        # MISSION: AUTONOMOUS CODE REPAIR (HEPHAESTUS)
+        **Role:** Lead Software Architect (Python/Flask Expert).
         
-        ERROR: {str(error)}
+        **CONTEXT:**
+        A critical runtime exception occurred in `{target_file}`.
         
-        TRACEBACK:
+        **ERROR SIGNATURE:**
+        `{str(error)}`
+
+        **TRACEBACK:**
         {tb_str}
         
-        BROKEN FILE ({target_file}):
+        **BROKEN CODE:**
         ```python
         {code_content}
         ```
         
-        TASK:
-        1. Analyze the error and the code.
-        2. Provide the CORRECTED full file content.
-        3. Do NOT provide explanations, only the python code block.
-        4. Ensure the fix is safe and maintains existing functionality.
+        **DIRECTIVE:**
+        1. **Diagnose:** Identify the root cause (Syntax, Logic, Import, Type Error).
+        2. **Fix:** Rewrite the ENTIRE file with the fix applied.
+        3. **Constraint:**
+           - Preserve all unrelated logic.
+           - Add defensive try/except blocks where risky.
+           - Do NOT remove imports unless they are the cause.
         
-        RESPONSE FORMAT:
+        **OUTPUT:**
+        Return ONLY the raw Python code block. No conversation.
         ```python
-        ... full corrected code ...
+        ...
         ```
         """
         
         try:
-            # Use Pro model for code repair
+            # Use Pro model for code repair - Critical reasoning required
             response = model_manager.generate_content(prompt, model_type='pro')
             fix_code = self._extract_code_block(response.text)
             

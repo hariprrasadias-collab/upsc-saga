@@ -15,6 +15,7 @@ class ChallengeService:
     def get_daily_challenge(self, user_id):
         """
         Get today's challenge for the user. Assigns one if not already assigned.
+        PHASE 9: AI GENERATED RAIDS
         """
         try:
             conn = get_db()
@@ -31,7 +32,61 @@ class ChallengeService:
             if existing:
                 return dict(existing)
 
-            # Assign a new random challenge
+            # PHASE 9: GENERATE DYNAMIC BOSS RAID
+            from app.services.model_manager import model_manager
+
+            if model_manager.is_configured:
+                try:
+                    # Generate a unique challenge based on recent context
+                    prompt = """
+                    # MISSION: GENERATE DAILY UPSC CHALLENGE (BOSS RAID)
+                    **Directive:** Create a gamified 1-day challenge.
+
+                    **Examples:**
+                    - "The Inflation Dragon": Answer 50 MCQs on Economy.
+                    - "The Polity Siege": Read 3 Chapters of Laxmikanth.
+
+                    **OUTPUT SCHEMA (JSON):**
+                    {
+                        "title": "Creative Boss Name",
+                        "description": "Lore description of the challenge.",
+                        "type": "quiz_count" or "study_hours",
+                        "target_value": 50 or 4 (hours),
+                        "xp_reward": 200
+                    }
+                    """
+                    response = model_manager.generate_content(prompt, model_type='fast')
+                    import json
+                    raid_data = json.loads(response.text.strip().replace('```json', '').replace('```', ''))
+
+                    # Save new challenge to DB
+                    cursor = conn.execute('''
+                        INSERT INTO challenges (title, description, type, target_value, xp_reward)
+                        VALUES (?, ?, ?, ?, ?)
+                    ''', (raid_data['title'], raid_data['description'], raid_data['type'], raid_data['target_value'], raid_data['xp_reward']))
+                    challenge_id = cursor.lastrowid
+
+                    # Assign
+                    conn.execute('''
+                        INSERT INTO user_challenges (user_id, challenge_id, assigned_date, progress)
+                        VALUES (?, ?, ?, 0)
+                    ''', (user_id, challenge_id, today))
+                    conn.commit()
+
+                    # Fetch and return
+                    assigned = conn.execute('''
+                        SELECT uc.*, c.title, c.description, c.type, c.target_value, c.xp_reward
+                        FROM user_challenges uc
+                        JOIN challenges c ON uc.challenge_id = c.id
+                        WHERE uc.id = ?
+                    ''', (cursor.lastrowid,)).fetchone()
+                    return dict(assigned)
+
+                except Exception as e:
+                    print(f"AI Raid Generation Failed: {e}")
+                    # Fallback to standard logic below
+
+            # Assign a new random challenge (Fallback)
             all_challenges = conn.execute('SELECT * FROM challenges').fetchall()
             if not all_challenges:
                 return None

@@ -65,7 +65,7 @@ class SelfReviewService:
             FROM brain_action_log
             WHERE executed_at >= ? AND outcome_status IN ('undone', 'corrected')
         ''', (since,)).fetchone()
-        correction_count = corrections['count'] or 0
+        correction_count = corrections['count'] if corrections else 0
 
         # 4. Generate Improvement Plan (using BrainService/Gemini)
         # We ask the Brain to reflect on its own stats

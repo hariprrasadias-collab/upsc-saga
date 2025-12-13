@@ -94,6 +94,34 @@ class PomodoroService:
             }
         }
 
+    @staticmethod
+    def get_break_briefing():
+        """
+        PHASE 9: FOCUS WHISPER (Drill Sergeant Mode)
+        Returns a short motivational text or meditation script for the break.
+        """
+        from app.services.model_manager import model_manager
+        if not model_manager.is_configured:
+            return "Take a deep breath. Hydrate."
+
+        prompt = """
+        # MISSION: BREAK TIME COACHING
+        **Context:** User just finished a 50m study session.
+
+        **DIRECTIVE:**
+        Provide a 30-second reset script.
+        - Option A: Box Breathing instruction.
+        - Option B: Stoic affirmation.
+        - Option C: Physical stretch command.
+
+        **OUTPUT:** Just the text.
+        """
+        try:
+            response = model_manager.generate_content(prompt, model_type='fast')
+            return response.text.strip()
+        except:
+            return "Stand up and stretch."
+
 # Register Synapse
 try:
     from app.services.synapse_registry import SynapseRegistry
