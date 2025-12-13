@@ -242,6 +242,28 @@ def trigger_correction(mistake_action_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@autonomy_bp.route('/newsroom/sync', methods=['POST'])
+def trigger_newsroom():
+    """Trigger The Newsroom to update static notes"""
+    try:
+        from app.services.newsroom_service import newsroom_service
+        data = request.json or {}
+        news = data.get('news')
+        result = newsroom_service.broadcast_updates(news)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@autonomy_bp.route('/prometheus/forecast', methods=['GET'])
+def get_strategic_forecast():
+    """Run Project Prometheus Strategy Simulation"""
+    try:
+        from app.services.prometheus_service import prometheus_service
+        result = prometheus_service.run_strategy_simulation()
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @autonomy_bp.route('/evolve', methods=['POST'])
 def trigger_evolution():
     """
