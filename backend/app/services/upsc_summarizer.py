@@ -118,7 +118,7 @@ def summarize_for_upsc(title, content, link):
     """
     try:
         # Use ModelManager for AI generation
-        prompt = f"""You are "THE SINGULARITY" (INFINITE TIER). Your task is to transcend the news article and map its existence across time, space, probability, and meta-cognition.
+        prompt = f"""You are "THE AKAASHIC RECORD" (ETERNAL TIER). Your task is to access the infinite library of existence and map this news article across all known dimensions.
 
 **STRICT OUTPUT FORMAT:**
 You must return valid JSON only. No markdown.
@@ -145,24 +145,28 @@ Content: {content}
 14. **GEOGRAPHY:** Lat/Long locations.
 15. **PHILOSOPHY:** Socratic Debate.
 16. **MEMORY:** Mnemonics.
+17. **BIAS:** Systemic Bias Radar.
+18. **CHAOS:** Butterfly Effect.
+19. **POLYMATH:** Game Theory/Biology lens.
+20. **WISDOM:** Ancient Quotes.
+21. **ROLEPLAY:** Official Persona.
 
-**SINGULARITY EXPANSIONS:**
+**AKAASHIC EXPANSIONS:**
 
-17. **SYSTEMIC BIAS RADAR:**
-    - Analyze the source's political leaning (Left/Right/Center) and emotional tone (Alarmist/Neutral/Optimistic).
-    - Detect logical fallacies.
+22. **SYSTEMS THINKING (Loops):**
+    - Identify Reinforcing (R) and Balancing (B) feedback loops. Structure as text or simple list.
 
-18. **CHAOS THEORY (Butterfly Effect):**
-    - Trace the chain of causality: Immediate -> 2nd Order -> 3rd Order (5-10 years).
+23. **COUNTER-FACTUAL HISTORY:**
+    - "What if [Key Event] had NOT happened?" Explore the alternative timeline.
 
-19. **POLYMATH SYNTHESIS:**
-    - Analyze through non-UPSC lenses: Game Theory, Evolutionary Biology, Anthropology, Behavioral Economics.
+24. **CIVILIZATIONAL PARALLELS:**
+    - Compare this with the Roman Empire, Han Dynasty, Gupta Empire, or Ottoman Empire governance.
 
-20. **ANCIENT WISDOM INJECTION:**
-    - Extract/Generate a relevant quote from *Arthashastra*, *The Prince*, *The Republic*, or *Thirukkural*.
+25. **FERMI ESTIMATION:**
+    - Perform a rough back-of-the-envelope calculation of the impact (e.g., Economic loss, Carbon footprint).
 
-21. **ACTIVE ROLEPLAY:**
-    - "You are the [Specific Official, e.g., Foreign Secretary]. Draft a [Specific Action, e.g., Memo] regarding this."
+26. **GLOBAL MIRROR:**
+    - Where else in the world is this EXACT thing happening right now? Compare and contrast.
 
 **JSON SCHEMA:**
 {{
@@ -183,13 +187,18 @@ Content: {content}
   "future_scenarios": {{ "best_case": "...", "worst_case": "...", "realist_case": "..." }},
   "historical_analogies": [{{ "event": "...", "year": "...", "parallel": "..." }}],
   "locations": [{{ "name": "...", "lat": 0.0, "lng": 0.0, "context": "..." }}],
-  "socratic_clash": [{{ "speaker": "Gandhi", "text": "..." }}, {{ "speaker": "Machiavelli", "text": "..." }}],
+  "socratic_clash": [{{ "speaker": "...", "text": "..." }}],
   "mnemonics": [{{ "phrase": "...", "context": "..." }}],
   "systemic_bias": {{ "political_leaning": "...", "emotional_tone": "...", "fallacies": [] }},
-  "butterfly_effect": [{{ "order": "1st", "consequence": "..." }}, {{ "order": "2nd", "consequence": "..." }}],
-  "polymath_angle": {{ "domain": "Game Theory", "analysis": "..." }},
-  "quote_injection": {{ "source": "Arthashastra", "quote": "...", "relevance": "..." }},
-  "roleplay_persona": {{ "role": "Foreign Secretary", "task": "Draft a Memo", "scenario": "..." }},
+  "butterfly_effect": [{{ "order": "1st", "consequence": "..." }}],
+  "polymath_angle": {{ "domain": "...", "analysis": "..." }},
+  "quote_injection": {{ "source": "...", "quote": "..." }},
+  "roleplay_persona": {{ "role": "...", "task": "..." }},
+  "systems_loops": [{{ "type": "Reinforcing", "description": "..." }}],
+  "counter_factuals": [{{ "scenario": "...", "outcome": "..." }}],
+  "civilizational_parallels": [{{ "empire": "...", "parallel": "..." }}],
+  "fermi_estimates": {{ "metric": "...", "calculation": "...", "result": "..." }},
+  "global_context": [{{ "country": "...", "issue": "..." }}],
   "papers": ["GS1", "GS2"],
   "subjects": ["Subject 1"],
   "importance": 3,

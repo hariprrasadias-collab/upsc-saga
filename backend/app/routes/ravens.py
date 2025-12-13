@@ -117,7 +117,13 @@ def run_background_fetch(app):
                             'butterfly_effect': ai_result.get('butterfly_effect', []),
                             'polymath_angle': ai_result.get('polymath_angle', {}),
                             'quote_injection': ai_result.get('quote_injection', {}),
-                            'roleplay_persona': ai_result.get('roleplay_persona', {})
+                            'roleplay_persona': ai_result.get('roleplay_persona', {}),
+                            # Akaashic Mode Metadata
+                            'systems_loops': ai_result.get('systems_loops', []),
+                            'counter_factuals': ai_result.get('counter_factuals', []),
+                            'civilizational_parallels': ai_result.get('civilizational_parallels', []),
+                            'fermi_estimates': ai_result.get('fermi_estimates', {}),
+                            'global_context': ai_result.get('global_context', [])
                         }
                         
                         save_article(article_data)
@@ -261,7 +267,13 @@ def process_article():
             'butterfly_effect': ai_result.get('butterfly_effect', []),
             'polymath_angle': ai_result.get('polymath_angle', {}),
             'quote_injection': ai_result.get('quote_injection', {}),
-            'roleplay_persona': ai_result.get('roleplay_persona', {})
+            'roleplay_persona': ai_result.get('roleplay_persona', {}),
+            # Akaashic Mode Metadata
+            'systems_loops': ai_result.get('systems_loops', []),
+            'counter_factuals': ai_result.get('counter_factuals', []),
+            'civilizational_parallels': ai_result.get('civilizational_parallels', []),
+            'fermi_estimates': ai_result.get('fermi_estimates', {}),
+            'global_context': ai_result.get('global_context', [])
         }
         
         # Save or Update
@@ -301,7 +313,12 @@ def process_article():
                 'butterflyEffect': ai_result.get('butterfly_effect', []),
                 'polymathAngle': ai_result.get('polymath_angle', {}),
                 'quoteInjection': ai_result.get('quote_injection', {}),
-                'roleplayPersona': ai_result.get('roleplay_persona', {})
+                'roleplayPersona': ai_result.get('roleplay_persona', {}),
+                'systemsLoops': ai_result.get('systems_loops', []),
+                'counterFactuals': ai_result.get('counter_factuals', []),
+                'civilizationalParallels': ai_result.get('civilizational_parallels', []),
+                'fermiEstimates': ai_result.get('fermi_estimates', {}),
+                'globalContext': ai_result.get('global_context', [])
             }
         })
         
