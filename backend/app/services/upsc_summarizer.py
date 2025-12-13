@@ -118,7 +118,7 @@ def summarize_for_upsc(title, content, link):
     """
     try:
         # Use ModelManager for AI generation
-        prompt = f"""You are "THE TIME-SPACE ORACLE" (OMNIVERSE TIER). Your task is to transcend the news article and map its existence across time, space, and probability.
+        prompt = f"""You are "THE SINGULARITY" (INFINITE TIER). Your task is to transcend the news article and map its existence across time, space, probability, and meta-cognition.
 
 **STRICT OUTPUT FORMAT:**
 You must return valid JSON only. No markdown.
@@ -140,25 +140,29 @@ Content: {content}
 9.  **AUDIO:** Podcast Script (Host vs Expert).
 10. **INTERVIEW:** 3 Board Questions.
 11. **ETHICS:** Case Study Scenario.
+12. **PREDICTIVE MODELLING:** Best/Worst/Realist scenarios.
+13. **HISTORY:** Past parallels.
+14. **GEOGRAPHY:** Lat/Long locations.
+15. **PHILOSOPHY:** Socratic Debate.
+16. **MEMORY:** Mnemonics.
 
-**OMNIVERSE EXPANSIONS:**
+**SINGULARITY EXPANSIONS:**
 
-12. **PREDICTIVE MODELLING (Future Scenarios):**
-    - *Best Case:* Utopia/Optimal outcome.
-    - *Worst Case:* Dystopia/Failure mode.
-    - *Realist:* Most likely trajectory.
+17. **SYSTEMIC BIAS RADAR:**
+    - Analyze the source's political leaning (Left/Right/Center) and emotional tone (Alarmist/Neutral/Optimistic).
+    - Detect logical fallacies.
 
-13. **HISTORICAL PATTERN MATCHING:**
-    - Identify a specific historical event (Indian or World History) that parallels this situation. Explain the analogy.
+18. **CHAOS THEORY (Butterfly Effect):**
+    - Trace the chain of causality: Immediate -> 2nd Order -> 3rd Order (5-10 years).
 
-14. **GEOSPATIAL INTELLIGENCE:**
-    - Extract locations with Lat/Long and Context. Format: `{{ "name": "...", "lat": 0.0, "lng": 0.0, "context": "..." }}`.
+19. **POLYMATH SYNTHESIS:**
+    - Analyze through non-UPSC lenses: Game Theory, Evolutionary Biology, Anthropology, Behavioral Economics.
 
-15. **SOCRATIC CLASH (Debate):**
-    - Script a short philosophical debate between two historical figures (e.g., Gandhi vs. Machiavelli) on this topic.
+20. **ANCIENT WISDOM INJECTION:**
+    - Extract/Generate a relevant quote from *Arthashastra*, *The Prince*, *The Republic*, or *Thirukkural*.
 
-16. **NEURAL MNEMONICS:**
-    - Generate 3 funny/weird mnemonics to remember the key facts.
+21. **ACTIVE ROLEPLAY:**
+    - "You are the [Specific Official, e.g., Foreign Secretary]. Draft a [Specific Action, e.g., Memo] regarding this."
 
 **JSON SCHEMA:**
 {{
@@ -181,6 +185,11 @@ Content: {content}
   "locations": [{{ "name": "...", "lat": 0.0, "lng": 0.0, "context": "..." }}],
   "socratic_clash": [{{ "speaker": "Gandhi", "text": "..." }}, {{ "speaker": "Machiavelli", "text": "..." }}],
   "mnemonics": [{{ "phrase": "...", "context": "..." }}],
+  "systemic_bias": {{ "political_leaning": "...", "emotional_tone": "...", "fallacies": [] }},
+  "butterfly_effect": [{{ "order": "1st", "consequence": "..." }}, {{ "order": "2nd", "consequence": "..." }}],
+  "polymath_angle": {{ "domain": "Game Theory", "analysis": "..." }},
+  "quote_injection": {{ "source": "Arthashastra", "quote": "...", "relevance": "..." }},
+  "roleplay_persona": {{ "role": "Foreign Secretary", "task": "Draft a Memo", "scenario": "..." }},
   "papers": ["GS1", "GS2"],
   "subjects": ["Subject 1"],
   "importance": 3,

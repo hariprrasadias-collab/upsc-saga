@@ -46,7 +46,12 @@ def init_current_affairs_table():
             historical_analogies TEXT,
             locations TEXT,
             socratic_clash TEXT,
-            mnemonics TEXT
+            mnemonics TEXT,
+            systemic_bias TEXT,
+            butterfly_effect TEXT,
+            polymath_angle TEXT,
+            quote_injection TEXT,
+            roleplay_persona TEXT
         )
     ''')
 
@@ -131,6 +136,28 @@ def init_current_affairs_table():
     except sqlite3.OperationalError:
         pass
 
+    # Singularity Mode Metadata v5
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN systemic_bias TEXT')
+    except sqlite3.OperationalError:
+        pass
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN butterfly_effect TEXT')
+    except sqlite3.OperationalError:
+        pass
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN polymath_angle TEXT')
+    except sqlite3.OperationalError:
+        pass
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN quote_injection TEXT')
+    except sqlite3.OperationalError:
+        pass
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN roleplay_persona TEXT')
+    except sqlite3.OperationalError:
+        pass
+
     conn.commit()
 
 def article_exists(link):
@@ -151,8 +178,9 @@ def save_article(article_data):
                 prelims_pointers, mains_dimensions, steeple_analysis, inter_linkages,
                 mind_map, quiz, answer_framework, essay_fodder,
                 timeline, data_visualization, podcast_script, interview_questions, simulation_scenario,
-                future_scenarios, historical_analogies, locations, socratic_clash, mnemonics
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                future_scenarios, historical_analogies, locations, socratic_clash, mnemonics,
+                systemic_bias, butterfly_effect, polymath_angle, quote_injection, roleplay_persona
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             article_data['title'],
             article_data['link'],
@@ -183,7 +211,13 @@ def save_article(article_data):
             json.dumps(article_data.get('historical_analogies', [])),
             json.dumps(article_data.get('locations', [])),
             json.dumps(article_data.get('socratic_clash', [])),
-            json.dumps(article_data.get('mnemonics', []))
+            json.dumps(article_data.get('mnemonics', [])),
+            # Singularity Mode
+            json.dumps(article_data.get('systemic_bias', {})),
+            json.dumps(article_data.get('butterfly_effect', [])),
+            json.dumps(article_data.get('polymath_angle', {})),
+            json.dumps(article_data.get('quote_injection', {})),
+            json.dumps(article_data.get('roleplay_persona', {}))
         ))
         conn.commit()
         return cursor.lastrowid
@@ -262,7 +296,13 @@ def get_saved_articles(filters=None):
             'historicalAnalogies': json.loads(row['historical_analogies'] or '[]') if 'historical_analogies' in row.keys() else [],
             'locations': json.loads(row['locations'] or '[]') if 'locations' in row.keys() else [],
             'socraticClash': json.loads(row['socratic_clash'] or '[]') if 'socratic_clash' in row.keys() else [],
-            'mnemonics': json.loads(row['mnemonics'] or '[]') if 'mnemonics' in row.keys() else []
+            'mnemonics': json.loads(row['mnemonics'] or '[]') if 'mnemonics' in row.keys() else [],
+            # Singularity Mode fields
+            'systemicBias': json.loads(row['systemic_bias'] or '{}') if 'systemic_bias' in row.keys() else {},
+            'butterflyEffect': json.loads(row['butterfly_effect'] or '[]') if 'butterfly_effect' in row.keys() else [],
+            'polymathAngle': json.loads(row['polymath_angle'] or '{}') if 'polymath_angle' in row.keys() else {},
+            'quoteInjection': json.loads(row['quote_injection'] or '{}') if 'quote_injection' in row.keys() else {},
+            'roleplayPersona': json.loads(row['roleplay_persona'] or '{}') if 'roleplay_persona' in row.keys() else {}
         })
     
     return articles
@@ -361,6 +401,11 @@ def update_article_content_by_link(link, article_data):
             locations = ?,
             socratic_clash = ?,
             mnemonics = ?,
+            systemic_bias = ?,
+            butterfly_effect = ?,
+            polymath_angle = ?,
+            quote_injection = ?,
+            roleplay_persona = ?,
             fetch_date = CURRENT_TIMESTAMP
         WHERE original_link = ?
     ''', (
@@ -389,6 +434,11 @@ def update_article_content_by_link(link, article_data):
         json.dumps(article_data.get('locations', [])),
         json.dumps(article_data.get('socratic_clash', [])),
         json.dumps(article_data.get('mnemonics', [])),
+        json.dumps(article_data.get('systemic_bias', {})),
+        json.dumps(article_data.get('butterfly_effect', [])),
+        json.dumps(article_data.get('polymath_angle', {})),
+        json.dumps(article_data.get('quote_injection', {})),
+        json.dumps(article_data.get('roleplay_persona', {})),
         link
     ))
     conn.commit()

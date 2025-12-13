@@ -111,7 +111,13 @@ def run_background_fetch(app):
                             'historical_analogies': ai_result.get('historical_analogies', []),
                             'locations': ai_result.get('locations', []),
                             'socratic_clash': ai_result.get('socratic_clash', []),
-                            'mnemonics': ai_result.get('mnemonics', [])
+                            'mnemonics': ai_result.get('mnemonics', []),
+                            # Singularity Mode Metadata
+                            'systemic_bias': ai_result.get('systemic_bias', {}),
+                            'butterfly_effect': ai_result.get('butterfly_effect', []),
+                            'polymath_angle': ai_result.get('polymath_angle', {}),
+                            'quote_injection': ai_result.get('quote_injection', {}),
+                            'roleplay_persona': ai_result.get('roleplay_persona', {})
                         }
                         
                         save_article(article_data)
@@ -249,7 +255,13 @@ def process_article():
             'historical_analogies': ai_result.get('historical_analogies', []),
             'locations': ai_result.get('locations', []),
             'socratic_clash': ai_result.get('socratic_clash', []),
-            'mnemonics': ai_result.get('mnemonics', [])
+            'mnemonics': ai_result.get('mnemonics', []),
+            # Singularity Mode Metadata
+            'systemic_bias': ai_result.get('systemic_bias', {}),
+            'butterfly_effect': ai_result.get('butterfly_effect', []),
+            'polymath_angle': ai_result.get('polymath_angle', {}),
+            'quote_injection': ai_result.get('quote_injection', {}),
+            'roleplay_persona': ai_result.get('roleplay_persona', {})
         }
         
         # Save or Update
@@ -284,7 +296,12 @@ def process_article():
                 'historicalAnalogies': ai_result.get('historical_analogies', []),
                 'locations': ai_result.get('locations', []),
                 'socraticClash': ai_result.get('socratic_clash', []),
-                'mnemonics': ai_result.get('mnemonics', [])
+                'mnemonics': ai_result.get('mnemonics', []),
+                'systemicBias': ai_result.get('systemic_bias', {}),
+                'butterflyEffect': ai_result.get('butterfly_effect', []),
+                'polymathAngle': ai_result.get('polymath_angle', {}),
+                'quoteInjection': ai_result.get('quote_injection', {}),
+                'roleplayPersona': ai_result.get('roleplay_persona', {})
             }
         })
         

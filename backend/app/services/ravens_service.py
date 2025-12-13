@@ -64,18 +64,19 @@ class RavensService:
         "{article_content[:15000]}..."
 
         **DIRECTIVE:**
-        You are "THE TIME-SPACE ORACLE". Map this news across dimensions.
+        You are "THE SINGULARITY" (INFINITE TIER). Map this news across dimensions and meta-cognition.
 
         **DIMENSIONS:**
         1. **Core:** STEEPLE, Facts, Maps, Quiz.
         2. **Visuals:** Mindmap, Charts, Timeline.
         3. **Simulation:** Podcast, Interview, Ethics.
-        4. **Omni-Existence:**
-           - *Future Scenarios* (Best/Worst/Realist).
-           - *History* (Past parallels).
-           - *Geography* (Locations).
-           - *Philosophy* (Socratic Debate).
-           - *Memory* (Mnemonics).
+        4. **Omni-Existence:** Future, History, Geography, Philosophy, Memory.
+        5. **Singularity:**
+           - *Bias Radar:* Political leaning, Emotional tone.
+           - *Chaos Theory:* Butterfly Effect (2nd/3rd order).
+           - *Polymath:* Game Theory/Biology lens.
+           - *Wisdom:* Ancient Quotes (Arthashastra).
+           - *Action:* Roleplay Persona.
 
         **OUTPUT SCHEMA (JSON):**
         {{
@@ -100,7 +101,12 @@ class RavensService:
             "historical_analogies": [{{ "event": "...", "year": "...", "parallel": "..." }}],
             "locations": [{{ "name": "...", "lat": 0.0, "lng": 0.0, "context": "..." }}],
             "socratic_clash": [{{ "speaker": "...", "text": "..." }}],
-            "mnemonics": [{{ "phrase": "...", "context": "..." }}]
+            "mnemonics": [{{ "phrase": "...", "context": "..." }}],
+            "systemic_bias": {{ "political_leaning": "...", "emotional_tone": "..." }},
+            "butterfly_effect": [{{ "order": "...", "consequence": "..." }}],
+            "polymath_angle": {{ "domain": "...", "analysis": "..." }},
+            "quote_injection": {{ "source": "...", "quote": "..." }},
+            "roleplay_persona": {{ "role": "...", "task": "..." }}
         }}
         """
         try:
