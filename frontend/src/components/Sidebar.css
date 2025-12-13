@@ -71,6 +71,30 @@
   overflow: hidden;
 }
 
+/* Button Reset for Menu Items */
+button.menu-item,
+button.group-header {
+  background: transparent;
+  border: none;
+  border-left: 3px solid transparent; /* Restore specific border */
+  width: 100%;
+  text-align: left;
+  font: inherit; /* Inherit font-family, size, weight from parent/class */
+  color: inherit;
+  padding: 1rem 1.5rem; /* Explicitly restate padding to be safe against user-agent styles */
+  margin: 0;
+}
+
+/* Keyboard Focus Styles */
+button.menu-item:focus-visible,
+button.group-header:focus-visible,
+.mobile-close-btn:focus-visible {
+  outline: 2px solid var(--color-accent-orange);
+  outline-offset: -2px;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.05); /* Slight highlight on focus */
+}
+
 .menu-item:hover {
   background: rgba(255, 255, 255, 0.05);
   color: var(--color-text-primary);
@@ -135,6 +159,11 @@
   user-select: none;
 }
 
+/* Special padding adjustment for group header button */
+button.group-header {
+  padding: 0.8rem 1.5rem;
+}
+
 .group-header:hover {
   background: rgba(255, 255, 255, 0.03);
 }
@@ -169,8 +198,15 @@
 .sub-item {
   padding-left: 3rem;
   font-size: 0.9rem;
-  border-left: none;
+  border-left: none; /* sub-items don't have the left border */
+  border-left: 3px solid transparent; /* Keep structure but transparent */
   position: relative;
+}
+
+/* Adjust sub-item button padding */
+button.sub-item {
+  padding-left: 3rem;
+  border-left: 3px solid transparent;
 }
 
 .sub-item::before {
@@ -245,7 +281,16 @@
     padding: 0.8rem 1rem;
   }
 
+  button.menu-item,
+  button.sub-item {
+    padding: 0.8rem 1rem;
+  }
+
   .group-header {
+    padding: 0.8rem 1rem;
+  }
+
+  button.group-header {
     padding: 0.8rem 1rem;
   }
 }

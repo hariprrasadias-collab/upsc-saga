@@ -111,55 +111,71 @@ const Sidebar: React.FC = memo(() => {
       <div className="sidebar-header">
         <h2>UPSC SAGA</h2>
         {/* Mobile Close Button */}
-        <button className="mobile-close-btn" onClick={toggleSidebar}>×</button>
+        <button
+          className="mobile-close-btn"
+          onClick={toggleSidebar}
+          aria-label="Close sidebar"
+          type="button"
+        >
+          ×
+        </button>
       </div>
 
       {/* Dashboard - Always Top */}
-      <div
+      <button
+        type="button"
         className={`menu-item ${currentTab === 'dashboard' ? 'active' : ''}`}
         onClick={() => handleTabChange('dashboard')}
       >
-        <span className="icon">🏠</span>
+        <span className="icon" aria-hidden="true">🏠</span>
         <span className="label">Dashboard</span>
-      </div>
+      </button>
 
       {/* Analytics - Standalone */}
-      <div
+      <button
+        type="button"
         className={`menu-item ${currentTab === 'analytics' ? 'active' : ''}`}
         onClick={() => handleTabChange('analytics')}
       >
-        <span className="icon">📊</span>
+        <span className="icon" aria-hidden="true">📊</span>
         <span className="label">Analytics</span>
-      </div>
+      </button>
 
       {/* Weak Areas - Standalone */}
-      <div
+      <button
+        type="button"
         className={`menu-item ${currentTab === 'weak-areas' ? 'active' : ''}`}
         onClick={() => handleTabChange('weak-areas')}
       >
-        <span className="icon">🎯</span>
+        <span className="icon" aria-hidden="true">🎯</span>
         <span className="label">Weak Areas</span>
-      </div>
+      </button>
 
       {/* Expandable Groups */}
       {Object.entries(menuGroups).map(([groupKey, group]) => (
         <div key={groupKey} className="menu-group">
-          <div className="group-header" onClick={() => toggleGroup(groupKey)}>
+          <button
+            type="button"
+            className="group-header"
+            onClick={() => toggleGroup(groupKey)}
+            aria-expanded={expandedGroups[groupKey]}
+          >
             <span className="group-title">{group.title}</span>
-            <span className="expand-icon">{expandedGroups[groupKey] ? '▼' : '▶'}</span>
-          </div>
+            <span className="expand-icon" aria-hidden="true">{expandedGroups[groupKey] ? '▼' : '▶'}</span>
+          </button>
 
           {expandedGroups[groupKey] && (
             <div className="group-items">
               {group.items.map(item => (
-                <div
+                <button
+                  type="button"
                   key={item.id}
                   className={`menu-item sub-item ${currentTab === item.id ? 'active' : ''}`}
                   onClick={() => handleTabChange(item.id)}
                 >
-                  <span className="icon">{item.icon}</span>
+                  <span className="icon" aria-hidden="true">{item.icon}</span>
                   <span className="label">{item.label}</span>
-                </div>
+                </button>
               ))}
             </div>
           )}
