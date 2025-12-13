@@ -109,26 +109,6 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         setPrompt(content);
     }, [content]);
 
-    // Fetch History from Backend
-    useEffect(() => {
-        fetch('http://localhost:5000/api/visual/history')
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    // Map backend format to frontend format
-                    const mapped = data.data.map((item: any) => ({
-                        url: item.url,
-                        prompt: item.prompt,
-                        seed: item.seed,
-                        model: item.model,
-                        timestamp: new Date(item.timestamp).getTime()
-                    }));
-                    setHistory(mapped);
-                }
-            })
-            .catch(err => console.error("Failed to load visual history", err));
-    }, []);
-
     // HUD Update Loop
     useEffect(() => {
         let interval: any;
@@ -273,7 +253,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         }, 4500);
     };
 
-    const addToHistory = async (url: string, promptText: string, seedVal: number, modelVal: string) => {
+    const addToHistory = (url: string, promptText: string, seedVal: number, modelVal: string) => {
         const newItem: ImageHistoryItem = {
             url,
             prompt: promptText,
@@ -281,24 +261,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
             model: modelVal,
             timestamp: Date.now()
         };
-        setHistory(prev => [newItem, ...prev].slice(0, 50));
-
-        // Persist to Backend
-        try {
-            await fetch('http://localhost:5000/api/visual/save', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    url,
-                    prompt: promptText,
-                    seed: seedVal,
-                    model: modelVal,
-                    tags: extractTags(promptText)
-                })
-            });
-        } catch (e) {
-            console.error("Failed to persist visual", e);
-        }
+        setHistory(prev => [newItem, ...prev].slice(0, 10));
     };
 
     const handleRemix = () => {

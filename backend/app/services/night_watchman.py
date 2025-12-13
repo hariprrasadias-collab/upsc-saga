@@ -4,10 +4,12 @@ The Night Watchman - Autonomous Research Service
 import os
 import json
 import feedparser
+import feedparser
 from datetime import datetime
 from app.db_models.night_watchman import save_briefing
 from app.services.model_manager import model_manager
 from dotenv import load_dotenv
+from app.services.model_manager import model_manager
 
 load_dotenv()
 
@@ -45,13 +47,11 @@ class NightWatchman:
         # 1. Gather Intelligence
         articles = self._gather_intelligence()
         if not articles:
-            print("🦉 Night Watchman: No intel gathered. Aborting.")
             return {"success": False, "message": "No intelligence gathered."}
             
         # 2. Synthesize Briefing
         briefing = self._synthesize_briefing(articles)
         if not briefing:
-             print("🦉 Night Watchman: Synthesis failed. Aborting.")
              return {"success": False, "message": "Synthesis failed."}
         
         # 3. Save Report
@@ -144,38 +144,28 @@ class NightWatchman:
 
 
     def _gather_intelligence(self):
-        """Fetch news from RSS feeds with Headers"""
+        """Fetch news from RSS feeds"""
         articles = []
         import socket
         # Set default timeout for socket operations
         socket.setdefaulttimeout(10)
 
-        # Custom User Agent to avoid 403 Forbidden
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-            'Accept': 'application/rss+xml, application/xml, text/xml, */*'
-        }
-
         for url in self.feeds:
             try:
-                # Use feedparser with header support if possible, or request separately
-                # Feedparser handles http/https but sometimes needs help with headers
-                d = feedparser.parse(url, request_headers=headers)
+                # Use feedparser with a timeout wrapper if possible, or just rely on socket timeout
+                feed = feedparser.parse(url)
 
                 # Check for bozo bit (parsing error)
-                if d.bozo:
-                    print(f"⚠️ Feed parsing issue for {url}: {d.bozo_exception}")
+                if feed.bozo:
+                    print(f"⚠️ Feed parsing issue for {url}: {feed.bozo_exception}")
                     # Continue anyway if entries exist
 
-                if not d.entries:
-                     print(f"⚠️ No entries found for {url} (Status: {d.get('status', 'Unknown')})")
-
-                for entry in d.entries[:5]: # Top 5 from each
+                for entry in feed.entries[:5]: # Top 5 from each
                     articles.append({
                         'title': entry.title,
                         'summary': entry.get('summary', ''),
                         'link': entry.link,
-                        'source': d.feed.get('title', 'Unknown')
+                        'source': feed.feed.get('title', 'Unknown')
                     })
             except Exception as e:
                 print(f"⚠️ Watchman failed to scout {url}: {e}")

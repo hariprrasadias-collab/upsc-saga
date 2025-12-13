@@ -27,28 +27,34 @@ class ModelManager:
 
     # --- GOOGLE GEMINI MODELS ---
     GEMINI_PRO_MODELS = [
-        'gemini-2.5-pro',
-        'gemini-2.0-flash',
-        'gemini-pro-latest'
+        'gemini-2.0-pro-exp-02-05',
+        'gemini-1.5-pro',
+        'gemini-pro'
     ]
     GEMINI_FAST_MODELS = [
-        'gemini-2.5-flash',
-        'gemini-2.0-flash-lite',
-        'gemini-flash-latest'
+        'gemini-2.0-flash',
+        'gemini-2.0-flash-lite-preview-02-05',
+        'gemini-1.5-flash'
     ]
 
     # --- OPENROUTER MODELS (Tiered for Efficiency) ---
     OPENROUTER_FREE = [
         "google/gemini-2.0-flash-lite-preview-02-05:free",
+        "google/gemini-2.0-pro-exp-02-05:free",
         "meta-llama/llama-3.3-70b-instruct:free",
+        "deepseek/deepseek-r1:free",
+        "deepseek/deepseek-chat:free",
         "microsoft/phi-3-medium-128k-instruct:free",
         "google/gemma-2-9b-it:free",
         "mistralai/mistral-7b-instruct:free",
         "openchat/openchat-7b:free",
+        "nousresearch/hermes-3-llama-3.1-405b:free",
         "qwen/qwen-2-7b-instruct:free",
+        "nvidia/llama-3.1-nemotron-70b-instruct:free",
     ]
 
     OPENROUTER_PREMIUM = [
+        "anthropic/claude-3.7-sonnet",
         "anthropic/claude-3.5-sonnet",
         "openai/gpt-4o",
         "google/gemini-pro-1.5",
@@ -57,19 +63,13 @@ class ModelManager:
     # --- NVIDIA NIM MODELS ---
     NVIDIA_MODELS_PRO = [
         'meta/llama-3.1-405b-instruct',
-        'meta/llama-3.1-70b-instruct' # Reliable High-End Fallback
+        'nvidia/nemotron-4-340b-instruct'
     ]
 
     NVIDIA_MODELS_FAST = [
         'meta/llama-3.1-70b-instruct',
         'meta/llama-3.1-8b-instruct',
         'mistralai/mixtral-8x22b-instruct-v0.1'
-    ]
-
-    # --- PERPLEXITY MODELS ---
-    PERPLEXITY_MODELS = [
-        'sonar-pro',   # Reasoning/Search (High Tier)
-        'sonar'        # Standard Search
     ]
 
     def __init__(self):
@@ -98,14 +98,6 @@ class ModelManager:
              self.clients['nvidia'] = openai.OpenAI(
                 base_url="https://integrate.api.nvidia.com/v1",
                 api_key=nv_key
-            )
-
-        # Perplexity AI
-        pplx_key = os.environ.get('PERPLEXITY_API_KEY')
-        if pplx_key:
-            self.clients['perplexity'] = openai.OpenAI(
-                base_url="https://api.perplexity.ai",
-                api_key=pplx_key
             )
 
         # State Management
@@ -208,12 +200,7 @@ class ModelManager:
             for m in self.GEMINI_PRO_MODELS:
                 add_candidate('google', m)
 
-            # Priority 3: Perplexity Pro (Reasoning)
-            for m in self.PERPLEXITY_MODELS:
-                if 'pro' in m: # sonar-pro
-                    add_candidate('perplexity', m)
-
-            # Priority 4: OpenRouter Premium/Free Top Tier
+            # Priority 3: OpenRouter Premium/Free Top Tier
             for m in self.OPENROUTER_PREMIUM: # Only if user pays, but list exists
                  add_candidate('openrouter', m)
             for m in self.OPENROUTER_FREE:
@@ -225,16 +212,11 @@ class ModelManager:
             for m in self.NVIDIA_MODELS_FAST:
                 add_candidate('nvidia', m)
 
-            # Priority 2: Perplexity Fast
-            for m in self.PERPLEXITY_MODELS:
-                if 'pro' not in m: # sonar
-                    add_candidate('perplexity', m)
-
-            # Priority 3: OpenRouter Free (Top ones)
+            # Priority 2: OpenRouter Free (Top ones)
             for m in self.OPENROUTER_FREE:
                  add_candidate('openrouter', m)
 
-            # Priority 4: Google Fast
+            # Priority 3: Google Fast
             for m in self.GEMINI_FAST_MODELS:
                 add_candidate('google', m)
 

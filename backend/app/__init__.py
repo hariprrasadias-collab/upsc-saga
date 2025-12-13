@@ -201,9 +201,6 @@ def create_app():
     from app.routes.neural_hash import neural_hash_bp
     app.register_blueprint(neural_hash_bp, url_prefix='/api/neural_hash')
 
-    from app.routes.visual_routes import visual_bp
-    app.register_blueprint(visual_bp, url_prefix='/api/visual')
-
 
 
     # Initialize Tables
