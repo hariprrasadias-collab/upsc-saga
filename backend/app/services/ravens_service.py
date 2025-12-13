@@ -61,10 +61,16 @@ class RavensService:
         prompt = f"""
         # MISSION: CURRENT AFFAIRS FILTER (THE HINDU/IE)
         **Input:**
-        "{article_content[:3000]}..."
+        "{article_content[:15000]}..."
 
         **DIRECTIVE:**
+        You are a UPSC Chief Examiner. Analyze this text and provide a "Titan Level" summary.
         Extract ONLY what matters for UPSC. Disregard political gossip.
+        Focus on:
+        1. Context/Background (Why is this in news?)
+        2. Key Provisions/Data/Facts
+        3. Issues/Challenges
+        4. Way Forward/Solutions
 
         **OUTPUT SCHEMA (JSON):**
         {{
@@ -76,11 +82,12 @@ class RavensService:
                 "cons": ["Arg 2"],
                 "way_forward": ["Committee Recommendation"]
             }},
-            "keywords": ["Keyword1", "Keyword2"]
+            "keywords": ["Keyword1", "Keyword2"],
+            "summary": "Comprehensive paragraph summary"
         }}
         """
         try:
-            response = model_manager.generate_content(prompt, model_type='fast')
+            response = model_manager.generate_content(prompt, model_type='pro')
             return response.text
         except Exception:
             return "{}"

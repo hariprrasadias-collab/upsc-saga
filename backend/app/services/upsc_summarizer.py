@@ -116,53 +116,38 @@ def summarize_for_upsc(title, content, link):
     """Summarise a news article for UPSC preparation using Gemini.
     Returns a dict with summary, key points, tags, importance, etc.
     """
-    if not GEMINI_API_KEY:
-        return _simple_extraction(title, content)
     try:
-        # model = genai.GenerativeModel('gemini-2.0-flash-001') -> Removed, using ModelManager
-        # Send FULL content to AI (no truncation)
-        # Send FULL content to AI (no truncation)
-        prompt = f"""You are a UPSC expert analyzer. Tag articles accurately based on content.
+        # Use ModelManager for AI generation
+        prompt = f"""You are the CHIEF EXAMINER for UPSC Civil Services. Your task is to analyze this news article and extract a "Titan Level" summary suitable for Mains Answer Writing.
 
-EXAMPLES OF CORRECT TAGGING:
+**STRICT OUTPUT FORMAT:**
+You must return valid JSON only. No markdown formatting (no ```json ... ```), no introductory text.
 
-Example 1:
-Title: \"RBI announces new monetary policy rates\"
-→ Papers: [\"GS3\"], Subjects: [\"Economics\"]
-
-Example 2:
-Title: \"Supreme Court ruling on Right to Privacy\"
-→ Papers: [\"GS2\"], Subjects: [\"Polity & Governance\"]
-
-Example 3:
-Title: \"India-France defense cooperation agreement\"
-→ Papers: [\"GS2\", \"GS3\"], Subjects: [\"International Relations\", \"Internal Security\"]
-
-Example 4:
-Title: \"New renewable energy targets announced\"
-→ Papers: [\"GS3\"], Subjects: [\"Environment & Ecology\", \"Economics\"]
-
-Example 5:
-Title: \"Constitution Bench verdict on federalism\"
-→ Papers: [\"GS2\"], Subjects: [\"Polity & Governance\"]
-
-TAGGING RULES:
-- GS1: History, Culture, Geography, Society
-- GS2: Polity, Governance, IR, Social Justice
-- GS3: Economy, Science, Environment, Security
-- GS4: Ethics
-
-SUBJECTS:
-Polity & Governance | Economics | International Relations | Environment & Ecology | Science & Technology | Internal Security | Disaster Management | Social Issues | History & Culture | Geography | Ethics
-
-NOW TAG THIS ARTICLE:
+**ARTICLE:**
 Title: {title}
 Content: {content}
 
-Return ONLY this JSON (no markdown, no explanation):
-{{"upsc_summary": "...", "key_points": ["...", "..."], "papers": ["GS_"], "subjects": ["..."], "importance": 1-3, "exam_questions": ["..."], "related_topics": ["..."]}}"""
-        # Call ModelManager (handles retry, rotation, rate limits)
-        response = model_manager.generate_content(prompt, model_type='fast')
+**ANALYSIS INSTRUCTIONS:**
+1.  **UPSC Summary:** Write a high-yield summary (approx 200 words). Focus on the "Why", "What", and "Implications". Avoid journalistic fluff.
+2.  **Key Points:** Extract 4-5 distinct, punchy points (Facts, Committees, Data, Articles).
+3.  **Tagging:** Assign relevant GS Papers (GS1-GS4) and Subjects.
+4.  **Importance:** Rate relevance 1 (Low) to 3 (Critical).
+5.  **Exam Questions:** Frame 1-2 potential Mains Questions based on this topic.
+6.  **Related Topics:** List 2-3 static syllabus topics linked to this current affair.
+
+**JSON SCHEMA:**
+{{
+  "upsc_summary": "Comprehensive summary focusing on policy/governance/economy...",
+  "key_points": ["Point 1", "Point 2", "Point 3", "Point 4"],
+  "papers": ["GS2", "GS3"],
+  "subjects": ["Polity & Governance", "International Relations"],
+  "importance": 3,
+  "exam_questions": ["Discuss the implications of...", "Critically analyze..."],
+  "related_topics": ["Federalism", "Basic Structure Doctrine"]
+}}"""
+
+        # Call ModelManager with 'pro' model for peak performance
+        response = model_manager.generate_content(prompt, model_type='pro')
         text = get_gemini_text(response)
         if not text:
             print(f"Empty or blocked response for: {title}")
