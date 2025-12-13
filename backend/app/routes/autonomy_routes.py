@@ -242,6 +242,115 @@ def trigger_correction(mistake_action_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@autonomy_bp.route('/newsroom/sync', methods=['POST'])
+def trigger_newsroom():
+    """Trigger The Newsroom to update static notes"""
+    try:
+        from app.services.newsroom_service import newsroom_service
+        data = request.json or {}
+        news = data.get('news')
+        result = newsroom_service.broadcast_updates(news)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@autonomy_bp.route('/prometheus/forecast', methods=['GET'])
+def get_strategic_forecast():
+    """Run Project Prometheus Strategy Simulation"""
+    try:
+        from app.services.prometheus_service import prometheus_service
+        result = prometheus_service.run_strategy_simulation()
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@autonomy_bp.route('/evolve', methods=['POST'])
+def trigger_evolution():
+    """
+    Manually trigger Hephaestus to evolve a specific file or the codebase.
+    """
+    try:
+        from app.services.hephaestus_service import hephaestus
+        import os
+        import random
+
+        data = request.json or {}
+        target_file = data.get('target_file')
+
+        if not target_file:
+            # Pick a random service to evolve
+            services_dir = os.path.join(os.getcwd(), 'backend', 'app', 'services')
+            if os.path.exists(services_dir):
+                files = [f for f in os.listdir(services_dir) if f.endswith('.py') and f != '__init__.py']
+                if files:
+                    target_file = os.path.join(services_dir, random.choice(files))
+
+            if not target_file:
+                 return jsonify({'error': 'No suitable candidate found for evolution'}), 404
+        else:
+            # Verify path safety (Simple check)
+            if '..' in target_file or not target_file.endswith('.py'):
+                return jsonify({'error': 'Invalid file path'}), 400
+
+            # Allow relative paths from root
+            if not os.path.isabs(target_file):
+                target_file = os.path.join(os.getcwd(), target_file)
+
+        if not os.path.exists(target_file):
+            return jsonify({'error': f'File not found: {target_file}'}), 404
+
+        # Trigger in background
+        import threading
+        def run_evolution():
+            hephaestus.evolve_feature(target_file)
+
+        threading.Thread(target=run_evolution).start()
+
+        return jsonify({
+            'success': True,
+            'message': f'Evolution triggered for {os.path.basename(target_file)}',
+            'mode': 'God Mode',
+            'target': target_file
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@autonomy_bp.route('/director/check', methods=['POST'])
+def check_director():
+    """Trigger The Director to check user velocity"""
+    try:
+        from app.services.director_service import director_service
+        result = director_service.check_user_velocity(user_id=1)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@autonomy_bp.route('/doppelganger/duel', methods=['POST'])
+def trigger_shadow_duel():
+    """Trigger a Shadow Duel (Adversarial Quiz)"""
+    try:
+        from app.services.doppelganger_service import doppelganger_service
+        result = doppelganger_service.generate_shadow_duel(user_id=1)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@autonomy_bp.route('/neural_lace/ingest', methods=['POST'])
+def ingest_content():
+    """Ingest URL or Text"""
+    try:
+        from app.services.neural_lace_service import neural_lace
+        data = request.json
+        result = neural_lace.ingest_content(
+            url=data.get('url'),
+            text_content=data.get('text'),
+            context_tag=data.get('tag', 'General')
+        )
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @autonomy_bp.route('/review/now', methods=['POST'])
 def trigger_self_review():
     """Trigger an immediate self-review"""
