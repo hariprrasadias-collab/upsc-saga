@@ -79,6 +79,27 @@ body {
   /* Prevent double scrollbars */
 }
 
+/* Skip Link for Accessibility */
+.skip-link {
+  position: absolute;
+  top: -9999px;
+  left: 0;
+  background: var(--color-accent-orange);
+  color: var(--color-primary);
+  padding: 1rem;
+  z-index: 9999;
+  text-decoration: none;
+  font-weight: bold;
+  font-family: var(--font-headings);
+  border-bottom-right-radius: 4px;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 2px solid white;
+}
+
 /* --- ANIMATIONS (REQUIRED FOR PARTICLES) --- */
 @keyframes fall {
   0% {

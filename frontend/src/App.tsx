@@ -87,6 +87,9 @@ function App() {
   return (
     <AnalyticsProvider>
       <PomodoroProvider onSessionComplete={handleSessionComplete}>
+        {/* Skip Link for Accessibility */}
+        <a href="#main-content" className="skip-link">Skip to content</a>
+
         <div className={`app-container ${isSidebarOpen ? 'left-open' : ''} ${isRitualsOpen ? 'right-open' : ''}`} style={{
           backgroundImage: `url(/assets/bg_main.jpg)`,
           backgroundSize: 'cover',
@@ -107,6 +110,8 @@ function App() {
             className={`sidebar-toggle-btn ${isSidebarOpen ? 'open' : ''}`}
             onClick={toggleSidebar}
             aria-label="Toggle Sidebar"
+            aria-controls="sidebar-nav"
+            aria-expanded={isSidebarOpen}
           >
             ☰
           </button>
@@ -121,18 +126,23 @@ function App() {
           </button>
 
           {/* MAIN CONTENT AREA (Middle Column - Z-Index 10) */}
-          <main className={`content ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'} ${isRitualsOpen ? 'rituals-open' : 'rituals-closed'}`} style={{
-            backgroundImage: currentTab === 'dashboard' ? `url(/assets/bg_sidebar.png)` : undefined,
-            backgroundSize: 'cover',
-            height: '100vh',
-            maxHeight: '100vh',
-            overflowY: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            zIndex: 10,
-            position: 'relative',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}>
+          <main
+            id="main-content"
+            className={`content ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'} ${isRitualsOpen ? 'rituals-open' : 'rituals-closed'}`}
+            style={{
+              backgroundImage: currentTab === 'dashboard' ? `url(/assets/bg_sidebar.png)` : undefined,
+              backgroundSize: 'cover',
+              height: '100vh',
+              maxHeight: '100vh',
+              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              zIndex: 10,
+              position: 'relative',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+            }}
+            tabIndex={-1} // Allow programmatic focus
+          >
             <Suspense fallback={<div className="loading-screen">Summoning Realm...</div>}>
               {/* Only render Tab Content if we are on the root path */}
               {location.pathname === '/' && (

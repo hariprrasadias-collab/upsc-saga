@@ -18,6 +18,7 @@ const CommandPalette: React.FC = () => {
     const [query, setQuery] = useState('');
     const [selectedIndex, setSelectedIndex] = useState(0);
     const inputRef = useRef<HTMLInputElement>(null);
+    const resultsRef = useRef<HTMLDivElement>(null);
 
     const { toggleTimer, isRunning } = usePomodoro();
 
@@ -66,6 +67,11 @@ const CommandPalette: React.FC = () => {
         cmd.label.toLowerCase().includes(query.toLowerCase())
     );
 
+    // Ensure selected index is valid when filter changes
+    useEffect(() => {
+        setSelectedIndex(0);
+    }, [query]);
+
     // Handle Keyboard Shortcuts
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -106,37 +112,63 @@ const CommandPalette: React.FC = () => {
         }
     }, [isOpen]);
 
+    // Scroll selected item into view
+    useEffect(() => {
+        if (isOpen && resultsRef.current) {
+            const selectedElement = resultsRef.current.children[selectedIndex] as HTMLElement;
+            if (selectedElement) {
+                selectedElement.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+        }
+    }, [selectedIndex, isOpen]);
+
     if (!isOpen) return null;
 
     return (
         <div className="command-palette-overlay" onClick={() => setIsOpen(false)}>
-            <div className="command-palette-modal" onClick={e => e.stopPropagation()}>
+            <div
+                className="command-palette-modal"
+                onClick={e => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Command Palette"
+            >
                 <div className="command-palette-search">
-                    <span className="search-icon">🔍</span>
+                    <span className="search-icon" aria-hidden="true">🔍</span>
                     <input
                         ref={inputRef}
                         type="text"
                         placeholder="Type a command or search..."
                         value={query}
-                        onChange={e => {
-                            setQuery(e.target.value);
-                            setSelectedIndex(0);
-                        }}
+                        onChange={e => setQuery(e.target.value)}
+                        aria-activedescendant={filteredCommands[selectedIndex]?.id}
+                        aria-controls="command-results"
+                        role="combobox"
+                        aria-expanded="true"
+                        aria-autocomplete="list"
                     />
-                    <span className="esc-hint">ESC</span>
+                    <span className="esc-hint" aria-label="Press Escape to close">ESC</span>
                 </div>
 
-                <div className="command-palette-results">
+                <div
+                    id="command-results"
+                    className="command-palette-results"
+                    role="listbox"
+                    ref={resultsRef}
+                >
                     {filteredCommands.length > 0 ? (
                         filteredCommands.map((cmd, index) => (
                             <div
                                 key={cmd.id}
+                                id={cmd.id}
                                 className={`command-item ${index === selectedIndex ? 'selected' : ''}`}
                                 onClick={() => {
                                     cmd.action();
                                     setIsOpen(false);
                                 }}
                                 onMouseEnter={() => setSelectedIndex(index)}
+                                role="option"
+                                aria-selected={index === selectedIndex}
                             >
                                 <div className="command-content">
                                     <span className="command-label">{cmd.label}</span>
@@ -146,13 +178,13 @@ const CommandPalette: React.FC = () => {
                             </div>
                         ))
                     ) : (
-                        <div className="no-results">No commands found</div>
+                        <div className="no-results" role="status">No commands found</div>
                     )}
                 </div>
 
                 <div className="command-palette-footer">
-                    <span>Use <b>↑↓</b> to navigate</span>
-                    <span><b>↵</b> to select</span>
+                    <span>Use <kbd>↑</kbd> <kbd>↓</kbd> to navigate</span>
+                    <span><kbd>↵</kbd> to select</span>
                 </div>
             </div>
         </div>

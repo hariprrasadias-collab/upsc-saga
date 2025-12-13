@@ -14,7 +14,10 @@
   z-index: 1000;
   position: relative;
   box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Reduced Motion Support */
+  @media (prefers-reduced-motion: no-preference) {
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }
 
 .sidebar.closed {
@@ -61,7 +64,6 @@
   gap: 1rem;
   padding: 1rem 1.5rem;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-left: 3px solid transparent;
   user-select: none;
   color: var(--color-text-secondary);
@@ -69,6 +71,10 @@
   letter-spacing: 0.5px;
   position: relative;
   overflow: hidden;
+  /* Reduced Motion Support */
+  @media (prefers-reduced-motion: no-preference) {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }
 
 /* Button Reset for Menu Items */
@@ -101,7 +107,8 @@ button.group-header:focus-visible,
   padding-left: 2rem;
 }
 
-.menu-item.active {
+.menu-item.active,
+.menu-item[aria-current="page"] {
   background: linear-gradient(90deg, rgba(243, 156, 18, 0.1) 0%, transparent 100%);
   border-left-color: var(--color-accent-orange);
   color: var(--color-accent-orange);
@@ -118,8 +125,12 @@ button.group-header:focus-visible,
   height: 100%;
   background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
   opacity: 0;
-  transition: opacity 0.3s;
   pointer-events: none;
+
+  /* Reduced Motion Support */
+  @media (prefers-reduced-motion: no-preference) {
+    transition: opacity 0.3s;
+  }
 }
 
 .menu-item:hover::after {
@@ -130,7 +141,10 @@ button.group-header:focus-visible,
   font-size: 1.2rem;
   min-width: 24px;
   text-align: center;
-  transition: transform 0.3s;
+  /* Reduced Motion Support */
+  @media (prefers-reduced-motion: no-preference) {
+    transition: transform 0.3s;
+  }
 }
 
 .menu-item:hover .icon {
@@ -155,8 +169,11 @@ button.group-header:focus-visible,
   align-items: center;
   padding: 0.8rem 1.5rem;
   cursor: pointer;
-  transition: all 0.2s;
   user-select: none;
+  /* Reduced Motion Support */
+  @media (prefers-reduced-motion: no-preference) {
+    transition: all 0.2s;
+  }
 }
 
 /* Special padding adjustment for group header button */
@@ -186,13 +203,19 @@ button.group-header {
 .expand-icon {
   font-size: 0.8rem;
   color: var(--color-text-secondary);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Reduced Motion Support */
+  @media (prefers-reduced-motion: no-preference) {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }
 
 /* Group Items */
 .group-items {
   overflow: hidden;
-  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+  /* Reduced Motion Support */
+  @media (prefers-reduced-motion: no-preference) {
+    transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+  }
 }
 
 .sub-item {
@@ -220,7 +243,10 @@ button.sub-item {
   background: var(--color-text-secondary);
   opacity: 0.3;
   transform: translateY(-50%);
-  transition: all 0.3s;
+  /* Reduced Motion Support */
+  @media (prefers-reduced-motion: no-preference) {
+    transition: all 0.3s;
+  }
 }
 
 .sub-item:hover::before {
@@ -229,7 +255,8 @@ button.sub-item {
   box-shadow: 0 0 5px var(--color-accent-orange);
 }
 
-.sub-item.active::before {
+.sub-item.active::before,
+.sub-item[aria-current="page"]::before {
   background: var(--color-accent-orange);
   opacity: 1;
   box-shadow: 0 0 8px var(--color-accent-orange);
@@ -292,5 +319,29 @@ button.sub-item {
 
   button.group-header {
     padding: 0.8rem 1rem;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (forced-colors: active) {
+  .sidebar {
+    border-right: 2px solid CanvasText;
+  }
+
+  .menu-item,
+  .group-header {
+    border: 1px solid transparent;
+  }
+
+  .menu-item:hover,
+  .group-header:hover {
+    border: 1px solid Highlight;
+  }
+
+  .menu-item.active,
+  .menu-item[aria-current="page"] {
+    border-left: 3px solid Highlight;
+    background: Highlight;
+    color: HighlightText;
   }
 }
