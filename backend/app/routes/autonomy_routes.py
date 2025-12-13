@@ -304,6 +304,31 @@ def check_director():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@autonomy_bp.route('/doppelganger/duel', methods=['POST'])
+def trigger_shadow_duel():
+    """Trigger a Shadow Duel (Adversarial Quiz)"""
+    try:
+        from app.services.doppelganger_service import doppelganger_service
+        result = doppelganger_service.generate_shadow_duel(user_id=1)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@autonomy_bp.route('/neural_lace/ingest', methods=['POST'])
+def ingest_content():
+    """Ingest URL or Text"""
+    try:
+        from app.services.neural_lace_service import neural_lace
+        data = request.json
+        result = neural_lace.ingest_content(
+            url=data.get('url'),
+            text_content=data.get('text'),
+            context_tag=data.get('tag', 'General')
+        )
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @autonomy_bp.route('/review/now', methods=['POST'])
 def trigger_self_review():
     """Trigger an immediate self-review"""
