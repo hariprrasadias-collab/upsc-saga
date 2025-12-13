@@ -1,0 +1,74 @@
+.heatmap-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    background: rgba(0,0,0,0.02);
+    border-radius: 8px;
+}
+
+.heatmap-title {
+    margin: 0 0 10px 0;
+    text-align: center;
+    color: #555;
+    font-size: 1rem;
+}
+
+.dark-mode .heatmap-title {
+    color: #ccc;
+}
+
+.heatmap-wrapper {
+    flex: 1;
+    min-height: 300px;
+}
+
+.heatmap-tooltip {
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 10px;
+    color: #fff;
+    font-size: 0.85rem;
+}
+
+.heatmap-tooltip p {
+    margin: 0;
+    line-height: 1.4;
+}
+
+.heatmap-tooltip .label {
+    font-weight: bold;
+    color: #ffeb3b;
+    margin-bottom: 5px;
+}
+
+.heatmap-legend {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+    padding: 5px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.dark-mode .legend-item {
+    color: #aaa;
+}
+
+.legend-item span {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    display: inline-block;
+}

@@ -180,8 +180,6 @@ const NeuralHash: React.FC = () => {
                 </div>
             )}
 
-            {/* DEBUG INDICATOR REMOVED */}
-
             <div className="decoder-header">
                 <h1>The Neural Hash</h1>
                 <div className="subtitle">PATTERN RECOGNITION & DECODING ENGINE</div>

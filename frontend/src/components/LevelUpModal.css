@@ -36,6 +36,23 @@
     animation: fadeIn 1s 0.8s forwards; /* Delay appearance */
 }
 
+.levelup-lore {
+    margin: 2rem auto;
+    max-width: 600px;
+    background: rgba(0,0,0,0.6);
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 3px solid #ffd700;
+    color: #f0f0f0;
+    font-style: italic;
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    opacity: 0;
+    animation: fadeIn 1s 1s forwards;
+    text-align: left;
+}
+
 .levelup-rewards {
     margin-top: 2rem;
     display: flex;

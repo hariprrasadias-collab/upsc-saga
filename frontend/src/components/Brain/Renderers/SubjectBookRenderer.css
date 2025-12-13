@@ -1,0 +1,163 @@
+.subject-book-container {
+    display: flex;
+    height: 100%;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    overflow: hidden;
+    font-family: 'Crimson Text', serif; /* Book-like font */
+}
+
+.book-spine {
+    width: 250px;
+    background: rgba(0, 0, 0, 0.4);
+    border-right: 1px solid var(--glass-border);
+    display: flex;
+    flex-direction: column;
+}
+
+.book-spine h2 {
+    padding: 20px;
+    margin: 0;
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    color: var(--gold);
+    border-bottom: 1px solid var(--glass-border);
+    text-align: center;
+}
+
+.chapter-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.chapter-tab {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 5px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    border-radius: 6px;
+}
+
+.chapter-tab:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.chapter-tab.active {
+    background: rgba(255, 215, 0, 0.1);
+    color: var(--gold);
+    border-left: 3px solid var(--gold);
+}
+
+.chapter-num {
+    font-weight: bold;
+    margin-right: 10px;
+    opacity: 0.5;
+}
+
+.chapter-title {
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.book-page {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #fdfbf7; /* Paper color */
+    color: #2c3e50; /* Ink color */
+    padding: 40px;
+}
+
+.dark-mode .book-page {
+    background: #1a1a1a;
+    color: #e0e0e0;
+}
+
+.page-header {
+    border-bottom: 2px solid rgba(0,0,0,0.1);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.dark-mode .page-header {
+    border-bottom: 2px solid rgba(255,255,255,0.1);
+}
+
+.page-header h3 {
+    margin: 0 0 10px 0;
+    font-family: 'Cinzel', serif;
+}
+
+.page-meta {
+    display: flex;
+    gap: 8px;
+}
+
+.concept-tag {
+    font-size: 0.75rem;
+    background: rgba(0,0,0,0.05);
+    padding: 2px 8px;
+    border-radius: 12px;
+    color: #666;
+}
+
+.dark-mode .concept-tag {
+    background: rgba(255,255,255,0.1);
+    color: #aaa;
+}
+
+.page-content {
+    flex: 1;
+    overflow-y: auto;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    padding-right: 10px;
+}
+
+.page-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.dark-mode .page-footer {
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.page-footer button {
+    background: none;
+    border: 1px solid rgba(0,0,0,0.2);
+    padding: 5px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: inherit;
+}
+
+.dark-mode .page-footer button {
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.page-footer button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.page-number {
+    font-style: italic;
+    opacity: 0.7;
+}

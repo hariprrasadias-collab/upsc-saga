@@ -306,7 +306,7 @@ def generate_debate_verdict(topic, history):
     Structure:
     {{
         "winner": "Name of Agent",
-        "key_concepts": ["concept1", "concept2"],
+        "key_concepts": ["concept1", "concept2", ...],
         "synthesis": "...",
         "best_quote": "...",
         "mental_models": ["model1", "model2"]
@@ -382,6 +382,6 @@ def generate_debate_verdict(topic, history):
         return {
             "winner": "Undecided",
             "key_concepts": [],
-            "synthesis": "An error occurred during analysis.",
+            "synthesis": "Analysis failed.",
             "best_quote": ""
         }

@@ -777,15 +777,10 @@ Your output must be structurally perfect, intellectually dense, and strictly com
             # Capture app context for worker threads
             app = current_app._get_current_object()
             
-            # Define all actions to run (The Full Brain Vault Suite)
+            # Define all actions to run
             actions = [
-                # Core Learning
                 ("CREATE_FLASHCARDS", {"topic": topic, "count": 5, "reasoning": "Task Completion Automation"}),
                 ("CREATE_MOCK_TEST", {"topic": topic, "count": 10, "reasoning": "Task Completion Automation"}),
-                ("GENERATE_ELI5", {"topic": topic}),
-                ("GENERATE_CHEAT_SHEET", {"topic": topic}),
-                
-                # Context & Connections
                 ("PREDICT_QUESTIONS", {"topic": topic, "subject": subject, "timeframe_days": 30}),
                 ("GENERATE_TOPIC_LINKAGES", {"topic": topic, "subject": subject}),
                 ("GENERATE_TIMELINE", {"topic": topic}),
@@ -794,14 +789,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 
                 # Creative & Application
                 ("GENERATE_PODCAST_SCRIPT", {"topic": topic, "style": "humorous"}),
-                ("GENERATE_SOCRATIC_DIALOGUE", {"topic": topic, "subject": subject}),
-                ("GENERATE_ROLEPLAY_SCENARIO", {"topic": topic}),
-                ("GENERATE_VISUAL_PROMPT", {"topic": topic}),
-                
-                # Analysis & Writing
-                ("GENERATE_ESSAY_PROMPT", {"topic": topic, "subject": subject}),
-                ("GENERATE_QUOTE_BANK", {"topic": topic}),
-                ("FIND_COMMON_PITFALLS", {"topic": topic})
+                ("GENERATE_SOCRATIC_DIALOGUE", {"topic": topic, "subject": subject})
             ]
 
             print(f"Brain: 🚀 Launching {len(actions)} parallel automation tasks for {topic}")
@@ -821,29 +809,33 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                         if result and result.get('success'):
                             # 1. Foresight Predictions
                             if action == "PREDICT_QUESTIONS":
+                                # Save Predictions
                                 data = result.get('data', [])
                                 if data:
-                                    # Already saved in execute_action usually, but double check
-                                    # The execute_action for PREDICT_QUESTIONS calls foresight_engine.predict_questions which saves to DB.
-                                    # ALSO save summary to Brain Vault
-                                    prediction_summary = "\n".join([f"- {p.get('question')} ({p.get('type')})" for p in data])
-                                    save_ai_content('predictions', topic, prediction_summary, {'predictions': data})
+                                    print(f"Brain: Saving {len(data)} predictions...")
+                                    for p in data:
+                                        conn.execute('INSERT INTO foresight_predictions (topic, question, type, probability, reasoning) VALUES (?, ?, ?, ?, ?)',
+                                                    (topic, p.get('question'), p.get('type'), p.get('probability'), p.get('reasoning')))
+                                    conn.commit()
                             
-                            # 2. Socratic Dialogue
                             elif action == "GENERATE_SOCRATIC_DIALOGUE":
+                                # Save Dialogue
                                 dialogue = result.get('dialogue')
                                 verdict = result.get('verdict')
                                 if dialogue:
-                                    save_socratic_dialogue(user_id, topic, dialogue, json.dumps(verdict))
+                                    print(f"Brain: Saving Socratic Dialogue...")
+                                    cursor = save_socratic_dialogue(user_id, topic, dialogue, json.dumps(verdict))
                                     # Double write to Brain Vault
                                     save_ai_content('socratic', topic, dialogue, verdict)
+                                    # Create notification
                                     conn.execute('INSERT INTO notifications (user_id, title, message, type) VALUES (?, ?, ?, ?)',
                                                 (1, "New Socratic Debate", f"A debate on {topic} is ready.", "debate"))
                                     conn.commit()
 
                             # 3. Neural Hash
                             elif action == "GENERATE_TOPIC_LINKAGES":
-                                linkages_data = result.get('data') # Assuming execute_action returns structured data now
+                                # Save Linkages (Neural Hash)
+                                linkages_data = result.get('data') # It returns {'success': True, 'data': {...}} # Assuming execute_action returns structured data now
                                 if not linkages_data and result.get('linkages'):
                                     # Backward compatibility if it returns simple list
                                     linkages_data = {'cross_linkages': result.get('linkages'), 'core_themes': []}
@@ -1215,20 +1207,22 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 try:
                     topic = payload.get('topic', '')
                     prompt = f"""
-                    Create a comprehensive 'Chapter Summary Infographic' text-to-image prompt for '{topic}'.
-                    The prompt should describe a dense, high-resolution informational poster or digital illustration that covers ALL key concepts of the topic.
-                    Include:
-                    - Central theme visualization.
-                    - Surroundings containing charts, icons, and symbolic representations of sub-topics.
-                    - Color palette (e.g., 'Professional Blue & Gold', 'Historical Sepia').
-                    - Style: 'Detailed Vector Art', 'Infographic Design', or 'Hyper-realistic Educational Poster'.
-                    
-                    Return ONLY the prompt text.
+                    # MISSION: GENERATE A MIDJOURNEY V6 PROMPT
+                    **Concept:** {topic}
+
+                    **PARAMETERS:**
+                    - **Style:** Cinematic, Editorial Photography, National Geographic style.
+                    - **Lighting:** Volumetric lighting, Golden Hour, or Noir (depending on mood).
+                    - **Composition:** Rule of thirds, Macro shot for details, Wide angle for landscapes.
+                    - **Symbolism:** Translate abstract concepts (e.g., "Inflation") into concrete visual metaphors (e.g., "A burning wallet in a rainstorm").
+
+                    **OUTPUT:**
+                    Return ONLY the raw prompt string with parameters (e.g., --ar 16:9 --v 6.0).
                     """
                     response = model_manager.generate_content(prompt, model_type='pro')
                     result = {
                         "success": True,
-                        "message": "Visual Infographic Prompt Generated.",
+                        "message": "Visual Prompt Generated.",
                         "prompt": response.text
                     }
                 except Exception as e:
@@ -1256,7 +1250,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     response = model_manager.generate_content(prompt, model_type='pro')
                     result = {
                         "success": True,
-                        "message": "Case Study Generated.",
+                        "message": "Roleplay Scenario Generated.",
                         "scenario": response.text
                     }
                 except Exception as e:
@@ -1422,13 +1416,10 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 try:
                     topic = payload.get('topic', '')
                     prompt = f"""
-                    Provide a high-quality Quote Bank and Data Sheet for '{topic}' suitable for UPSC Mains answers.
-                    Structure:
-                    1. **Quotes**: 3 impactful quotes by famous personalities/scholars. Include the Source.
-                    2. **Data/Stats**: 3 key data points with Source (e.g. World Bank, NITI Aayog).
-                    3. **Keywords**: 5 high-yield keywords to drop in answers.
-                    
-                    Format nicely with Markdown. 
+                    Provide 2 impactful Quotes and 2 key Data Points/Statistics relevant to '{topic}' for UPSC Mains answers.
+                    Format:
+                    Quotes: ...
+                    Data: ...
                     """
                     response = model_manager.generate_content(prompt, model_type='pro')
                     # Simple splitting to separate quotes and data is hard without structured output
@@ -1449,8 +1440,8 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     result = {
                         "success": True,
                         "message": "Quote Bank Generated.",
-                        "quotes": response.text, # This field is legacy named 'quotes' but contains full rich text now
-                        "data": "" # Deprecated, merged into quotes
+                        "quotes": quotes_part,
+                        "data": data_part
                     }
                 except Exception as e:
                     result = {"success": False, "message": f"Quote Bank Gen Failed: {str(e)}"}

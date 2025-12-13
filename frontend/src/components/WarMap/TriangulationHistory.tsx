@@ -62,7 +62,7 @@ const TriangulationHistory: React.FC = () => {
 
     const fetchHistory = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/triangulation/history?limit=50');
+            const response = await fetch('http://127.0.0.1:5000/api/triangulation/history?limit=50');
             const data = await response.json();
             if (data.success) {
                 setHistory(data.data);
@@ -322,8 +322,6 @@ const TriangulationHistory: React.FC = () => {
     return (
         <div className="triangulation-history-container">
             <h1 className="neon-text">⚔️ War Room Archives</h1>
-
-            {/* DEBUG INDICATOR REMOVED */}
 
             <div className="triangulation-layout">
                 <div className="history-list glass-panel">
