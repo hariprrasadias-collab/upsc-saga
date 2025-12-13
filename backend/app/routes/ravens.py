@@ -89,7 +89,12 @@ def run_background_fetch(app):
                             'subjects': ai_result['subjects'],
                             'importance': ai_result['importance'],
                             'image_url': image_url,
-                            'related_pyqs': related_pyqs
+                            'related_pyqs': related_pyqs,
+                            # Enhanced Metadata
+                            'prelims_pointers': ai_result.get('prelims_pointers', []),
+                            'mains_dimensions': ai_result.get('mains_dimensions', []),
+                            'steeple_analysis': ai_result.get('steeple_analysis', {}),
+                            'inter_linkages': ai_result.get('inter_linkages', [])
                         }
                         
                         save_article(article_data)
@@ -205,7 +210,12 @@ def process_article():
             'subjects': ai_result['subjects'],
             'importance': ai_result['importance'],
             'image_url': image_url,
-            'related_pyqs': related_pyqs
+            'related_pyqs': related_pyqs,
+            # Enhanced Metadata
+            'prelims_pointers': ai_result.get('prelims_pointers', []),
+            'mains_dimensions': ai_result.get('mains_dimensions', []),
+            'steeple_analysis': ai_result.get('steeple_analysis', {}),
+            'inter_linkages': ai_result.get('inter_linkages', [])
         }
         
         # Save or Update
@@ -224,7 +234,9 @@ def process_article():
                 **article_data,
                 'id': article_id,
                 'examQuestions': ai_result.get('exam_questions', []),
-                'relatedTopics': ai_result.get('related_topics', [])
+                'relatedTopics': ai_result.get('related_topics', []),
+                'steepleAnalysis': ai_result.get('steeple_analysis', {}),
+                'interLinkages': ai_result.get('inter_linkages', [])
             }
         })
         

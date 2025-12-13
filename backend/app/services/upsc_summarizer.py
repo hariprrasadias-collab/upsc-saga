@@ -127,23 +127,32 @@ You must return valid JSON only. No markdown formatting (no ```json ... ```), no
 Title: {title}
 Content: {content}
 
+**ANALYSIS FRAMEWORK (STEEPLE):**
+Analyze using Social, Technological, Economic, Environmental, Political, Legal, and Ethical dimensions where applicable.
+
 **ANALYSIS INSTRUCTIONS:**
-1.  **UPSC Summary:** Write a high-yield summary (approx 200 words). Focus on the "Why", "What", and "Implications". Avoid journalistic fluff.
-2.  **Key Points:** Extract 4-5 distinct, punchy points (Facts, Committees, Data, Articles).
-3.  **Tagging:** Assign relevant GS Papers (GS1-GS4) and Subjects.
-4.  **Importance:** Rate relevance 1 (Low) to 3 (Critical).
-5.  **Exam Questions:** Frame 1-2 potential Mains Questions based on this topic.
-6.  **Related Topics:** List 2-3 static syllabus topics linked to this current affair.
+1.  **UPSC Summary:** Write a high-yield summary (approx 200 words) using the STEEPLE framework implicitly. Focus on "Why", "What", "Implications", and "Way Forward".
+2.  **Prelims Pointers:** Extract distinct, fact-based points (Data, Committees, Constitutional Articles, Species names, Reports).
+3.  **Mains Dimensions:** Extract analytical arguments (Pros, Cons, Institutional Challenges, Ethical Concerns).
+4.  **Tagging:** Assign relevant GS Papers (GS1-GS4) and Subjects.
+5.  **Inter-linkages:** Connect this topic to other syllabus areas (e.g., Polity linking to Internal Security).
+6.  **Importance:** Rate relevance 1 (Low) to 3 (Critical).
 
 **JSON SCHEMA:**
 {{
-  "upsc_summary": "Comprehensive summary focusing on policy/governance/economy...",
-  "key_points": ["Point 1", "Point 2", "Point 3", "Point 4"],
+  "upsc_summary": "Comprehensive summary text...",
+  "prelims_pointers": ["Fact 1", "Fact 2 (Committee Name)", "Fact 3 (Article X)"],
+  "mains_dimensions": ["Argument 1 (Federalism issue)", "Argument 2 (Economic impact)"],
+  "steeple_analysis": {{
+    "social": "Impact on society...",
+    "economic": "Fiscal burden...",
+    "legal": "Supreme Court judgement..."
+  }},
+  "inter_linkages": ["GS2: Federalism", "GS3: Fiscal Deficit"],
   "papers": ["GS2", "GS3"],
-  "subjects": ["Polity & Governance", "International Relations"],
+  "subjects": ["Polity & Governance", "Economy"],
   "importance": 3,
-  "exam_questions": ["Discuss the implications of...", "Critically analyze..."],
-  "related_topics": ["Federalism", "Basic Structure Doctrine"]
+  "exam_questions": ["Discuss the implications of...", "Critically analyze..."]
 }}"""
 
         # Call ModelManager with 'pro' model for peak performance
@@ -234,9 +243,19 @@ def fetch_article_content(url):
         response = requests.get(url, headers=headers, timeout=15)
         soup = BeautifulSoup(response.content, 'html.parser')
         
-        # Remove scripts and styles
-        for script in soup(["script", "style", "nav", "header", "footer", "aside"]):
-            script.extract()
+        # Remove junk elements
+        for element in soup(["script", "style", "nav", "header", "footer", "aside", "form", "iframe", "ads"]):
+            element.extract()
+
+        # Specific cleanup for known garbage classes/IDs
+        garbage_selectors = [
+            '.ad-container', '.advertisement', '.related-articles', '.read-more',
+            '.share-buttons', '.social-share', '.comment-section', '.copyright',
+            '#bottom-bar', '#cookie-banner', '.newsletter-signup'
+        ]
+        for selector in garbage_selectors:
+            for div in soup.select(selector):
+                div.extract()
             
         # Try to find main content based on common classes/ids
         content = None
@@ -249,25 +268,42 @@ def fetch_article_content(url):
         if not content and 'indianexpress.com' in url:
             content = soup.find('div', class_='story_details') or soup.find('div', class_='full-details')
             
+        # PIB (Press Information Bureau)
+        if not content and 'pib.gov.in' in url:
+            content = soup.find('div', class_='innner-page-main-about-us-content-right-part')
+
         # Generic fallback: find the element with the most <p> tags
         if not content:
              candidates = soup.find_all('div')
              best_candidate = None
              max_p = 0
              for c in candidates:
+                 # Check direct children paragraphs
                  p_count = len(c.find_all('p', recursive=False))
-                 if p_count > max_p:
-                     max_p = p_count
+                 # Bonus for long paragraphs (likely content)
+                 score = 0
+                 for p in c.find_all('p', recursive=False):
+                     if len(p.get_text()) > 100:
+                         score += 2
+                     else:
+                         score += 1
+
+                 if score > max_p:
+                     max_p = score
                      best_candidate = c
              content = best_candidate
 
         if content:
+            # Clean text
             text = content.get_text(separator=' ', strip=True)
+            # Normalize whitespace
+            text = re.sub(r'\s+', ' ', text)
         else:
             # Fallback to all paragraphs
             text = ' '.join([p.get_text() for p in soup.find_all('p')])
+            text = re.sub(r'\s+', ' ', text)
             
-        return text[:15000] # Limit length
+        return text[:20000] # Increased limit for deep analysis
     except Exception as e:
         print(f"Failed to fetch content from {url}: {e}")
         return ""

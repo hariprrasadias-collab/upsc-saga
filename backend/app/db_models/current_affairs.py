@@ -28,9 +28,35 @@ def init_current_affairs_table():
             user_notes TEXT,
             anki_card_id INTEGER DEFAULT NULL,
             image_url TEXT,
-            related_pyqs TEXT
+            related_pyqs TEXT,
+            prelims_pointers TEXT,
+            mains_dimensions TEXT,
+            steeple_analysis TEXT,
+            inter_linkages TEXT
         )
     ''')
+
+    # Attempt to add new columns for existing databases
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN prelims_pointers TEXT')
+    except sqlite3.OperationalError:
+        pass
+
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN mains_dimensions TEXT')
+    except sqlite3.OperationalError:
+        pass
+
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN steeple_analysis TEXT')
+    except sqlite3.OperationalError:
+        pass
+
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN inter_linkages TEXT')
+    except sqlite3.OperationalError:
+        pass
+
     conn.commit()
 
 def article_exists(link):
@@ -47,8 +73,9 @@ def save_article(article_data):
             INSERT INTO current_affairs (
                 title, original_link, source, published_date,
                 original_summary, upsc_summary, key_points,
-                papers, subjects, importance, image_url, related_pyqs
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                papers, subjects, importance, image_url, related_pyqs,
+                prelims_pointers, mains_dimensions, steeple_analysis, inter_linkages
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             article_data['title'],
             article_data['link'],
@@ -61,7 +88,11 @@ def save_article(article_data):
             json.dumps(article_data.get('subjects', [])),
             article_data.get('importance', 2),
             article_data.get('image_url', ''),
-            json.dumps(article_data.get('related_pyqs', []))
+            json.dumps(article_data.get('related_pyqs', [])),
+            json.dumps(article_data.get('prelims_pointers', [])),
+            json.dumps(article_data.get('mains_dimensions', [])),
+            json.dumps(article_data.get('steeple_analysis', {})),
+            json.dumps(article_data.get('inter_linkages', []))
         ))
         conn.commit()
         return cursor.lastrowid
@@ -119,7 +150,11 @@ def get_saved_articles(filters=None):
             'userNotes': row['user_notes'],
             'ankiCardId': row['anki_card_id'],
             'imageUrl': row['image_url'],
-            'relatedPyqs': json.loads(row['related_pyqs'] or '[]')
+            'relatedPyqs': json.loads(row['related_pyqs'] or '[]'),
+            'prelimsPointers': json.loads(row['prelims_pointers'] or '[]') if 'prelims_pointers' in row.keys() else [],
+            'mainsDimensions': json.loads(row['mains_dimensions'] or '[]') if 'mains_dimensions' in row.keys() else [],
+            'steepleAnalysis': json.loads(row['steeple_analysis'] or '{}') if 'steeple_analysis' in row.keys() else {},
+            'interLinkages': json.loads(row['inter_linkages'] or '[]') if 'inter_linkages' in row.keys() else []
         })
     
     return articles
@@ -200,6 +235,10 @@ def update_article_content_by_link(link, article_data):
             importance = ?,
             image_url = ?,
             related_pyqs = ?,
+            prelims_pointers = ?,
+            mains_dimensions = ?,
+            steeple_analysis = ?,
+            inter_linkages = ?,
             fetch_date = CURRENT_TIMESTAMP
         WHERE original_link = ?
     ''', (
@@ -210,6 +249,10 @@ def update_article_content_by_link(link, article_data):
         article_data.get('importance', 2),
         article_data.get('image_url', ''),
         json.dumps(article_data.get('related_pyqs', [])),
+        json.dumps(article_data.get('prelims_pointers', [])),
+        json.dumps(article_data.get('mains_dimensions', [])),
+        json.dumps(article_data.get('steeple_analysis', {})),
+        json.dumps(article_data.get('inter_linkages', [])),
         link
     ))
     conn.commit()

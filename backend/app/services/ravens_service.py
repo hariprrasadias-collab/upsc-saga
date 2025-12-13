@@ -66,11 +66,9 @@ class RavensService:
         **DIRECTIVE:**
         You are a UPSC Chief Examiner. Analyze this text and provide a "Titan Level" summary.
         Extract ONLY what matters for UPSC. Disregard political gossip.
-        Focus on:
-        1. Context/Background (Why is this in news?)
-        2. Key Provisions/Data/Facts
-        3. Issues/Challenges
-        4. Way Forward/Solutions
+
+        **ANALYSIS FRAMEWORK (STEEPLE):**
+        Analyze using Social, Technological, Economic, Environmental, Political, Legal, and Ethical dimensions where applicable.
 
         **OUTPUT SCHEMA (JSON):**
         {{
@@ -83,7 +81,13 @@ class RavensService:
                 "way_forward": ["Committee Recommendation"]
             }},
             "keywords": ["Keyword1", "Keyword2"],
-            "summary": "Comprehensive paragraph summary"
+            "summary": "Comprehensive paragraph summary using STEEPLE framework implicitly",
+            "steeple_analysis": {{
+                "social": "Impact on society...",
+                "economic": "Fiscal burden...",
+                "legal": "Supreme Court judgement..."
+            }},
+            "inter_linkages": ["GS2: Federalism", "GS3: Fiscal Deficit"]
         }}
         """
         try:
