@@ -70,6 +70,9 @@ class NightWatchman:
         # 4. Trigger REM Sleep (Autonomy)
         self.perform_rem_sleep_cycle()
 
+        # 4.5 Trigger Code Audit (Evolution)
+        self.perform_nightly_code_audit()
+
         # 5. Weekly Self-Review (Sundays only)
         if datetime.now().weekday() == 6: # Sunday
             try:
@@ -83,6 +86,33 @@ class NightWatchman:
             "success": True, 
             "briefing_id": briefing_id
         }
+
+    def perform_nightly_code_audit(self):
+        """
+        AUTONOMOUS EVOLUTION:
+        Review one codebase file every night to check for 'Tech Debt' or 'UPSC Misalignment'.
+        """
+        print("🕵️ Night Watchman: Initiating Code Audit...")
+        try:
+            from app.services.hephaestus_service import hephaestus
+            import random
+
+            # Select a random service to audit
+            services_dir = os.path.join(os.getcwd(), 'backend', 'app', 'services')
+            if not os.path.exists(services_dir): return
+
+            files = [f for f in os.listdir(services_dir) if f.endswith('.py') and f != '__init__.py']
+            if not files: return
+
+            target_file = os.path.join(services_dir, random.choice(files))
+
+            print(f"🕵️ Auditing Target: {target_file}")
+
+            # Use Hephaestus to evolve it
+            hephaestus.evolve_feature(target_file)
+
+        except Exception as e:
+            print(f"❌ Code Audit Failed: {e}")
 
     def perform_rem_sleep_cycle(self):
         """

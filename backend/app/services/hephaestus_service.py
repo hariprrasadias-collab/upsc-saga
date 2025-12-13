@@ -240,4 +240,34 @@ class HephaestusService:
         except:
             pass
 
+    def self_diagnose(self):
+        """
+        Runs internal integrity checks.
+        """
+        print("🏥 Hephaestus: Running System Diagnostics...")
+        issues = []
+
+        # 1. Check Model Configuration
+        if not model_manager.is_configured:
+            issues.append("ModelManager not configured.")
+
+        # 2. Check Database Connection
+        try:
+            get_db()
+        except:
+            issues.append("Database connection failed.")
+
+        # 3. Check Logs Directory
+        if not os.path.exists('logs'):
+            issues.append("Logs directory missing.")
+
+        if issues:
+            print(f"⚠️ Diagnostics Found Issues: {issues}")
+            # Try to fix?
+            if "Logs directory missing." in issues:
+                os.makedirs('logs', exist_ok=True)
+                print("🔧 Fixed: Logs directory created.")
+        else:
+            print("✅ Diagnostics Passed: System Nominal.")
+
 hephaestus = HephaestusService()
