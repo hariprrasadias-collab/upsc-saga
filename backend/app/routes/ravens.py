@@ -99,7 +99,13 @@ def run_background_fetch(app):
                             'mind_map': ai_result.get('mind_map', ''),
                             'quiz': ai_result.get('quiz', []),
                             'answer_framework': ai_result.get('answer_framework', {}),
-                            'essay_fodder': ai_result.get('essay_fodder', {})
+                            'essay_fodder': ai_result.get('essay_fodder', {}),
+                            # Universe Mode Metadata
+                            'timeline': ai_result.get('timeline', []),
+                            'data_visualization': ai_result.get('data_visualization', {}),
+                            'podcast_script': ai_result.get('podcast_script', ''),
+                            'interview_questions': ai_result.get('interview_questions', []),
+                            'simulation_scenario': ai_result.get('simulation_scenario', {})
                         }
                         
                         save_article(article_data)
@@ -225,7 +231,13 @@ def process_article():
             'mind_map': ai_result.get('mind_map', ''),
             'quiz': ai_result.get('quiz', []),
             'answer_framework': ai_result.get('answer_framework', {}),
-            'essay_fodder': ai_result.get('essay_fodder', {})
+            'essay_fodder': ai_result.get('essay_fodder', {}),
+            # Universe Mode Metadata
+            'timeline': ai_result.get('timeline', []),
+            'data_visualization': ai_result.get('data_visualization', {}),
+            'podcast_script': ai_result.get('podcast_script', ''),
+            'interview_questions': ai_result.get('interview_questions', []),
+            'simulation_scenario': ai_result.get('simulation_scenario', {})
         }
         
         # Save or Update
@@ -250,7 +262,12 @@ def process_article():
                 'mindMap': ai_result.get('mind_map', ''),
                 'quiz': ai_result.get('quiz', []),
                 'answerFramework': ai_result.get('answer_framework', {}),
-                'essayFodder': ai_result.get('essay_fodder', {})
+                'essayFodder': ai_result.get('essay_fodder', {}),
+                'timeline': ai_result.get('timeline', []),
+                'dataVisualization': ai_result.get('data_visualization', {}),
+                'podcastScript': ai_result.get('podcast_script', ''),
+                'interviewQuestions': ai_result.get('interview_questions', []),
+                'simulationScenario': ai_result.get('simulation_scenario', {})
             }
         })
         

@@ -64,14 +64,15 @@ class RavensService:
         "{article_content[:15000]}..."
 
         **DIRECTIVE:**
-        You are the OMNISCIENT UPSC ARCHITECT. Deconstruct this text into a "God Tier" study artifact.
+        You are the UNIVERSAL WEAVER. Transmute this text into an Omega Tier study module.
 
         **ARCHITECTURAL DIRECTIVES:**
-        1. **STEEPLE Analysis:** Deep dive into Social, Tech, Econ, etc.
-        2. **Facts:** Extract all hard data, reports, committees.
-        3. **Visuals:** Create a Mermaid.js mindmap string.
-        4. **Quiz:** 5 High-quality MCQs.
-        5. **Essay:** Quotes, Anecdotes, Data Nukes.
+        1. **Deep Analysis:** STEEPLE Framework.
+        2. **Facts:** Prelims Armory (Data/Reports).
+        3. **Visuals:** Mermaid.js Mindmap & Data Viz (Chart).
+        4. **Audio:** Podcast Script (Host/Expert).
+        5. **Simulation:** Interview Questions & Ethics Scenario.
+        6. **Chronology:** Timeline of events.
 
         **OUTPUT SCHEMA (JSON):**
         {{
@@ -86,7 +87,12 @@ class RavensService:
             "mind_map": "graph TD; ...",
             "quiz": [ {{ "question": "...", "options": [], "answer": "...", "explanation": "..." }} ],
             "answer_framework": {{ "intro": "...", "body_points": [], "conclusion": "..." }},
-            "essay_fodder": {{ "quote": "...", "statistic": "..." }}
+            "essay_fodder": {{ "quote": "...", "statistic": "..." }},
+            "timeline": [ {{ "date": "...", "event": "..." }} ],
+            "data_visualization": {{ "type": "bar", "data": [] }},
+            "podcast_script": "Host: ... Expert: ...",
+            "interview_questions": [ {{ "question": "...", "context": "..." }} ],
+            "simulation_scenario": {{ "scenario": "...", "options": [] }}
         }}
         """
         try:

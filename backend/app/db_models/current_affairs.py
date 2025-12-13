@@ -36,7 +36,12 @@ def init_current_affairs_table():
             mind_map TEXT,
             quiz TEXT,
             answer_framework TEXT,
-            essay_fodder TEXT
+            essay_fodder TEXT,
+            timeline TEXT,
+            data_visualization TEXT,
+            podcast_script TEXT,
+            interview_questions TEXT,
+            simulation_scenario TEXT
         )
     ''')
 
@@ -77,6 +82,28 @@ def init_current_affairs_table():
     except sqlite3.OperationalError:
         pass
 
+    # Universe Mode Metadata v3
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN timeline TEXT')
+    except sqlite3.OperationalError:
+        pass
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN data_visualization TEXT')
+    except sqlite3.OperationalError:
+        pass
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN podcast_script TEXT')
+    except sqlite3.OperationalError:
+        pass
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN interview_questions TEXT')
+    except sqlite3.OperationalError:
+        pass
+    try:
+        conn.execute('ALTER TABLE current_affairs ADD COLUMN simulation_scenario TEXT')
+    except sqlite3.OperationalError:
+        pass
+
     conn.commit()
 
 def article_exists(link):
@@ -95,8 +122,9 @@ def save_article(article_data):
                 original_summary, upsc_summary, key_points,
                 papers, subjects, importance, image_url, related_pyqs,
                 prelims_pointers, mains_dimensions, steeple_analysis, inter_linkages,
-                mind_map, quiz, answer_framework, essay_fodder
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                mind_map, quiz, answer_framework, essay_fodder,
+                timeline, data_visualization, podcast_script, interview_questions, simulation_scenario
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             article_data['title'],
             article_data['link'],
@@ -117,7 +145,12 @@ def save_article(article_data):
             article_data.get('mind_map', ''),
             json.dumps(article_data.get('quiz', [])),
             json.dumps(article_data.get('answer_framework', {})),
-            json.dumps(article_data.get('essay_fodder', {}))
+            json.dumps(article_data.get('essay_fodder', {})),
+            json.dumps(article_data.get('timeline', [])),
+            json.dumps(article_data.get('data_visualization', {})),
+            article_data.get('podcast_script', ''),
+            json.dumps(article_data.get('interview_questions', [])),
+            json.dumps(article_data.get('simulation_scenario', {}))
         ))
         conn.commit()
         return cursor.lastrowid
@@ -184,7 +217,13 @@ def get_saved_articles(filters=None):
             'mindMap': row['mind_map'] if 'mind_map' in row.keys() else '',
             'quiz': json.loads(row['quiz'] or '[]') if 'quiz' in row.keys() else [],
             'answerFramework': json.loads(row['answer_framework'] or '{}') if 'answer_framework' in row.keys() else {},
-            'essayFodder': json.loads(row['essay_fodder'] or '{}') if 'essay_fodder' in row.keys() else {}
+            'essayFodder': json.loads(row['essay_fodder'] or '{}') if 'essay_fodder' in row.keys() else {},
+            # Universe Mode fields
+            'timeline': json.loads(row['timeline'] or '[]') if 'timeline' in row.keys() else [],
+            'dataVisualization': json.loads(row['data_visualization'] or '{}') if 'data_visualization' in row.keys() else {},
+            'podcastScript': row['podcast_script'] if 'podcast_script' in row.keys() else '',
+            'interviewQuestions': json.loads(row['interview_questions'] or '[]') if 'interview_questions' in row.keys() else [],
+            'simulationScenario': json.loads(row['simulation_scenario'] or '{}') if 'simulation_scenario' in row.keys() else {}
         })
     
     return articles
@@ -273,6 +312,11 @@ def update_article_content_by_link(link, article_data):
             quiz = ?,
             answer_framework = ?,
             essay_fodder = ?,
+            timeline = ?,
+            data_visualization = ?,
+            podcast_script = ?,
+            interview_questions = ?,
+            simulation_scenario = ?,
             fetch_date = CURRENT_TIMESTAMP
         WHERE original_link = ?
     ''', (
@@ -291,6 +335,11 @@ def update_article_content_by_link(link, article_data):
         json.dumps(article_data.get('quiz', [])),
         json.dumps(article_data.get('answer_framework', {})),
         json.dumps(article_data.get('essay_fodder', {})),
+        json.dumps(article_data.get('timeline', [])),
+        json.dumps(article_data.get('data_visualization', {})),
+        article_data.get('podcast_script', ''),
+        json.dumps(article_data.get('interview_questions', [])),
+        json.dumps(article_data.get('simulation_scenario', {})),
         link
     ))
     conn.commit()

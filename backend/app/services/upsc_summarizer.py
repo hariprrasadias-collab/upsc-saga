@@ -118,7 +118,7 @@ def summarize_for_upsc(title, content, link):
     """
     try:
         # Use ModelManager for AI generation
-        prompt = f"""You are the OMNISCIENT UPSC ARCHITECT (GOD MODE). Your task is to deconstruct this news article into a comprehensive study artifact.
+        prompt = f"""You are the UNIVERSAL WEAVER (OMEGA TIER). Your task is to transmute this news article into a multidimensional learning module.
 
 **STRICT OUTPUT FORMAT:**
 You must return valid JSON only. No markdown formatting (no ```json ... ```).
@@ -130,33 +130,41 @@ Content: {content}
 **ARCHITECTURAL DIRECTIVES:**
 
 1.  **THEORY OF EVERYTHING (STEEPLE Analysis):**
-    Analyze using Social, Technological, Economic, Environmental, Political, Legal, and Ethical dimensions. Deep dive into the *nuance*.
+    Analyze using Social, Technological, Economic, Environmental, Political, Legal, and Ethical dimensions.
 
 2.  **PRELIMS ARMORY (Facts):**
     Extract high-value facts: Committees, Reports, Data Points, Articles, Species, Locations.
 
 3.  **MAINS STRATEGY (Framework):**
-    Construct a skeleton answer for a potential question on this topic:
-    - *Introduction:* Definition/Context/Data.
-    - *Body:* Arguments/Dimensions/Issues.
-    - *Conclusion:* Way Forward/Sustainable Solution (SDGs).
+    Construct a skeleton answer for a potential question on this topic.
 
 4.  **VISUAL SYNTHESIS (Mind Map):**
-    Create a MERMAID.JS graph syntax string representing the topic's causal links.
-    Format: `graph TD; A[Node] --> B[Node];`
+    Create a MERMAID.JS graph syntax string. Format: `graph TD; A[Node] --> B[Node];`
 
 5.  **ACTIVE RECALL (Quiz):**
-    Create 5 High-Quality MCQs with options and correct answers.
+    Create 5 High-Quality MCQs.
 
 6.  **ESSAY FODDER:**
-    Extract or Generate:
-    - A relevant Quote (by a thinker/leader).
-    - An Anecdote/Case Study.
-    - A "Data Nuke" (Shocking statistic).
+    Quotes, Anecdotes, Data Nukes.
+
+7.  **CHRONOLOGICAL INTELLIGENCE (Timeline):**
+    Extract dates and events mentioned or implied to create a sequence.
+
+8.  **DATA JOURNALISM (Visualization):**
+    Extract data points suitable for a chart. Format: `{{ "type": "bar", "title": "...", "data": [{{ "name": "Category", "value": 10 }}] }}`.
+
+9.  **AUDIO LEARNING (Podcast Script):**
+    Write a 60-second engaging dialogue between a 'Host' and an 'Expert' summarizing the core issue.
+
+10. **INTERVIEW SIMULATOR:**
+    Frame 3 questions a Board Member might ask based on this topic (Profile-based/Opinion-based).
+
+11. **ETHICS SIMULATION:**
+    Create a short "What would you do?" scenario related to this topic (GS4).
 
 **JSON SCHEMA:**
 {{
-  "upsc_summary": "High-yield summary (200 words) integrating STEEPLE...",
+  "upsc_summary": "High-yield summary (200 words)...",
   "prelims_pointers": ["Fact 1", "Fact 2"],
   "mains_dimensions": ["Arg 1", "Arg 2"],
   "steeple_analysis": {{ "social": "...", "economic": "..." }},
@@ -174,6 +182,22 @@ Content: {content}
     "quote": "...",
     "statistic": "...",
     "example": "..."
+  }},
+  "timeline": [
+    {{ "date": "2020", "event": "Policy introduced" }}
+  ],
+  "data_visualization": {{
+    "type": "bar",
+    "title": "Growth Rate",
+    "data": [{{ "name": "2021", "value": 5.4 }}]
+  }},
+  "podcast_script": "Host: Welcome back... Expert: precise insight...",
+  "interview_questions": [
+    {{ "question": "...", "context": "Why ask this?" }}
+  ],
+  "simulation_scenario": {{
+    "scenario": "You are the District Magistrate...",
+    "options": ["Option A", "Option B"]
   }},
   "papers": ["GS1", "GS2"],
   "subjects": ["Subject 1"],
