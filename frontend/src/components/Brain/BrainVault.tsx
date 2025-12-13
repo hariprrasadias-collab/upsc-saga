@@ -11,6 +11,7 @@ import ELI5Renderer from './Renderers/ELI5Renderer';
 import CheatSheetRenderer from './Renderers/CheatSheetRenderer';
 import PitfallRenderer from './Renderers/PitfallRenderer';
 import QuoteBankRenderer from './Renderers/QuoteBankRenderer';
+import MindMapRenderer from './Renderers/MindMapRenderer';
 
 interface AIContent {
     id: number;
@@ -30,7 +31,8 @@ const BrainVault: React.FC = () => {
 
     const contentTypes = [
         'all', 'podcast', 'essay', 'visual_prompt', 'roleplay',
-        'cheat_sheet', 'timeline', 'eli5', 'pitfalls', 'quote_bank', 'map_work'
+        'cheat_sheet', 'timeline', 'eli5', 'pitfalls', 'quote_bank', 'map_work',
+        'mind_map', 'socratic', 'neural_hash'
     ];
 
     useEffect(() => {
@@ -49,13 +51,10 @@ const BrainVault: React.FC = () => {
             if (data.success) {
                 setContentList(data.data);
             } else {
-                // Fallback for dev/test
-                console.warn("API returned unsuccessful, using mock data if empty");
-                if (data.data && data.data.length === 0) throw new Error("Empty data");
+                console.warn("API returned unsuccessful");
             }
         } catch (error) {
             console.error("Failed to fetch Brain Vault content", error);
-            // We could set an error state here, but for now just leave empty
         } finally {
             setLoading(false);
         }
@@ -82,17 +81,11 @@ const BrainVault: React.FC = () => {
         const normalizedType = String(item.content_type || '').trim().toLowerCase();
 
         let metadataObj = item.metadata;
-        // Ensure metadata is an object
         if (typeof metadataObj === 'string') {
-            try {
-                metadataObj = JSON.parse(metadataObj);
-            } catch (e) {
-                console.error("Failed to parse metadata in BrainVault", e);
-                metadataObj = {};
-            }
+            try { metadataObj = JSON.parse(metadataObj); } catch (e) { metadataObj = {}; }
         }
 
-        // Priority Override: If it looks like a map, treat it as a map!
+        // Priority Override
         if (metadataObj?.locations && Array.isArray(metadataObj.locations)) {
             return <MapRenderer content={item.content} metadata={metadataObj} />;
         }
@@ -108,29 +101,33 @@ const BrainVault: React.FC = () => {
             case 'visual_prompt':
                 return <VisualPromptRenderer content={item.content} />;
             case 'essay':
+            case 'essay_prompt':
                 return <EssayRenderer content={item.content} />;
             case 'eli5':
                 return <ELI5Renderer content={item.content} />;
             case 'map_work':
-            case 'mapwork': // just in case
                 return <MapRenderer content={item.content} metadata={item.metadata} />;
             case 'cheat_sheet':
                 return <CheatSheetRenderer content={item.content} />;
-            case 'eli5':
-                return <ELI5Renderer content={item.content} />;
             case 'pitfalls':
+            case 'common_pitfalls':
                 return <PitfallRenderer content={item.content} />;
             case 'quote_bank':
                 return <QuoteBankRenderer content={item.content} />;
-            default:
+            case 'mind_map':
+                return <MindMapRenderer content={item.content} />;
+            case 'neural_hash':
+            case 'predictions':
+                // For now, render as Markdown/JSON-dump, specialized renderer can be added later
                 return (
-                    <div>
-                        <div style={{ color: 'orange', fontSize: '0.8rem', padding: '5px', border: '1px dashed orange', marginBottom: '10px' }}>
-                            Debug: Type="{item.content_type}" (Normalized="{normalizedType}") - Falling back to Markdown
-                        </div>
-                        <MarkdownRenderer content={item.content} />
+                    <div className="json-renderer">
+                        <pre style={{ whiteSpace: 'pre-wrap', color: '#00fff2' }}>{item.content}</pre>
                     </div>
                 );
+            case 'triangulation':
+                 return <MarkdownRenderer content={item.content} />;
+            default:
+                return <MarkdownRenderer content={item.content} />;
         }
     };
 

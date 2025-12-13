@@ -292,15 +292,6 @@ class BrainService:
             print(f"Brain: Failed to save mnemonic: {e}")
 
     def generate_manual_completion_prompt(self, task_data: dict):
-        # ... (Previous implementation unchanged for manual)
-        # Using existing manual prompt logic as requested
-        # Just calling the existing method if needed, but for brevity not re-pasting entire string unless requested.
-        # Assuming we keep the existing large prompt method from original file.
-        pass # Placeholder: The full method body from original file is assumed to be here or handled via existing code structure if we were patching.
-             # Since I am overwriting the file, I MUST include the full method.
-
-    # RE-INSERTING generate_manual_completion_prompt FULLY:
-    def generate_manual_completion_prompt(self, task_data: dict):
         """
         Generates a 'TITAN LEVEL' MEGA PROMPT for manual execution in Gemini.
         Saves context to pending_manual_task.json.
@@ -576,6 +567,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 try:
                     from app.services.mindmap_service import MindMapService
                     MindMapService.save_mindmap(f"{topic} Mind Map", json_data['mind_map'])
+                    save_ai_content('mind_map', topic, json.dumps(json_data['mind_map']))
                 except Exception as e:
                     print(f"Ingest Error (MindMap): {e}")
 
@@ -610,6 +602,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 self._save_prediction(topic, subject, json_data['predictions'])
                 pred_text = "\n".join([f"- {p.get('question')} ({p.get('type')})" for p in json_data['predictions']])
                 self._add_flashcard(user_id, topic, subject, f"Predicted Questions: {topic}", pred_text, 'manual_ai_foresight')
+                save_ai_content('predictions', topic, pred_text)
 
             # 7. Socratic Dialogue
             if 'socratic_dialogue' in json_data:
@@ -619,6 +612,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 # Flatten dialogue to string for flashcard
                 self._add_flashcard(user_id, topic, subject, f"Socratic Debate: {topic}", "See Socratic Archives.", 'manual_ai_socratic')
                 save_socratic_dialogue(user_id, topic, json.dumps(dialogue), json.dumps(verdict))
+                save_ai_content('socratic', topic, json.dumps(dialogue), verdict)
 
             # 8. Triangulation
             if 'triangulation' in json_data:
@@ -628,6 +622,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 content = f"Synthesis:\n{synthesis}\n\nWay Forward:\n{way_forward}"
                 self._add_flashcard(user_id, topic, subject, f"Mains Strategy: {topic}", content, 'manual_ai_triangulation')
                 save_triangulation(topic, synthesis, tri)
+                save_ai_content('triangulation', topic, synthesis, tri)
 
             # 9. Neural Hash
             if 'neural_hash' in json_data:
@@ -638,6 +633,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 self._add_flashcard(user_id, topic, subject, f"Examiner's Lens: {topic}", content, 'manual_ai_neural_hash')
                 # Log simplified
                 save_neural_hash_log(topic, "upsc_topic", nh)
+                save_ai_content('neural_hash', topic, json.dumps(nh))
 
             # 10. Pitfalls
             if 'pitfalls' in json_data:
@@ -829,7 +825,9 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                                 if data:
                                     # Already saved in execute_action usually, but double check
                                     # The execute_action for PREDICT_QUESTIONS calls foresight_engine.predict_questions which saves to DB.
-                                    pass
+                                    # ALSO save summary to Brain Vault
+                                    prediction_summary = "\n".join([f"- {p.get('question')} ({p.get('type')})" for p in data])
+                                    save_ai_content('predictions', topic, prediction_summary, {'predictions': data})
                             
                             # 2. Socratic Dialogue
                             elif action == "GENERATE_SOCRATIC_DIALOGUE":
@@ -837,6 +835,8 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                                 verdict = result.get('verdict')
                                 if dialogue:
                                     save_socratic_dialogue(user_id, topic, dialogue, json.dumps(verdict))
+                                    # Double write to Brain Vault
+                                    save_ai_content('socratic', topic, dialogue, verdict)
                                     conn.execute('INSERT INTO notifications (user_id, title, message, type) VALUES (?, ?, ?, ?)',
                                                 (1, "New Socratic Debate", f"A debate on {topic} is ready.", "debate"))
                                     conn.commit()
@@ -851,6 +851,9 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                                 if linkages_data:
                                     from app.db_models.neural_hash import save_neural_hash_log
                                     save_neural_hash_log(topic, "brain_vault", linkages_data)
+                                    # Double write to Brain Vault
+                                    save_ai_content('neural_hash', topic, json.dumps(linkages_data))
+
                                     # Also save to main table
                                     conn.execute('INSERT INTO neural_hashes (topic, core_themes, examiner_pattern, cross_linkages) VALUES (?, ?, ?, ?)',
                                                 (topic, 
@@ -864,6 +867,8 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                                 content = result.get('mind_map_json') # Preferred JSON
                                 if content:
                                     MindMapService.save_mindmap(f"{topic} Mind Map", content)
+                                    # Double write to Brain Vault
+                                    save_ai_content('mind_map', topic, json.dumps(content))
                                 else:
                                     # Fallback if text
                                     text_content = result.get('mind_map')
@@ -907,7 +912,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                             elif action == "FIND_COMMON_PITFALLS":
                                 content = result.get('pitfalls')
                                 if content:
-                                    save_ai_content('common_pitfalls', topic, content)
+                                    save_ai_content('pitfalls', topic, content)
                                     self._add_flashcard(user_id, topic, subject, f"Pitfalls: {topic}", content, 'auto_ai_pitfalls')
 
                             # 9. Other Content Types (Standard)
@@ -1569,6 +1574,71 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 except Exception as e:
                     result = {"success": False, "message": f"Pitfall search Failed: {str(e)}"}
 
+            elif action_type == "ANALYZE_PYQ_TRENDS":
+                try:
+                    from app.db import get_db
+                    conn = get_db()
+                    filters = payload.get('filters', {})
+                    topic_fallback = payload.get('topic')
+
+                    # Construct query based on filters
+                    query = "SELECT year, subject, topic, question_text FROM pyq_questions WHERE 1=1"
+                    params = []
+
+                    if filters.get('subject'):
+                        query += " AND subject = ?"
+                        params.append(filters['subject'])
+
+                    if filters.get('year'):
+                        query += " AND year = ?"
+                        params.append(filters['year'])
+
+                    if filters.get('topic'):
+                        query += " AND topic LIKE ?"
+                        params.append(f"%{filters['topic']}%")
+                    elif topic_fallback:
+                        query += " AND topic LIKE ?"
+                        params.append(f"%{topic_fallback}%")
+
+                    query += " ORDER BY year DESC LIMIT 50" # Analyze last 50 questions matching criteria
+
+                    questions = conn.execute(query, params).fetchall()
+                    questions_text = "\n".join([f"[{q['year']}] {q['topic']}: {q['question_text']}" for q in questions])
+
+                    analysis_prompt = f"""
+                    # MISSION: STRATEGIC INTELLIGENCE REPORT (SIR)
+                    **Subject/Topic:** {filters.get('topic') or topic_fallback or 'General'}
+
+                    **DATASET (PYQs):**
+                    {questions_text}
+
+                    **DIRECTIVE:**
+                    You are the Chief Strategy Officer for a UPSC aspirant.
+                    Decode the "Mind of the Examiner".
+
+                    **OUTPUT FORMAT:**
+                    **1. Thematic Heatmap:**
+                    - List top 3 recurring micro-themes (e.g., "Not just Inflation, but specifically 'Headline vs Core Inflation'").
+
+                    **2. Evolution Vector:**
+                    - How has the question style changed? (e.g., "2015 was factual, 2023 is purely conceptual application").
+
+                    **3. The 'Trap' Pattern:**
+                    - Identify how they trick students (e.g., "Confusing Ministry X with Ministry Y").
+
+                    **4. Next Year Prediction:**
+                    - Based on this trajectory, what is the *exact* type of question likely to appear next?
+                    """
+                    # Trend analysis benefits from Pro
+                    response = model_manager.generate_content(analysis_prompt, model_type='pro')
+                    result = {
+                        "success": True,
+                        "message": "Trend Analysis Complete.",
+                        "analysis": response.text
+                    }
+                except Exception as e:
+                    result = {"success": False, "message": f"Trend Analysis Failed: {str(e)}"}
+
             elif action_type == "TRIANGULATE_TOPIC":
                 try:
                     topic = payload.get('topic', '')
@@ -1600,7 +1670,32 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 except Exception as e:
                     result = {"success": False, "message": f"Triangulation Failed: {str(e)}"}
 
-            # ... (Other cases like GEN_PODCAST_SCRIPT etc seem OK in execute_action, persistence handled in process_task_completion)
+            elif action_type == "DECODE_NEURAL_HASH":
+                try:
+                    topic = payload.get('topic', '')
+                    prompt = f"""
+                    # MISSION: DECODE THE NEURAL HASH
+                    **Input:** {topic}
+
+                    **TASK:**
+                    Extract the "Hidden Syllabus" - the concepts examiners test but don't explicitly list.
+
+                    **OUTPUT SCHEMA (JSON):**
+                    {{
+                        "core_themes": ["Theme 1 (The Obvious)", "Theme 2 (The Hidden)"],
+                        "high_yield_keywords": ["Keyword 1", "Keyword 2"],
+                        "examiner_pattern": "The mental model used to set questions on this (e.g. 'Focuses on exceptions to the rule').",
+                        "potential_questions": [
+                            {{ "type": "Conceptual", "question": "..." }},
+                            {{ "type": "Applied", "question": "..." }}
+                        ]
+                    }}
+                    """
+                    response = model_manager.generate_content(prompt, model_type='pro')
+                    data = self._parse_response(response.text)
+                    result = {"success": True, "message": "Neural Hash Decoded.", "data": data}
+                except Exception as e:
+                    result = {"success": False, "message": f"Neural Hash Decode Failed: {str(e)}"}
 
             return result
 
@@ -1618,6 +1713,8 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 reasoning=str(e)
             )
             return {"success": False, "message": str(e)}
+
+
 
     def _get_system_status_summary(self):
         """
