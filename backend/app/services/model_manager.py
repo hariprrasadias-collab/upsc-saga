@@ -321,4 +321,61 @@ class ModelManager:
         text_content = completion.choices[0].message.content
         return FallbackResponse(text_content)
 
+    def generate_consensus(self, prompt, context="", **kwargs):
+        """
+        HYDRA ENGINE: 3-Way Consensus Generation.
+        1. Nvidia (The Strategist) -> Draft
+        2. Gemini (The Critic) -> Critique
+        3. Nvidia (The Judge) -> Synthesis
+        """
+        print("🐍 HYDRA: Engaging Multi-Head Consensus...")
+
+        # Head 1: The Strategist (Nvidia)
+        def run_strategist():
+            p = f"ROLE: The Strategist.\nTASK: Provide a comprehensive, structured answer.\n\n{prompt}"
+            # Prefer Nvidia, fallback to Pro logic
+            return self.generate_content(p, model_type='pro').text
+
+        # Head 2: The Critic (Gemini)
+        def run_critic(draft):
+            p = f"ROLE: The Critic.\nTASK: Critique the following draft. Point out logical fallacies, missing angles, and weak arguments.\n\nDRAFT:\n{draft}"
+            # Explicitly ask for Google if possible for diversity
+            return self.generate_content(p, provider='google', model_name=self.GEMINI_PRO_MODELS[0]).text
+
+        try:
+            # Step 1: Draft
+            draft = run_strategist()
+
+            # Step 2: Critique
+            critique = run_critic(draft)
+
+            # Step 3: Synthesis (The Judge)
+            judge_prompt = f"""
+            # MISSION: FINAL SYNTHESIS
+            **Role:** The Supreme Judge.
+
+            **DRAFT:**
+            {draft}
+
+            **CRITIQUE:**
+            {critique}
+
+            **DIRECTIVE:**
+            Synthesize the Perfect Answer.
+            - Incorporate valid points from the Critique.
+            - Strengthen the Draft.
+            - Maintain the user's requested style.
+
+            **OUTPUT:**
+            The final, polished content only.
+            """
+
+            final_response = self.generate_content(judge_prompt, model_type='pro')
+            print("🐍 HYDRA: Consensus Achieved.")
+            return final_response
+
+        except Exception as e:
+            print(f"🐍 HYDRA Failed: {e}. Fallback to standard generation.")
+            return self.generate_content(prompt, model_type='pro')
+
 model_manager = ModelManager()

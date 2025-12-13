@@ -73,6 +73,13 @@ class NightWatchman:
         # 4.5 Trigger Code Audit (Evolution)
         self.perform_nightly_code_audit()
 
+        # 4.6 Update Psychometric Profile (The Oracle)
+        try:
+            from app.services.psychometric_service import psychometric_service
+            psychometric_service.build_user_profile()
+        except Exception as e:
+            print(f"Oracle Update Failed: {e}")
+
         # 5. Weekly Self-Review (Sundays only)
         if datetime.now().weekday() == 6: # Sunday
             try:

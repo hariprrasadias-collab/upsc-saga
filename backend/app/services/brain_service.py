@@ -7,6 +7,7 @@ from app.services.model_manager import model_manager
 from app.services.synapse_registry import SynapseRegistry
 from app.services.autonomy_manager import autonomy_manager
 from app.services.syllabus_tracker import SyllabusTracker
+from app.services.psychometric_service import psychometric_service
 from app.services.ab_tester import ab_tester
 from app.db_models.automation_storage import (
     save_socratic_dialogue, save_triangulation, 
@@ -136,16 +137,24 @@ class BrainService:
             future_bio = executor.submit(run_in_context, self.check_bio_status)
             future_lessons = executor.submit(run_in_context, self._get_lessons)
             future_specific = executor.submit(run_in_context, self._resolve_context, user_input)
+            future_profile = executor.submit(run_in_context, psychometric_service.get_profile)
             
             system_status = future_system.result()
             bio_status = future_bio.result()
             lessons = future_lessons.result()
             specific_context = future_specific.result()
+            profile = future_profile.result()
 
         # Construct Prompt (Optimized & Minified)
         prompt = f"""
         You are the CENTRAL NERVOUS SYSTEM (The Brain) of a UPSC Preparation App.
         
+        **PSYCHOMETRIC PROFILE (USER DNA):**
+        - Learning Style: {profile.get('learning_style')}
+        - Peak Hours: {profile.get('peak_hours')}
+        - Cognitive Bias: {profile.get('bias_tendency')}
+        - INSTRUCTION: {profile.get('prompt_instruction')}
+
         CONTEXT:
         - Sys: {json.dumps(system_status, separators=(',', ':'))}
         - Bio: {json.dumps(bio_status, separators=(',', ':'))}
