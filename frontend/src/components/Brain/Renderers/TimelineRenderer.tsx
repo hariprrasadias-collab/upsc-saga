@@ -51,28 +51,45 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
 
         const lines = text.split('\n');
         const events: TimelineEvent[] = [];
-        
+
         lines.forEach((line, idx) => {
             if (!line.trim()) return;
             const cleanLine = line.replace(/^[\-\*]\s*/, '').trim();
 
-            // Enhanced Regex: Captures "1939-1945" or "1947"
-            const match = cleanLine.match(/^((?:\d{4}(?:\s?-\s?\d{4})?)|\d{4}(?:\s?BC|AD|BCE|CE)?|c\.\s?\d{4})[:\-\s]+(.+)/i);
+            // Broad Regex: Matches lines starting with a 4-digit year (1000-2099)
+            // Groups: 1=YearPart, 2=Rest
+            // Supports: "1947: Event", "1947 - Event", "1947 Event", "c. 1947 Event"
+            const match = cleanLine.match(/^(?:c\.\s?)?((?:\d{4}(?:\s?-\s?\d{4})?)|\d{4}(?:\s?BC|AD|BCE|CE)?)(?:[:\-\s]+)(.*)/i);
 
-            if (match) {
-                const yearStr = match[1].trim();
-                const rest = match[2].trim();
+            // Fallback: If line starts with bold year "**1947**"
+            const boldMatch = cleanLine.match(/^\*\*(\d{4})\*\*(?:\s?-\s?|\s?:?\s?)(.*)/);
+
+            const effectiveMatch = match || boldMatch;
+
+            if (effectiveMatch) {
+                const yearStr = effectiveMatch[1].trim();
+                const rest = effectiveMatch[2].trim();
 
                 let title = rest;
                 let desc = '';
-                const splitIndex = rest.indexOf(' - ');
+
+                // Heuristic to split title/desc
+                const splitters = [' - ', ': ', '. '];
+                let splitIndex = -1;
+
+                for (const s of splitters) {
+                    const idx = rest.indexOf(s);
+                    if (idx > 0 && idx < 50) { // Split likely happens early
+                        splitIndex = idx;
+                        break;
+                    }
+                }
+
                 if (splitIndex > 0) {
                     title = rest.substring(0, splitIndex).trim();
-                    desc = rest.substring(splitIndex + 3).trim();
-                } else if (rest.includes(': ')) {
-                     const parts = rest.split(': ');
-                     title = parts[0].trim();
-                     desc = parts.slice(1).join(': ').trim();
+                    desc = rest.substring(splitIndex + 2).trim();
+                    // Remove leading chars from desc if any
+                    desc = desc.replace(/^[:\-\.]\s*/, '');
                 }
 
                 // Range parsing
@@ -84,7 +101,7 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
                     numYear = parseInt(rangeMatch[1]);
                     endYear = parseInt(rangeMatch[2]);
                 } else {
-                    const numMatch = yearStr.match(/(\d+)/);
+                    const numMatch = yearStr.match(/(\d{3,4})/);
                     numYear = numMatch ? parseInt(numMatch[1]) : 0;
                     if (yearStr.toUpperCase().includes('BC') || yearStr.toUpperCase().includes('BCE')) {
                         numYear = -numYear;
@@ -96,7 +113,7 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
                     year: yearStr,
                     numericYear: numYear,
                     endYear,
-                    event: title.replace(/^\*\*|\*\*$/g, ''),
+                    event: title.replace(/^\*\*|\*\*$/g, ''), // Remove Markdown bold
                     description: desc,
                 });
             }
@@ -112,9 +129,9 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
         uniqueEras.add('all');
         allEvents.forEach(e => {
             if (e.numericYear !== 0) {
-               const century = Math.floor((Math.abs(e.numericYear) - 1) / 100) + 1;
-               const eraLabel = e.numericYear < 0 ? `${century}c BC` : `${century}c AD`;
-               uniqueEras.add(eraLabel);
+                const century = Math.floor((Math.abs(e.numericYear) - 1) / 100) + 1;
+                const eraLabel = e.numericYear < 0 ? `${century}c BC` : `${century}c AD`;
+                uniqueEras.add(eraLabel);
             }
         });
         return Array.from(uniqueEras).sort((a, b) => {
@@ -181,7 +198,7 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
             <>
                 {parts.map((part, i) =>
                     part.toLowerCase() === highlight.toLowerCase() ?
-                    <span key={i} className="search-highlight">{part}</span> : part
+                        <span key={i} className="search-highlight">{part}</span> : part
                 )}
             </>
         );
@@ -226,9 +243,9 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
                     // Calculate duration width if endYear exists
                     let durationWidth = 0;
                     if (evt.endYear && evt.numericYear) {
-                         // extremely simplified pixel mapping
-                         durationWidth = (evt.endYear - evt.numericYear) * 10 * zoomLevel;
-                         if (durationWidth < 0) durationWidth = 0;
+                        // extremely simplified pixel mapping
+                        durationWidth = (evt.endYear - evt.numericYear) * 10 * zoomLevel;
+                        if (durationWidth < 0) durationWidth = 0;
                     }
 
                     return (
@@ -297,7 +314,7 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
                 </div>
 
                 <div className="control-group view-toggles">
-                     {/* Presentation Toggle */}
+                    {/* Presentation Toggle */}
                     <button
                         className={`view-btn play-btn ${isPlaying ? 'active-pulse' : ''}`}
                         onClick={() => {
