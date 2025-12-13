@@ -61,6 +61,19 @@ def create_app():
 
     threading.Thread(target=run_startup_scan, daemon=True).start()
 
+    # Start Hyper-Evolution Engine (The Singularity)
+    def start_evolution_engine():
+        time.sleep(10) # Let app settle
+        try:
+            from app.services.hyper_evolution_service import hyper_evolution
+            # Start with 5 minute interval for visibility
+            hyper_evolution.start_loop(interval_seconds=300)
+            print("🧬 Hyper-Evolution Engine: ONLINE")
+        except Exception as e:
+            print(f"❌ Hyper-Evolution Startup Failed: {e}")
+
+    threading.Thread(target=start_evolution_engine, daemon=True).start()
+
     # Configure Caching (Simple Local Memory Cache for speed)
     app.config['CACHE_TYPE'] = 'SimpleCache'
     app.config['CACHE_DEFAULT_TIMEOUT'] = 300 # 5 minutes default

@@ -281,6 +281,32 @@ def get_strategic_forecast():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@autonomy_bp.route('/stream', methods=['GET'])
+def get_evolution_stream():
+    """Get live logs from the Hyper-Evolution Engine"""
+    try:
+        from app.services.hyper_evolution_service import hyper_evolution
+        return jsonify({
+            'active': hyper_evolution.active,
+            'stream': hyper_evolution.get_stream()
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@autonomy_bp.route('/singularity/toggle', methods=['POST'])
+def toggle_singularity():
+    try:
+        from app.services.hyper_evolution_service import hyper_evolution
+        state = request.json.get('active', False)
+        if state:
+            # Fast mode (30s) for immediate feedback
+            hyper_evolution.start_loop(interval_seconds=30)
+        else:
+            hyper_evolution.stop_loop()
+        return jsonify({'success': True, 'active': hyper_evolution.active})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @autonomy_bp.route('/evolve', methods=['POST'])
 def trigger_evolution():
     """
