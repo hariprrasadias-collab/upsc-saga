@@ -313,32 +313,44 @@ def generate_debate_verdict(topic, history):
 
     try:
         response = model_manager.generate_content(judge_prompt, model_type='pro')
+        text = response.text.strip()
         
-        # Robust JSON Extraction
-        text = response.text.replace('\n', ' ').strip()
-        
-        # Clean markdown
+        # 1. Strip Markdown Code Blocks (More specifically)
         if "```" in text:
-             text = text.replace("```json", "").replace("```", "")
-        
-        # Extract JSON object
+            # Try to split by code blocks
+            parts = text.split("```")
+            for part in parts:
+                if "{" in part and "}" in part:
+                    # Clean potential 'json' label
+                    if part.startswith("json"):
+                        text = part[4:].strip()
+                    else:
+                        text = part.strip()
+                    break
+
+        # 2. Extract JSON object (Find outer braces)
         start = text.find('{')
         end = text.rfind('}')
         
         if start != -1 and end != -1:
             json_str = text[start : end + 1]
             try:
+                # Try standard parse
                 return json.loads(json_str)
-            except json.JSONDecodeError:
-                # Try simple fix for common issues (e.g. trailing commas)
-                pass
+            except json.JSONDecodeError as e:
+                print(f"JSON Decode Error: {e} | Content: {json_str[:50]}...")
+                # Fallback: Try strict=False (allows control chars)
+                try:
+                    return json.loads(json_str, strict=False)
+                except:
+                    pass
         
         # Fallback if parsing completely fails
         print(f"Verdict Parsing Failed. Raw Text: {text[:100]}...")
         return {
             "winner": "Undecided (Parsing Error)",
             "key_concepts": ["Debate Analysis"],
-            "synthesis": response.text[:500], # Use raw text as synthesis
+            "synthesis": response.text, # Use raw text as synthesis
             "best_quote": "N/A",
             "mental_models": []
         }
