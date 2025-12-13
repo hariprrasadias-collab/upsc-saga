@@ -61,26 +61,62 @@ class RavensService:
         prompt = f"""
         # MISSION: CURRENT AFFAIRS FILTER (THE HINDU/IE)
         **Input:**
-        "{article_content[:3000]}..."
+        "{article_content[:15000]}..."
 
         **DIRECTIVE:**
-        Extract ONLY what matters for UPSC. Disregard political gossip.
+        You are "THE AKAASHIC RECORD" (ETERNAL TIER). Map this news across dimensions and meta-cognition.
+
+        **DIMENSIONS:**
+        1. **Core:** STEEPLE, Facts, Maps, Quiz.
+        2. **Visuals:** Mindmap, Charts, Timeline.
+        3. **Simulation:** Podcast, Interview, Ethics.
+        4. **Omni-Existence:** Future, History, Geography, Philosophy, Memory.
+        5. **Singularity:** Bias, Chaos, Polymath, Wisdom, Roleplay.
+        6. **Akaashic:**
+           - *Systems:* Loops (Reinforcing/Balancing).
+           - *Alt-History:* Counter-Factuals.
+           - *Civilization:* Ancient parallels.
+           - *Math:* Fermi estimation.
+           - *Global:* International mirror.
 
         **OUTPUT SCHEMA (JSON):**
         {{
             "headline": "Punchy Title",
             "gs_mapping": ["GS2 (Polity)", "GS3 (Economy)"],
-            "prelims_facts": ["Fact 1 (Data/Committee)", "Fact 2"],
-            "mains_arguments": {{
-                "pros": ["Arg 1"],
-                "cons": ["Arg 2"],
-                "way_forward": ["Committee Recommendation"]
-            }},
-            "keywords": ["Keyword1", "Keyword2"]
+            "prelims_facts": ["Fact 1", "Fact 2"],
+            "mains_arguments": {{ "pros": ["..."], "cons": ["..."], "way_forward": ["..."] }},
+            "keywords": ["K1", "K2"],
+            "summary": "Deep summary...",
+            "steeple_analysis": {{ "social": "..." }},
+            "inter_linkages": ["GS2: ..."],
+            "mind_map": "graph TD; ...",
+            "quiz": [ {{ "question": "...", "options": [], "answer": "...", "explanation": "..." }} ],
+            "answer_framework": {{ "intro": "...", "body_points": [], "conclusion": "..." }},
+            "essay_fodder": {{ "quote": "...", "statistic": "..." }},
+            "timeline": [],
+            "data_visualization": {{}},
+            "podcast_script": "...",
+            "interview_questions": [],
+            "simulation_scenario": {{}},
+            "future_scenarios": {{ "best_case": "...", "worst_case": "...", "realist_case": "..." }},
+            "historical_analogies": [{{ "event": "...", "year": "...", "parallel": "..." }}],
+            "locations": [{{ "name": "...", "lat": 0.0, "lng": 0.0, "context": "..." }}],
+            "socratic_clash": [{{ "speaker": "...", "text": "..." }}],
+            "mnemonics": [{{ "phrase": "...", "context": "..." }}],
+            "systemic_bias": {{ "political_leaning": "...", "emotional_tone": "..." }},
+            "butterfly_effect": [{{ "order": "...", "consequence": "..." }}],
+            "polymath_angle": {{ "domain": "...", "analysis": "..." }},
+            "quote_injection": {{ "source": "...", "quote": "..." }},
+            "roleplay_persona": {{ "role": "...", "task": "..." }},
+            "systems_loops": [{{ "type": "...", "description": "..." }}],
+            "counter_factuals": [{{ "scenario": "...", "outcome": "..." }}],
+            "civilizational_parallels": [{{ "empire": "...", "parallel": "..." }}],
+            "fermi_estimates": {{ "metric": "...", "result": "..." }},
+            "global_context": [{{ "country": "...", "issue": "..." }}]
         }}
         """
         try:
-            response = model_manager.generate_content(prompt, model_type='fast')
+            response = model_manager.generate_content(prompt, model_type='pro')
             return response.text
         except Exception:
             return "{}"

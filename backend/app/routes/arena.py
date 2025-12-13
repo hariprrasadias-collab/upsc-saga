@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from app.db import get_db
 import random
 import json
@@ -182,7 +182,7 @@ def end_fight():
         outcome = data.get('outcome') # 'VICTORY' or 'DEFEAT'
         damage_dealt = data.get('damage_dealt', 0)
         
-        user_id = 1 # TODO: Session
+        user_id = session.get('user_id', 1)
         
         boss = get_boss_stats(boss_type, boss_id)
         

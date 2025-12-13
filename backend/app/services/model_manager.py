@@ -27,28 +27,34 @@ class ModelManager:
 
     # --- GOOGLE GEMINI MODELS ---
     GEMINI_PRO_MODELS = [
-        'gemini-2.5-pro',
-        'gemini-2.0-flash',
-        'gemini-pro-latest'
+        'gemini-2.0-pro-exp-02-05',
+        'gemini-1.5-pro',
+        'gemini-pro'
     ]
     GEMINI_FAST_MODELS = [
-        'gemini-2.5-flash',
-        'gemini-2.0-flash-lite',
-        'gemini-flash-latest'
+        'gemini-2.0-flash',
+        'gemini-2.0-flash-lite-preview-02-05',
+        'gemini-1.5-flash'
     ]
 
     # --- OPENROUTER MODELS (Tiered for Efficiency) ---
     OPENROUTER_FREE = [
         "google/gemini-2.0-flash-lite-preview-02-05:free",
+        "google/gemini-2.0-pro-exp-02-05:free",
         "meta-llama/llama-3.3-70b-instruct:free",
+        "deepseek/deepseek-r1:free",
+        "deepseek/deepseek-chat:free",
         "microsoft/phi-3-medium-128k-instruct:free",
         "google/gemma-2-9b-it:free",
         "mistralai/mistral-7b-instruct:free",
         "openchat/openchat-7b:free",
+        "nousresearch/hermes-3-llama-3.1-405b:free",
         "qwen/qwen-2-7b-instruct:free",
+        "nvidia/llama-3.1-nemotron-70b-instruct:free",
     ]
 
     OPENROUTER_PREMIUM = [
+        "anthropic/claude-3.7-sonnet",
         "anthropic/claude-3.5-sonnet",
         "openai/gpt-4o",
         "google/gemini-pro-1.5",
@@ -57,19 +63,13 @@ class ModelManager:
     # --- NVIDIA NIM MODELS ---
     NVIDIA_MODELS_PRO = [
         'meta/llama-3.1-405b-instruct',
-        'meta/llama-3.1-70b-instruct' # Reliable High-End Fallback
+        'nvidia/nemotron-4-340b-instruct'
     ]
 
     NVIDIA_MODELS_FAST = [
         'meta/llama-3.1-70b-instruct',
         'meta/llama-3.1-8b-instruct',
         'mistralai/mixtral-8x22b-instruct-v0.1'
-    ]
-
-    # --- PERPLEXITY MODELS ---
-    PERPLEXITY_MODELS = [
-        'sonar-pro',   # Reasoning/Search (High Tier)
-        'sonar'        # Standard Search
     ]
 
     def __init__(self):
@@ -98,14 +98,6 @@ class ModelManager:
              self.clients['nvidia'] = openai.OpenAI(
                 base_url="https://integrate.api.nvidia.com/v1",
                 api_key=nv_key
-            )
-
-        # Perplexity AI
-        pplx_key = os.environ.get('PERPLEXITY_API_KEY')
-        if pplx_key:
-            self.clients['perplexity'] = openai.OpenAI(
-                base_url="https://api.perplexity.ai",
-                api_key=pplx_key
             )
 
         # State Management
@@ -208,12 +200,7 @@ class ModelManager:
             for m in self.GEMINI_PRO_MODELS:
                 add_candidate('google', m)
 
-            # Priority 3: Perplexity Pro (Reasoning)
-            for m in self.PERPLEXITY_MODELS:
-                if 'pro' in m: # sonar-pro
-                    add_candidate('perplexity', m)
-
-            # Priority 4: OpenRouter Premium/Free Top Tier
+            # Priority 3: OpenRouter Premium/Free Top Tier
             for m in self.OPENROUTER_PREMIUM: # Only if user pays, but list exists
                  add_candidate('openrouter', m)
             for m in self.OPENROUTER_FREE:
@@ -225,16 +212,11 @@ class ModelManager:
             for m in self.NVIDIA_MODELS_FAST:
                 add_candidate('nvidia', m)
 
-            # Priority 2: Perplexity Fast
-            for m in self.PERPLEXITY_MODELS:
-                if 'pro' not in m: # sonar
-                    add_candidate('perplexity', m)
-
-            # Priority 3: OpenRouter Free (Top ones)
+            # Priority 2: OpenRouter Free (Top ones)
             for m in self.OPENROUTER_FREE:
                  add_candidate('openrouter', m)
 
-            # Priority 4: Google Fast
+            # Priority 3: Google Fast
             for m in self.GEMINI_FAST_MODELS:
                 add_candidate('google', m)
 
@@ -338,5 +320,62 @@ class ModelManager:
         
         text_content = completion.choices[0].message.content
         return FallbackResponse(text_content)
+
+    def generate_consensus(self, prompt, context="", **kwargs):
+        """
+        HYDRA ENGINE: 3-Way Consensus Generation.
+        1. Nvidia (The Strategist) -> Draft
+        2. Gemini (The Critic) -> Critique
+        3. Nvidia (The Judge) -> Synthesis
+        """
+        print("🐍 HYDRA: Engaging Multi-Head Consensus...")
+
+        # Head 1: The Strategist (Nvidia)
+        def run_strategist():
+            p = f"ROLE: The Strategist.\nTASK: Provide a comprehensive, structured answer.\n\n{prompt}"
+            # Prefer Nvidia, fallback to Pro logic
+            return self.generate_content(p, model_type='pro').text
+
+        # Head 2: The Critic (Gemini)
+        def run_critic(draft):
+            p = f"ROLE: The Critic.\nTASK: Critique the following draft. Point out logical fallacies, missing angles, and weak arguments.\n\nDRAFT:\n{draft}"
+            # Explicitly ask for Google if possible for diversity
+            return self.generate_content(p, provider='google', model_name=self.GEMINI_PRO_MODELS[0]).text
+
+        try:
+            # Step 1: Draft
+            draft = run_strategist()
+
+            # Step 2: Critique
+            critique = run_critic(draft)
+
+            # Step 3: Synthesis (The Judge)
+            judge_prompt = f"""
+            # MISSION: FINAL SYNTHESIS
+            **Role:** The Supreme Judge.
+
+            **DRAFT:**
+            {draft}
+
+            **CRITIQUE:**
+            {critique}
+
+            **DIRECTIVE:**
+            Synthesize the Perfect Answer.
+            - Incorporate valid points from the Critique.
+            - Strengthen the Draft.
+            - Maintain the user's requested style.
+
+            **OUTPUT:**
+            The final, polished content only.
+            """
+
+            final_response = self.generate_content(judge_prompt, model_type='pro')
+            print("🐍 HYDRA: Consensus Achieved.")
+            return final_response
+
+        except Exception as e:
+            print(f"🐍 HYDRA Failed: {e}. Fallback to standard generation.")
+            return self.generate_content(prompt, model_type='pro')
 
 model_manager = ModelManager()

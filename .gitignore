@@ -1,3 +1,4 @@
+backend/upsc_saga.db
 # Secrets
 .env
 **/.env
@@ -33,3 +34,6 @@ backend/logs/
 
 # Backup files (Hephaestus)
 *.bak
+backend/upsc_saga.db
+backend/*.db
+*.db
