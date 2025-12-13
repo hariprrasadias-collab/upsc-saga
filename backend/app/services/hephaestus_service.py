@@ -2,6 +2,7 @@ import os
 import traceback
 import re
 import threading
+from datetime import datetime
 from app.services.model_manager import model_manager
 from app.db import get_db
 
@@ -19,10 +20,10 @@ class HephaestusService:
         Main entry point for self-repair (Reactive).
         """
         if not model_manager:
-            print("❌ Hephaestus Disabled: No Manager.")
+            print("❌ Hephaestus Disabled: No Manager.", flush=True)
             return False
             
-        print(f"🔥 Hephaestus Activated: Analyzing error '{str(error)}'...")
+        print(f"🔥 Hephaestus Activated: Analyzing error '{str(error)}'...", flush=True)
         
         # 1. Get Traceback
         if traceback_str:
@@ -33,17 +34,17 @@ class HephaestusService:
         target_file = self._identify_culprit_file(tb_str)
         
         if not target_file:
-            print("❌ Hephaestus: Could not identify a modifiable file in traceback.")
+            print("❌ Hephaestus: Could not identify a modifiable file in traceback.", flush=True)
             return False
             
-        print(f"🎯 Hephaestus: Culprit identified -> {target_file}")
+        print(f"🎯 Hephaestus: Culprit identified -> {target_file}", flush=True)
         
         # 2. Read the broken code
         try:
             with open(target_file, 'r', encoding='utf-8') as f:
                 code_content = f.read()
         except Exception as e:
-            print(f"❌ Hephaestus: Failed to read file: {e}")
+            print(f"❌ Hephaestus: Failed to read file: {e}", flush=True)
             return False
             
         # 3. Consult the Oracle (UPSC Architect Persona)
@@ -75,7 +76,7 @@ class HephaestusService:
         - Preserve all unrelated logic.
         - Add defensive try/except blocks.
         - Ensure imports are correct.
-        
+
         **OUTPUT:**
         Return ONLY the raw Python code block.
         ```python
@@ -89,11 +90,11 @@ class HephaestusService:
             fix_code = self._extract_code_block(response.text)
             
             if not fix_code:
-                print("❌ Hephaestus: Failed to generate a valid code fix.")
+                print("❌ Hephaestus: Failed to generate a valid code fix.", flush=True)
                 return False
                 
             if not self._verify_syntax(fix_code):
-                print("❌ Hephaestus: Generated code failed syntax check. Aborting.")
+                print("❌ Hephaestus: Generated code failed syntax check. Aborting.", flush=True)
                 return False
                 
             self._apply_patch(target_file, fix_code)
@@ -101,7 +102,7 @@ class HephaestusService:
             return True
             
         except Exception as e:
-            print(f"❌ Hephaestus: Repair process failed: {e}")
+            print(f"❌ Hephaestus: Repair process failed: {e}", flush=True)
             return False
 
     def evolve_feature(self, file_path: str):
@@ -110,7 +111,7 @@ class HephaestusService:
         """
         if not model_manager.is_configured: return False
 
-        print(f"🧬 Hephaestus: Evolving {file_path} to God Mode...")
+        print(f"🧬 Hephaestus: Evolving {file_path} to God Mode...", flush=True)
 
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
@@ -141,25 +142,25 @@ class HephaestusService:
             response = model_manager.generate_content(prompt, model_type='pro')
 
             if "NO_CHANGES" in response.text:
-                print("✨ Hephaestus: Code is already at Titan Level.")
+                print("✨ Hephaestus: Code is already at Titan Level.", flush=True)
                 return False
 
             new_code = self._extract_code_block(response.text)
 
             if new_code and self._verify_syntax(new_code):
                 self._apply_patch(file_path, new_code)
-                print(f"🚀 Hephaestus: Evolved {file_path} successfully.")
+                print(f"🚀 Hephaestus: Evolved {file_path} successfully.", flush=True)
                 return True
 
         except Exception as e:
-            print(f"❌ Evolution Failed: {e}")
+            print(f"❌ Evolution Failed: {e}", flush=True)
             return False
 
     def scan_logs_and_repair(self, log_path: str):
         """
-        Reads the log file, finds the last traceback, and attempts to fix it.
+        Reads the log file, finds recent tracebacks, and attempts to fix them.
         """
-        print(f"🕵️ Hephaestus: Scanning logs at {log_path}...")
+        print(f"🕵️ Hephaestus: Scanning logs at {log_path}...", flush=True)
         if not os.path.exists(log_path):
              return
 
@@ -167,21 +168,35 @@ class HephaestusService:
             with open(log_path, 'r', encoding='utf-8') as f:
                 content = f.read()
 
+            # Improved regex to capture tracebacks more reliably
+            # Looks for "Traceback (most recent call last):"
             traceback_blocks = re.split(r'(?=Traceback \(most recent call last\):)', content)
+
+            # Filter valid blocks
             tracebacks = [block for block in traceback_blocks if "Traceback (most recent call last):" in block]
 
             if not tracebacks:
+                print("✅ No tracebacks found in logs.", flush=True)
                 return
 
-            last_tb = tracebacks[-1]
-            lines = [l for l in last_tb.strip().split('\n') if l.strip()]
-            error_msg = lines[-1]
+            print(f"🕵️ Found {len(tracebacks)} tracebacks. Analyzing recent ones...", flush=True)
 
-            print(f"found error in logs: {error_msg}")
-            self.attempt_repair(error=Exception(error_msg), traceback_str=last_tb)
+            # Process the last 3 distinct errors to be aggressive but safe
+            processed_errors = set()
+
+            for tb in reversed(tracebacks[-3:]):
+                lines = [l for l in tb.strip().split('\n') if l.strip()]
+                error_msg = lines[-1]
+
+                # Avoid repeat processing in same scan
+                if error_msg in processed_errors: continue
+                processed_errors.add(error_msg)
+
+                print(f"🔧 Attempting repair for: {error_msg}", flush=True)
+                self.attempt_repair(error=Exception(error_msg), traceback_str=tb)
 
         except Exception as e:
-            print(f"❌ Log Scan Failed: {e}")
+            print(f"❌ Log Scan Failed: {e}", flush=True)
 
     def start_background_repair(self, error: Exception):
         t = threading.Thread(target=self.attempt_repair, args=(error,))
@@ -194,17 +209,39 @@ class HephaestusService:
             ast.parse(code)
             return True
         except SyntaxError as e:
-            print(f"❌ Hephaestus Syntax Error: {e}")
+            print(f"❌ Hephaestus Syntax Error: {e}", flush=True)
             return False
 
     def _identify_culprit_file(self, tb_str):
+        """
+        Robust file identification with fuzzy fallback.
+        """
         lines = tb_str.split('\n')
         for line in lines:
             match = re.search(r'File "(.*?)",', line)
             if match:
                 path = match.group(1)
+
+                # Filter for project files
                 if ('backend' in path or 'app' in path) and 'site-packages' not in path and 'lib' not in path:
-                    return path
+                    # 1. Exact match
+                    if os.path.exists(path):
+                        return path
+
+                    # 2. Relative to CWD
+                    rel_path = os.path.join(os.getcwd(), path.lstrip('/'))
+                    if os.path.exists(rel_path):
+                        return rel_path
+
+                    # 3. Fuzzy Search (Basename match in project)
+                    filename = os.path.basename(path)
+                    print(f"🔍 Exact path not found. Searching for '{filename}'...", flush=True)
+                    for root, dirs, files in os.walk(os.getcwd()):
+                        if filename in files:
+                            found_path = os.path.join(root, filename)
+                            print(f"🔍 Found candidate: {found_path}", flush=True)
+                            return found_path
+
         return None
 
     def _extract_code_block(self, text):
@@ -225,11 +262,12 @@ class HephaestusService:
                     f.write(original)
             with open(file_path, 'w', encoding='utf-8') as f:
                 f.write(new_code)
-            print(f"🔨 Hephaestus: Patch applied to {file_path}. Backup saved to {backup_path}.")
+            print(f"🔨 Hephaestus: Patch applied to {file_path}. Backup saved to {backup_path}.", flush=True)
         except Exception as e:
-            print(f"❌ Hephaestus Patch Error: {e}")
+            print(f"❌ Hephaestus Patch Error: {e}", flush=True)
 
     def _log_repair(self, file_path, error_msg):
+        # 1. DB Log
         try:
             conn = get_db()
             conn.execute('''
@@ -240,11 +278,21 @@ class HephaestusService:
         except:
             pass
 
+        # 2. Visible File Log
+        try:
+            with open("REPAIR_HISTORY.md", "a") as f:
+                f.write(f"## Repair Event: {datetime.now()}\n")
+                f.write(f"- **File:** `{file_path}`\n")
+                f.write(f"- **Error:** `{error_msg}`\n")
+                f.write(f"- **Status:** ✅ Patch Applied\n\n")
+        except:
+            pass
+
     def self_diagnose(self):
         """
         Runs internal integrity checks.
         """
-        print("🏥 Hephaestus: Running System Diagnostics...")
+        print("🏥 Hephaestus: Running System Diagnostics...", flush=True)
         issues = []
 
         # 1. Check Model Configuration
@@ -262,12 +310,12 @@ class HephaestusService:
             issues.append("Logs directory missing.")
 
         if issues:
-            print(f"⚠️ Diagnostics Found Issues: {issues}")
+            print(f"⚠️ Diagnostics Found Issues: {issues}", flush=True)
             # Try to fix?
             if "Logs directory missing." in issues:
                 os.makedirs('logs', exist_ok=True)
-                print("🔧 Fixed: Logs directory created.")
+                print("🔧 Fixed: Logs directory created.", flush=True)
         else:
-            print("✅ Diagnostics Passed: System Nominal.")
+            print("✅ Diagnostics Passed: System Nominal.", flush=True)
 
 hephaestus = HephaestusService()

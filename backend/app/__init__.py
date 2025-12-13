@@ -201,7 +201,8 @@ def create_app():
     from app.routes.neural_hash import neural_hash_bp
     app.register_blueprint(neural_hash_bp, url_prefix='/api/neural_hash')
 
-
+    from app.routes.interview import interview_bp
+    app.register_blueprint(interview_bp, url_prefix='/api/interview')
 
     # Initialize Tables
     from app.db_models.mind_palace import init_mind_palace_tables
