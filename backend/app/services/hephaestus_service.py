@@ -1,9 +1,9 @@
 import os
 import traceback
 import re
+import threading
 from app.services.model_manager import model_manager
 from app.db import get_db
-from app.services.model_manager import model_manager
 
 class HephaestusService:
     """
@@ -14,9 +14,11 @@ class HephaestusService:
     def __init__(self):
         pass # ModelManager handles init
             
-    def attempt_repair(self, error: Exception, context_file: str = None):
+    def attempt_repair(self, error: Exception, context_file: str = None, traceback_str: str = None):
         """
         Main entry point for self-repair.
+        If traceback_str is provided, it uses that (for log scanning).
+        Otherwise, it calls traceback.format_exc() (for live errors).
         """
         if not model_manager: # Should never happen
             print("❌ Hephaestus Disabled: No Manager.")
@@ -24,8 +26,11 @@ class HephaestusService:
             
         print(f"🔥 Hephaestus Activated: Analyzing error '{str(error)}'...")
         
-        # 1. Get Traceback and File
-        tb_str = traceback.format_exc()
+        # 1. Get Traceback
+        if traceback_str:
+            tb_str = traceback_str
+        else:
+            tb_str = traceback.format_exc()
         
         # Extract the last file in the traceback that belongs to our app (not libraries)
         target_file = self._identify_culprit_file(tb_str)
@@ -44,11 +49,11 @@ class HephaestusService:
             print(f"❌ Hephaestus: Failed to read file: {e}")
             return False
             
-        # 3. Consult the Oracle (Gemini)
+        # 3. Consult the Oracle (Gemini/Nvidia)
         prompt = f"""
         # MISSION: AUTONOMOUS CODE REPAIR (HEPHAESTUS)
         **Role:** Lead Software Architect (Python/Flask Expert).
-        
+
         **CONTEXT:**
         A critical runtime exception occurred in `{target_file}`.
         
@@ -70,6 +75,7 @@ class HephaestusService:
            - Preserve all unrelated logic.
            - Add defensive try/except blocks where risky.
            - Do NOT remove imports unless they are the cause.
+           - Fix the specific error mentioned.
         
         **OUTPUT:**
         Return ONLY the raw Python code block. No conversation.
@@ -80,6 +86,7 @@ class HephaestusService:
         
         try:
             # Use Pro model for code repair - Critical reasoning required
+            # The 'pro' tier (Nvidia/Gemini 1.5 Pro) is best for coding tasks.
             response = model_manager.generate_content(prompt, model_type='pro')
             fix_code = self._extract_code_block(response.text)
             
@@ -103,6 +110,56 @@ class HephaestusService:
         except Exception as e:
             print(f"❌ Hephaestus: Repair process failed: {e}")
             return False
+
+    def scan_logs_and_repair(self, log_path: str):
+        """
+        Reads the log file, finds the last traceback, and attempts to fix it.
+        """
+        print(f"🕵️ Hephaestus: Scanning logs at {log_path}...")
+        if not os.path.exists(log_path):
+             print(f"ℹ️ Log file {log_path} not found. Skipping scan.")
+             return
+
+        try:
+            with open(log_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            # Regex to capture Python tracebacks
+            # Starts with "Traceback (most recent call last):" and consumes until the next timestamp or EOF
+            # Assuming timestamps look like [202... or similar, or just relying on indentation
+            # A safer bet is just extracting the block starting with Traceback
+            traceback_blocks = re.split(r'(?=Traceback \(most recent call last\):)', content)
+
+            # Filter for actual tracebacks
+            tracebacks = [block for block in traceback_blocks if "Traceback (most recent call last):" in block]
+
+            if not tracebacks:
+                print("✅ No tracebacks found in logs.")
+                return
+
+            # Analyze the last one
+            last_tb = tracebacks[-1]
+
+            # Extract error message (last non-empty line usually)
+            lines = [l for l in last_tb.strip().split('\n') if l.strip()]
+            error_msg = lines[-1]
+
+            print(f"found error in logs: {error_msg}")
+
+            # Attempt repair
+            # We pass the error message as the Exception string, and the full text as traceback
+            self.attempt_repair(error=Exception(error_msg), traceback_str=last_tb)
+
+        except Exception as e:
+            print(f"❌ Log Scan Failed: {e}")
+
+    def start_background_repair(self, error: Exception):
+        """
+        Non-blocking wrapper for attempt_repair.
+        """
+        t = threading.Thread(target=self.attempt_repair, args=(error,))
+        t.daemon = True
+        t.start()
 
     def audit_file(self, file_path: str):
         """

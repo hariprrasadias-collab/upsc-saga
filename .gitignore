@@ -16,6 +16,7 @@
 
 # Database
 **/*.db
+backend/upsc_saga.db
 
 # OS
 .DS_Store
@@ -24,4 +25,11 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
-backend/upsc_saga.db
+
+# Logs
+logs/
+**/*.log
+backend/logs/
+
+# Backup files (Hephaestus)
+*.bak

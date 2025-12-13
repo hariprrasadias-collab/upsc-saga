@@ -3,6 +3,11 @@ from flask import Flask
 from flask_cors import CORS
 from flask_compress import Compress
 from flask_caching import Cache
+import logging
+from logging.handlers import RotatingFileHandler
+import os
+import threading
+import time
 
 cache = Cache()
 
@@ -11,6 +16,50 @@ def create_app():
     app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
     CORS(app, resources={r"/*": {"origins": "*"}})
     Compress(app) # Enable Gzip compression
+
+    # --- LOGGING & AUTONOMOUS REPAIR SETUP ---
+    if not os.path.exists('logs'):
+        os.makedirs('logs', exist_ok=True)
+
+    file_handler = RotatingFileHandler('logs/app.log', maxBytes=1024*1024, backupCount=10)
+    file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+    ))
+    file_handler.setLevel(logging.ERROR)
+    app.logger.addHandler(file_handler)
+    app.logger.setLevel(logging.INFO) # Ensure we capture info too if needed
+
+    # Global Error Handler for Hephaestus
+    @app.errorhandler(Exception)
+    def handle_exception(e):
+        # Pass through HTTP exceptions (404, 403, etc.)
+        if hasattr(e, 'code'):
+            return e
+
+        # Log the full traceback to file
+        app.logger.error(f"CRITICAL EXCEPTION: {e}", exc_info=True)
+
+        # Trigger Autonomous Repair (Background)
+        try:
+            from app.services.hephaestus_service import hephaestus
+            hephaestus.start_background_repair(e)
+            print(f"🔥 Hephaestus dispatched for error: {e}")
+        except Exception as h_err:
+            print(f"❌ Hephaestus Dispatch Failed: {h_err}")
+
+        # Return generic error
+        return {"success": False, "error": "Internal Server Error. The System is attempting self-repair."}, 500
+
+    # Startup Log Scan (Background)
+    def run_startup_scan():
+        time.sleep(3) # Wait for app to fully initialize
+        try:
+            from app.services.hephaestus_service import hephaestus
+            hephaestus.scan_logs_and_repair('logs/app.log')
+        except Exception as e:
+            print(f"❌ Startup Log Scan Failed: {e}")
+
+    threading.Thread(target=run_startup_scan, daemon=True).start()
 
     # Configure Caching (Simple Local Memory Cache for speed)
     app.config['CACHE_TYPE'] = 'SimpleCache'
