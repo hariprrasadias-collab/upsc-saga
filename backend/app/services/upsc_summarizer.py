@@ -116,53 +116,97 @@ def summarize_for_upsc(title, content, link):
     """Summarise a news article for UPSC preparation using Gemini.
     Returns a dict with summary, key points, tags, importance, etc.
     """
-    if not GEMINI_API_KEY:
-        return _simple_extraction(title, content)
     try:
-        # model = genai.GenerativeModel('gemini-2.0-flash-001') -> Removed, using ModelManager
-        # Send FULL content to AI (no truncation)
-        # Send FULL content to AI (no truncation)
-        prompt = f"""You are a UPSC expert analyzer. Tag articles accurately based on content.
+        # Use ModelManager for AI generation
+        prompt = f"""You are "THE AKAASHIC RECORD" (ETERNAL TIER). Your task is to access the infinite library of existence and map this news article across all known dimensions.
 
-EXAMPLES OF CORRECT TAGGING:
+**STRICT OUTPUT FORMAT:**
+You must return valid JSON only. No markdown.
 
-Example 1:
-Title: \"RBI announces new monetary policy rates\"
-→ Papers: [\"GS3\"], Subjects: [\"Economics\"]
-
-Example 2:
-Title: \"Supreme Court ruling on Right to Privacy\"
-→ Papers: [\"GS2\"], Subjects: [\"Polity & Governance\"]
-
-Example 3:
-Title: \"India-France defense cooperation agreement\"
-→ Papers: [\"GS2\", \"GS3\"], Subjects: [\"International Relations\", \"Internal Security\"]
-
-Example 4:
-Title: \"New renewable energy targets announced\"
-→ Papers: [\"GS3\"], Subjects: [\"Environment & Ecology\", \"Economics\"]
-
-Example 5:
-Title: \"Constitution Bench verdict on federalism\"
-→ Papers: [\"GS2\"], Subjects: [\"Polity & Governance\"]
-
-TAGGING RULES:
-- GS1: History, Culture, Geography, Society
-- GS2: Polity, Governance, IR, Social Justice
-- GS3: Economy, Science, Environment, Security
-- GS4: Ethics
-
-SUBJECTS:
-Polity & Governance | Economics | International Relations | Environment & Ecology | Science & Technology | Internal Security | Disaster Management | Social Issues | History & Culture | Geography | Ethics
-
-NOW TAG THIS ARTICLE:
+**ARTICLE:**
 Title: {title}
 Content: {content}
 
-Return ONLY this JSON (no markdown, no explanation):
-{{"upsc_summary": "...", "key_points": ["...", "..."], "papers": ["GS_"], "subjects": ["..."], "importance": 1-3, "exam_questions": ["..."], "related_topics": ["..."]}}"""
-        # Call ModelManager (handles retry, rotation, rate limits)
-        response = model_manager.generate_content(prompt, model_type='fast')
+**DIMENSIONAL DIRECTIVES:**
+
+1.  **THEORY OF EVERYTHING (STEEPLE):** Social, Tech, Econ, Env, Pol, Legal, Ethical analysis.
+2.  **PRELIMS ARMORY:** Facts, Data, Reports, Articles.
+3.  **MAINS STRATEGY:** Skeleton Answer (Intro/Body/Conclusion).
+4.  **VISUAL SYNTHESIS:** Mermaid.js Mindmap.
+5.  **ACTIVE RECALL:** 5 MCQs.
+6.  **ESSAY FODDER:** Quotes, Data Nukes.
+7.  **CHRONOLOGY:** Timeline of events.
+8.  **DATA VIZ:** Chart data (Bar/Pie/Line).
+9.  **AUDIO:** Podcast Script (Host vs Expert).
+10. **INTERVIEW:** 3 Board Questions.
+11. **ETHICS:** Case Study Scenario.
+12. **PREDICTIVE MODELLING:** Best/Worst/Realist scenarios.
+13. **HISTORY:** Past parallels.
+14. **GEOGRAPHY:** Lat/Long locations.
+15. **PHILOSOPHY:** Socratic Debate.
+16. **MEMORY:** Mnemonics.
+17. **BIAS:** Systemic Bias Radar.
+18. **CHAOS:** Butterfly Effect.
+19. **POLYMATH:** Game Theory/Biology lens.
+20. **WISDOM:** Ancient Quotes.
+21. **ROLEPLAY:** Official Persona.
+
+**AKAASHIC EXPANSIONS:**
+
+22. **SYSTEMS THINKING (Loops):**
+    - Identify Reinforcing (R) and Balancing (B) feedback loops. Structure as text or simple list.
+
+23. **COUNTER-FACTUAL HISTORY:**
+    - "What if [Key Event] had NOT happened?" Explore the alternative timeline.
+
+24. **CIVILIZATIONAL PARALLELS:**
+    - Compare this with the Roman Empire, Han Dynasty, Gupta Empire, or Ottoman Empire governance.
+
+25. **FERMI ESTIMATION:**
+    - Perform a rough back-of-the-envelope calculation of the impact (e.g., Economic loss, Carbon footprint).
+
+26. **GLOBAL MIRROR:**
+    - Where else in the world is this EXACT thing happening right now? Compare and contrast.
+
+**JSON SCHEMA:**
+{{
+  "upsc_summary": "...",
+  "prelims_pointers": [],
+  "mains_dimensions": [],
+  "steeple_analysis": {{}},
+  "inter_linkages": [],
+  "mind_map": "graph TD; ...",
+  "quiz": [{{ "question": "...", "options": [], "answer": "...", "explanation": "..." }}],
+  "answer_framework": {{}},
+  "essay_fodder": {{}},
+  "timeline": [],
+  "data_visualization": {{}},
+  "podcast_script": "...",
+  "interview_questions": [],
+  "simulation_scenario": {{}},
+  "future_scenarios": {{ "best_case": "...", "worst_case": "...", "realist_case": "..." }},
+  "historical_analogies": [{{ "event": "...", "year": "...", "parallel": "..." }}],
+  "locations": [{{ "name": "...", "lat": 0.0, "lng": 0.0, "context": "..." }}],
+  "socratic_clash": [{{ "speaker": "...", "text": "..." }}],
+  "mnemonics": [{{ "phrase": "...", "context": "..." }}],
+  "systemic_bias": {{ "political_leaning": "...", "emotional_tone": "...", "fallacies": [] }},
+  "butterfly_effect": [{{ "order": "1st", "consequence": "..." }}],
+  "polymath_angle": {{ "domain": "...", "analysis": "..." }},
+  "quote_injection": {{ "source": "...", "quote": "..." }},
+  "roleplay_persona": {{ "role": "...", "task": "..." }},
+  "systems_loops": [{{ "type": "Reinforcing", "description": "..." }}],
+  "counter_factuals": [{{ "scenario": "...", "outcome": "..." }}],
+  "civilizational_parallels": [{{ "empire": "...", "parallel": "..." }}],
+  "fermi_estimates": {{ "metric": "...", "calculation": "...", "result": "..." }},
+  "global_context": [{{ "country": "...", "issue": "..." }}],
+  "papers": ["GS1", "GS2"],
+  "subjects": ["Subject 1"],
+  "importance": 3,
+  "exam_questions": []
+}}"""
+
+        # Call ModelManager with 'pro' model for peak performance
+        response = model_manager.generate_content(prompt, model_type='pro')
         text = get_gemini_text(response)
         if not text:
             print(f"Empty or blocked response for: {title}")
@@ -249,9 +293,19 @@ def fetch_article_content(url):
         response = requests.get(url, headers=headers, timeout=15)
         soup = BeautifulSoup(response.content, 'html.parser')
         
-        # Remove scripts and styles
-        for script in soup(["script", "style", "nav", "header", "footer", "aside"]):
-            script.extract()
+        # Remove junk elements
+        for element in soup(["script", "style", "nav", "header", "footer", "aside", "form", "iframe", "ads"]):
+            element.extract()
+
+        # Specific cleanup for known garbage classes/IDs
+        garbage_selectors = [
+            '.ad-container', '.advertisement', '.related-articles', '.read-more',
+            '.share-buttons', '.social-share', '.comment-section', '.copyright',
+            '#bottom-bar', '#cookie-banner', '.newsletter-signup'
+        ]
+        for selector in garbage_selectors:
+            for div in soup.select(selector):
+                div.extract()
             
         # Try to find main content based on common classes/ids
         content = None
@@ -264,25 +318,42 @@ def fetch_article_content(url):
         if not content and 'indianexpress.com' in url:
             content = soup.find('div', class_='story_details') or soup.find('div', class_='full-details')
             
+        # PIB (Press Information Bureau)
+        if not content and 'pib.gov.in' in url:
+            content = soup.find('div', class_='innner-page-main-about-us-content-right-part')
+
         # Generic fallback: find the element with the most <p> tags
         if not content:
              candidates = soup.find_all('div')
              best_candidate = None
              max_p = 0
              for c in candidates:
+                 # Check direct children paragraphs
                  p_count = len(c.find_all('p', recursive=False))
-                 if p_count > max_p:
-                     max_p = p_count
+                 # Bonus for long paragraphs (likely content)
+                 score = 0
+                 for p in c.find_all('p', recursive=False):
+                     if len(p.get_text()) > 100:
+                         score += 2
+                     else:
+                         score += 1
+
+                 if score > max_p:
+                     max_p = score
                      best_candidate = c
              content = best_candidate
 
         if content:
+            # Clean text
             text = content.get_text(separator=' ', strip=True)
+            # Normalize whitespace
+            text = re.sub(r'\s+', ' ', text)
         else:
             # Fallback to all paragraphs
             text = ' '.join([p.get_text() for p in soup.find_all('p')])
+            text = re.sub(r'\s+', ' ', text)
             
-        return text[:15000] # Limit length
+        return text[:20000] # Increased limit for deep analysis
     except Exception as e:
         print(f"Failed to fetch content from {url}: {e}")
         return ""
