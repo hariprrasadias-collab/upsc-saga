@@ -26,35 +26,25 @@ interface Props {
 const TriangulationDashboard: React.FC<Props> = ({ text, onClose }) => {
     const [result, setResult] = useState<TriangulationResult | null>(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<'core' | 'prism' | 'omni' | 'solution'>('core');
 
     React.useEffect(() => {
         const analyze = async () => {
-            setLoading(true);
-            setError(null);
             try {
                 const res = await fetch('http://localhost:5000/api/triangulation/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ text })
                 });
-                if (!res.ok) {
-                    throw new Error(`Server returned ${res.status}`);
-                }
                 const data = await res.json();
-                if (data.success === false) {
-                     throw new Error(data.message || "Analysis failed");
-                }
                 setResult(data);
-            } catch (e: any) {
+            } catch (e) {
                 console.error(e);
-                setError(e.message || "Failed to connect to Triangulation service.");
             } finally {
                 setLoading(false);
             }
         };
-        if (text) analyze();
+        analyze();
     }, [text]);
 
     const [saving, setSaving] = useState(false);
@@ -311,11 +301,6 @@ ${result.predicted_question}
                             <span className="sub-text">Scanning PESTLE • Linking GS Papers • Predicting Questions</span>
                         </div>
                     </div>
-                ) : error ? (
-                    <div className="t-error">
-                         <h3>⚠️ Triangulation Failed</h3>
-                         <p>{error}</p>
-                    </div>
                 ) : result ? (
                     <>
                         <div className="t-tabs">
@@ -329,7 +314,7 @@ ${result.predicted_question}
                         </div>
                     </>
                 ) : (
-                    <div className="t-empty">No Data Available</div>
+                    <div className="t-error">Analysis Failed</div>
                 )}
             </div>
         </div>,

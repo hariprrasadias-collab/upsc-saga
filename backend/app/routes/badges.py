@@ -1,7 +1,22 @@
-from flask import Blueprint, jsonify, request, session
+from flask import Blueprint, jsonify, request, session, current_app
 from app.services.badge_service import badge_service
 
 badges_bp = Blueprint('badges', __name__)
+
+def get_current_user_id():
+    """
+    Helper to get user_id from session with dev fallback.
+    Returns None if unauthorized in production.
+    """
+    user_id = session.get('user_id')
+    if user_id:
+        return user_id
+
+    # Fallback for development/demo mode
+    if current_app.debug or current_app.config.get('FLASK_ENV') == 'development':
+        return 1
+
+    return None
 
 @badges_bp.route('/api/badges/all', methods=['GET'])
 def get_all_badges():

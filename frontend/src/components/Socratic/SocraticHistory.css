@@ -6,8 +6,7 @@
     flex-direction: column;
     background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
     color: #fff;
-    font-family: 'Cinzel', serif;
-    /* Classical font if available */
+    font-family: 'Cinzel', serif; /* Classical font if available */
 }
 
 .history-header {
@@ -67,10 +66,7 @@
 .history-list {
     flex: 1;
     max-width: 350px;
-    overflow: hidden;
-    /* Fix header, scroll list inside */
-    display: flex;
-    flex-direction: column;
+    overflow-y: auto;
 }
 
 .history-list h3 {
@@ -78,35 +74,12 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding-bottom: 1rem;
     color: #ffd700;
-    flex-shrink: 0;
-    /* Prevent header shrink */
 }
 
 .history-list ul {
     list-style: none;
     padding: 0;
     margin: 0;
-    overflow-y: auto;
-    /* Scroll ONLY the list */
-    flex: 1;
-    min-height: 0;
-    /* Flexbox overflow fix */
-    padding-right: 5px;
-    /* Space for scrollbar */
-}
-
-/* Custom Scrollbar for the list */
-.history-list ul::-webkit-scrollbar {
-    width: 6px;
-}
-
-.history-list ul::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1);
-}
-
-.history-list ul::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 3px;
 }
 
 .history-item {
@@ -142,8 +115,7 @@
 /* View Side */
 .dialogue-view {
     flex: 2;
-    overflow-y: hidden;
-    /* Scroll internal content */
+    overflow-y: hidden; /* Scroll internal content */
 }
 
 .view-header {
@@ -158,9 +130,7 @@
     gap: 0.5rem;
 }
 
-.copy-btn,
-.play-btn,
-.mode-btn {
+.copy-btn, .play-btn, .mode-btn {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #fff;
@@ -181,9 +151,7 @@
     box-shadow: 0 0 10px #9b59b6;
 }
 
-.copy-btn:hover,
-.play-btn:not(.playing):hover,
-.mode-btn:hover {
+.copy-btn:hover, .play-btn:not(.playing):hover, .mode-btn:hover {
     background: rgba(255, 255, 255, 0.2);
 }
 
@@ -374,7 +342,7 @@
     font-size: 1.1rem;
     border-radius: 30px;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     transition: transform 0.2s;
 }
 
