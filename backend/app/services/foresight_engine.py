@@ -4,7 +4,6 @@ Analyzes PYQs and current affairs to predict probable future questions
 """
 
 from typing import List, Dict
-from typing import List, Dict
 import os
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
@@ -61,8 +60,12 @@ class ForesightEngine:
         )
         
         # 4. Save predictions to DB
+        print(f"Foresight: Saving {len(predictions)} predictions...")
         for pred in predictions:
             try:
+                # Ensure fields exist
+                pred.setdefault('subject', subject)
+                pred.setdefault('topic', topic or "General")
                 save_foresight_prediction(pred)
             except Exception as e:
                 print(f"Failed to save prediction: {e}")
@@ -333,6 +336,12 @@ class ForesightEngine:
                     
                     # Phase 2: The Critic (High Rigor)
                     final_predictions = self._critic_review(candidates)
+
+                    # Add metadata
+                    for pred in final_predictions:
+                        pred['generated_at'] = datetime.now().isoformat()
+                        pred['id'] = hash(pred['question']) % 10000
+
                     return final_predictions
                 else:
                     print("No JSON array found (brackets missing)")
@@ -342,16 +351,6 @@ class ForesightEngine:
                 return []
             except Exception as e:
                 print(f"Extraction Error: {e}")
-                return []
-                
-                # Add metadata
-                for pred in final_predictions:
-                    pred['generated_at'] = datetime.now().isoformat()
-                    pred['id'] = hash(pred['question']) % 10000
-
-                return final_predictions
-            else:
-                print("No JSON found in response")
                 return []
 
         except Exception as e:
