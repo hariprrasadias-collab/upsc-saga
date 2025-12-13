@@ -17,7 +17,10 @@ def get_shop_items():
 def get_balance():
     """Get user's currency balance."""
     try:
-        user_id = session.get('user_id', 1)
+        user_id = session.get('user_id')
+        if not user_id:
+             return jsonify({'error': 'Unauthorized'}), 401
+
         balance = shop_service.get_user_balance(user_id)
         return jsonify(balance)
     except Exception as e:
@@ -28,7 +31,10 @@ def get_balance():
 def purchase_item():
     """Purchase an item."""
     try:
-        user_id = session.get('user_id', 1)
+        user_id = session.get('user_id')
+        if not user_id:
+             return jsonify({'error': 'Unauthorized'}), 401
+
         data = request.get_json()
         item_id = data.get('item_id')
         
@@ -52,7 +58,10 @@ def purchase_item():
 def get_inventory():
     """Get user's inventory."""
     try:
-        user_id = session.get('user_id', 1)
+        user_id = session.get('user_id')
+        if not user_id:
+             return jsonify({'error': 'Unauthorized'}), 401
+
         inventory = shop_service.get_user_inventory(user_id)
         return jsonify(inventory)
     except Exception as e:
@@ -63,7 +72,10 @@ def get_inventory():
 def activate_item():
     """Activate an item from inventory."""
     try:
-        user_id = session.get('user_id', 1)
+        user_id = session.get('user_id')
+        if not user_id:
+             return jsonify({'error': 'Unauthorized'}), 401
+
         data = request.get_json()
         inventory_id = data.get('inventory_id')
         
@@ -87,7 +99,10 @@ def activate_item():
 def get_active_powerups():
     """Get currently active power-ups."""
     try:
-        user_id = session.get('user_id', 1)
+        user_id = session.get('user_id')
+        if not user_id:
+             return jsonify({'error': 'Unauthorized'}), 401
+
         active = shop_service.get_active_powerups(user_id)
         return jsonify(active)
     except Exception as e:
