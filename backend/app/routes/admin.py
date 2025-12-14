@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request
 from app.db import get_db
 import json
 import time as import_time
+from app.utils.session import get_current_user_id
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -15,7 +16,7 @@ def is_admin(user_id):
 def get_admin_stats():
     """Get overview statistics for admin dashboard"""
     try:
-        user_id = 1 # TODO: Get from session
+        user_id = get_current_user_id()
         if not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
@@ -51,7 +52,7 @@ def get_admin_stats():
 def get_questions():
     """Get paginated questions for management"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         if not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
@@ -98,7 +99,7 @@ def get_questions():
 def add_question():
     """Add a new question"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         if not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
@@ -136,7 +137,7 @@ def add_question():
 def update_question(id):
     """Update an existing question"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         if not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
@@ -170,7 +171,7 @@ def update_question(id):
 def delete_question(id):
     """Delete a question"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         if not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
@@ -188,7 +189,7 @@ def delete_question(id):
 def get_articles():
     """Get paginated articles"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         if not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
@@ -240,7 +241,7 @@ def get_articles():
 def add_article():
     """Add a new article"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         if not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
@@ -283,7 +284,7 @@ def add_article():
 def update_article(id):
     """Update an article"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         if not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
@@ -329,7 +330,7 @@ def update_article(id):
 def delete_article(id):
     """Delete an article"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         if not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
