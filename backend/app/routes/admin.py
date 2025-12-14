@@ -1,21 +1,47 @@
 # Admin API Routes
 from flask import Blueprint, jsonify, request
 from app.db import get_db
+from app.utils.session import get_current_user_id
 import json
 import time as import_time
 
 admin_bp = Blueprint('admin', __name__)
 
 def is_admin(user_id):
-    # TODO: Implement real admin check
-    # For now, user_id 1 is admin
-    return user_id == 1
+    """
+    Check if the user has admin privileges.
+    Verifies the is_admin column in the users table.
+    """
+    try:
+        conn = get_db()
+        # Fetch is_admin status from database
+        user = conn.execute('SELECT is_admin FROM users WHERE id = ?', (user_id,)).fetchone()
+
+        # If user exists and is_admin is explicitly set to 1/True
+        if user:
+            # In SQLite, boolean is 0 or 1.
+            if user['is_admin']:
+                return True
+            else:
+                return False
+
+        # User not found
+        return False
+
+    except Exception as e:
+        print(f"Admin check failed for user {user_id}: {e}")
+        # In case of database error (e.g. column missing before migration),
+        # fail safe to deny access unless it is the hardcoded admin during dev/migration.
+        if user_id == 1:
+             return True
+        return False
 
 @admin_bp.route('/api/admin/stats', methods=['GET'])
 def get_admin_stats():
     """Get overview statistics for admin dashboard"""
     try:
-        user_id = 1 # TODO: Get from session
+        user_id = get_current_user_id()
+
         if not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
@@ -27,7 +53,6 @@ def get_admin_stats():
         # Count users
         users_count = conn.execute('SELECT COUNT(*) FROM users').fetchone()[0]
         
-        # Count articles (Ravens)
         # Count articles (Ravens)
         articles_count = conn.execute('SELECT COUNT(*) FROM current_affairs').fetchone()[0]
         
@@ -51,7 +76,7 @@ def get_admin_stats():
 def get_questions():
     """Get paginated questions for management"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         if not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
@@ -98,7 +123,7 @@ def get_questions():
 def add_question():
     """Add a new question"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         if not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
@@ -136,7 +161,7 @@ def add_question():
 def update_question(id):
     """Update an existing question"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         if not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
@@ -170,7 +195,7 @@ def update_question(id):
 def delete_question(id):
     """Delete a question"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         if not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
@@ -188,7 +213,7 @@ def delete_question(id):
 def get_articles():
     """Get paginated articles"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         if not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
@@ -240,7 +265,7 @@ def get_articles():
 def add_article():
     """Add a new article"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         if not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
@@ -283,7 +308,7 @@ def add_article():
 def update_article(id):
     """Update an article"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         if not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
@@ -329,7 +354,7 @@ def update_article(id):
 def delete_article(id):
     """Delete an article"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         if not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
