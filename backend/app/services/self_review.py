@@ -1,5 +1,4 @@
 from app.db import get_db
-# from app.services.brain_service import brain_service # Unused
 from datetime import datetime, timedelta
 import json
 import re
@@ -59,7 +58,7 @@ class SelfReviewService:
         
         top_successes = [dict(s) for s in successes]
         
-        # 3.1 Identify Self-Corrections (TODO Implemented)
+        # 3.1 Identify Self-Corrections
         corrections = conn.execute('''
             SELECT COUNT(*) as count
             FROM brain_action_log
@@ -67,20 +66,33 @@ class SelfReviewService:
         ''', (since,)).fetchone()
         correction_count = corrections['count'] if corrections else 0
 
-        # 4. Generate Improvement Plan (using BrainService/Gemini)
+        # 4. Generate Improvement Plan (using Gemini API via ModelManager)
         # We ask the Brain to reflect on its own stats
         reflection_prompt = f"""
-        Analyze your performance over the last {lookback_days} days:
-        - Total Actions: {total}
-        - Success Rate: {success_rate:.1f}%
-        - Average Impact: {avg_impact:.2f}
-        - Self Corrections: {correction_count}
-        - Top Mistakes: {json.dumps(top_mistakes)}
-        - Top Successes: {json.dumps(top_successes)}
+        # SYSTEM ROLE: THE ARCHITECT (Self-Correction Module)
+        You are the internal audit mechanism for the "Brain" (an AI UPSC Coach).
+        Your job is to ruthlessly analyze performance metrics and prescribe optimization protocols.
+
+        # PERFORMANCE DATA ({lookback_days} DAYS):
+        - **Total Actions:** {total}
+        - **Success Rate:** {success_rate:.1f}%
+        - **Average Impact Score:** {avg_impact:.2f}
+        - **Self Corrections:** {correction_count}
+        - **Top Failures:** {json.dumps(top_mistakes)}
+        - **Top Successes:** {json.dumps(top_successes)}
         
-        Provide a brief 3-point improvement plan for the next week.
-        RETURN ONLY JSON.
-        Format: {{"plan": ["point 1", "point 2", "point 3"]}}
+        # MISSION:
+        Analyze the data. Identify patterns of failure. Prescribe a concrete, actionable 3-point plan for the next week.
+        Do not be generic. Be specific to the "Action Types" mentioned in mistakes.
+
+        # OUTPUT SCHEMA (JSON ONLY):
+        {{
+            "plan": [
+                "Actionable Point 1 (Focus on correcting X...)",
+                "Actionable Point 2 (Leverage success in Y...)",
+                "Actionable Point 3 (System optimization...)"
+            ]
+        }}
         """
         
         try:
@@ -129,7 +141,7 @@ class SelfReviewService:
             success_rate,
             avg_impact * 100, # Normalize to 0-100 roughly
             stats['failures'] or 0,
-            correction_count, # Implemented
+            correction_count,
             json.dumps(improvement_plan)
         ))
         conn.commit()
