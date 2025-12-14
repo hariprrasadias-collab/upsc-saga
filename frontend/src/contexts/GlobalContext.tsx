@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { audioManager } from '../util/AudioManager';
+import { API_BASE_URL } from '../config';
 
 // --- TYPES ---
 export interface Task {
@@ -94,7 +95,7 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
         // We will handle "initial load" separately.
 
         try {
-            const response = await fetch('http://127.0.0.1:5000/api/dashboard-data');
+            const response = await fetch(`${API_BASE_URL}/api/dashboard-data`);
             if (!response.ok) throw new Error('Failed to fetch dashboard data');
             const data = await response.json();
 
@@ -162,7 +163,7 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
     const completeTask = async (taskId: number) => {
         try {
             // Updated to correct route based on verification
-            const response = await fetch(`http://127.0.0.1:5000/api/planner/task/${taskId}/status`, {
+            const response = await fetch(`${API_BASE_URL}/api/planner/task/${taskId}/status`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'

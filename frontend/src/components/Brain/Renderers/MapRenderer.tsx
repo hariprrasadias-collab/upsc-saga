@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import './Renderers.css';
+import { API_BASE_URL } from '../../../config';
 
 interface Location {
     name: string;
@@ -286,7 +287,7 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
             // Mock integration
             console.log("Submitting Score:", score);
             // Use relative URL for production compatibility
-            await fetch('/api/gamification/reward', {
+            await fetch(`${API_BASE_URL}/api/gamification/reward`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
