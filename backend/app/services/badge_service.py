@@ -213,8 +213,44 @@ class BadgeService:
             except:
                 stats['csat_quant'] = 0
 
-            stats['streak_days'] = 0  # Will implement with challenges feature
-            stats['correct_answers'] = 0
+            # Streak Days
+            try:
+                streak = conn.execute('SELECT current_streak FROM streaks WHERE user_id = ?', (user_id,)).fetchone()
+                stats['streak_days'] = streak['current_streak'] if streak else 0
+            except Exception:
+                stats['streak_days'] = 0
+
+            # Correct Answers (Mock Tests)
+            try:
+                correct = conn.execute('SELECT SUM(total_correct) as count FROM test_attempts WHERE user_id = ?', (user_id,)).fetchone()
+                stats['correct_answers'] = correct['count'] if correct and correct['count'] else 0
+            except Exception:
+                stats['correct_answers'] = 0
+
+            # Subject Completion
+            try:
+                # Get list of subjects and their completion status
+                subjects_data = conn.execute('''
+                    SELECT subject,
+                           COUNT(*) as total_topics,
+                           SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed_topics
+                    FROM syllabus_topics
+                    GROUP BY subject
+                ''').fetchall()
+
+                completed_subjects_count = 0
+                for subj in subjects_data:
+                    if subj['total_topics'] > 0 and subj['total_topics'] == subj['completed_topics']:
+                        completed_subjects_count += 1
+
+                stats['subject_complete'] = completed_subjects_count
+
+                # Also track total topics completed
+                stats['topics_completed'] = conn.execute("SELECT COUNT(*) as count FROM syllabus_topics WHERE status='Completed'").fetchone()['count']
+
+            except Exception:
+                stats['subject_complete'] = 0
+                stats['topics_completed'] = 0
 
             return stats
         except Exception as e:
