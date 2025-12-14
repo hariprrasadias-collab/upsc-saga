@@ -108,11 +108,22 @@ const CommandPalette: React.FC = () => {
 
     if (!isOpen) return null;
 
+    const activeDescendantId = filteredCommands[selectedIndex]?.id;
+
     return (
-        <div className="command-palette-overlay" onClick={() => setIsOpen(false)}>
-            <div className="command-palette-modal" onClick={e => e.stopPropagation()}>
+        <div
+            className="command-palette-overlay"
+            onClick={() => setIsOpen(false)}
+        >
+            <div
+                className="command-palette-modal"
+                onClick={e => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Command Palette"
+            >
                 <div className="command-palette-search">
-                    <span className="search-icon">🔍</span>
+                    <span className="search-icon" aria-hidden="true">🔍</span>
                     <input
                         ref={inputRef}
                         type="text"
@@ -122,21 +133,34 @@ const CommandPalette: React.FC = () => {
                             setQuery(e.target.value);
                             setSelectedIndex(0);
                         }}
+                        aria-label="Search commands"
+                        role="combobox"
+                        aria-expanded="true"
+                        aria-controls="command-results-list"
+                        aria-activedescendant={activeDescendantId}
+                        aria-autocomplete="list"
                     />
-                    <span className="esc-hint">ESC</span>
+                    <span className="esc-hint" aria-hidden="true">ESC</span>
                 </div>
 
-                <div className="command-palette-results">
+                <div
+                    className="command-palette-results"
+                    id="command-results-list"
+                    role="listbox"
+                >
                     {filteredCommands.length > 0 ? (
                         filteredCommands.map((cmd, index) => (
                             <div
                                 key={cmd.id}
+                                id={cmd.id}
                                 className={`command-item ${index === selectedIndex ? 'selected' : ''}`}
                                 onClick={() => {
                                     cmd.action();
                                     setIsOpen(false);
                                 }}
                                 onMouseEnter={() => setSelectedIndex(index)}
+                                role="option"
+                                aria-selected={index === selectedIndex}
                             >
                                 <div className="command-content">
                                     <span className="command-label">{cmd.label}</span>
@@ -146,11 +170,11 @@ const CommandPalette: React.FC = () => {
                             </div>
                         ))
                     ) : (
-                        <div className="no-results">No commands found</div>
+                        <div className="no-results" role="alert">No commands found</div>
                     )}
                 </div>
 
-                <div className="command-palette-footer">
+                <div className="command-palette-footer" aria-hidden="true">
                     <span>Use <b>↑↓</b> to navigate</span>
                     <span><b>↵</b> to select</span>
                 </div>
