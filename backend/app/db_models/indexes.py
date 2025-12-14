@@ -32,7 +32,12 @@ def init_indexes():
         'CREATE INDEX IF NOT EXISTS idx_study_sessions_user_time ON study_sessions (user_id, start_time)',
 
         # Brain Action Log
-        'CREATE INDEX IF NOT EXISTS idx_brain_action_log_user_time ON brain_action_log (user_id, executed_at)'
+        'CREATE INDEX IF NOT EXISTS idx_brain_action_log_user_time ON brain_action_log (user_id, executed_at)',
+
+        # Syllabus Optimization (Bolt)
+        'CREATE INDEX IF NOT EXISTS idx_syllabus_topics_sort ON syllabus_topics (paper, subject)',
+        'CREATE INDEX IF NOT EXISTS idx_topic_revisions_topic_id ON topic_revisions (topic_id)',
+        'CREATE INDEX IF NOT EXISTS idx_topic_revisions_next_date ON topic_revisions (next_revision_date)'
     ]
 
     print("Optimization: Checking indexes...")
