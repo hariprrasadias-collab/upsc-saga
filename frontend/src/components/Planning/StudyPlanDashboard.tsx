@@ -24,6 +24,7 @@ import { CausalInferenceEngine, type CausalWarning } from '../../util/CausalInfe
 
 import { audioManager } from '../../util/AudioManager';
 import { brainService, type BrainInsight } from '../../services/BrainService';
+import { API_BASE_URL } from '../../config';
 
 interface Slot {
     id: string;
@@ -237,7 +238,7 @@ const StudyPlanDashboard: React.FC = () => {
         try {
             // Try fetching from the new API first
             const today = new Date().toISOString().split('T')[0];
-            const response = await fetch(`/api/planner/current?start_date=${today}&days=365`); // Fetch 1 year
+            const response = await fetch(`${API_BASE_URL}/api/planner/current?start_date=${today}&days=365`); // Fetch 1 year
             if (response.ok) {
                 const data = await response.json();
                 if (data.success && Array.isArray(data.plan)) {
@@ -350,7 +351,7 @@ const StudyPlanDashboard: React.FC = () => {
             try {
                 // Convert 'completed'/'pending' to 'Completed'/'Pending' for backend consistency
                 const apiStatus = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
-                fetch(`/api/planner/task/${task.id}/status`, {
+                fetch(`${API_BASE_URL}/api/planner/task/${task.id}/status`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: apiStatus })
@@ -1578,4 +1579,3 @@ const StudyPlanDashboard: React.FC = () => {
 };
 
 export default StudyPlanDashboard;
-

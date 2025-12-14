@@ -9,7 +9,7 @@ import PYQHeatmap from '../Analytics/PYQHeatmap';
 import DifficultyTrendChart from '../Analytics/DifficultyTrendChart';
 import Modal from '../Shared/Modal';
 import { generateCombatSheet } from '../../util/exportUtils';
-
+import { API_BASE_URL } from '../../config';
 
 interface Question {
     id: number;
@@ -68,7 +68,7 @@ const PYQDatabase: React.FC = () => {
                 try {
                     const params = new URLSearchParams();
                     selectedSubjects.forEach(subject => params.append('subjects', subject));
-                    const res = await fetch(`/api/pyq/topics?${params.toString()}`);
+                    const res = await fetch(`${API_BASE_URL}/api/pyq/topics?${params.toString()}`);
                     const data = await res.json();
                     setAvailableTopics(data);
                 } catch (err) {
@@ -105,7 +105,7 @@ const PYQDatabase: React.FC = () => {
             if (searchQuery) params.append('search', searchQuery);
             if (showFavoritesOnly) params.append('is_favorite', 'true');
 
-            const res = await fetch(`/api/pyq/questions?${params.toString()}`);
+            const res = await fetch(`${API_BASE_URL}/api/pyq/questions?${params.toString()}`);
             const data = await res.json();
             setQuestions(data);
 
@@ -114,7 +114,7 @@ const PYQDatabase: React.FC = () => {
             selectedSubjects.forEach(s => analyticsParams.append('subjects', s));
             selectedYears.forEach(y => analyticsParams.append('years', y.toString()));
 
-            const analyticsRes = await fetch(`/api/pyq/analytics?${analyticsParams.toString()}`);
+            const analyticsRes = await fetch(`${API_BASE_URL}/api/pyq/analytics?${analyticsParams.toString()}`);
             const analyticsData = await analyticsRes.json();
             setAnalytics(analyticsData);
 
@@ -138,7 +138,7 @@ const PYQDatabase: React.FC = () => {
 
     const toggleFavorite = async (id: number) => {
         try {
-            const res = await fetch(`/api/pyq/${id}/favorite`, { method: 'POST' });
+            const res = await fetch(`${API_BASE_URL}/api/pyq/${id}/favorite`, { method: 'POST' });
             if (res.ok) {
                 setQuestions(prev => prev.map(q =>
                     q.id === id ? { ...q, is_favorite: !q.is_favorite } : q
@@ -188,7 +188,7 @@ const PYQDatabase: React.FC = () => {
                 limit: 25
             };
 
-            const res = await fetch('/api/pyq/start-quiz', {
+            const res = await fetch(`${API_BASE_URL}/api/pyq/start-quiz`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ filters, title: 'PYQ Quiz' })
@@ -219,7 +219,7 @@ const PYQDatabase: React.FC = () => {
                 search: searchQuery
             };
 
-            const res = await fetch('/api/arena/create-custom-boss', {
+            const res = await fetch(`${API_BASE_URL}/api/arena/create-custom-boss`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, filters })
@@ -260,7 +260,7 @@ const PYQDatabase: React.FC = () => {
     const askStrategos = async (id: number) => {
         setAnalyzingId(id);
         try {
-            const res = await fetch(`/api/pyq/strategos/${id}`, { method: 'POST' });
+            const res = await fetch(`${API_BASE_URL}/api/pyq/strategos/${id}`, { method: 'POST' });
             const data = await res.json();
             if (data.success) {
                 setStrategosAnalysis(data.analysis);
@@ -282,7 +282,7 @@ const PYQDatabase: React.FC = () => {
         setShowSimilar(id);
         setLoadingSimilar(true);
         try {
-            const res = await fetch(`/api/pyq/similar/${id}`);
+            const res = await fetch(`${API_BASE_URL}/api/pyq/similar/${id}`);
             const data = await res.json();
             setSimilarQuestions(data);
         } catch (err) {

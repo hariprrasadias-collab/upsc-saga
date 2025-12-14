@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './Renderers.css';
 import './ChatInterface.css';
 import MarkdownRenderer from '../../Shared/MarkdownRenderer';
+import { API_BASE_URL } from '../../../config';
 
 interface ChatInterfaceProps {
     content: string;
@@ -72,7 +73,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ content, topic }) => {
                 history.push({ speakerId: 'user', text: inputToSend });
             }
 
-            const response = await fetch('http://127.0.0.1:5000/api/socratic/debate', {
+            const response = await fetch(`${API_BASE_URL}/api/socratic/debate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
