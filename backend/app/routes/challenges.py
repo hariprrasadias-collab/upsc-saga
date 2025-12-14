@@ -1,7 +1,19 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, session
 from app.services.challenge_service import challenge_service
 
 challenges_bp = Blueprint('challenges', __name__)
+
+def get_current_user_id():
+    """
+    Retrieve the logged-in user's ID from the session.
+    Falls back to User ID 1 for development/single-user environments.
+    """
+    user_id = session.get('user_id')
+    if not user_id:
+        # TODO: In a strict production environment with auth, this should raise 401.
+        # Currently maintaining existing behavior for single-user mode.
+        user_id = 1
+    return user_id
 
 @challenges_bp.route('/api/challenges/daily', methods=['GET'])
 def get_daily_challenge():
@@ -9,7 +21,7 @@ def get_daily_challenge():
     Get today's assigned challenge for the user.
     """
     try:
-        user_id = 1  # TODO: Get from session
+        user_id = get_current_user_id()
         challenge = challenge_service.get_daily_challenge(user_id)
         
         if not challenge:
@@ -28,7 +40,7 @@ def complete_challenge():
     Mark today's challenge as complete.
     """
     try:
-        user_id = 1  # TODO: Get from session
+        user_id = get_current_user_id()
         result = challenge_service.complete_challenge(user_id)
         
         return jsonify(result)
@@ -44,7 +56,7 @@ def get_streak():
     Get user's current streak information.
     """
     try:
-        user_id = 1  # TODO: Get from session
+        user_id = get_current_user_id()
         streak = challenge_service.get_streak(user_id)
         
         if not streak:
@@ -67,7 +79,7 @@ def get_history():
     Get user's challenge completion history (last 30 days).
     """
     try:
-        user_id = 1  # TODO: Get from session
+        user_id = get_current_user_id()
         days = request.args.get('days', 30, type=int)
         
         history = challenge_service.get_challenge_history(user_id, days)
@@ -84,7 +96,7 @@ def update_progress():
     Update progress for today's challenge.
     """
     try:
-        user_id = 1  # TODO: Get from session
+        user_id = get_current_user_id()
         data = request.get_json()
         progress = data.get('progress', 0)
         

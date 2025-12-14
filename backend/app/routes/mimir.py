@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from app.db import get_db
 from app.services.mimir_service import mimir_service
 
@@ -8,7 +8,7 @@ mimir_bp = Blueprint('mimir_chat', __name__)
 def chat():
     try:
         data = request.json
-        user_id = 1 # TODO: Get from session
+        user_id = session.get('user_id', 1)
         message = data.get('message')
         
         if not message:
@@ -53,7 +53,7 @@ def chat():
 @mimir_bp.route('/api/mimir/history', methods=['GET'])
 def get_history():
     try:
-        user_id = 1
+        user_id = session.get('user_id', 1)
         conn = get_db()
         rows = conn.execute('''
             SELECT role, content, timestamp FROM mimir_chat_history
@@ -69,7 +69,7 @@ def get_history():
 @mimir_bp.route('/api/mimir/clear', methods=['POST'])
 def clear_history():
     try:
-        user_id = 1
+        user_id = session.get('user_id', 1)
         conn = get_db()
         conn.execute('DELETE FROM mimir_chat_history WHERE user_id = ?', (user_id,))
         conn.commit()

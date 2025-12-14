@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ResponsiveContainer, Treemap, Tooltip } from 'recharts';
 import './Analytics.css'; // Assuming we can reuse existing analytics styles
+import { API_BASE_URL } from '../../config';
 
 interface HeatmapData {
     name: string;
@@ -15,7 +16,7 @@ const PYQHeatmap: React.FC = () => {
     useEffect(() => {
         const fetchAnalytics = async () => {
             try {
-                const res = await fetch('/api/pyq/analytics');
+                const res = await fetch(`${API_BASE_URL}/api/pyq/analytics`);
                 const rawData = await res.json();
 
                 // Transform data for Treemap (Hierarchical: Subject > Topic)

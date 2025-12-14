@@ -262,7 +262,7 @@ const NeuralHash: React.FC = () => {
                                 <div className="result-card glass-panel">
                                     <h3 className="neon-text-blue"><FaBrain /> Core Themes (The Soul)</h3>
                                     <div className="themes-list">
-                                        {result.core_themes.map((theme, i) => (
+                                        {result.core_themes && result.core_themes.map((theme, i) => (
                                             <span key={i} className="theme-tag">{theme}</span>
                                         ))}
                                     </div>
@@ -302,19 +302,22 @@ const NeuralHash: React.FC = () => {
 
                                 <div className="result-card glass-panel" style={{ marginTop: '2rem' }}>
                                     <h3 className="neon-text-blue">Potential Derivatives</h3>
-                                    {result.potential_questions.map((q, i) => (
-                                        <div key={i} className="question-item">
-                                            <span className="q-type">{q.type}</span>
-                                            <div className="q-text">{q.question}</div>
-                                            <button
-                                                className="add-task-btn"
-                                                title="Add to WarMap"
-                                                onClick={() => handleCreateTask(q.question)}
-                                            >
-                                                <FaPlus />
-                                            </button>
-                                        </div>
-                                    ))}
+                                    {result.potential_questions && result.potential_questions.length > 0 ? (
+                                        result.potential_questions.map((q, i) => (
+                                            <div key={i} className="question-item">
+                                                <span className="q-type">{q.type}</span>
+                                                <div className="q-text">{q.question}</div>
+                                                <button
+                                                    className="add-task-btn"
+                                                    title="Add to WarMap"
+                                                    onClick={() => handleCreateTask(q.question)}
+                                                >
+                                                    <FaPlus />
+                                                </button>
+                                            </div>
+                                        ))) : (
+                                        <div className="text-muted">No derivatives found.</div>
+                                    )}
                                 </div>
                             </div>
 
@@ -338,7 +341,7 @@ const NeuralHash: React.FC = () => {
                                 <div className="result-card glass-panel" style={{ marginTop: '2rem' }}>
                                     <h3 className="neon-text-blue"><FaBolt /> High Yield Keywords</h3>
                                     <div className="keywords-list">
-                                        {result.high_yield_keywords.map((kw, i) => (
+                                        {result.high_yield_keywords && result.high_yield_keywords.map((kw, i) => (
                                             <span
                                                 key={i}
                                                 className="keyword-tag"

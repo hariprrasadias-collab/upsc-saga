@@ -89,7 +89,41 @@ def run_background_fetch(app):
                             'subjects': ai_result['subjects'],
                             'importance': ai_result['importance'],
                             'image_url': image_url,
-                            'related_pyqs': related_pyqs
+                            'related_pyqs': related_pyqs,
+                            # Enhanced Metadata
+                            'prelims_pointers': ai_result.get('prelims_pointers', []),
+                            'mains_dimensions': ai_result.get('mains_dimensions', []),
+                            'steeple_analysis': ai_result.get('steeple_analysis', {}),
+                            'inter_linkages': ai_result.get('inter_linkages', []),
+                            # God Mode Metadata
+                            'mind_map': ai_result.get('mind_map', ''),
+                            'quiz': ai_result.get('quiz', []),
+                            'answer_framework': ai_result.get('answer_framework', {}),
+                            'essay_fodder': ai_result.get('essay_fodder', {}),
+                            # Universe Mode Metadata
+                            'timeline': ai_result.get('timeline', []),
+                            'data_visualization': ai_result.get('data_visualization', {}),
+                            'podcast_script': ai_result.get('podcast_script', ''),
+                            'interview_questions': ai_result.get('interview_questions', []),
+                            'simulation_scenario': ai_result.get('simulation_scenario', {}),
+                            # Omniverse Mode Metadata
+                            'future_scenarios': ai_result.get('future_scenarios', {}),
+                            'historical_analogies': ai_result.get('historical_analogies', []),
+                            'locations': ai_result.get('locations', []),
+                            'socratic_clash': ai_result.get('socratic_clash', []),
+                            'mnemonics': ai_result.get('mnemonics', []),
+                            # Singularity Mode Metadata
+                            'systemic_bias': ai_result.get('systemic_bias', {}),
+                            'butterfly_effect': ai_result.get('butterfly_effect', []),
+                            'polymath_angle': ai_result.get('polymath_angle', {}),
+                            'quote_injection': ai_result.get('quote_injection', {}),
+                            'roleplay_persona': ai_result.get('roleplay_persona', {}),
+                            # Akaashic Mode Metadata
+                            'systems_loops': ai_result.get('systems_loops', []),
+                            'counter_factuals': ai_result.get('counter_factuals', []),
+                            'civilizational_parallels': ai_result.get('civilizational_parallels', []),
+                            'fermi_estimates': ai_result.get('fermi_estimates', {}),
+                            'global_context': ai_result.get('global_context', [])
                         }
                         
                         save_article(article_data)
@@ -205,7 +239,41 @@ def process_article():
             'subjects': ai_result['subjects'],
             'importance': ai_result['importance'],
             'image_url': image_url,
-            'related_pyqs': related_pyqs
+            'related_pyqs': related_pyqs,
+            # Enhanced Metadata
+            'prelims_pointers': ai_result.get('prelims_pointers', []),
+            'mains_dimensions': ai_result.get('mains_dimensions', []),
+            'steeple_analysis': ai_result.get('steeple_analysis', {}),
+            'inter_linkages': ai_result.get('inter_linkages', []),
+            # God Mode Metadata
+            'mind_map': ai_result.get('mind_map', ''),
+            'quiz': ai_result.get('quiz', []),
+            'answer_framework': ai_result.get('answer_framework', {}),
+            'essay_fodder': ai_result.get('essay_fodder', {}),
+            # Universe Mode Metadata
+            'timeline': ai_result.get('timeline', []),
+            'data_visualization': ai_result.get('data_visualization', {}),
+            'podcast_script': ai_result.get('podcast_script', ''),
+            'interview_questions': ai_result.get('interview_questions', []),
+            'simulation_scenario': ai_result.get('simulation_scenario', {}),
+            # Omniverse Mode Metadata
+            'future_scenarios': ai_result.get('future_scenarios', {}),
+            'historical_analogies': ai_result.get('historical_analogies', []),
+            'locations': ai_result.get('locations', []),
+            'socratic_clash': ai_result.get('socratic_clash', []),
+            'mnemonics': ai_result.get('mnemonics', []),
+            # Singularity Mode Metadata
+            'systemic_bias': ai_result.get('systemic_bias', {}),
+            'butterfly_effect': ai_result.get('butterfly_effect', []),
+            'polymath_angle': ai_result.get('polymath_angle', {}),
+            'quote_injection': ai_result.get('quote_injection', {}),
+            'roleplay_persona': ai_result.get('roleplay_persona', {}),
+            # Akaashic Mode Metadata
+            'systems_loops': ai_result.get('systems_loops', []),
+            'counter_factuals': ai_result.get('counter_factuals', []),
+            'civilizational_parallels': ai_result.get('civilizational_parallels', []),
+            'fermi_estimates': ai_result.get('fermi_estimates', {}),
+            'global_context': ai_result.get('global_context', [])
         }
         
         # Save or Update
@@ -224,7 +292,33 @@ def process_article():
                 **article_data,
                 'id': article_id,
                 'examQuestions': ai_result.get('exam_questions', []),
-                'relatedTopics': ai_result.get('related_topics', [])
+                'relatedTopics': ai_result.get('related_topics', []),
+                'steepleAnalysis': ai_result.get('steeple_analysis', {}),
+                'interLinkages': ai_result.get('inter_linkages', []),
+                'mindMap': ai_result.get('mind_map', ''),
+                'quiz': ai_result.get('quiz', []),
+                'answerFramework': ai_result.get('answer_framework', {}),
+                'essayFodder': ai_result.get('essay_fodder', {}),
+                'timeline': ai_result.get('timeline', []),
+                'dataVisualization': ai_result.get('data_visualization', {}),
+                'podcastScript': ai_result.get('podcast_script', ''),
+                'interviewQuestions': ai_result.get('interview_questions', []),
+                'simulationScenario': ai_result.get('simulation_scenario', {}),
+                'futureScenarios': ai_result.get('future_scenarios', {}),
+                'historicalAnalogies': ai_result.get('historical_analogies', []),
+                'locations': ai_result.get('locations', []),
+                'socraticClash': ai_result.get('socratic_clash', []),
+                'mnemonics': ai_result.get('mnemonics', []),
+                'systemicBias': ai_result.get('systemic_bias', {}),
+                'butterflyEffect': ai_result.get('butterfly_effect', []),
+                'polymathAngle': ai_result.get('polymath_angle', {}),
+                'quoteInjection': ai_result.get('quote_injection', {}),
+                'roleplayPersona': ai_result.get('roleplay_persona', {}),
+                'systemsLoops': ai_result.get('systems_loops', []),
+                'counterFactuals': ai_result.get('counter_factuals', []),
+                'civilizationalParallels': ai_result.get('civilizational_parallels', []),
+                'fermiEstimates': ai_result.get('fermi_estimates', {}),
+                'globalContext': ai_result.get('global_context', [])
             }
         })
         

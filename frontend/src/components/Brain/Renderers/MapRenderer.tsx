@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import './Renderers.css';
+import { API_BASE_URL } from '../../../config';
 
 interface Location {
     name: string;
@@ -161,10 +162,9 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
     // D3 Zoom Behavior instance
 
 
-    // Parse Locations (Robust)
+    // Parse Locations
     useEffect(() => {
         let foundLocations: Location[] = [];
-
         const extract = (data: any) => {
             if (!data) return [];
             let locs = [];
@@ -172,37 +172,33 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
             else if (Array.isArray(data)) locs = data;
             return locs.map((l: any) => ({
                 name: l.name,
-                lat: parseFloat(l.lat), // Ensure number
-                lon: parseFloat(l.lon),
+                lat: l.lat,
+                lon: l.lon,
                 reason: l.reason || l.hint || l.description || "Historical Site"
-            })).filter((l: any) => !isNaN(l.lat) && !isNaN(l.lon));
+            }));
+
         };
 
-        const tryParse = (str: string) => {
-            try { return extract(JSON.parse(str)); } catch (e) { return []; }
-        };
-
-        // 1. Try Metadata
         if (metadata) {
-            if (typeof metadata === 'string') foundLocations = tryParse(metadata);
-            else foundLocations = extract(metadata);
-        }
-
-        // 2. Try Raw Content
-        if (foundLocations.length === 0) {
-            foundLocations = tryParse(content);
-        }
-
-        // 3. Try Extracting JSON Code Block from Content (Markdown)
-        if (foundLocations.length === 0) {
-            const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/) || content.match(/\{[\s\S]*\}/) || content.match(/\[[\s\S]*\]/);
-            if (jsonMatch) {
-                foundLocations = tryParse(jsonMatch[1] || jsonMatch[0]);
+            if (typeof metadata === 'string') {
+                try { foundLocations = extract(JSON.parse(metadata)); } catch (e) { }
+            } else {
+                foundLocations = extract(metadata);
             }
         }
+        if (foundLocations.length === 0) {
+            try { foundLocations = extract(JSON.parse(content)); } catch (e) { }
 
+            if (foundLocations.length === 0) {
+                try {
+                    if (content.trim().startsWith('{') || content.trim().startsWith('[')) {
+                        foundLocations = extract(JSON.parse(content));
+                    }
+                } catch (e) { }
+            }
+        }
         setLocations(foundLocations);
-    }, [content, metadata]);
+        }, [content, metadata]);
 
     // Map Fetching
     useEffect(() => {
@@ -291,7 +287,7 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
             // Mock integration
             console.log("Submitting Score:", score);
             // Use relative URL for production compatibility
-            await fetch('/api/gamification/reward', {
+            await fetch(`${API_BASE_URL}/api/gamification/reward`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

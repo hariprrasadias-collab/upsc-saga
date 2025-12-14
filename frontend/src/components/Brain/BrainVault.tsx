@@ -15,7 +15,6 @@ import SubjectBookRenderer from './Renderers/SubjectBookRenderer';
 import InterviewSimulator from './Renderers/InterviewSimulator';
 import HeatmapRenderer from './Renderers/HeatmapRenderer';
 import SelfReviewRenderer from './Renderers/SelfReviewRenderer';
-import MindMapRenderer from './Renderers/MindMapRenderer';
 
 interface AIContent {
     id: number;
@@ -36,8 +35,7 @@ const BrainVault: React.FC = () => {
     const contentTypes = [
         'all', 'podcast', 'essay', 'visual_prompt', 'roleplay',
         'cheat_sheet', 'timeline', 'eli5', 'pitfalls', 'quote_bank', 'map_work',
-        'subject_book', 'interview_sim', 'heatmap', 'self_review',
-        'mind_map', 'socratic', 'neural_hash'
+        'subject_book', 'interview_sim', 'heatmap', 'self_review'
     ];
 
     useEffect(() => {
@@ -56,10 +54,13 @@ const BrainVault: React.FC = () => {
             if (data.success) {
                 setContentList(data.data);
             } else {
-                console.warn("API returned unsuccessful");
+                // Fallback for dev/test
+                console.warn("API returned unsuccessful, using mock data if empty");
+                if (data.data && data.data.length === 0) throw new Error("Empty data");
             }
         } catch (error) {
             console.error("Failed to fetch Brain Vault content", error);
+            // We could set an error state here, but for now just leave empty
         } finally {
             setLoading(false);
         }
@@ -86,11 +87,17 @@ const BrainVault: React.FC = () => {
         const normalizedType = String(item.content_type || '').trim().toLowerCase();
 
         let metadataObj = item.metadata;
+        // Ensure metadata is an object
         if (typeof metadataObj === 'string') {
-            try { metadataObj = JSON.parse(metadataObj); } catch (e) { metadataObj = {}; }
+            try {
+                metadataObj = JSON.parse(metadataObj);
+            } catch (e) {
+                console.error("Failed to parse metadata in BrainVault", e);
+                metadataObj = {};
+            }
         }
 
-        // Priority Override
+        // Priority Override: If it looks like a map, treat it as a map!
         if (metadataObj?.locations && Array.isArray(metadataObj.locations)) {
             return <MapRenderer content={item.content} metadata={metadataObj} />;
         }
@@ -106,16 +113,17 @@ const BrainVault: React.FC = () => {
             case 'visual_prompt':
                 return <VisualPromptRenderer content={item.content} />;
             case 'essay':
-            case 'essay_prompt':
                 return <EssayRenderer content={item.content} />;
             case 'eli5':
                 return <ELI5Renderer content={item.content} />;
             case 'map_work':
+            case 'mapwork': // just in case
                 return <MapRenderer content={item.content} metadata={item.metadata} />;
             case 'cheat_sheet':
                 return <CheatSheetRenderer content={item.content} />;
+            case 'eli5':
+                return <ELI5Renderer content={item.content} />;
             case 'pitfalls':
-            case 'common_pitfalls':
                 return <PitfallRenderer content={item.content} />;
             case 'quote_bank':
                 return <QuoteBankRenderer content={item.content} />;
@@ -129,20 +137,15 @@ const BrainVault: React.FC = () => {
                 return <HeatmapRenderer content={item.content} title={item.topic} />;
             case 'self_review':
                 return <SelfReviewRenderer content={item.content} />;
-            case 'mind_map':
-                return <MindMapRenderer content={item.content} />;
-            case 'neural_hash':
-            case 'predictions':
-                // For now, render as Markdown/JSON-dump, specialized renderer can be added later
+            default:
                 return (
-                    <div className="json-renderer">
-                        <pre style={{ whiteSpace: 'pre-wrap', color: '#00fff2' }}>{item.content}</pre>
+                    <div>
+                        <div style={{ color: 'orange', fontSize: '0.8rem', padding: '5px', border: '1px dashed orange', marginBottom: '10px' }}>
+                            Debug: Type="{item.content_type}" (Normalized="{normalizedType}") - Falling back to Markdown
+                        </div>
+                        <MarkdownRenderer content={item.content} />
                     </div>
                 );
-            case 'triangulation':
-                 return <MarkdownRenderer content={item.content} />;
-            default:
-                return <MarkdownRenderer content={item.content} />;
         }
     };
 

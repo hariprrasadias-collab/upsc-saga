@@ -4,7 +4,8 @@ from flask import g
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATABASE = os.path.join(BASE_DIR, 'upsc_saga.db')
+# Allow overriding DB path via env var (for Fly.io volume)
+DATABASE = os.environ.get('DATABASE_PATH', os.path.join(BASE_DIR, 'upsc_saga.db'))
 
 def get_db():
     db = getattr(g, '_database', None)
