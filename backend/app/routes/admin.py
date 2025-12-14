@@ -1,22 +1,41 @@
 # Admin API Routes
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, session
 from app.db import get_db
 import json
 import time as import_time
+import sqlite3
 
 admin_bp = Blueprint('admin', __name__)
 
 def is_admin(user_id):
-    # TODO: Implement real admin check
-    # For now, user_id 1 is admin
-    return user_id == 1
+    """Check if the user has admin privileges"""
+    try:
+        conn = get_db()
+        # Check if is_admin column exists (backward compatibility)
+        cursor = conn.execute("PRAGMA table_info(users)")
+        columns = [info[1] for info in cursor.fetchall()]
+
+        if 'is_admin' not in columns:
+            # Fallback for old schema: user 1 is admin
+            return user_id == 1
+
+        result = conn.execute('SELECT is_admin FROM users WHERE id = ?', (user_id,)).fetchone()
+        if result:
+            return bool(result[0])
+        return False
+    except sqlite3.OperationalError:
+        # If table or column missing (should be covered by PRAGMA check but safety first)
+        return user_id == 1
+    except Exception as e:
+        print(f"Error checking admin status: {e}")
+        return False
 
 @admin_bp.route('/api/admin/stats', methods=['GET'])
 def get_admin_stats():
     """Get overview statistics for admin dashboard"""
     try:
-        user_id = 1 # TODO: Get from session
-        if not is_admin(user_id):
+        user_id = session.get('user_id')
+        if not user_id or not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
         conn = get_db()
@@ -51,8 +70,8 @@ def get_admin_stats():
 def get_questions():
     """Get paginated questions for management"""
     try:
-        user_id = 1
-        if not is_admin(user_id):
+        user_id = session.get('user_id')
+        if not user_id or not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
         page = request.args.get('page', 1, type=int)
@@ -98,8 +117,8 @@ def get_questions():
 def add_question():
     """Add a new question"""
     try:
-        user_id = 1
-        if not is_admin(user_id):
+        user_id = session.get('user_id')
+        if not user_id or not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
         data = request.get_json()
@@ -136,8 +155,8 @@ def add_question():
 def update_question(id):
     """Update an existing question"""
     try:
-        user_id = 1
-        if not is_admin(user_id):
+        user_id = session.get('user_id')
+        if not user_id or not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
         data = request.get_json()
@@ -170,8 +189,8 @@ def update_question(id):
 def delete_question(id):
     """Delete a question"""
     try:
-        user_id = 1
-        if not is_admin(user_id):
+        user_id = session.get('user_id')
+        if not user_id or not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
         conn = get_db()
@@ -188,8 +207,8 @@ def delete_question(id):
 def get_articles():
     """Get paginated articles"""
     try:
-        user_id = 1
-        if not is_admin(user_id):
+        user_id = session.get('user_id')
+        if not user_id or not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
         page = request.args.get('page', 1, type=int)
@@ -240,8 +259,8 @@ def get_articles():
 def add_article():
     """Add a new article"""
     try:
-        user_id = 1
-        if not is_admin(user_id):
+        user_id = session.get('user_id')
+        if not user_id or not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
         data = request.get_json()
@@ -283,8 +302,8 @@ def add_article():
 def update_article(id):
     """Update an article"""
     try:
-        user_id = 1
-        if not is_admin(user_id):
+        user_id = session.get('user_id')
+        if not user_id or not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
         data = request.get_json()
@@ -329,8 +348,8 @@ def update_article(id):
 def delete_article(id):
     """Delete an article"""
     try:
-        user_id = 1
-        if not is_admin(user_id):
+        user_id = session.get('user_id')
+        if not user_id or not is_admin(user_id):
             return jsonify({'error': 'Unauthorized'}), 403
             
         conn = get_db()

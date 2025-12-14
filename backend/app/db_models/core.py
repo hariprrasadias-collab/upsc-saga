@@ -23,7 +23,10 @@ def init_core_tables():
             strength_stat INTEGER DEFAULT 1,
             runic_stat INTEGER DEFAULT 1,
             vitality_stat INTEGER DEFAULT 1,
-            luck_stat INTEGER DEFAULT 1
+            luck_stat INTEGER DEFAULT 1,
+
+            -- Admin Role
+            is_admin BOOLEAN DEFAULT 0
         )
     ''')
     
