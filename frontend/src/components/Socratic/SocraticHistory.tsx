@@ -228,7 +228,8 @@ const SocraticHistory: React.FC = () => {
                 })
             });
             alert("Flashcard Created!");
-        } catch (e) {
+        } catch (error) {
+            console.error(error);
             alert("Failed to create flashcard.");
         }
     };
@@ -241,10 +242,11 @@ const SocraticHistory: React.FC = () => {
                     <input
                         type="text"
                         placeholder="Search archives..."
+                        aria-label="Search archives"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
-                    <span className="search-icon">🔍</span>
+                    <span className="search-icon" aria-hidden="true">🔍</span>
                 </div>
             </div>
 
@@ -254,18 +256,20 @@ const SocraticHistory: React.FC = () => {
                     {loading ? (
                         <div className="loading-spinner">Loading archives...</div>
                     ) : (
-                        <ul>
+                        <ul className="history-ul">
                             {filteredHistory.map(item => (
-                                <li
-                                    key={item.id}
-                                    className={`history-item ${selectedDialogue?.id === item.id ? 'active' : ''}`}
-                                    onClick={() => {
-                                        stopPlayback();
-                                        setSelectedDialogue(item);
-                                    }}
-                                >
-                                    <div className="item-topic">{item.topic}</div>
-                                    <div className="item-date">{new Date(item.created_at).toLocaleDateString()}</div>
+                                <li key={item.id}>
+                                    <button
+                                        className={`history-item-btn ${selectedDialogue?.id === item.id ? 'active' : ''}`}
+                                        onClick={() => {
+                                            stopPlayback();
+                                            setSelectedDialogue(item);
+                                        }}
+                                        aria-current={selectedDialogue?.id === item.id ? 'true' : undefined}
+                                    >
+                                        <div className="item-topic">{item.topic}</div>
+                                        <div className="item-date">{new Date(item.created_at).toLocaleDateString()}</div>
+                                    </button>
                                 </li>
                             ))}
                         </ul>
@@ -282,6 +286,8 @@ const SocraticHistory: React.FC = () => {
                                         className={`mode-btn ${analysisMode ? 'active' : ''}`}
                                         onClick={() => setAnalysisMode(!analysisMode)}
                                         title="Toggle Logical Analysis"
+                                        aria-label="Toggle Logical Analysis"
+                                        aria-pressed={analysisMode}
                                     >
                                         🧠 Analysis
                                     </button>
@@ -290,14 +296,25 @@ const SocraticHistory: React.FC = () => {
                                             className={`play-btn ${isPlaying ? 'playing' : ''}`}
                                             onClick={togglePlay}
                                             title={isPlaying ? "Stop Debate" : "Listen to Debate"}
+                                            aria-label={isPlaying ? "Stop Debate" : "Listen to Debate"}
                                         >
                                             {isPlaying ? "⏹️ Stop" : "▶️ Listen"}
                                         </button>
                                     )}
-                                    <button className="copy-btn" onClick={handleDownload} title="Download">
+                                    <button
+                                        className="copy-btn"
+                                        onClick={handleDownload}
+                                        title="Download"
+                                        aria-label="Download Debate"
+                                    >
                                         📥
                                     </button>
-                                    <button className="copy-btn" onClick={handleCopy} title="Copy">
+                                    <button
+                                        className="copy-btn"
+                                        onClick={handleCopy}
+                                        title="Copy"
+                                        aria-label="Copy Debate to Clipboard"
+                                    >
                                         📋
                                     </button>
                                 </div>
@@ -312,6 +329,7 @@ const SocraticHistory: React.FC = () => {
                                             className="card-add-btn"
                                             onClick={() => createFlashcard(`Socratic Verdict: ${selectedDialogue.topic}`, selectedVerdict.synthesis)}
                                             title="Save Verdict as Flashcard"
+                                            aria-label="Save Verdict as Flashcard"
                                         >
                                             ⚡
                                         </button>
@@ -351,7 +369,7 @@ const SocraticHistory: React.FC = () => {
                                                 className={`script-turn ${currentTurnIndex === idx ? 'speaking' : ''}`}
                                                 style={{ borderLeftColor: AGENTS[turn.speakerId]?.color || '#fff' }}
                                             >
-                                                <div className="turn-avatar">
+                                                <div className="turn-avatar" aria-hidden="true">
                                                     {AGENTS[turn.speakerId]?.icon || '👤'}
                                                 </div>
                                                 <div className="turn-body">
@@ -369,6 +387,7 @@ const SocraticHistory: React.FC = () => {
                                                                 createFlashcard(`${AGENTS[turn.speakerId]?.name} on ${selectedDialogue.topic}`, turn.text);
                                                             }}
                                                             title="Save as Flashcard"
+                                                            aria-label="Save as Flashcard"
                                                         >
                                                             ⚡
                                                         </button>
@@ -380,8 +399,8 @@ const SocraticHistory: React.FC = () => {
 
                                                     {/* Fallacy Warning in Analysis Mode */}
                                                     {analysisMode && turn.fallacies && turn.fallacies.length > 0 && (
-                                                        <div className="fallacy-box">
-                                                            <span className="fallacy-icon">⚠️</span>
+                                                        <div className="fallacy-box" role="alert">
+                                                            <span className="fallacy-icon" aria-hidden="true">⚠️</span>
                                                             <span className="fallacy-label">Potential Fallacy detected in previous argument: </span>
                                                             {turn.fallacies.join(', ')}
                                                         </div>
@@ -409,7 +428,7 @@ const SocraticHistory: React.FC = () => {
                         </>
                     ) : (
                         <div className="placeholder-text">
-                            <div className="placeholder-icon">📜</div>
+                            <div className="placeholder-icon" aria-hidden="true">📜</div>
                             Select a dialogue to review the wisdom of the ancients.
                         </div>
                     )}
