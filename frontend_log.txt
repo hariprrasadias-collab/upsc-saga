@@ -1,0 +1,10 @@
+
+> frontend@0.0.0 dev /app/frontend
+> vite
+
+(!) the `splitVendorChunk` plugin doesn't have any effect when using the object form of `build.rollupOptions.output.manualChunks`. Consider using the function form instead.
+
+  VITE v6.4.1  ready in 221 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
