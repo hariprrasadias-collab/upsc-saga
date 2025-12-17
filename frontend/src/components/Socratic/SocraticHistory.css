@@ -83,20 +83,33 @@
 }
 
 .history-item {
-    padding: 1rem;
     margin-bottom: 0.8rem;
+}
+
+.history-item-btn {
+    width: 100%;
+    text-align: left;
+    padding: 1rem;
     background: rgba(0, 0, 0, 0.2);
+    border: none;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
     border-left: 3px solid transparent;
+    color: inherit; /* Inherit white color from container */
+    font-family: inherit; /* Inherit font */
 }
 
-.history-item:hover {
+.history-item-btn:hover {
     background: rgba(255, 255, 255, 0.1);
 }
 
-.history-item.active {
+.history-item-btn:focus-visible {
+    outline: 2px solid #00d4ff;
+    outline-offset: 2px;
+}
+
+.history-item-btn.active {
     background: rgba(0, 212, 255, 0.15);
     border-left: 3px solid #00d4ff;
 }
