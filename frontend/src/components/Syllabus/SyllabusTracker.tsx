@@ -4,34 +4,13 @@ import './SyllabusTracker.css';
 import { brainService } from '../../services/BrainService';
 import MarkdownRenderer from '../Shared/MarkdownRenderer';
 import { API_BASE_URL } from '../../config';
-
-interface Topic {
-    id: number;
-    paper: string;
-    subject: string;
-    topic: string;
-    subtopic: string | null;
-    status: string;
-    notes: string | null;
-    last_updated: string;
-    revision_count?: number;
-    next_revision_date?: string;
-    last_revised_at?: string;
-}
+import TopicItem from './TopicItem';
+import { type Topic } from './types';
 
 interface Analytics {
     totals: { paper: string; total: number }[];
     breakdown: { paper: string; status: string; count: number }[];
 }
-
-const STATUS_OPTIONS = [
-    'Not Started',
-    'Reading',
-    'Notes Done',
-    'Revision 1',
-    'Revision 2',
-    'Completed'
-];
 
 interface SyllabusTrackerProps {
     onTaskCompleted?: () => void;
@@ -77,7 +56,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         fetchData();
     }, [fetchData]);
 
-    const handleStatusChange = async (id: number, newStatus: string) => {
+    const handleStatusChange = useCallback(async (id: number, newStatus: string) => {
         // Optimistic update
         setTopics(prev => prev.map(t => t.id === id ? { ...t, status: newStatus } : t));
 
@@ -97,11 +76,12 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
             }
         } catch (err) {
             console.error("Failed to update status", err);
-            fetchData(); // Revert on error
+            // Revert on error
+            fetchData();
         }
-    };
+    }, [fetchData, onTaskCompleted]);
 
-    const handleMarkRevised = async (id: number) => {
+    const handleMarkRevised = useCallback(async (id: number) => {
         try {
             const res = await fetch(`${API_BASE_URL}/api/syllabus/${id}/revise`, {
                 method: 'POST'
@@ -118,13 +98,13 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         } catch (err) {
             console.error("Failed to mark revised", err);
         }
-    };
+    }, []);
 
-    const openNotes = (topic: Topic) => {
+    const openNotes = useCallback((topic: Topic) => {
         setCurrentTopicId(topic.id);
         setNotesText(topic.notes || '');
         setShowNotesModal(true);
-    };
+    }, []);
 
     const saveNotes = async () => {
         if (!currentTopicId) return;
@@ -166,6 +146,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
             );
             setBrainInsight(response.response_text);
         } catch (error) {
+            // Unused error variable handled implicitly
             setBrainInsight("Strategos is currently unavailable. Please try again later.");
         } finally {
             setIsBrainLoading(false);
@@ -290,47 +271,14 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                                             {expandedSubjects[subjectKey] && (
                                                 <div className="topic-list">
                                                     {subjectTopics.map(topic => (
-                                                        <div key={topic.id} className={`topic-item ${priorityIds.includes(topic.id) ? 'high-priority' : ''}`}>
-                                                            <div className="topic-content">
-                                                                <div className="topic-text">
-                                                                    {priorityIds.includes(topic.id) && <span title="High Yield Topic">🔥 </span>}
-                                                                    {topic.topic}
-                                                                </div>
-                                                                {topic.subtopic && (
-                                                                    <div className="topic-meta">Subtopic: {topic.subtopic}</div>
-                                                                )}
-                                                            </div>
-                                                            <div className="topic-actions">
-                                                                <button
-                                                                    className={`notes-btn ${topic.notes ? 'has-notes' : ''}`}
-                                                                    onClick={() => openNotes(topic)}
-                                                                    title="Add/View Notes"
-                                                                >
-                                                                    📝
-                                                                </button>
-                                                                <button
-                                                                    className="revise-btn"
-                                                                    onClick={() => handleMarkRevised(topic.id)}
-                                                                    title={`Mark as Revised (Count: ${topic.revision_count || 0})`}
-                                                                >
-                                                                    ↻
-                                                                </button>
-                                                                <select
-                                                                    className={`status-select ${topic.status.toLowerCase().replace(' ', '-')}`}
-                                                                    value={topic.status}
-                                                                    onChange={(e) => handleStatusChange(topic.id, e.target.value)}
-                                                                >
-                                                                    {STATUS_OPTIONS.map(opt => (
-                                                                        <option key={opt} value={opt}>{opt}</option>
-                                                                    ))}
-                                                                </select>
-                                                            </div>
-                                                            {topic.next_revision_date && (
-                                                                <div className={`revision-badge ${new Date(topic.next_revision_date) <= new Date() ? 'due' : ''}`}>
-                                                                    Next: {new Date(topic.next_revision_date).toLocaleDateString()}
-                                                                </div>
-                                                            )}
-                                                        </div>
+                                                        <TopicItem
+                                                            key={topic.id}
+                                                            topic={topic}
+                                                            isHighPriority={priorityIds.includes(topic.id)}
+                                                            onStatusChange={handleStatusChange}
+                                                            onMarkRevised={handleMarkRevised}
+                                                            onOpenNotes={openNotes}
+                                                        />
                                                     ))}
                                                 </div>
                                             )}
