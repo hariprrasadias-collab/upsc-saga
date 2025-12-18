@@ -165,7 +165,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                 context
             );
             setBrainInsight(response.response_text);
-        } catch (error) {
+        } catch {
             setBrainInsight("Strategos is currently unavailable. Please try again later.");
         } finally {
             setIsBrainLoading(false);
@@ -269,26 +269,36 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
             <div className="syllabus-tree">
                 {Object.entries(groupedData).sort().map(([paper, subjects]) => (
                     <div key={paper} className="paper-section">
-                        <div className="paper-header" onClick={() => togglePaper(paper)}>
+                        <button
+                            className="paper-header"
+                            onClick={() => togglePaper(paper)}
+                            aria-expanded={!!expandedPapers[paper]}
+                            aria-controls={`section-${paper}`}
+                        >
                             <h2>{paper}</h2>
                             <span>{expandedPapers[paper] ? '▼' : '▶'}</span>
-                        </div>
+                        </button>
 
                         {expandedPapers[paper] && (
-                            <div className="subject-list">
+                            <div className="subject-list" id={`section-${paper}`}>
                                 {Object.entries(subjects).sort().map(([subject, subjectTopics]) => {
                                     const subjectKey = `${paper}-${subject}`;
                                     return (
                                         <div key={subjectKey} className="subject-item">
-                                            <div className="subject-header" onClick={() => toggleSubject(subjectKey)}>
+                                            <button
+                                                className="subject-header"
+                                                onClick={() => toggleSubject(subjectKey)}
+                                                aria-expanded={!!expandedSubjects[subjectKey]}
+                                                aria-controls={`list-${subjectKey}`}
+                                            >
                                                 <span>{subject}</span>
                                                 <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>
                                                     {subjectTopics.filter(t => t.status === 'Completed').length}/{subjectTopics.length} Done
                                                 </span>
-                                            </div>
+                                            </button>
 
                                             {expandedSubjects[subjectKey] && (
-                                                <div className="topic-list">
+                                                <div className="topic-list" id={`list-${subjectKey}`}>
                                                     {subjectTopics.map(topic => (
                                                         <div key={topic.id} className={`topic-item ${priorityIds.includes(topic.id) ? 'high-priority' : ''}`}>
                                                             <div className="topic-content">
@@ -305,6 +315,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                                                                     className={`notes-btn ${topic.notes ? 'has-notes' : ''}`}
                                                                     onClick={() => openNotes(topic)}
                                                                     title="Add/View Notes"
+                                                                    aria-label="Add or view notes"
                                                                 >
                                                                     📝
                                                                 </button>
@@ -312,6 +323,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                                                                     className="revise-btn"
                                                                     onClick={() => handleMarkRevised(topic.id)}
                                                                     title={`Mark as Revised (Count: ${topic.revision_count || 0})`}
+                                                                    aria-label={`Mark as Revised (Current count: ${topic.revision_count || 0})`}
                                                                 >
                                                                     ↻
                                                                 </button>
