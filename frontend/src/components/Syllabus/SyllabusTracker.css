@@ -125,13 +125,18 @@
 
 .paper-header {
     background: rgba(30, 41, 59, 0.4);
+    color: inherit;
     padding: 1.2rem 1.5rem;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     transition: background 0.2s;
+    width: 100%;
+    text-align: left;
+    font: inherit;
 }
 
 .paper-header:hover {
@@ -164,6 +169,10 @@
     justify-content: space-between;
     align-items: center;
     background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font: inherit;
     transition: background 0.2s;
     position: relative;
 }
@@ -178,6 +187,13 @@
 
 .subject-header:hover {
     background: rgba(255, 255, 255, 0.03);
+}
+
+.paper-header:focus-visible,
+.subject-header:focus-visible {
+    outline: 2px solid var(--color-accent-blue);
+    outline-offset: -2px;
+    background: rgba(30, 41, 59, 0.8);
 }
 
 .topic-list {
