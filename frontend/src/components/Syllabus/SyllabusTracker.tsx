@@ -1,5 +1,5 @@
 // /frontend/src/components/Syllabus/SyllabusTracker.tsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import './SyllabusTracker.css';
 import { brainService } from '../../services/BrainService';
 import MarkdownRenderer from '../Shared/MarkdownRenderer';
@@ -39,8 +39,32 @@ interface SyllabusTrackerProps {
 
 const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) => {
     const [topics, setTopics] = useState<Topic[]>([]);
-    const [analytics, setAnalytics] = useState<Analytics | null>(null);
     const [loading, setLoading] = useState(true);
+
+    // Derived Analytics (Client-side computation)
+    const analytics = useMemo<Analytics>(() => {
+        const totalsMap: Record<string, number> = {};
+        const breakdownMap: Record<string, Record<string, number>> = {};
+
+        topics.forEach(t => {
+            const p = t.paper || 'Unknown';
+            totalsMap[p] = (totalsMap[p] || 0) + 1;
+
+            if (!breakdownMap[p]) breakdownMap[p] = {};
+            breakdownMap[p][t.status] = (breakdownMap[p][t.status] || 0) + 1;
+        });
+
+        const totals = Object.entries(totalsMap).map(([paper, total]) => ({ paper, total }));
+        const breakdown: { paper: string; status: string; count: number }[] = [];
+
+        Object.entries(breakdownMap).forEach(([paper, statuses]) => {
+            Object.entries(statuses).forEach(([status, count]) => {
+                breakdown.push({ paper, status, count });
+            });
+        });
+
+        return { totals, breakdown };
+    }, [topics]);
 
     // UI State
     const [expandedPapers, setExpandedPapers] = useState<Record<string, boolean>>({ 'GS1': true });
@@ -62,10 +86,6 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
             const res = await fetch(`${API_BASE_URL}/api/syllabus/`);
             const data = await res.json();
             setTopics(data);
-
-            const analyticsRes = await fetch(`${API_BASE_URL}/api/syllabus/analytics`);
-            const analyticsData = await analyticsRes.json();
-            setAnalytics(analyticsData);
         } catch (err) {
             console.error("Failed to load syllabus", err);
         } finally {
@@ -87,10 +107,6 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })
             });
-            // Refresh analytics in background
-            const analyticsRes = await fetch(`${API_BASE_URL}/api/syllabus/analytics`);
-            const analyticsData = await analyticsRes.json();
-            setAnalytics(analyticsData);
 
             if (newStatus === 'Completed' && onTaskCompleted) {
                 onTaskCompleted();
