@@ -38,14 +38,23 @@ const Toast: React.FC<ToastProps> = ({
         }
     };
 
+    const role = (type === 'error' || type === 'warning') ? 'alert' : 'status';
+
     return (
-        <div className={`toast toast-${type} ${isExiting ? 'toast-exit' : 'toast-enter'}`}>
-            <div className="toast-icon">{getIcon()}</div>
+        <div
+            className={`toast toast-${type} ${isExiting ? 'toast-exit' : 'toast-enter'}`}
+            role={role}
+        >
+            <div className="toast-icon" aria-hidden="true">{getIcon()}</div>
             <div className="toast-message">{message}</div>
-            <button className="toast-close" onClick={() => {
-                setIsExiting(true);
-                setTimeout(onClose, 300);
-            }}>
+            <button
+                className="toast-close"
+                onClick={() => {
+                    setIsExiting(true);
+                    setTimeout(onClose, 300);
+                }}
+                aria-label="Close notification"
+            >
                 ×
             </button>
         </div>
