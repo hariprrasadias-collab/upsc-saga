@@ -129,7 +129,15 @@ const FlashcardReview: React.FC<FlashcardReviewProps> = ({ deckId, onFinish }) =
                         <div className="progress-text">
                             Card {currentIndex + 1} / {cards.length}
                         </div>
-                        <div className="progress-bar-container">
+                        <div
+                            className="progress-bar-container"
+                            role="progressbar"
+                            aria-valuenow={currentIndex + 1}
+                            aria-valuemin={1}
+                            aria-valuemax={cards.length}
+                            aria-valuetext={`Card ${currentIndex + 1} of ${cards.length}`}
+                            aria-label="Session Progress"
+                        >
                             <div
                                 className="progress-bar-fill"
                                 style={{ width: `${((currentIndex + 1) / cards.length) * 100}%` }}
@@ -152,13 +160,26 @@ const FlashcardReview: React.FC<FlashcardReviewProps> = ({ deckId, onFinish }) =
     }
 
     return (
-        <div className="flashcard-review" tabIndex={0} onKeyDown={handleKeyPress}>
+        <div
+            className="flashcard-review"
+            tabIndex={0}
+            onKeyDown={handleKeyPress}
+            aria-label="Flashcard Review Interface"
+        >
             {/* Progress */}
             <div className="review-progress">
                 <div className="progress-text">
                     Card {currentIndex + 1} / {cards.length}
                 </div>
-                <div className="progress-bar-container">
+                <div
+                    className="progress-bar-container"
+                    role="progressbar"
+                    aria-valuenow={currentIndex + 1}
+                    aria-valuemin={1}
+                    aria-valuemax={cards.length}
+                    aria-valuetext={`Card ${currentIndex + 1} of ${cards.length}`}
+                    aria-label="Session Progress"
+                >
                     <div
                         className="progress-bar-fill"
                         style={{ width: `${((currentIndex + 1) / cards.length) * 100}%` }}
@@ -182,19 +203,43 @@ const FlashcardReview: React.FC<FlashcardReviewProps> = ({ deckId, onFinish }) =
             {/* Ratings (only show when flipped) */}
             {isFlipped && (
                 <div className="rating-buttons">
-                    <button onClick={() => handleRating(1)} className="rating-btn again">
+                    <button
+                        onClick={() => handleRating(1)}
+                        className="rating-btn again"
+                        aria-keyshortcuts="1"
+                        title="Shortcut: 1"
+                        aria-label="Rate as Again (Shortcut: 1)"
+                    >
                         <span className="key">1</span>
                         <span className="label">Again</span>
                     </button>
-                    <button onClick={() => handleRating(2)} className="rating-btn hard">
+                    <button
+                        onClick={() => handleRating(2)}
+                        className="rating-btn hard"
+                        aria-keyshortcuts="2"
+                        title="Shortcut: 2"
+                        aria-label="Rate as Hard (Shortcut: 2)"
+                    >
                         <span className="key">2</span>
                         <span className="label">Hard</span>
                     </button>
-                    <button onClick={() => handleRating(3)} className="rating-btn good">
+                    <button
+                        onClick={() => handleRating(3)}
+                        className="rating-btn good"
+                        aria-keyshortcuts="3"
+                        title="Shortcut: 3"
+                        aria-label="Rate as Good (Shortcut: 3)"
+                    >
                         <span className="key">3</span>
                         <span className="label">Good</span>
                     </button>
-                    <button onClick={() => handleRating(4)} className="rating-btn easy">
+                    <button
+                        onClick={() => handleRating(4)}
+                        className="rating-btn easy"
+                        aria-keyshortcuts="4"
+                        title="Shortcut: 4"
+                        aria-label="Rate as Easy (Shortcut: 4)"
+                    >
                         <span className="key">4</span>
                         <span className="label">Easy</span>
                     </button>
@@ -204,7 +249,13 @@ const FlashcardReview: React.FC<FlashcardReviewProps> = ({ deckId, onFinish }) =
             {/* Session Stats */}
             <div className="session-stats">
                 <span>Reviewed: {cardsReviewed}</span>
-                <button onClick={finishSession} className="end-session-btn">End Session</button>
+                <button
+                    onClick={finishSession}
+                    className="end-session-btn"
+                    aria-label="End current review session"
+                >
+                    End Session
+                </button>
             </div>
         </div>
     );
