@@ -8,6 +8,9 @@ import os
 import json
 import re
 import time
+import socket
+import ipaddress
+from urllib.parse import urlparse
 from dotenv import load_dotenv
 from app.services.model_manager import model_manager
 
@@ -27,6 +30,40 @@ SUBJECTS = [
     'Geography', 'Ethics', 'Current Affairs'
 ]
 
+def is_safe_url(url):
+    """
+    Validates URL to prevent SSRF attacks.
+    Blocks private IPs, loopback, and non-http schemes.
+    """
+    try:
+        parsed = urlparse(url)
+        if parsed.scheme not in ('http', 'https'):
+            return False
+
+        hostname = parsed.hostname
+        if not hostname:
+            return False
+
+        # Resolve hostname to IP to check for local addresses
+        try:
+            ip_str = socket.gethostbyname(hostname)
+        except socket.gaierror:
+            return False # DNS failure
+
+        ip = ipaddress.ip_address(ip_str)
+
+        # Block internal network access
+        if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
+            return False
+
+        # Explicitly block 0.0.0.0
+        if str(ip) == '0.0.0.0':
+            return False
+
+        return True
+    except Exception:
+        return False
+
 def retry_with_backoff(func, *args, **kwargs):
     """Retry a function with exponential backoff for rate limits."""
     max_retries = 3
@@ -35,15 +72,16 @@ def retry_with_backoff(func, *args, **kwargs):
     for attempt in range(max_retries):
         try:
             return func(*args, **kwargs)
-        except google_exceptions.ResourceExhausted:
-            if attempt == max_retries - 1:
-                raise  # Re-raise if last attempt fails
-            
-            delay = base_delay * (2 ** attempt)
-            print(f"⚠️ Quota exceeded. Retrying in {delay} seconds...")
-            time.sleep(delay)
         except Exception as e:
-            raise e  # Re-raise other exceptions immediately
+            # We can't import google_exceptions easily here due to module structure
+            if "ResourceExhausted" in str(e):
+                if attempt == max_retries - 1:
+                    raise
+                delay = base_delay * (2 ** attempt)
+                print(f"⚠️ Quota exceeded. Retrying in {delay} seconds...")
+                time.sleep(delay)
+            else:
+                raise e
 
 def get_gemini_text(response):
     """Safely extract text from Gemini response, handling safety blocks."""
@@ -262,6 +300,12 @@ def extract_image_from_article(link):
     try:
         import requests
         from bs4 import BeautifulSoup
+
+        # Validate URL
+        if not is_safe_url(link):
+            print(f"🛑 Security Block: Unsafe URL prevented in image extraction: {link}")
+            return None
+
         response = requests.get(link, timeout=10)
         soup = BeautifulSoup(response.content, 'html.parser')
         og_image = soup.find('meta', property='og:image')
@@ -284,6 +328,11 @@ def fetch_article_content(url):
         import requests
         from bs4 import BeautifulSoup
         
+        # SSRF Protection
+        if not is_safe_url(url):
+            print(f"🛑 Security Block: Unsafe URL attempted: {url}")
+            return "Error: Access to this URL is blocked for security reasons."
+
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
@@ -438,11 +487,9 @@ SUMMARY:"""
 
     try:
         if not GEMINI_API_KEY:
-            print("ERROR: GEMINI_API_KEY not configured in environment")
-            return f"⚠️ AI service not configured. Please add GEMINI_API_KEY to backend/.env file."
+            # model_manager handles API keys now, but keeping check for logging
+            pass
         
-        # model = genai.GenerativeModel('gemini-2.0-flash-001')  # Using stable latest version
-        # response = model.generate_content(prompt)
         response = model_manager.generate_content(prompt, model_type='fast')
         one_liner = get_gemini_text(response)
         if not one_liner:
@@ -452,16 +499,16 @@ SUMMARY:"""
         return one_liner
     except Exception as e:
         print(f"ERROR generating one-liner for '{title}': {type(e).__name__}: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        # import traceback
+        # traceback.print_exc()
         return f"⚠️ AI generation failed: {str(e)[:100]}"
 
 def generate_mnemonic(text: str, mnemonic_type: str = "facts") -> str:
     """Generate memory aids (mnemonics) for facts, dates, lists, concepts."""
     
     # Check if Gemini API key is configured
-    if not GEMINI_API_KEY:
-        return "⚠️ Gemini API Key not configured. Please add GEMINI_API_KEY to your environment variables to use AI-powered mnemonic generation."
+    # if not GEMINI_API_KEY:
+    #     return "⚠️ Gemini API Key not configured."
     
     type_instructions = {
         "facts": "Create a memorable acronym or phrase to remember key facts",
@@ -486,8 +533,6 @@ Requirements:
 MNEMONIC:"""
 
     try:
-        model = None # genai.GenerativeModel('gemini-2.0-flash-001')
-        # response = model.generate_content(prompt)
         response = model_manager.generate_content(prompt, model_type='fast')
         mnemonic = get_gemini_text(response)
         if not mnemonic:
@@ -496,7 +541,4 @@ MNEMONIC:"""
         return mnemonic
     except Exception as e:
         print(f"Error generating mnemonic: {e}")
-        return f"⚠️ Error generating mnemonic: {str(e)}. Please check your Gemini API configuration."
-
-
-
+        return f"⚠️ Error generating mnemonic: {str(e)}. Please check your AI configuration."
