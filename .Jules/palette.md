@@ -5,3 +5,7 @@
 ## 2024-05-22 - Command Palette Accessibility
 **Learning:** Overlays like Command Palettes often lack semantic structure, leaving screen reader users lost in a sea of divs. Adding `role="combobox"` and `aria-activedescendant` instantly transforms a confusing list into a navigable interface.
 **Action:** Always wrap search-driven interfaces in `role="combobox"`/`listbox` pattern and ensure `aria-activedescendant` is updated with keyboard navigation.
+
+## 2024-05-23 - Custom Modal Accessibility
+**Learning:** Custom full-screen overlays often miss the semantic structure of dialogs. Screen readers perceive them as part of the normal document flow unless `role="dialog"` and `aria-modal="true"` are used, and focus is often not trapped.
+**Action:** Enhance custom modals with `role="dialog"`, trap focus or focus initial container on mount, and always implement Escape key listeners for standard dismissal.
