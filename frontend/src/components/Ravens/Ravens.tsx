@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Ravens.css';
 import { audioManager } from '../../util/AudioManager';
-import { useToast } from '../Toast';
+import { useToast } from '../../hooks/useToast';
 import IssueMappingViewer from '../IssueMapping/IssueMappingViewer';
 // import { AnkiConnect } from '../../util/AnkiConnect';
 import TriangulationDashboard from './TriangulationDashboard';

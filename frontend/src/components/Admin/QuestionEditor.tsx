@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './ArticleEditor.css'; // Reuse styles
-import { useToast } from '../Toast';
+import { useToast } from '../../hooks/useToast';
 
 interface QuestionEditorProps {
     onClose: () => void;

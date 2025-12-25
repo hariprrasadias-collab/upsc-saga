@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './ArticleEditor.css';
-import { useToast } from '../Toast';
+import { useToast } from '../../hooks/useToast';
 
 interface ArticleEditorProps {
     onClose: () => void;
