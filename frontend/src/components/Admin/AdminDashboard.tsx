@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './AdminDashboard.css';
-import { useToast } from '../Toast';
+import { useToast } from '../../hooks/useToast';
 import ArticleEditor from './ArticleEditor';
 import QuestionEditor from './QuestionEditor';
 

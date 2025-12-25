@@ -38,55 +38,31 @@ const Toast: React.FC<ToastProps> = ({
         }
     };
 
+    const getRole = () => {
+        if (type === 'error' || type === 'warning') return 'alert';
+        return 'status';
+    };
+
     return (
-        <div className={`toast toast-${type} ${isExiting ? 'toast-exit' : 'toast-enter'}`}>
-            <div className="toast-icon">{getIcon()}</div>
+        <div
+            className={`toast toast-${type} ${isExiting ? 'toast-exit' : 'toast-enter'}`}
+            role={getRole()}
+            aria-live={type === 'error' ? 'assertive' : 'polite'}
+        >
+            <div className="toast-icon" aria-hidden="true">{getIcon()}</div>
             <div className="toast-message">{message}</div>
-            <button className="toast-close" onClick={() => {
-                setIsExiting(true);
-                setTimeout(onClose, 300);
-            }}>
+            <button
+                className="toast-close"
+                onClick={() => {
+                    setIsExiting(true);
+                    setTimeout(onClose, 300);
+                }}
+                aria-label="Close notification"
+            >
                 ×
             </button>
         </div>
     );
-};
-
-// Toast Container Component
-interface ToastContainerProps {
-    toasts: Array<{ id: string; message: string; type: ToastType }>;
-    removeToast: (id: string) => void;
-}
-
-export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, removeToast }) => {
-    return (
-        <div className="toast-container">
-            {toasts.map(toast => (
-                <Toast
-                    key={toast.id}
-                    message={toast.message}
-                    type={toast.type}
-                    onClose={() => removeToast(toast.id)}
-                />
-            ))}
-        </div>
-    );
-};
-
-// Toast Hook
-export const useToast = () => {
-    const [toasts, setToasts] = useState<Array<{ id: string; message: string; type: ToastType }>>([]);
-
-    const addToast = (message: string, type: ToastType = 'info') => {
-        const id = Math.random().toString(36).substr(2, 9);
-        setToasts(prev => [...prev, { id, message, type }]);
-    };
-
-    const removeToast = (id: string) => {
-        setToasts(prev => prev.filter(toast => toast.id !== id));
-    };
-
-    return { toasts, addToast, removeToast };
 };
 
 export default Toast;
