@@ -3,17 +3,22 @@ from flask import Flask
 from flask_cors import CORS
 from flask_compress import Compress
 from flask_caching import Cache
+from dotenv import load_dotenv
 import logging
 from logging.handlers import RotatingFileHandler
 import os
 import threading
 import time
 
+# Load environment variables explicitly
+load_dotenv()
+
 cache = Cache()
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
+    # Secure: Load SECRET_KEY from environment, fallback only for dev
+    app.secret_key = os.getenv('SECRET_KEY', 'dev_secret_key_upsc_saga')
     CORS(app, resources={r"/*": {"origins": "*"}})
     Compress(app) # Enable Gzip compression
 
