@@ -1,11 +1,16 @@
 from flask import Blueprint, request, jsonify
 from flask_cors import CORS
 from app.db import get_db
+from app import cache
 import json
 from datetime import datetime
+import re
 
 bp = Blueprint('pyq', __name__, url_prefix='/api/pyq')
 CORS(bp)
+
+# Compile regex once for performance
+CLEAN_TEXT_REGEX = re.compile(r'[^a-zA-Z0-9 ]')
 
 @bp.route('/questions', methods=['GET'])
 def get_questions():
@@ -79,6 +84,7 @@ def get_questions():
         return jsonify({'error': str(e)}), 500
 
 @bp.route('/filters', methods=['GET'])
+@cache.cached(timeout=300) # Cache filters for 5 minutes
 def get_filters():
     """Get available filter options"""
     try:
@@ -97,6 +103,7 @@ def get_filters():
         return jsonify({'error': str(e)}), 500
 
 @bp.route('/topics', methods=['GET'])
+@cache.cached(timeout=300, query_string=True) # Cache topics for 5 minutes (based on subjects)
 def get_topics():
     """Get topics filtered by selected subject(s)"""
     try:
@@ -148,6 +155,7 @@ def toggle_favorite(id):
         return jsonify({'error': str(e)}), 500
 
 @bp.route('/analytics', methods=['GET'])
+@cache.cached(timeout=60, query_string=True) # Cache analytics for 1 minute
 def get_analytics():
     """Get analytics with optional filters"""
     try:
@@ -668,9 +676,10 @@ def get_similar_questions(question_id):
             return jsonify({'error': 'Question not found'}), 404
 
         text = question['question_text']
-        # Clean text for FTS query (remove special chars, etc.)
-        import re
-        clean_text = re.sub(r'[^a-zA-Z0-9 ]', '', text)
+
+        # Use compiled regex
+        clean_text = CLEAN_TEXT_REGEX.sub('', text)
+
         # Use first few important words or the whole thing?
         # FTS MATCH query needs to be carefully constructed.
         # Simple approach: "word1 OR word2 OR ..."
