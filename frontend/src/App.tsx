@@ -82,7 +82,20 @@ function App() {
   };
 
   if (isLoading && !userStats) return <div className="loading-screen">Loading the Realms...</div>;
-  if (error) return <div className="error-screen">Error: {error}</div>;
+  if (error) return (
+    <div className="error-screen" role="alert" aria-live="assertive" style={{ flexDirection: 'column', gap: '1rem', padding: '2rem', textAlign: 'center' }}>
+      <h1 className="neon-text-orange" style={{ margin: 0, fontSize: '2rem' }}>Realm Connection Failed</h1>
+      <p style={{ margin: 0 }}>Error: {error}</p>
+      <button
+        onClick={() => window.location.reload()}
+        className="btn-primary"
+        style={{ marginTop: '1rem', textTransform: 'uppercase', letterSpacing: '1px' }}
+        aria-label="Retry connection"
+      >
+        Retry Connection
+      </button>
+    </div>
+  );
 
   return (
     <AnalyticsProvider>
