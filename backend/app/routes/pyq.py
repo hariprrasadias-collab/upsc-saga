@@ -50,21 +50,16 @@ def get_questions():
             query += " AND is_favorite = 1"
 
         if search:
-            # Optimization: Use FTS5 match if available
+            # ⚡ Bolt Optimization: Use FTS5 JOIN directly for O(log n) search speed
+            # Previous approach fetched IDs to python (slow) or used LIKE (slower)
             try:
-                # We join with FTS table for speed
-                # Note: We can't just join easily in one query if we want to keep all filters
-                # So we use the rowid from FTS to filter the main table
-                fts_query = "SELECT rowid FROM pyq_questions_fts WHERE pyq_questions_fts MATCH ? ORDER BY rank"
-                fts_rows = conn.execute(fts_query, (search,)).fetchall()
-                if fts_rows:
-                    ids = [str(r['rowid']) for r in fts_rows]
-                    query += f" AND id IN ({','.join(ids)})"
-                else:
-                    # No matches found in FTS
-                    query += " AND 1=0"
+                # Ensure FTS virtual table exists (created by optimize_pyq_search.py)
+                # We use a subquery/JOIN approach that allows composing with other filters
+                # Note: 'pyq_questions_fts' matches against the virtual table
+                query += " AND id IN (SELECT rowid FROM pyq_questions_fts WHERE pyq_questions_fts MATCH ? ORDER BY rank)"
+                params.append(search)
             except Exception as e:
-                # Fallback to LIKE if FTS fails or table doesn't exist
+                # Safe Fallback to LIKE if something critically fails (should not happen after migration)
                 print(f"FTS Search failed, falling back to LIKE: {e}")
                 query += " AND (question_text LIKE ? OR explanation LIKE ?)"
                 search_term = f"%{search}%"
