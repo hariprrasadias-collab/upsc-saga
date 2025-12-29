@@ -1,5 +1,5 @@
 // /frontend/src/components/Syllabus/SyllabusTracker.tsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import './SyllabusTracker.css';
 import { brainService } from '../../services/BrainService';
 import MarkdownRenderer from '../Shared/MarkdownRenderer';
@@ -19,11 +19,6 @@ interface Topic {
     last_revised_at?: string;
 }
 
-interface Analytics {
-    totals: { paper: string; total: number }[];
-    breakdown: { paper: string; status: string; count: number }[];
-}
-
 const STATUS_OPTIONS = [
     'Not Started',
     'Reading',
@@ -39,7 +34,6 @@ interface SyllabusTrackerProps {
 
 const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) => {
     const [topics, setTopics] = useState<Topic[]>([]);
-    const [analytics, setAnalytics] = useState<Analytics | null>(null);
     const [loading, setLoading] = useState(true);
 
     // UI State
@@ -62,10 +56,6 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
             const res = await fetch(`${API_BASE_URL}/api/syllabus/`);
             const data = await res.json();
             setTopics(data);
-
-            const analyticsRes = await fetch(`${API_BASE_URL}/api/syllabus/analytics`);
-            const analyticsData = await analyticsRes.json();
-            setAnalytics(analyticsData);
         } catch (err) {
             console.error("Failed to load syllabus", err);
         } finally {
@@ -87,10 +77,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })
             });
-            // Refresh analytics in background
-            const analyticsRes = await fetch(`${API_BASE_URL}/api/syllabus/analytics`);
-            const analyticsData = await analyticsRes.json();
-            setAnalytics(analyticsData);
+            // Analytics is now derived, no need to refresh
 
             if (newStatus === 'Completed' && onTaskCompleted) {
                 onTaskCompleted();
@@ -144,6 +131,34 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         }
     };
 
+    // Derived Analytics (Client-Side)
+    const analytics = useMemo(() => {
+        if (topics.length === 0) return null;
+
+        const totalsMap: Record<string, number> = {};
+        const breakdownMap: Record<string, Record<string, number>> = {};
+
+        topics.forEach(t => {
+            // Totals
+            totalsMap[t.paper] = (totalsMap[t.paper] || 0) + 1;
+
+            // Breakdown
+            if (!breakdownMap[t.paper]) breakdownMap[t.paper] = {};
+            breakdownMap[t.paper][t.status] = (breakdownMap[t.paper][t.status] || 0) + 1;
+        });
+
+        const totals = Object.entries(totalsMap).map(([paper, total]) => ({ paper, total }));
+        const breakdown: { paper: string; status: string; count: number }[] = [];
+
+        Object.entries(breakdownMap).forEach(([paper, statuses]) => {
+            Object.entries(statuses).forEach(([status, count]) => {
+                breakdown.push({ paper, status, count });
+            });
+        });
+
+        return { totals, breakdown };
+    }, [topics]);
+
     const handleBrainAudit = async () => {
         if (!analytics) return;
         setIsBrainLoading(true);
@@ -166,6 +181,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
             );
             setBrainInsight(response.response_text);
         } catch (error) {
+            console.error("Failed to get brain insight", error);
             setBrainInsight("Strategos is currently unavailable. Please try again later.");
         } finally {
             setIsBrainLoading(false);
