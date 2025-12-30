@@ -428,8 +428,13 @@ def start_quiz():
         query += " ORDER BY RANDOM()"
         
         # Limit number of questions if specified
-        limit = filters.get('limit', 25)  # Default 25 questions
-        query += f" LIMIT {limit}"
+        try:
+            limit = int(filters.get('limit', 25))
+        except (ValueError, TypeError):
+            limit = 25
+
+        query += " LIMIT ?"
+        params.append(limit)
         
         questions = conn.execute(query, params).fetchall()
         
