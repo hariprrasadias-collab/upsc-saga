@@ -12,7 +12,8 @@ interface Topic {
     topic: string;
     subtopic: string | null;
     status: string;
-    notes: string | null;
+    has_notes: number | boolean; // Optimized: notes are fetched on demand
+    notes?: string | null; // Optional now, only present if fetched
     last_updated: string;
     revision_count?: number;
     next_revision_date?: string;
@@ -50,6 +51,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
     const [showNotesModal, setShowNotesModal] = useState(false);
     const [currentTopicId, setCurrentTopicId] = useState<number | null>(null);
     const [notesText, setNotesText] = useState('');
+    const [loadingNotes, setLoadingNotes] = useState(false);
 
     // Brain Audit State
     const [brainInsight, setBrainInsight] = useState<string | null>(null);
@@ -120,17 +122,37 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         }
     };
 
-    const openNotes = (topic: Topic) => {
+    const openNotes = async (topic: Topic) => {
         setCurrentTopicId(topic.id);
-        setNotesText(topic.notes || '');
+        setNotesText('');
         setShowNotesModal(true);
+        setLoadingNotes(true);
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/syllabus/${topic.id}/notes`);
+            if (res.ok) {
+                const data = await res.json();
+                setNotesText(data.notes || '');
+            } else {
+                setNotesText('');
+            }
+        } catch (err) {
+            console.error("Failed to load notes", err);
+            setNotesText('Error loading notes.');
+        } finally {
+            setLoadingNotes(false);
+        }
     };
 
     const saveNotes = async () => {
         if (!currentTopicId) return;
 
-        // Optimistic update
-        setTopics(prev => prev.map(t => t.id === currentTopicId ? { ...t, notes: notesText } : t));
+        // Optimistic update: Update has_notes
+        setTopics(prev => prev.map(t => t.id === currentTopicId ? {
+            ...t,
+            has_notes: notesText.length > 0
+        } : t));
+
         setShowNotesModal(false);
 
         try {
@@ -302,7 +324,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                                                             </div>
                                                             <div className="topic-actions">
                                                                 <button
-                                                                    className={`notes-btn ${topic.notes ? 'has-notes' : ''}`}
+                                                                    className={`notes-btn ${topic.has_notes ? 'has-notes' : ''}`}
                                                                     onClick={() => openNotes(topic)}
                                                                     title="Add/View Notes"
                                                                 >
@@ -348,15 +370,19 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                 <div className="notes-modal-overlay">
                     <div className="notes-modal">
                         <h3>Topic Notes</h3>
-                        <textarea
-                            className="notes-textarea"
-                            value={notesText}
-                            onChange={(e) => setNotesText(e.target.value)}
-                            placeholder="Add your notes, strategy, or resource links here..."
-                        />
+                        {loadingNotes ? (
+                            <div className="loading-spinner">Loading notes...</div>
+                        ) : (
+                            <textarea
+                                className="notes-textarea"
+                                value={notesText}
+                                onChange={(e) => setNotesText(e.target.value)}
+                                placeholder="Add your notes, strategy, or resource links here..."
+                            />
+                        )}
                         <div className="modal-actions">
                             <button className="cancel-btn" onClick={() => setShowNotesModal(false)}>Cancel</button>
-                            <button className="save-btn" onClick={saveNotes}>Save Notes</button>
+                            <button className="save-btn" onClick={saveNotes} disabled={loadingNotes}>Save Notes</button>
                         </div>
                     </div>
                 </div>
