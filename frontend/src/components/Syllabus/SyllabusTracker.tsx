@@ -1,37 +1,16 @@
 // /frontend/src/components/Syllabus/SyllabusTracker.tsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import './SyllabusTracker.css';
 import { brainService } from '../../services/BrainService';
 import MarkdownRenderer from '../Shared/MarkdownRenderer';
 import { API_BASE_URL } from '../../config';
-
-interface Topic {
-    id: number;
-    paper: string;
-    subject: string;
-    topic: string;
-    subtopic: string | null;
-    status: string;
-    notes: string | null;
-    last_updated: string;
-    revision_count?: number;
-    next_revision_date?: string;
-    last_revised_at?: string;
-}
+import TopicItem from './TopicItem';
+import type { Topic } from './types';
 
 interface Analytics {
     totals: { paper: string; total: number }[];
     breakdown: { paper: string; status: string; count: number }[];
 }
-
-const STATUS_OPTIONS = [
-    'Not Started',
-    'Reading',
-    'Notes Done',
-    'Revision 1',
-    'Revision 2',
-    'Completed'
-];
 
 interface SyllabusTrackerProps {
     onTaskCompleted?: () => void;
@@ -39,7 +18,7 @@ interface SyllabusTrackerProps {
 
 const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) => {
     const [topics, setTopics] = useState<Topic[]>([]);
-    const [analytics, setAnalytics] = useState<Analytics | null>(null);
+    // Analytics is now derived from topics
     const [loading, setLoading] = useState(true);
 
     // UI State
@@ -57,15 +36,12 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
     const [priorityIds, setPriorityIds] = useState<number[]>([]);
     const [isPrioritizing, setIsPrioritizing] = useState(false);
 
+    // Fetch only syllabus data, no separate analytics call
     const fetchData = useCallback(async () => {
         try {
             const res = await fetch(`${API_BASE_URL}/api/syllabus/`);
             const data = await res.json();
             setTopics(data);
-
-            const analyticsRes = await fetch(`${API_BASE_URL}/api/syllabus/analytics`);
-            const analyticsData = await analyticsRes.json();
-            setAnalytics(analyticsData);
         } catch (err) {
             console.error("Failed to load syllabus", err);
         } finally {
@@ -77,7 +53,35 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         fetchData();
     }, [fetchData]);
 
-    const handleStatusChange = async (id: number, newStatus: string) => {
+    // Derive analytics client-side
+    const analytics: Analytics | null = useMemo(() => {
+        if (!topics.length) return null;
+
+        const totalsMap: Record<string, number> = {};
+        const breakdownMap: Record<string, Record<string, number>> = {};
+
+        topics.forEach(t => {
+            // Totals
+            totalsMap[t.paper] = (totalsMap[t.paper] || 0) + 1;
+
+            // Breakdown
+            if (!breakdownMap[t.paper]) breakdownMap[t.paper] = {};
+            breakdownMap[t.paper][t.status] = (breakdownMap[t.paper][t.status] || 0) + 1;
+        });
+
+        const totals = Object.entries(totalsMap).map(([paper, total]) => ({ paper, total }));
+        const breakdown: { paper: string; status: string; count: number }[] = [];
+
+        Object.entries(breakdownMap).forEach(([paper, statuses]) => {
+            Object.entries(statuses).forEach(([status, count]) => {
+                breakdown.push({ paper, status, count });
+            });
+        });
+
+        return { totals, breakdown };
+    }, [topics]);
+
+    const handleStatusChange = useCallback(async (id: number, newStatus: string) => {
         // Optimistic update
         setTopics(prev => prev.map(t => t.id === id ? { ...t, status: newStatus } : t));
 
@@ -87,10 +91,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })
             });
-            // Refresh analytics in background
-            const analyticsRes = await fetch(`${API_BASE_URL}/api/syllabus/analytics`);
-            const analyticsData = await analyticsRes.json();
-            setAnalytics(analyticsData);
+            // No need to fetch analytics, it's derived from topics
 
             if (newStatus === 'Completed' && onTaskCompleted) {
                 onTaskCompleted();
@@ -99,9 +100,9 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
             console.error("Failed to update status", err);
             fetchData(); // Revert on error
         }
-    };
+    }, [fetchData, onTaskCompleted]);
 
-    const handleMarkRevised = async (id: number) => {
+    const handleMarkRevised = useCallback(async (id: number) => {
         try {
             const res = await fetch(`${API_BASE_URL}/api/syllabus/${id}/revise`, {
                 method: 'POST'
@@ -118,13 +119,13 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         } catch (err) {
             console.error("Failed to mark revised", err);
         }
-    };
+    }, []);
 
-    const openNotes = (topic: Topic) => {
+    const openNotes = useCallback((topic: Topic) => {
         setCurrentTopicId(topic.id);
         setNotesText(topic.notes || '');
         setShowNotesModal(true);
-    };
+    }, []);
 
     const saveNotes = async () => {
         if (!currentTopicId) return;
@@ -166,6 +167,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
             );
             setBrainInsight(response.response_text);
         } catch (error) {
+            console.error(error); // Log error instead of unused var
             setBrainInsight("Strategos is currently unavailable. Please try again later.");
         } finally {
             setIsBrainLoading(false);
@@ -191,7 +193,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
     };
 
     // Group Data
-    const groupedData = React.useMemo(() => {
+    const groupedData = useMemo(() => {
         const groups: Record<string, Record<string, Topic[]>> = {};
 
         topics.forEach(t => {
@@ -290,47 +292,14 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                                             {expandedSubjects[subjectKey] && (
                                                 <div className="topic-list">
                                                     {subjectTopics.map(topic => (
-                                                        <div key={topic.id} className={`topic-item ${priorityIds.includes(topic.id) ? 'high-priority' : ''}`}>
-                                                            <div className="topic-content">
-                                                                <div className="topic-text">
-                                                                    {priorityIds.includes(topic.id) && <span title="High Yield Topic">🔥 </span>}
-                                                                    {topic.topic}
-                                                                </div>
-                                                                {topic.subtopic && (
-                                                                    <div className="topic-meta">Subtopic: {topic.subtopic}</div>
-                                                                )}
-                                                            </div>
-                                                            <div className="topic-actions">
-                                                                <button
-                                                                    className={`notes-btn ${topic.notes ? 'has-notes' : ''}`}
-                                                                    onClick={() => openNotes(topic)}
-                                                                    title="Add/View Notes"
-                                                                >
-                                                                    📝
-                                                                </button>
-                                                                <button
-                                                                    className="revise-btn"
-                                                                    onClick={() => handleMarkRevised(topic.id)}
-                                                                    title={`Mark as Revised (Count: ${topic.revision_count || 0})`}
-                                                                >
-                                                                    ↻
-                                                                </button>
-                                                                <select
-                                                                    className={`status-select ${topic.status.toLowerCase().replace(' ', '-')}`}
-                                                                    value={topic.status}
-                                                                    onChange={(e) => handleStatusChange(topic.id, e.target.value)}
-                                                                >
-                                                                    {STATUS_OPTIONS.map(opt => (
-                                                                        <option key={opt} value={opt}>{opt}</option>
-                                                                    ))}
-                                                                </select>
-                                                            </div>
-                                                            {topic.next_revision_date && (
-                                                                <div className={`revision-badge ${new Date(topic.next_revision_date) <= new Date() ? 'due' : ''}`}>
-                                                                    Next: {new Date(topic.next_revision_date).toLocaleDateString()}
-                                                                </div>
-                                                            )}
-                                                        </div>
+                                                        <TopicItem
+                                                            key={topic.id}
+                                                            topic={topic}
+                                                            isPriority={priorityIds.includes(topic.id)}
+                                                            onStatusChange={handleStatusChange}
+                                                            onMarkRevised={handleMarkRevised}
+                                                            onOpenNotes={openNotes}
+                                                        />
                                                     ))}
                                                 </div>
                                             )}
