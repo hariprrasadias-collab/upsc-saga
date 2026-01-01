@@ -38,15 +38,25 @@ const Toast: React.FC<ToastProps> = ({
         }
     };
 
+    const isUrgent = type === 'error' || type === 'warning';
+
     return (
-        <div className={`toast toast-${type} ${isExiting ? 'toast-exit' : 'toast-enter'}`}>
-            <div className="toast-icon">{getIcon()}</div>
+        <div
+            className={`toast toast-${type} ${isExiting ? 'toast-exit' : 'toast-enter'}`}
+            role={isUrgent ? 'alert' : 'status'}
+            aria-live={isUrgent ? 'assertive' : 'polite'}
+        >
+            <div className="toast-icon" aria-hidden="true">{getIcon()}</div>
             <div className="toast-message">{message}</div>
-            <button className="toast-close" onClick={() => {
-                setIsExiting(true);
-                setTimeout(onClose, 300);
-            }}>
-                ×
+            <button
+                className="toast-close"
+                onClick={() => {
+                    setIsExiting(true);
+                    setTimeout(onClose, 300);
+                }}
+                aria-label="Close notification"
+            >
+                <span aria-hidden="true">×</span>
             </button>
         </div>
     );
@@ -60,7 +70,11 @@ interface ToastContainerProps {
 
 export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, removeToast }) => {
     return (
-        <div className="toast-container">
+        <div
+            className="toast-container"
+            role="region"
+            aria-label="Notifications"
+        >
             {toasts.map(toast => (
                 <Toast
                     key={toast.id}
