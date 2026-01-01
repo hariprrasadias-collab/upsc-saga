@@ -13,7 +13,17 @@ cache = Cache()
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
+    # SECURITY: Use env var for secret key, fallback to dev key only if not set
+    app.secret_key = os.environ.get('SECRET_KEY') or 'dev_secret_key_upsc_saga'
+    if not os.environ.get('SECRET_KEY'):
+        print("⚠️  WARNING: Using default insecure secret key. Set SECRET_KEY in .env")
+
+    # SECURITY: Secure Cookie Settings
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+    if os.environ.get('FLASK_ENV') == 'production':
+        app.config['SESSION_COOKIE_SECURE'] = True
+
     CORS(app, resources={r"/*": {"origins": "*"}})
     Compress(app) # Enable Gzip compression
 
