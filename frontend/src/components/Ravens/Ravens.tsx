@@ -263,12 +263,21 @@ const Ravens: React.FC = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="search-input"
+                    aria-label="Search articles"
                 />
-                <select value={selectedPaper} onChange={(e) => setSelectedPaper(e.target.value)}>
+                <select
+                    value={selectedPaper}
+                    onChange={(e) => setSelectedPaper(e.target.value)}
+                    aria-label="Filter by Paper"
+                >
                     <option value="All Papers">All Papers</option>
                     {papers.map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
-                <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)}>
+                <select
+                    value={selectedSubject}
+                    onChange={(e) => setSelectedSubject(e.target.value)}
+                    aria-label="Filter by Subject"
+                >
                     <option value="All Subjects">All Subjects</option>
                     {subjects.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
@@ -276,6 +285,7 @@ const Ravens: React.FC = () => {
                     value={selectedSource}
                     onChange={(e) => setSelectedSource(e.target.value)}
                     className="source-select"
+                    aria-label="Filter by Source"
                 >
                     <option value="All Sources">All Sources</option>
                     <option value="The Hindu">The Hindu</option>
@@ -287,6 +297,8 @@ const Ravens: React.FC = () => {
                 <button
                     className={`bookmark-filter ${showBookmarked ? 'active' : ''}`}
                     onClick={() => setShowBookmarked(!showBookmarked)}
+                    aria-pressed={showBookmarked}
+                    aria-label={showBookmarked ? "Show all articles" : "Show bookmarked articles only"}
                 >
                     {showBookmarked ? '⭐ Showing Bookmarked' : '☆ All Articles'}
                 </button>
@@ -326,6 +338,9 @@ const Ravens: React.FC = () => {
                                     <button
                                         className="bookmark-btn"
                                         onClick={() => article.id && handleBookmark(article.id)}
+                                        aria-label={article.isBookmarked ? "Remove from bookmarks" : "Add to bookmarks"}
+                                        aria-pressed={article.isBookmarked}
+                                        title={article.isBookmarked ? "Remove from bookmarks" : "Add to bookmarks"}
                                     >
                                         {article.isBookmarked ? '⭐' : '☆'}
                                     </button>
@@ -479,7 +494,11 @@ const Ravens: React.FC = () => {
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2>{selectedArticle.title}</h2>
-                            <button className="close-modal-btn" onClick={() => setSelectedArticle(null)}>×</button>
+                            <button
+                                className="close-modal-btn"
+                                onClick={() => setSelectedArticle(null)}
+                                aria-label="Close modal"
+                            >×</button>
                         </div>
 
                         <div className="modal-body">
