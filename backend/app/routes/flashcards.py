@@ -213,34 +213,36 @@ def get_due_cards():
         
         conn = get_db()
         
-        # Get cards with their latest review session
+        # Optimized Query: Use Window Function + Filter by Due Date
         query = '''
-            SELECT f.*,
-                   rs.halflife, rs.alpha, rs.beta, rs.next_review, rs.reviewed_at
-            FROM flashcards f
-            LEFT JOIN (
-                SELECT flashcard_id, halflife, alpha, beta, next_review, reviewed_at
+            WITH LatestReviews AS (
+                SELECT flashcard_id, halflife, alpha, beta, next_review, reviewed_at,
+                       ROW_NUMBER() OVER (PARTITION BY flashcard_id ORDER BY reviewed_at DESC) as rn
                 FROM review_sessions
-                WHERE (flashcard_id, reviewed_at) IN (
-                    SELECT flashcard_id, MAX(reviewed_at)
-                    FROM review_sessions
-                    GROUP BY flashcard_id
-                )
-            ) rs ON f.id = rs.flashcard_id
-            WHERE 1=1
+            )
+            SELECT f.*,
+                   lr.halflife, lr.alpha, lr.beta, lr.next_review, lr.reviewed_at
+            FROM flashcards f
+            LEFT JOIN LatestReviews lr ON f.id = lr.flashcard_id AND lr.rn = 1
+            WHERE (lr.next_review <= datetime('now') OR lr.reviewed_at IS NULL)
         '''
         
         params = []
         if deck_id:
             query += ' AND f.deck_id = ?'
             params.append(deck_id)
+
+        # Add Limit optimization - Sort by next_review (asc) as proxy for urgency
+        # NULLs (New cards) come first in SQLite ASC sort, which matches high urgency
+        query += ' ORDER BY lr.next_review ASC LIMIT ?'
+        params.append(limit)
         
-        # Get all cards
-        all_cards = conn.execute(query, params).fetchall()
+        # Get due cards directly
+        due_cards_rows = conn.execute(query, params).fetchall()
         
-        # Calculate urgency for each card
+        # Calculate exact urgency for the fetched cards (for UI display)
         cards_with_urgency = []
-        for card in all_cards:
+        for card in due_cards_rows:
             card_dict = dict(card)
             
             if card['reviewed_at'] is None:
@@ -260,11 +262,7 @@ def get_due_cards():
             card_dict['urgency'] = urgency
             cards_with_urgency.append(card_dict)
         
-        # Sort by urgency (highest first) and limit
-        cards_with_urgency.sort(key=lambda x: x['urgency'], reverse=True)
-        due_cards = cards_with_urgency[:limit]
-        
-        return jsonify(due_cards)
+        return jsonify(cards_with_urgency)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
