@@ -117,10 +117,12 @@
 }
 
 .vault-item {
-    padding: 15px;
+    padding: 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    cursor: pointer;
+    cursor: default;
     transition: background 0.2s;
+    position: relative;
+    display: flex;
 }
 
 .vault-item:hover {
@@ -132,11 +134,36 @@
     border-left: 3px solid #00fff2;
 }
 
+.item-select-btn {
+    background: transparent;
+    border: none;
+    text-align: left;
+    width: 100%;
+    padding: 15px;
+    color: inherit;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+.item-select-btn:focus-visible {
+    outline: 2px solid #00fff2;
+    outline-offset: -2px;
+}
+
 .item-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 5px;
+    width: 100%;
+}
+
+.h4-style {
+    display: block;
+    font-weight: bold;
+    font-size: 1rem;
+    margin: 5px 0;
 }
 
 .item-type-tag {
@@ -154,12 +181,18 @@
     color: #666;
     font-size: 1.2rem;
     cursor: pointer;
-    padding: 0 5px;
+    padding: 10px;
     line-height: 1;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 2;
+    border-radius: 50%;
 }
 
 .delete-btn:hover {
     color: #ff4444;
+    background: rgba(255, 0, 0, 0.1);
 }
 
 .item-topic {
