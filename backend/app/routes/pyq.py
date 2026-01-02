@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_cors import CORS
 from app.db import get_db
+from app import cache
 import json
 from datetime import datetime
 
@@ -214,24 +215,19 @@ def get_analytics():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# In-memory rate limiter (Simple Dictionary)
-# Key: IP Address, Value: timestamp of last request
-_strategos_rate_limit = {}
-
 @bp.route('/strategos/<int:question_id>', methods=['POST'])
 def ask_strategos(question_id):
     """Ask AI for tactical breakdown of a question"""
     try:
-        # 1. Rate Limiting Check (Simple)
-        import time
+        # 1. Rate Limiting Check (Using Flask-Caching to prevent memory leaks)
         client_ip = request.remote_addr
-        last_req = _strategos_rate_limit.get(client_ip, 0)
-        current_time = time.time()
+        cache_key = f"strategos_limit_{client_ip}"
 
-        if current_time - last_req < 5: # 5 seconds cooldown
+        if cache.get(cache_key):
             return jsonify({'success': False, 'error': 'Strategos is thinking. Please wait 5 seconds.'}), 429
 
-        _strategos_rate_limit[client_ip] = current_time
+        # Set cache with 5 seconds timeout
+        cache.set(cache_key, True, timeout=5)
 
         conn = get_db()
         question = conn.execute("SELECT * FROM pyq_questions WHERE id = ?", (question_id,)).fetchone()
