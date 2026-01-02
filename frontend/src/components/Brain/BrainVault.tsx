@@ -31,6 +31,7 @@ const BrainVault: React.FC = () => {
     const [filterType, setFilterType] = useState<string>('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedContent, setSelectedContent] = useState<AIContent | null>(null);
+    const [copyFeedback, setCopyFeedback] = useState(false);
 
     const contentTypes = [
         'all', 'podcast', 'essay', 'visual_prompt', 'roleplay',
@@ -79,6 +80,13 @@ const BrainVault: React.FC = () => {
         }
     };
 
+    const handleCopy = () => {
+        if (!selectedContent) return;
+        navigator.clipboard.writeText(selectedContent.content);
+        setCopyFeedback(true);
+        setTimeout(() => setCopyFeedback(false), 2000);
+    };
+
     const filteredList = contentList.filter(item =>
         item.topic.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -121,8 +129,6 @@ const BrainVault: React.FC = () => {
                 return <MapRenderer content={item.content} metadata={item.metadata} />;
             case 'cheat_sheet':
                 return <CheatSheetRenderer content={item.content} />;
-            case 'eli5':
-                return <ELI5Renderer content={item.content} />;
             case 'pitfalls':
                 return <PitfallRenderer content={item.content} />;
             case 'quote_bank':
@@ -158,6 +164,7 @@ const BrainVault: React.FC = () => {
                     <input
                         type="text"
                         placeholder="Search Neural Storage..."
+                        aria-label="Search Neural Storage"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -170,6 +177,7 @@ const BrainVault: React.FC = () => {
                         key={type}
                         className={`filter-btn ${filterType === type ? 'active' : ''}`}
                         onClick={() => setFilterType(type)}
+                        aria-pressed={filterType === type}
                     >
                         {type.toUpperCase().replace('_', ' ')}
                     </button>
@@ -179,27 +187,34 @@ const BrainVault: React.FC = () => {
             <div className="vault-layout">
                 <aside className="content-list-panel glass-panel">
                     {loading ? (
-                        <div className="loading-state">Accessing Neural Storage...</div>
+                        <div className="loading-state" role="status">Accessing Neural Storage...</div>
                     ) : (
                         <ul className="content-list-ul">
                             {filteredList.map(item => (
                                 <li
                                     key={item.id}
                                     className={`vault-item ${selectedContent?.id === item.id ? 'active' : ''}`}
-                                    onClick={() => setSelectedContent(item)}
                                 >
-                                    <div className="item-header">
-                                        <span className="item-type-tag">{item.content_type}</span>
-                                        <button
-                                            className="delete-btn"
-                                            onClick={(e) => handleDelete(item.id, e)}
-                                            title="Delete Artifact"
-                                        >
-                                            ×
-                                        </button>
-                                    </div>
-                                    <h4 className="item-topic">{item.topic}</h4>
-                                    <span className="item-date">{new Date(item.created_at).toLocaleDateString()}</span>
+                                    <button
+                                        type="button"
+                                        className="item-select-btn"
+                                        onClick={() => setSelectedContent(item)}
+                                        aria-pressed={selectedContent?.id === item.id}
+                                    >
+                                        <span className="item-header">
+                                            <span className="item-type-tag">{item.content_type}</span>
+                                        </span>
+                                        <span className="item-topic h4-style">{item.topic}</span>
+                                        <span className="item-date">{new Date(item.created_at).toLocaleDateString()}</span>
+                                    </button>
+                                    <button
+                                        className="delete-btn"
+                                        onClick={(e) => handleDelete(item.id, e)}
+                                        title="Delete Artifact"
+                                        aria-label={`Delete ${item.topic}`}
+                                    >
+                                        ×
+                                    </button>
                                 </li>
                             ))}
                             {filteredList.length === 0 && !loading && (
@@ -220,9 +235,10 @@ const BrainVault: React.FC = () => {
                                 <div className="action-buttons">
                                     <button
                                         className="action-btn"
-                                        onClick={() => navigator.clipboard.writeText(selectedContent.content)}
+                                        onClick={handleCopy}
+                                        aria-label="Copy content to clipboard"
                                     >
-                                        📋 Copy
+                                        {copyFeedback ? '✅ Copied!' : '📋 Copy'}
                                     </button>
                                 </div>
                             </div>
