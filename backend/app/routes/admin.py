@@ -5,6 +5,7 @@ from app.utils.session import get_current_user_id
 import json
 import time as import_time
 from app.utils.session import get_current_user_id
+from app.utils.security import sanitize_html
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -284,6 +285,9 @@ def add_article():
         subjects = json.dumps([data.get('tags', '')]) if data.get('tags') else '[]'
         papers = json.dumps([data.get('category', 'General')])
         
+        # Sanitize HTML content to prevent XSS
+        sanitized_content = sanitize_html(data['content'])
+
         cursor = conn.execute('''
             INSERT INTO current_affairs (
                 title, upsc_summary, original_summary, subjects, source, papers, 
@@ -292,8 +296,8 @@ def add_article():
             VALUES (?, ?, ?, ?, ?, ?, DATE('now'), ?)
         ''', (
             data['title'],
-            data['content'],
-            data['content'], # Use content for both summaries for manual entry
+            sanitized_content,
+            sanitized_content, # Use content for both summaries for manual entry
             subjects,
             data.get('source', 'Manual'),
             papers,
@@ -324,10 +328,11 @@ def update_article(id):
             params.append(data['title'])
             
         if 'content' in data:
+            sanitized_content = sanitize_html(data['content'])
             fields.append('upsc_summary = ?')
             fields.append('original_summary = ?')
-            params.append(data['content'])
-            params.append(data['content'])
+            params.append(sanitized_content)
+            params.append(sanitized_content)
             
         if 'tags' in data:
             import json
