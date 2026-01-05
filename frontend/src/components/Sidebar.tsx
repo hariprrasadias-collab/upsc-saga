@@ -125,6 +125,7 @@ const Sidebar: React.FC = memo(() => {
       <button
         type="button"
         className={`menu-item ${currentTab === 'dashboard' ? 'active' : ''}`}
+        aria-current={currentTab === 'dashboard' ? 'page' : undefined}
         onClick={() => handleTabChange('dashboard')}
       >
         <span className="icon" aria-hidden="true">🏠</span>
@@ -135,6 +136,7 @@ const Sidebar: React.FC = memo(() => {
       <button
         type="button"
         className={`menu-item ${currentTab === 'analytics' ? 'active' : ''}`}
+        aria-current={currentTab === 'analytics' ? 'page' : undefined}
         onClick={() => handleTabChange('analytics')}
       >
         <span className="icon" aria-hidden="true">📊</span>
@@ -145,6 +147,7 @@ const Sidebar: React.FC = memo(() => {
       <button
         type="button"
         className={`menu-item ${currentTab === 'weak-areas' ? 'active' : ''}`}
+        aria-current={currentTab === 'weak-areas' ? 'page' : undefined}
         onClick={() => handleTabChange('weak-areas')}
       >
         <span className="icon" aria-hidden="true">🎯</span>
@@ -171,6 +174,7 @@ const Sidebar: React.FC = memo(() => {
                   type="button"
                   key={item.id}
                   className={`menu-item sub-item ${currentTab === item.id ? 'active' : ''}`}
+                  aria-current={currentTab === item.id ? 'page' : undefined}
                   onClick={() => handleTabChange(item.id)}
                 >
                   <span className="icon" aria-hidden="true">{item.icon}</span>
