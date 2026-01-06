@@ -2,9 +2,9 @@
 from flask import Blueprint, jsonify, request
 from app.db import get_db
 from app.utils.session import get_current_user_id
+from app.utils.security import sanitize_html
 import json
 import time as import_time
-from app.utils.session import get_current_user_id
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -141,16 +141,16 @@ def add_question():
             (question_text, option_a, option_b, option_c, option_d, correct_option, explanation, subject, topic, difficulty)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
-            data['question_text'],
-            data['option_a'],
-            data['option_b'],
-            data['option_c'],
-            data['option_d'],
-            data['correct_option'],
-            data.get('explanation', ''),
-            data['subject'],
-            data['topic'],
-            data.get('difficulty', 'medium')
+            sanitize_html(data['question_text']),
+            sanitize_html(data['option_a']),
+            sanitize_html(data['option_b']),
+            sanitize_html(data['option_c']),
+            sanitize_html(data['option_d']),
+            sanitize_html(data['correct_option']),
+            sanitize_html(data.get('explanation', '')),
+            sanitize_html(data['subject']),
+            sanitize_html(data['topic']),
+            sanitize_html(data.get('difficulty', 'medium'))
         ))
         
         conn.commit()
@@ -177,7 +177,7 @@ def update_question(id):
         for field in allowed_fields:
             if field in data:
                 fields.append(f'{field} = ?')
-                params.append(data[field])
+                params.append(sanitize_html(data[field]))
                 
         if not fields:
             return jsonify({'error': 'No fields to update'}), 400
@@ -291,11 +291,11 @@ def add_article():
             )
             VALUES (?, ?, ?, ?, ?, ?, DATE('now'), ?)
         ''', (
-            data['title'],
-            data['content'],
-            data['content'], # Use content for both summaries for manual entry
-            subjects,
-            data.get('source', 'Manual'),
+            sanitize_html(data['title']),
+            sanitize_html(data['content']),
+            sanitize_html(data['content']), # Use content for both summaries for manual entry
+            subjects, # This is a JSON string of tags, we don't sanitize the JSON structure itself, but tags should be
+            sanitize_html(data.get('source', 'Manual')),
             papers,
             'manual-entry-' + str(int(import_time.time())) # Dummy link
         ))
@@ -321,22 +321,25 @@ def update_article(id):
         
         if 'title' in data:
             fields.append('title = ?')
-            params.append(data['title'])
+            params.append(sanitize_html(data['title']))
             
         if 'content' in data:
             fields.append('upsc_summary = ?')
             fields.append('original_summary = ?')
-            params.append(data['content'])
-            params.append(data['content'])
+            params.append(sanitize_html(data['content']))
+            params.append(sanitize_html(data['content']))
             
         if 'tags' in data:
             import json
             fields.append('subjects = ?')
-            params.append(json.dumps([data['tags']]))
+            # Tags is usually a string, if it's a list we'd need to map sanitize.
+            # Assuming tags is a single string here based on add_article logic: json.dumps([data.get('tags', '')])
+            # But update_article: json.dumps([data['tags']]) implies data['tags'] is the tag content.
+            params.append(json.dumps([sanitize_html(data['tags'])]))
             
         if 'source' in data:
             fields.append('source = ?')
-            params.append(data['source'])
+            params.append(sanitize_html(data['source']))
             
         if not fields:
             return jsonify({'error': 'No fields to update'}), 400
