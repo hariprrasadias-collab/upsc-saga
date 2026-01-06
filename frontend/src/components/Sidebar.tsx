@@ -126,6 +126,7 @@ const Sidebar: React.FC = memo(() => {
         type="button"
         className={`menu-item ${currentTab === 'dashboard' ? 'active' : ''}`}
         onClick={() => handleTabChange('dashboard')}
+        aria-current={currentTab === 'dashboard' ? 'page' : undefined}
       >
         <span className="icon" aria-hidden="true">🏠</span>
         <span className="label">Dashboard</span>
@@ -136,6 +137,7 @@ const Sidebar: React.FC = memo(() => {
         type="button"
         className={`menu-item ${currentTab === 'analytics' ? 'active' : ''}`}
         onClick={() => handleTabChange('analytics')}
+        aria-current={currentTab === 'analytics' ? 'page' : undefined}
       >
         <span className="icon" aria-hidden="true">📊</span>
         <span className="label">Analytics</span>
@@ -146,6 +148,7 @@ const Sidebar: React.FC = memo(() => {
         type="button"
         className={`menu-item ${currentTab === 'weak-areas' ? 'active' : ''}`}
         onClick={() => handleTabChange('weak-areas')}
+        aria-current={currentTab === 'weak-areas' ? 'page' : undefined}
       >
         <span className="icon" aria-hidden="true">🎯</span>
         <span className="label">Weak Areas</span>
@@ -159,19 +162,21 @@ const Sidebar: React.FC = memo(() => {
             className="group-header"
             onClick={() => toggleGroup(groupKey)}
             aria-expanded={expandedGroups[groupKey]}
+            aria-controls={`group-${groupKey}-content`}
           >
             <span className="group-title">{group.title}</span>
             <span className="expand-icon" aria-hidden="true">{expandedGroups[groupKey] ? '▼' : '▶'}</span>
           </button>
 
           {expandedGroups[groupKey] && (
-            <div className="group-items">
+            <div className="group-items" id={`group-${groupKey}-content`}>
               {group.items.map(item => (
                 <button
                   type="button"
                   key={item.id}
                   className={`menu-item sub-item ${currentTab === item.id ? 'active' : ''}`}
                   onClick={() => handleTabChange(item.id)}
+                  aria-current={currentTab === item.id ? 'page' : undefined}
                 >
                   <span className="icon" aria-hidden="true">{item.icon}</span>
                   <span className="label">{item.label}</span>
