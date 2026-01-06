@@ -2,7 +2,7 @@
 from flask import Blueprint, jsonify, request
 from app.db import get_db
 from app.utils.session import get_current_user_id
-from app.utils.security import sanitize_html
+from app.utils import sanitize_html
 import json
 import time as import_time
 
@@ -281,8 +281,13 @@ def add_article():
         # Map 'category' to 'papers'
         
         import json
-        subjects = json.dumps([data.get('tags', '')]) if data.get('tags') else '[]'
-        papers = json.dumps([data.get('category', 'General')])
+        # Sanitize the tag content before JSON encoding
+        safe_tag = sanitize_html(data.get('tags', ''))
+        subjects = json.dumps([safe_tag]) if safe_tag else '[]'
+
+        # Sanitize category
+        safe_category = sanitize_html(data.get('category', 'General'))
+        papers = json.dumps([safe_category])
         
         cursor = conn.execute('''
             INSERT INTO current_affairs (
@@ -294,7 +299,7 @@ def add_article():
             sanitize_html(data['title']),
             sanitize_html(data['content']),
             sanitize_html(data['content']), # Use content for both summaries for manual entry
-            subjects, # This is a JSON string of tags, we don't sanitize the JSON structure itself, but tags should be
+            subjects,
             sanitize_html(data.get('source', 'Manual')),
             papers,
             'manual-entry-' + str(int(import_time.time())) # Dummy link
@@ -330,11 +335,7 @@ def update_article(id):
             params.append(sanitize_html(data['content']))
             
         if 'tags' in data:
-            import json
             fields.append('subjects = ?')
-            # Tags is usually a string, if it's a list we'd need to map sanitize.
-            # Assuming tags is a single string here based on add_article logic: json.dumps([data.get('tags', '')])
-            # But update_article: json.dumps([data['tags']]) implies data['tags'] is the tag content.
             params.append(json.dumps([sanitize_html(data['tags'])]))
             
         if 'source' in data:
