@@ -2,7 +2,7 @@ services:
   - type: web
     name: upsc-saga
     env: python
-    buildCommand: pnpm install --frozen-lockfile --dir frontend && cd frontend && pnpm build && cd .. && pip install -r backend/requirements.txt
+    buildCommand: npm install -g pnpm && cd frontend && pnpm install --frozen-lockfile --config.production=false && pnpm build && cd .. && pip install -r backend/requirements.txt
     startCommand: gunicorn -w 4 -b 0.0.0.0:10000 backend.app:app
     envVars:
       - key: PYTHON_VERSION
