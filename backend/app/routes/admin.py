@@ -2,6 +2,7 @@
 from flask import Blueprint, jsonify, request
 from app.db import get_db
 from app.utils.session import get_current_user_id
+from app.utils.security import sanitize_html
 import json
 import time as import_time
 from app.utils.session import get_current_user_id
@@ -292,8 +293,8 @@ def add_article():
             VALUES (?, ?, ?, ?, ?, ?, DATE('now'), ?)
         ''', (
             data['title'],
-            data['content'],
-            data['content'], # Use content for both summaries for manual entry
+            sanitize_html(data['content']), # Sanitize HTML content
+            sanitize_html(data['content']),
             subjects,
             data.get('source', 'Manual'),
             papers,
@@ -326,8 +327,9 @@ def update_article(id):
         if 'content' in data:
             fields.append('upsc_summary = ?')
             fields.append('original_summary = ?')
-            params.append(data['content'])
-            params.append(data['content'])
+            clean_content = sanitize_html(data['content'])
+            params.append(clean_content)
+            params.append(clean_content)
             
         if 'tags' in data:
             import json
