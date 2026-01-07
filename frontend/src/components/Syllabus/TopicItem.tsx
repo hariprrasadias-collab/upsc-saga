@@ -17,6 +17,9 @@ const TopicItem: React.FC<TopicItemProps> = memo(({
     onMarkRevised,
     onOpenNotes
 }) => {
+    // Optimization: Check has_notes flag if available, fallback to notes length
+    const hasNotes = topic.has_notes !== undefined ? topic.has_notes : (topic.notes && topic.notes.length > 0);
+
     return (
         <div className={`topic-item ${isPriority ? 'high-priority' : ''}`}>
             <div className="topic-content">
@@ -30,7 +33,7 @@ const TopicItem: React.FC<TopicItemProps> = memo(({
             </div>
             <div className="topic-actions">
                 <button
-                    className={`notes-btn ${topic.notes ? 'has-notes' : ''}`}
+                    className={`notes-btn ${hasNotes ? 'has-notes' : ''}`}
                     onClick={() => onOpenNotes(topic)}
                     title="Add/View Notes"
                     aria-label={`Notes for ${topic.topic}`}
