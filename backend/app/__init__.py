@@ -1,5 +1,5 @@
 from app import cgi_fix
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_cors import CORS
 from flask_compress import Compress
 from flask_caching import Cache
@@ -12,7 +12,8 @@ import time
 cache = Cache()
 
 def create_app():
-    app = Flask(__name__)
+    # Configure static folder to point to frontend/dist
+    app = Flask(__name__, static_folder='../../frontend/dist', static_url_path='/')
     app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
     CORS(app, resources={r"/*": {"origins": "*"}})
     Compress(app) # Enable Gzip compression
@@ -76,6 +77,15 @@ def create_app():
                response.mimetype.startswith('application/javascript'):
                 response.headers['Cache-Control'] = 'public, max-age=31536000'
         return response
+
+    # Serve Frontend (SPA Catch-all)
+    @app.route('/', defaults={'path': ''})
+    @app.route('/<path:path>')
+    def serve(path):
+        if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+            return send_from_directory(app.static_folder, path)
+        else:
+            return send_from_directory(app.static_folder, 'index.html')
 
     from . import db
     db.init_app(app)

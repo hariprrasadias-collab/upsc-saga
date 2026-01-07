@@ -12,3 +12,8 @@
 **Vulnerability:** `beautifulsoup4` was used in backend code but missing from `requirements.txt`.
 **Learning:** Even if local dev works (due to pre-installed packages), Render builds fail if dependencies aren't explicit.
 **Prevention:** Always check `requirements.txt` when adding new imports.
+
+## 2024-05-23 - [Monolithic Deployment Config]
+**Vulnerability:** Application failed to start/serve frontend because `wsgi.py` was named `app.py` and Flask wasn't configured to serve `frontend/dist`.
+**Learning:** Render/Gunicorn often defaults to looking for `wsgi:app`. Also, SPA routing requires an explicit catch-all route in Flask if not using Nginx.
+**Prevention:** Ensure `wsgi.py` exists and `app.static_folder` points to the correct build directory.
