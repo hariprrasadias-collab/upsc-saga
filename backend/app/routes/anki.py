@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.db import get_db
+from app.utils.security import sanitize_html
 import anki_client
 
 bp = Blueprint('anki', __name__, url_prefix='/api/anki')
@@ -23,8 +24,8 @@ def get_anki_card():
         # Extract just what we need. Anki CSS usually comes in the 'css' field if needed.
         return jsonify({
             'id': card['cardId'],
-            'question': card['question'], # Raw HTML
-            'answer': card['answer'],     # Raw HTML
+            'question': sanitize_html(card['question']), # Sanitized HTML
+            'answer': sanitize_html(card['answer']),     # Sanitized HTML
             'deckName': card['deckName'],
             'modelName': card['modelName']
         })

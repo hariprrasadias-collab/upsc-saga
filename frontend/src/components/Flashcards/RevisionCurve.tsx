@@ -77,8 +77,8 @@ const RevisionCurve: React.FC = () => {
                                 borderRadius: '6px',
                                 color: '#d4a574'
                             }}
-                            formatter={(value: any, name: string) => {
-                                if (name === 'retention') return [`${value}%`, 'Retention Rate'];
+                            formatter={(value: any, name: any) => {
+                                if (name === 'Retention Rate' || name === 'retention') return [`${value}%`, 'Retention Rate'];
                                 if (name === 'reviews') return [value, 'Review Count'];
                                 return [value, name];
                             }}
