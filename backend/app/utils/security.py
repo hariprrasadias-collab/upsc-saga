@@ -20,19 +20,17 @@ def sanitize_html(content):
         'img': ['src', 'alt', 'width', 'height']
     }
 
+    # Bleach 6.x supports protocols argument.
     allowed_protocols = ['http', 'https', 'mailto', 'data']
 
     try:
         return bleach.clean(
             str(content),
-            tags=allowed_tags,
+            tags=list(allowed_tags),
             attributes=allowed_attrs,
             protocols=allowed_protocols,
-            strip=True # Strip disallowed tags instead of escaping them
+            strip=True
         )
     except Exception as e:
         print(f"Sanitization error: {e}")
-        # Fail safe: return empty or original depending on risk appetite.
-        # For security, failing safe usually means returning safe fallback.
-        # But disrupting service is also bad. Bleach is robust.
         return ""
