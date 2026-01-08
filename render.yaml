@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: upsc-saga
+    env: python
+    buildCommand: npm install -g pnpm && cd frontend && pnpm install --frozen-lockfile --config.production=false && pnpm build && cd .. && pip install -r backend/requirements.txt
+    startCommand: gunicorn -w 4 -b 0.0.0.0:10000 backend.wsgi:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: NODE_VERSION
+        value: 20.10.0
+      - key: PYTHONPATH
+        value: /opt/render/project/src
