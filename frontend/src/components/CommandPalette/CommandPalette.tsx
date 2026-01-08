@@ -13,8 +13,7 @@ interface CommandOption {
 }
 
 const CommandPalette: React.FC = () => {
-    const { setCurrentTab, toggleRageMode } = useGlobal();
-    const [isOpen, setIsOpen] = useState(false);
+    const { setCurrentTab, toggleRageMode, isCommandPaletteOpen, toggleCommandPalette } = useGlobal();
     const [query, setQuery] = useState('');
     const [selectedIndex, setSelectedIndex] = useState(0);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -71,12 +70,12 @@ const CommandPalette: React.FC = () => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                 e.preventDefault();
-                setIsOpen(prev => !prev);
+                toggleCommandPalette();
             }
 
-            if (isOpen) {
+            if (isCommandPaletteOpen) {
                 if (e.key === 'Escape') {
-                    setIsOpen(false);
+                    toggleCommandPalette(false);
                 } else if (e.key === 'ArrowDown') {
                     e.preventDefault();
                     setSelectedIndex(prev => (prev + 1) % filteredCommands.length);
@@ -87,7 +86,7 @@ const CommandPalette: React.FC = () => {
                     e.preventDefault();
                     if (filteredCommands[selectedIndex]) {
                         filteredCommands[selectedIndex].action();
-                        setIsOpen(false);
+                        toggleCommandPalette(false);
                     }
                 }
             }
@@ -95,25 +94,25 @@ const CommandPalette: React.FC = () => {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, filteredCommands, selectedIndex]);
+    }, [isCommandPaletteOpen, filteredCommands, selectedIndex, toggleCommandPalette]);
 
     // Focus input when opened
     useEffect(() => {
-        if (isOpen && inputRef.current) {
+        if (isCommandPaletteOpen && inputRef.current) {
             setTimeout(() => inputRef.current?.focus(), 50);
             setQuery('');
             setSelectedIndex(0);
         }
-    }, [isOpen]);
+    }, [isCommandPaletteOpen]);
 
-    if (!isOpen) return null;
+    if (!isCommandPaletteOpen) return null;
 
     const activeDescendantId = filteredCommands[selectedIndex]?.id;
 
     return (
         <div
             className="command-palette-overlay"
-            onClick={() => setIsOpen(false)}
+            onClick={() => toggleCommandPalette(false)}
         >
             <div
                 className="command-palette-modal"
@@ -156,7 +155,7 @@ const CommandPalette: React.FC = () => {
                                 className={`command-item ${index === selectedIndex ? 'selected' : ''}`}
                                 onClick={() => {
                                     cmd.action();
-                                    setIsOpen(false);
+                                    toggleCommandPalette(false);
                                 }}
                                 onMouseEnter={() => setSelectedIndex(index)}
                                 role="option"
