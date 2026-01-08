@@ -5,7 +5,7 @@ import './Sidebar.css';
 import { useGlobal } from '../contexts/GlobalContext';
 
 const Sidebar: React.FC = memo(() => {
-  const { currentTab, setCurrentTab, isSidebarOpen, toggleSidebar, toggleMimir } = useGlobal();
+  const { currentTab, setCurrentTab, isSidebarOpen, toggleSidebar, toggleMimir, toggleCommandPalette } = useGlobal();
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     planning: true,
     training: false,
@@ -110,15 +110,27 @@ const Sidebar: React.FC = memo(() => {
     <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
       <div className="sidebar-header">
         <h2>UPSC SAGA</h2>
-        {/* Mobile Close Button */}
-        <button
-          className="mobile-close-btn"
-          onClick={toggleSidebar}
-          aria-label="Close sidebar"
-          type="button"
-        >
-          ×
-        </button>
+        <div className="header-actions">
+          {/* Search/Command Palette Trigger */}
+          <button
+            className="search-trigger-btn"
+            onClick={() => toggleCommandPalette()}
+            aria-label="Search commands (Ctrl+K)"
+            title="Search commands (Ctrl+K)"
+            type="button"
+          >
+            🔍
+          </button>
+          {/* Mobile Close Button */}
+          <button
+            className="mobile-close-btn"
+            onClick={toggleSidebar}
+            aria-label="Close sidebar"
+            type="button"
+          >
+            ×
+          </button>
+        </div>
       </div>
 
       {/* Dashboard - Always Top */}

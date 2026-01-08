@@ -55,6 +55,8 @@ interface GlobalContextType {
     toggleRituals: () => void;
     isMimirOpen: boolean;
     toggleMimir: (isOpen?: boolean) => void;
+    isCommandPaletteOpen: boolean;
+    toggleCommandPalette: (isOpen?: boolean) => void;
 }
 
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
@@ -82,10 +84,12 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isRitualsOpen, setIsRitualsOpen] = useState(false);
     const [isMimirOpen, setIsMimirOpen] = useState(false);
+    const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
 
     const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
     const toggleRituals = () => setIsRitualsOpen(prev => !prev);
     const toggleMimir = (isOpen?: boolean) => setIsMimirOpen(prev => isOpen !== undefined ? isOpen : !prev);
+    const toggleCommandPalette = (isOpen?: boolean) => setIsCommandPaletteOpen(prev => isOpen !== undefined ? isOpen : !prev);
 
     // Refined fetchDashboardData to avoid dependency issues
     const refreshDashboard = useCallback(async () => {
@@ -202,7 +206,9 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
         isRitualsOpen,
         toggleRituals,
         isMimirOpen,
-        toggleMimir
+        toggleMimir,
+        isCommandPaletteOpen,
+        toggleCommandPalette
     }), [
         userStats,
         todayTasks,
@@ -214,7 +220,8 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
         refreshDashboard,
         isSidebarOpen,
         isRitualsOpen,
-        isMimirOpen
+        isMimirOpen,
+        isCommandPaletteOpen
     ]);
 
     return (
