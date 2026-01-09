@@ -20,11 +20,17 @@ def get_anki_card():
     
     if info_list and len(info_list) > 0:
         card = info_list[0]
+
+        # Sanitize HTML from Anki cards to prevent XSS
+        from app.utils.security import sanitize_html
+        safe_question = sanitize_html(card.get('question', ''))
+        safe_answer = sanitize_html(card.get('answer', ''))
+
         # Extract just what we need. Anki CSS usually comes in the 'css' field if needed.
         return jsonify({
             'id': card['cardId'],
-            'question': card['question'], # Raw HTML
-            'answer': card['answer'],     # Raw HTML
+            'question': safe_question,
+            'answer': safe_answer,
             'deckName': card['deckName'],
             'modelName': card['modelName']
         })

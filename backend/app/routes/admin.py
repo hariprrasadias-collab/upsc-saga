@@ -281,6 +281,10 @@ def add_article():
         # Map 'category' to 'papers'
         
         import json
+        from app.utils.security import sanitize_html
+
+        safe_content = sanitize_html(data['content'])
+
         subjects = json.dumps([data.get('tags', '')]) if data.get('tags') else '[]'
         papers = json.dumps([data.get('category', 'General')])
         
@@ -292,8 +296,8 @@ def add_article():
             VALUES (?, ?, ?, ?, ?, ?, DATE('now'), ?)
         ''', (
             data['title'],
-            data['content'],
-            data['content'], # Use content for both summaries for manual entry
+            safe_content,
+            safe_content, # Use content for both summaries for manual entry
             subjects,
             data.get('source', 'Manual'),
             papers,
@@ -324,10 +328,12 @@ def update_article(id):
             params.append(data['title'])
             
         if 'content' in data:
+            from app.utils.security import sanitize_html
+            safe_content = sanitize_html(data['content'])
             fields.append('upsc_summary = ?')
             fields.append('original_summary = ?')
-            params.append(data['content'])
-            params.append(data['content'])
+            params.append(safe_content)
+            params.append(safe_content)
             
         if 'tags' in data:
             import json
