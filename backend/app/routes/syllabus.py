@@ -9,16 +9,40 @@ CORS(bp)
 
 @bp.route('/', methods=['GET'])
 def get_syllabus():
-    """Get all syllabus topics with revision info"""
+    """Get all syllabus topics with revision info (optimized payload)"""
     try:
         conn = get_db()
+        # Exclude large 'notes' column, return has_notes flag instead
         topics = conn.execute('''
-            SELECT t.*, r.revision_count, r.next_revision_date, r.last_revised_at
+            SELECT
+                t.id, t.paper, t.subject, t.topic, t.subtopic, t.status, t.last_updated,
+                CASE WHEN t.notes IS NOT NULL AND t.notes != '' THEN 1 ELSE 0 END as has_notes,
+                r.revision_count, r.next_revision_date, r.last_revised_at
             FROM syllabus_topics t
             LEFT JOIN topic_revisions r ON t.id = r.topic_id
             ORDER BY t.paper, t.subject, t.id
         ''').fetchall()
         return jsonify([dict(row) for row in topics])
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@bp.route('/<int:id>', methods=['GET'])
+def get_topic_details(id):
+    """Get full topic details including notes"""
+    try:
+        conn = get_db()
+        topic = conn.execute('SELECT * FROM syllabus_topics WHERE id = ?', (id,)).fetchone()
+        if not topic:
+            return jsonify({'error': 'Topic not found'}), 404
+
+        # Also fetch revision info to be complete
+        revision = conn.execute('SELECT * FROM topic_revisions WHERE topic_id = ?', (id,)).fetchone()
+
+        result = dict(topic)
+        if revision:
+            result.update(dict(revision))
+
+        return jsonify(result)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

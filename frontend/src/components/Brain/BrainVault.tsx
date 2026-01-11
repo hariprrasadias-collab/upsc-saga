@@ -121,8 +121,7 @@ const BrainVault: React.FC = () => {
                 return <MapRenderer content={item.content} metadata={item.metadata} />;
             case 'cheat_sheet':
                 return <CheatSheetRenderer content={item.content} />;
-            case 'eli5':
-                return <ELI5Renderer content={item.content} />;
+            // Removed duplicate eli5 case
             case 'pitfalls':
                 return <PitfallRenderer content={item.content} />;
             case 'quote_bank':
