@@ -173,7 +173,7 @@ const Seer: React.FC = () => {
                                 </Pie>
                                 <Tooltip
                                     contentStyle={{ backgroundColor: '#001f3f', borderColor: '#7fdbff', color: '#fff' }}
-                                    formatter={(value: number, name: string) => [value, name]}
+                                    formatter={(value: any, name: any) => [value, name]}
                                 />
                                 <Legend
                                     verticalAlign="bottom"

@@ -10,6 +10,7 @@ const StudyTimer: React.FC = () => {
     const [seconds, setSeconds] = useState(0);
     const [isActive, setIsActive] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     const intervalRef = useRef<number | null>(null);
 
     useEffect(() => {
@@ -44,6 +45,7 @@ const StudyTimer: React.FC = () => {
             return;
         }
 
+        setIsSaving(true);
         const minutes = Math.floor(seconds / 60);
         try {
             const res = await fetch(`${API_BASE_URL}/api/tasks/log-study`, {
@@ -62,9 +64,10 @@ const StudyTimer: React.FC = () => {
         } catch (err) {
             console.error('Error logging study:', err);
             addToast("Error connecting to server.", "error");
+        } finally {
+            setIsSaving(false);
+            setSeconds(0);
         }
-
-        setSeconds(0);
     };
 
     const formatTime = (totalSeconds: number) => {
@@ -78,13 +81,20 @@ const StudyTimer: React.FC = () => {
         <div className="study-timer">
             <ToastContainer toasts={toasts} removeToast={removeToast} />
             <h3>⏱️ Focus Timer</h3>
-            <div className="timer-display">{formatTime(seconds)}</div>
+            <div
+                className="timer-display"
+                role="timer"
+                aria-label="Current session duration"
+            >
+                {formatTime(seconds)}
+            </div>
             <div className="timer-controls">
                 {!isActive ? (
                     <button
                         className="timer-btn start"
                         onClick={handleStart}
                         aria-label="Start study timer"
+                        disabled={isSaving}
                     >
                         START
                     </button>
@@ -95,6 +105,7 @@ const StudyTimer: React.FC = () => {
                                 className="timer-btn resume"
                                 onClick={handleStart}
                                 aria-label="Resume study timer"
+                                disabled={isSaving}
                             >
                                 RESUME
                             </button>
@@ -103,6 +114,7 @@ const StudyTimer: React.FC = () => {
                                 className="timer-btn pause"
                                 onClick={handlePause}
                                 aria-label="Pause study timer"
+                                disabled={isSaving}
                             >
                                 PAUSE
                             </button>
@@ -110,9 +122,11 @@ const StudyTimer: React.FC = () => {
                         <button
                             className="timer-btn stop"
                             onClick={handleStop}
-                            aria-label="Finish study session and log time"
+                            disabled={isSaving}
+                            aria-busy={isSaving}
+                            aria-label={isSaving ? "Saving study session" : "Finish study session and log time"}
                         >
-                            FINISH
+                            {isSaving ? "SAVING..." : "FINISH"}
                         </button>
                     </>
                 )}
