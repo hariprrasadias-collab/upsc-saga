@@ -95,7 +95,7 @@ const HeatmapRenderer: React.FC<HeatmapRendererProps> = ({ content, title }) => 
             <div className="heatmap-wrapper">
                 <ResponsiveContainer width="100%" height={400}>
                     <Treemap
-                        data={data}
+                        data={data as any}
                         dataKey="size"
                         stroke="#fff"
                         fill="#8884d8"
