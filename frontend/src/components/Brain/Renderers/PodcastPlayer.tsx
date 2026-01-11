@@ -219,7 +219,7 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
             const pool = enVoices.length > 0 ? enVoices : voices;
 
             const isStudent = line.speaker.toLowerCase().includes('student') || line.speaker.toLowerCase().includes('curious');
-            const isExpert = line.speaker.toLowerCase().includes('expert') || line.speaker.toLowerCase().includes('professor') || line.speaker.toLowerCase().includes('host');
+            // Removed unused isExpert variable
 
             // Find Voices - Try "Google" or "Natural" first
             const googleFemale = pool.find(v => v.name.includes('Google US English') || v.name.includes('Google UK English Female'));
@@ -333,6 +333,13 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
     const isStudentSpeaking = currentSpeaker.toLowerCase().includes('student') || currentSpeaker.toLowerCase().includes('curious');
     const isExpertSpeaking = currentSpeaker.toLowerCase().includes('expert') || currentSpeaker.toLowerCase().includes('professor') || currentSpeaker.toLowerCase().includes('host');
     const ambientColor = isStudentSpeaking ? 'rgba(163, 113, 247, 0.2)' : (isExpertSpeaking ? 'rgba(0, 255, 242, 0.2)' : 'transparent');
+
+    // Fix: Remove unused isExpert check in voice logic if not needed, or use it.
+    // The previous error was: 'isExpert' is declared but its value is never read.
+    // In "const isExpert = ...", it was defined but not used.
+    // Wait, the error was on line 222.
+    // Line 222 in original was: const isExpert = line.speaker.toLowerCase().includes('expert') || ...
+    // It seems it was unused inside speakLine.
 
     const handleSpeedToggle = () => {
         const potential = [0.8, 1.0, 1.25, 1.5, 2.0];
