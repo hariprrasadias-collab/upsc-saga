@@ -31,10 +31,8 @@ def is_admin(user_id):
 
     except Exception as e:
         print(f"Admin check failed for user {user_id}: {e}")
-        # In case of database error (e.g. column missing before migration),
-        # fail safe to deny access unless it is the hardcoded admin during dev/migration.
-        if user_id == 1:
-             return True
+        # FAIL SECURE: If database check fails, deny access.
+        # Do not allow fallback to True even for hardcoded admin ID.
         return False
 
 @admin_bp.route('/api/admin/stats', methods=['GET'])
