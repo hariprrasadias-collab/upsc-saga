@@ -121,9 +121,36 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         }
     }, []);
 
-    const openNotes = useCallback((topic: Topic) => {
+    const openNotes = useCallback(async (topic: Topic) => {
         setCurrentTopicId(topic.id);
-        setNotesText(topic.notes || '');
+
+        // If we have notes locally, use them
+        if (topic.notes !== undefined && topic.notes !== null) {
+             setNotesText(topic.notes);
+             setShowNotesModal(true);
+             return;
+        }
+
+        // If backend says there are notes but we don't have them, fetch them
+        if (topic.has_notes) {
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/syllabus/${topic.id}`);
+                const data = await res.json();
+                if (data.notes) {
+                    setNotesText(data.notes);
+                    // Update local cache so we don't fetch again
+                    setTopics(prev => prev.map(t => t.id === topic.id ? { ...t, notes: data.notes } : t));
+                } else {
+                    setNotesText('');
+                }
+            } catch (err) {
+                console.error("Failed to fetch notes", err);
+                setNotesText('');
+            }
+        } else {
+            setNotesText('');
+        }
+
         setShowNotesModal(true);
     }, []);
 
@@ -131,7 +158,11 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         if (!currentTopicId) return;
 
         // Optimistic update
-        setTopics(prev => prev.map(t => t.id === currentTopicId ? { ...t, notes: notesText } : t));
+        setTopics(prev => prev.map(t => t.id === currentTopicId ? {
+            ...t,
+            notes: notesText,
+            has_notes: notesText ? 1 : 0
+        } : t));
         setShowNotesModal(false);
 
         try {
