@@ -5,6 +5,7 @@ import { STATUS_OPTIONS } from './types';
 interface TopicItemProps {
     topic: Topic;
     isPriority: boolean;
+    isLoading?: boolean;
     onStatusChange: (id: number, newStatus: string) => void;
     onMarkRevised: (id: number) => void;
     onOpenNotes: (topic: Topic) => void;
@@ -13,6 +14,7 @@ interface TopicItemProps {
 const TopicItem: React.FC<TopicItemProps> = memo(({
     topic,
     isPriority,
+    isLoading,
     onStatusChange,
     onMarkRevised,
     onOpenNotes
@@ -30,12 +32,13 @@ const TopicItem: React.FC<TopicItemProps> = memo(({
             </div>
             <div className="topic-actions">
                 <button
-                    className={`notes-btn ${topic.notes ? 'has-notes' : ''}`}
+                    className={`notes-btn ${(topic.notes || topic.has_notes) ? 'has-notes' : ''}`}
                     onClick={() => onOpenNotes(topic)}
                     title="Add/View Notes"
                     aria-label={`Notes for ${topic.topic}`}
+                    disabled={isLoading}
                 >
-                    📝
+                    {isLoading ? '⏳' : '📝'}
                 </button>
                 <button
                     className="revise-btn"

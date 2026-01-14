@@ -29,6 +29,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
     const [showNotesModal, setShowNotesModal] = useState(false);
     const [currentTopicId, setCurrentTopicId] = useState<number | null>(null);
     const [notesText, setNotesText] = useState('');
+    const [loadingNoteId, setLoadingNoteId] = useState<number | null>(null);
 
     // Brain Audit State
     const [brainInsight, setBrainInsight] = useState<string | null>(null);
@@ -121,10 +122,34 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         }
     }, []);
 
-    const openNotes = useCallback((topic: Topic) => {
-        setCurrentTopicId(topic.id);
-        setNotesText(topic.notes || '');
-        setShowNotesModal(true);
+    const openNotes = useCallback(async (topic: Topic) => {
+        // If notes are already loaded, or if there are no notes on server (has_notes == 0)
+        // Note: has_notes is 0 or 1.
+        if (topic.notes !== undefined || !topic.has_notes) {
+            setCurrentTopicId(topic.id);
+            setNotesText(topic.notes || '');
+            setShowNotesModal(true);
+            return;
+        }
+
+        // Fetch notes
+        setLoadingNoteId(topic.id);
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/syllabus/${topic.id}`);
+            const data = await res.json();
+
+            // Update local state to cache the note
+            setTopics(prev => prev.map(t => t.id === topic.id ? { ...t, notes: data.notes } : t));
+
+            setCurrentTopicId(topic.id);
+            setNotesText(data.notes || '');
+            setShowNotesModal(true);
+        } catch (err) {
+            console.error("Failed to load topic details", err);
+            alert("Failed to load notes.");
+        } finally {
+            setLoadingNoteId(null);
+        }
     }, []);
 
     const saveNotes = async () => {
@@ -296,6 +321,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                                                             key={topic.id}
                                                             topic={topic}
                                                             isPriority={priorityIds.includes(topic.id)}
+                                                            isLoading={loadingNoteId === topic.id}
                                                             onStatusChange={handleStatusChange}
                                                             onMarkRevised={handleMarkRevised}
                                                             onOpenNotes={openNotes}
