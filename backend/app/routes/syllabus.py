@@ -12,13 +12,35 @@ def get_syllabus():
     """Get all syllabus topics with revision info"""
     try:
         conn = get_db()
+        # Optimize: exclude large notes, only return structure + has_notes flag
         topics = conn.execute('''
-            SELECT t.*, r.revision_count, r.next_revision_date, r.last_revised_at
+            SELECT t.id, t.paper, t.subject, t.topic, t.subtopic, t.status, t.last_updated,
+                   (CASE WHEN length(t.notes) > 0 THEN 1 ELSE 0 END) as has_notes,
+                   r.revision_count, r.next_revision_date, r.last_revised_at
             FROM syllabus_topics t
             LEFT JOIN topic_revisions r ON t.id = r.topic_id
             ORDER BY t.paper, t.subject, t.id
         ''').fetchall()
         return jsonify([dict(row) for row in topics])
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@bp.route('/<int:id>', methods=['GET'])
+def get_topic_details(id):
+    """Get full details for a single topic, including notes"""
+    try:
+        conn = get_db()
+        topic = conn.execute('''
+            SELECT t.*, r.revision_count, r.next_revision_date, r.last_revised_at
+            FROM syllabus_topics t
+            LEFT JOIN topic_revisions r ON t.id = r.topic_id
+            WHERE t.id = ?
+        ''', (id,)).fetchone()
+
+        if not topic:
+            return jsonify({'error': 'Topic not found'}), 404
+
+        return jsonify(dict(topic))
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

@@ -5,7 +5,8 @@ export interface Topic {
     topic: string;
     subtopic: string | null;
     status: string;
-    notes: string | null;
+    notes?: string | null;
+    has_notes?: number;
     last_updated: string;
     revision_count?: number;
     next_revision_date?: string;
