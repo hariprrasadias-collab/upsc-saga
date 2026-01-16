@@ -32,7 +32,14 @@ const DashboardMain: React.FC = () => {
           <div className="stat-row">
             <div className="stat-label">PROGRESS</div>
             <div className="stat-bar-container">
-              <div className="stat-bar-bg">
+              <div
+                className="stat-bar-bg"
+                role="progressbar"
+                aria-label="Level Progress"
+                aria-valuenow={currentXP}
+                aria-valuemin={0}
+                aria-valuemax={maxXP}
+              >
                 <div className="stat-bar-fill" style={{ width: `${progressPercent}%` }} />
               </div>
             </div>
