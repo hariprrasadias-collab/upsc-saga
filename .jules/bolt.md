@@ -1,0 +1,1 @@
+## 2026-01-16 - Frontend Verification Challenges\n**Learning:** Playwright verification can be brittle in the CI environment due to timeouts and network issues when spinning up full dev servers.\n**Action:** Rely more on unit tests (Vitest) for component logic and less on full end-to-end verification for minor UI changes unless strictly necessary.

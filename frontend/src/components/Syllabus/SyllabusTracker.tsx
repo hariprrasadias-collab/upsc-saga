@@ -121,10 +121,37 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         }
     }, []);
 
-    const openNotes = useCallback((topic: Topic) => {
+    const openNotes = useCallback(async (topic: Topic) => {
         setCurrentTopicId(topic.id);
-        setNotesText(topic.notes || '');
+
+        // If notes are already loaded, use them
+        if (topic.notes !== undefined && topic.notes !== null) {
+            setNotesText(topic.notes);
+            setShowNotesModal(true);
+            return;
+        }
+
+        // If not loaded, fetch them (lazy load)
         setShowNotesModal(true);
+        setNotesText('Loading notes...');
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/syllabus/${topic.id}`);
+            const data = await res.json();
+
+            if (data.notes) {
+                setNotesText(data.notes);
+                // Update local state to cache the loaded notes
+                setTopics(prev => prev.map(t => t.id === topic.id ? { ...t, notes: data.notes } : t));
+            } else {
+                setNotesText('');
+                // Update local state to reflect empty notes
+                setTopics(prev => prev.map(t => t.id === topic.id ? { ...t, notes: '' } : t));
+            }
+        } catch (err) {
+            console.error("Failed to load notes", err);
+            setNotesText('Error loading notes. Please try again.');
+        }
     }, []);
 
     const saveNotes = async () => {
