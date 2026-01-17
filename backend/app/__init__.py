@@ -8,10 +8,14 @@ from logging.handlers import RotatingFileHandler
 import os
 import threading
 import time
-from dotenv import load_dotenv
-
-# Load environment variables from .env
-load_dotenv()
+try:
+    from dotenv import load_dotenv
+    # Load environment variables from .env
+    load_dotenv()
+except ImportError:
+    # In production (Render), python-dotenv might not be installed or needed
+    # if env vars are set via dashboard.
+    pass
 
 cache = Cache()
 
