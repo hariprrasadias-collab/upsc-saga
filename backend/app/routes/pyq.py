@@ -3,6 +3,7 @@ from flask_cors import CORS
 from app.db import get_db
 import json
 from datetime import datetime
+from app import cache
 
 bp = Blueprint('pyq', __name__, url_prefix='/api/pyq')
 CORS(bp)
@@ -79,6 +80,7 @@ def get_questions():
         return jsonify({'error': str(e)}), 500
 
 @bp.route('/filters', methods=['GET'])
+@cache.cached(timeout=300)
 def get_filters():
     """Get available filter options"""
     try:
@@ -97,6 +99,7 @@ def get_filters():
         return jsonify({'error': str(e)}), 500
 
 @bp.route('/topics', methods=['GET'])
+@cache.cached(timeout=300, query_string=True)
 def get_topics():
     """Get topics filtered by selected subject(s)"""
     try:
@@ -148,6 +151,7 @@ def toggle_favorite(id):
         return jsonify({'error': str(e)}), 500
 
 @bp.route('/analytics', methods=['GET'])
+@cache.cached(timeout=300, query_string=True)
 def get_analytics():
     """Get analytics with optional filters"""
     try:
