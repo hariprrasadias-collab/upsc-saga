@@ -3,17 +3,27 @@ from flask import Flask
 from flask_cors import CORS
 from flask_compress import Compress
 from flask_caching import Cache
+from dotenv import load_dotenv
 import logging
 from logging.handlers import RotatingFileHandler
 import os
 import threading
 import time
 
+# Load environment variables
+load_dotenv()
+
 cache = Cache()
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
+
+    # 🛡️ Sentinel: Hardcoded secret key replaced with env var
+    app.secret_key = os.getenv('FLASK_SECRET_KEY', 'dev_secret_key_upsc_saga')
+
+    if app.secret_key == 'dev_secret_key_upsc_saga':
+        print("⚠️ WARNING: Using insecure default FLASK_SECRET_KEY. Set FLASK_SECRET_KEY in production.")
+
     CORS(app, resources={r"/*": {"origins": "*"}})
     Compress(app) # Enable Gzip compression
 
