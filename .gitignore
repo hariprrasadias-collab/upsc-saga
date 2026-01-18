@@ -18,6 +18,8 @@ backend/upsc_saga.db
 # Database
 **/*.db
 backend/upsc_saga.db
+**/*.db-shm
+**/*.db-wal
 
 # OS
 .DS_Store
