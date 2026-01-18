@@ -8,12 +8,21 @@ from logging.handlers import RotatingFileHandler
 import os
 import threading
 import time
+try:
+    from dotenv import load_dotenv
+    # Load environment variables from .env
+    load_dotenv()
+except ImportError:
+    # In production (Render), python-dotenv might not be installed or needed
+    # if env vars are set via dashboard.
+    pass
 
 cache = Cache()
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
+    # SECURITY: Load secret key from environment or fall back to dev key
+    app.secret_key = os.getenv('FLASK_SECRET_KEY', 'dev_secret_key_upsc_saga')
     CORS(app, resources={r"/*": {"origins": "*"}})
     Compress(app) # Enable Gzip compression
 
