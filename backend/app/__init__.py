@@ -1,9 +1,18 @@
-from app import cgi_fix
+try:
+    from . import cgi_fix
+except ImportError:
+    # Fallback for when running directly
+    from app import cgi_fix
+
 from flask import Flask
 from flask_cors import CORS
 from flask_compress import Compress
 from flask_caching import Cache
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    load_dotenv = None
+
 import logging
 from logging.handlers import RotatingFileHandler
 import os
@@ -11,7 +20,8 @@ import threading
 import time
 
 # Load environment variables
-load_dotenv()
+if load_dotenv:
+    load_dotenv()
 
 cache = Cache()
 
