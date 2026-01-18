@@ -271,10 +271,15 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
             <div className="syllabus-tree">
                 {Object.entries(groupedData).sort().map(([paper, subjects]) => (
                     <div key={paper} className="paper-section">
-                        <div className="paper-header" onClick={() => togglePaper(paper)}>
+                        <button
+                            type="button"
+                            className="paper-header"
+                            onClick={() => togglePaper(paper)}
+                            aria-expanded={!!expandedPapers[paper]}
+                        >
                             <h2>{paper}</h2>
-                            <span>{expandedPapers[paper] ? '▼' : '▶'}</span>
-                        </div>
+                            <span aria-hidden="true">{expandedPapers[paper] ? '▼' : '▶'}</span>
+                        </button>
 
                         {expandedPapers[paper] && (
                             <div className="subject-list">
@@ -282,12 +287,17 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                                     const subjectKey = `${paper}-${subject}`;
                                     return (
                                         <div key={subjectKey} className="subject-item">
-                                            <div className="subject-header" onClick={() => toggleSubject(subjectKey)}>
+                                            <button
+                                                type="button"
+                                                className="subject-header"
+                                                onClick={() => toggleSubject(subjectKey)}
+                                                aria-expanded={!!expandedSubjects[subjectKey]}
+                                            >
                                                 <span>{subject}</span>
                                                 <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>
                                                     {subjectTopics.filter(t => t.status === 'Completed').length}/{subjectTopics.length} Done
                                                 </span>
-                                            </div>
+                                            </button>
 
                                             {expandedSubjects[subjectKey] && (
                                                 <div className="topic-list">

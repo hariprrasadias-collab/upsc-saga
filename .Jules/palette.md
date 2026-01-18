@@ -1,3 +1,3 @@
-## 2024-05-23 - Toast Notification Accessibility
-**Learning:** Notifications are often invisible to screen readers without proper roles. Using `role="alert"` for errors (assertive) and `role="status"` for info (polite) ensures users are notified at the right urgency level.
-**Action:** Always categorize toast notifications by urgency and apply corresponding `aria-live` regions, while ensuring close buttons have clear labels.
+## 2024-10-24 - Semantic Buttons for Expandable Headers
+**Learning:** In React apps, clickable `div`s for accordion/expandable headers are a common anti-pattern that breaks keyboard accessibility. Using `<button type="button">` with `aria-expanded` and CSS resets (`all: inherit` or specific background/border removals) provides instant accessibility wins without needing complex custom components.
+**Action:** When auditing UI, look for `onClick` handlers on `div`s. If they trigger an action like expanding content, convert them to `<button>` elements and apply a "reset" CSS class to preserve the original design while gaining native focus and screen reader support.
