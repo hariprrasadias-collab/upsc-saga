@@ -1,4 +1,4 @@
-from app import cgi_fix
+from . import cgi_fix
 from flask import Flask
 from flask_cors import CORS
 from flask_compress import Compress
@@ -8,12 +8,22 @@ from logging.handlers import RotatingFileHandler
 import os
 import threading
 import time
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 cache = Cache()
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
+
+    # SECURITY: Load secret key from environment variable to prevent session hijacking
+    app.secret_key = os.getenv('FLASK_SECRET_KEY', 'dev_secret_key_upsc_saga')
+
+    if app.secret_key == 'dev_secret_key_upsc_saga' and os.getenv('FLASK_ENV') == 'production':
+        print("🚨 CRITICAL SECURITY WARNING: Using hardcoded dev secret key in production!")
+
     CORS(app, resources={r"/*": {"origins": "*"}})
     Compress(app) # Enable Gzip compression
 
@@ -41,7 +51,7 @@ def create_app():
 
         # Trigger Autonomous Repair (Background)
         try:
-            from app.services.hephaestus_service import hephaestus
+            from .services.hephaestus_service import hephaestus
             hephaestus.start_background_repair(e)
             print(f"🔥 Hephaestus dispatched for error: {e}")
         except Exception as h_err:
@@ -54,7 +64,7 @@ def create_app():
     def run_startup_scan():
         time.sleep(3) # Wait for app to fully initialize
         try:
-            from app.services.hephaestus_service import hephaestus
+            from .services.hephaestus_service import hephaestus
             hephaestus.scan_logs_and_repair('logs/app.log')
         except Exception as e:
             print(f"❌ Startup Log Scan Failed: {e}")
@@ -82,18 +92,18 @@ def create_app():
     app.config['DATABASE'] = db.DATABASE
 
     # Initialize DB tables
-    from app.db_models.study_plan import init_study_plan_tables
-    from app.db_models.autonomous_brain import init_autonomous_brain_tables
-    from app.db_models.gamification import init_gamification_tables
-    from app.db_models.core import init_core_tables
-    from app.db_models.tasks import init_tasks_table
-    from app.db_models.indexes import init_indexes
+    from .db_models.study_plan import init_study_plan_tables
+    from .db_models.autonomous_brain import init_autonomous_brain_tables
+    from .db_models.gamification import init_gamification_tables
+    from .db_models.core import init_core_tables
+    from .db_models.tasks import init_tasks_table
+    from .db_models.indexes import init_indexes
     
     # Extra modules
-    from app.db_models.flashcards import init_flashcard_tables
-    from app.db_models.answer_writing import init_answer_writing_tables
-    from app.db_models.revision import init_revision_tables
-    from app.db_models.syllabus import init_syllabus_tables
+    from .db_models.flashcards import init_flashcard_tables
+    from .db_models.answer_writing import init_answer_writing_tables
+    from .db_models.revision import init_revision_tables
+    from .db_models.syllabus import init_syllabus_tables
 
     with app.app_context():
         init_core_tables() # Core first (users)
@@ -103,7 +113,7 @@ def create_app():
         init_gamification_tables()
         
         # Initialize Automation Tables (Socratic, Triangulation, etc.)
-        from app.db_models.automation_storage import init_automation_tables
+        from .db_models.automation_storage import init_automation_tables
         init_automation_tables()
         
         init_indexes() # Ensure performance indexes
@@ -163,54 +173,54 @@ def create_app():
     app.register_blueprint(mindmap.bp)
     app.register_blueprint(study_plan.study_plan_bp)
     
-    from app.routes import compilation
+    from .routes import compilation
     app.register_blueprint(compilation.bp)
 
-    from app.routes.scribe import scribe_bp
+    from .routes.scribe import scribe_bp
     app.register_blueprint(scribe_bp, url_prefix='/api/scribe')
 
-    from app.routes.arena import arena_bp
+    from .routes.arena import arena_bp
     app.register_blueprint(arena_bp, url_prefix='/api/arena')
 
-    from app.routes.socratic_routes import socratic_bp
+    from .routes.socratic_routes import socratic_bp
     app.register_blueprint(socratic_bp, url_prefix='/api/socratic')
 
-    from app.routes.triangulation_routes import triangulation_bp
+    from .routes.triangulation_routes import triangulation_bp
     app.register_blueprint(triangulation_bp, url_prefix='/api/triangulation')
 
-    from app.routes.brain_routes import brain_bp
+    from .routes.brain_routes import brain_bp
     app.register_blueprint(brain_bp, url_prefix='/api/brain')
 
-    from app.routes.autonomy_routes import autonomy_bp
+    from .routes.autonomy_routes import autonomy_bp
     app.register_blueprint(autonomy_bp, url_prefix='/api/autonomy')
 
-    from app.routes.automation_routes import automation_bp
+    from .routes.automation_routes import automation_bp
     app.register_blueprint(automation_bp, url_prefix='/api/automation')
 
-    from app.routes.mind_palace import mind_palace_bp
+    from .routes.mind_palace import mind_palace_bp
     app.register_blueprint(mind_palace_bp, url_prefix='/api/mind_palace')
 
-    from app.routes.foresight import foresight_bp
+    from .routes.foresight import foresight_bp
     app.register_blueprint(foresight_bp, url_prefix='/api/foresight')
 
     # Removed duplicate watchman registration from here
 
-    from app.routes.panopticon import panopticon_bp
+    from .routes.panopticon import panopticon_bp
     app.register_blueprint(panopticon_bp)
 
-    from app.routes.neural_hash import neural_hash_bp
+    from .routes.neural_hash import neural_hash_bp
     app.register_blueprint(neural_hash_bp, url_prefix='/api/neural_hash')
 
-    from app.routes.interview import interview_bp
+    from .routes.interview import interview_bp
     app.register_blueprint(interview_bp, url_prefix='/api/interview')
 
     # Initialize Tables
-    from app.db_models.mind_palace import init_mind_palace_tables
-    from app.db_models.night_watchman import init_watchman_tables
-    from app.db_models.panopticon import init_panopticon_tables
-    from app.db_models.foresight import init_foresight_tables
-    from app.db_models.neural_hash import init_neural_hash_tables
-    from app.db import DATABASE
+    from .db_models.mind_palace import init_mind_palace_tables
+    from .db_models.night_watchman import init_watchman_tables
+    from .db_models.panopticon import init_panopticon_tables
+    from .db_models.foresight import init_foresight_tables
+    from .db_models.neural_hash import init_neural_hash_tables
+    from .db import DATABASE
     
     with app.app_context():
         init_mind_palace_tables()
