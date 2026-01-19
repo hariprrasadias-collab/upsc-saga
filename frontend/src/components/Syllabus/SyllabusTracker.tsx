@@ -271,15 +271,17 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
             <div className="syllabus-tree">
                 {Object.entries(groupedData).sort().map(([paper, subjects]) => (
                     <div key={paper} className="paper-section">
-                        <button
-                            type="button"
-                            className="paper-header"
-                            onClick={() => togglePaper(paper)}
-                            aria-expanded={!!expandedPapers[paper]}
-                        >
-                            <h2>{paper}</h2>
-                            <span aria-hidden="true">{expandedPapers[paper] ? '▼' : '▶'}</span>
-                        </button>
+                        <h2 className="paper-header-container">
+                            <button
+                                type="button"
+                                className="paper-header"
+                                onClick={() => togglePaper(paper)}
+                                aria-expanded={!!expandedPapers[paper]}
+                            >
+                                <span className="paper-header-text">{paper}</span>
+                                <span aria-hidden="true">{expandedPapers[paper] ? '▼' : '▶'}</span>
+                            </button>
+                        </h2>
 
                         {expandedPapers[paper] && (
                             <div className="subject-list">

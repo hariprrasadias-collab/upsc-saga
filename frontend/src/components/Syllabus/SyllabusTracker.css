@@ -123,6 +123,13 @@
     border-color: rgba(255, 255, 255, 0.2);
 }
 
+.paper-header-container {
+    margin: 0;
+    padding: 0;
+    font-size: 100%;
+    font-weight: normal;
+}
+
 .paper-header {
     background: rgba(30, 41, 59, 0.4);
     padding: 1.2rem 1.5rem;
@@ -143,11 +150,12 @@
     background: rgba(30, 41, 59, 0.6);
 }
 
-.paper-header h2 {
+.paper-header-text {
     margin: 0;
     font-size: 1.3rem;
     color: var(--color-accent-blue);
     font-family: 'Cinzel', serif;
+    font-weight: bold;
 }
 
 .subject-list {
