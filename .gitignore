@@ -17,6 +17,8 @@ backend/upsc_saga.db
 
 # Database
 **/*.db
+**/*.db-shm
+**/*.db-wal
 backend/upsc_saga.db
 
 # OS

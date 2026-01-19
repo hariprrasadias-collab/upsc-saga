@@ -8,12 +8,22 @@ from logging.handlers import RotatingFileHandler
 import os
 import threading
 import time
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 cache = Cache()
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
+
+    # SECURITY: Load secret key from environment variable to prevent session hijacking
+    app.secret_key = os.getenv('FLASK_SECRET_KEY', 'dev_secret_key_upsc_saga')
+
+    if app.secret_key == 'dev_secret_key_upsc_saga' and os.getenv('FLASK_ENV') == 'production':
+        print("🚨 CRITICAL SECURITY WARNING: Using hardcoded dev secret key in production!")
+
     CORS(app, resources={r"/*": {"origins": "*"}})
     Compress(app) # Enable Gzip compression
 
