@@ -29,6 +29,8 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
     const [showNotesModal, setShowNotesModal] = useState(false);
     const [currentTopicId, setCurrentTopicId] = useState<number | null>(null);
     const [notesText, setNotesText] = useState('');
+    const [isLoadingNotes, setIsLoadingNotes] = useState(false);
+    const [notesError, setNotesError] = useState<string | null>(null);
 
     // Brain Audit State
     const [brainInsight, setBrainInsight] = useState<string | null>(null);
@@ -121,17 +123,45 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         }
     }, []);
 
-    const openNotes = useCallback((topic: Topic) => {
+    const openNotes = useCallback(async (topic: Topic) => {
         setCurrentTopicId(topic.id);
-        setNotesText(topic.notes || '');
         setShowNotesModal(true);
+
+        // If notes are already loaded locally, use them
+        if (topic.notes !== undefined) {
+            setNotesText(topic.notes || '');
+            return;
+        }
+
+        // Otherwise fetch them
+        setIsLoadingNotes(true);
+        setNotesText(''); // Clear while loading
+        setNotesError(null);
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/syllabus/${topic.id}`);
+            if (res.ok) {
+                const data = await res.json();
+                const fetchedNotes = data.notes || '';
+                setNotesText(fetchedNotes);
+                // Cache it locally so next open is instant
+                setTopics(prev => prev.map(t => t.id === topic.id ? { ...t, notes: fetchedNotes } : t));
+            } else {
+                setNotesError('Failed to load notes.');
+            }
+        } catch (err) {
+            console.error("Failed to fetch notes", err);
+            setNotesError('Error loading notes.');
+        } finally {
+            setIsLoadingNotes(false);
+        }
     }, []);
 
     const saveNotes = async () => {
         if (!currentTopicId) return;
 
         // Optimistic update
-        setTopics(prev => prev.map(t => t.id === currentTopicId ? { ...t, notes: notesText } : t));
+        setTopics(prev => prev.map(t => t.id === currentTopicId ? { ...t, notes: notesText, has_notes: !!notesText } : t));
         setShowNotesModal(false);
 
         try {
@@ -317,15 +347,21 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                 <div className="notes-modal-overlay">
                     <div className="notes-modal">
                         <h3>Topic Notes</h3>
-                        <textarea
-                            className="notes-textarea"
-                            value={notesText}
-                            onChange={(e) => setNotesText(e.target.value)}
-                            placeholder="Add your notes, strategy, or resource links here..."
-                        />
+                        {isLoadingNotes ? (
+                            <div className="loading-spinner">Fetching notes...</div>
+                        ) : notesError ? (
+                            <div className="error-message" style={{ color: 'red', padding: '1rem' }}>{notesError}</div>
+                        ) : (
+                            <textarea
+                                className="notes-textarea"
+                                value={notesText}
+                                onChange={(e) => setNotesText(e.target.value)}
+                                placeholder="Add your notes, strategy, or resource links here..."
+                            />
+                        )}
                         <div className="modal-actions">
                             <button className="cancel-btn" onClick={() => setShowNotesModal(false)}>Cancel</button>
-                            <button className="save-btn" onClick={saveNotes}>Save Notes</button>
+                            <button className="save-btn" onClick={saveNotes} disabled={isLoadingNotes || !!notesError}>Save Notes</button>
                         </div>
                     </div>
                 </div>
