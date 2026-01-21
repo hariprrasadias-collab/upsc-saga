@@ -11,7 +11,6 @@ warmap = Blueprint('warmap', __name__)
 
 # Configuration
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-CREDENTIALS_FILE = os.path.join(BASE_DIR, 'credentials.json')
 TOKEN_FILE = os.path.join(BASE_DIR, 'token.json')
 SCOPES = ['https://www.googleapis.com/auth/calendar.events']
 # Allow HTTP for local development
@@ -50,13 +49,39 @@ def google_status():
     creds = get_credentials()
     return jsonify({"connected": creds is not None and creds.valid})
 
+def get_client_config():
+    """Constructs client config from environment variables."""
+    # Check if we have the necessary environment variables
+    client_id = os.environ.get('GOOGLE_CLIENT_ID')
+    client_secret = os.environ.get('GOOGLE_CLIENT_SECRET')
+    project_id = os.environ.get('GOOGLE_PROJECT_ID')
+
+    if not all([client_id, client_secret, project_id]):
+        return None
+
+    return {
+        "installed": {
+            "client_id": client_id,
+            "project_id": project_id,
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_secret": client_secret,
+            "redirect_uris": [url_for('warmap.google_callback', _external=True)]
+        }
+    }
+
 @warmap.route('/api/warmap/google-auth')
 def google_auth():
-    if not os.path.exists(CREDENTIALS_FILE):
-        return jsonify({"error": "credentials.json not found. Please configure Google Cloud credentials."}), 404
+    client_config = get_client_config()
 
-    flow = Flow.from_client_secrets_file(
-        CREDENTIALS_FILE,
+    if not client_config:
+        return jsonify({
+            "error": "Google Cloud credentials not found in environment variables. Please check your .env file."
+        }), 500
+
+    flow = Flow.from_client_config(
+        client_config,
         scopes=SCOPES,
         redirect_uri=url_for('warmap.google_callback', _external=True)
     )
@@ -73,9 +98,13 @@ def google_callback():
     if not state or state != request.args.get('state'):
         return jsonify({"error": "Invalid state parameter"}), 400
 
+    client_config = get_client_config()
+    if not client_config:
+        return jsonify({"error": "Google Cloud credentials missing configuration"}), 500
+
     try:
-        flow = Flow.from_client_secrets_file(
-            CREDENTIALS_FILE,
+        flow = Flow.from_client_config(
+            client_config,
             scopes=SCOPES,
             state=state,
             redirect_uri=url_for('warmap.google_callback', _external=True)
