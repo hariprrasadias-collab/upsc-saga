@@ -7,15 +7,6 @@ export default defineConfig({
     react()
   ],
   build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['framer-motion'],
-          'chart-vendor': ['recharts', 'd3']
-        }
-      }
-    },
     chunkSizeWarningLimit: 1000
   },
   server: {
