@@ -225,7 +225,11 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         setExpandedSubjects(prev => ({ ...prev, [subjectKey]: !prev[subjectKey] }));
     };
 
-    if (loading) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading Syllabus...</div>;
+    if (loading) return (
+        <div style={{ padding: '2rem', textAlign: 'center' }} role="status" aria-live="polite">
+            Loading Syllabus...
+        </div>
+    );
 
     return (
         <div className="syllabus-container">
@@ -255,14 +259,19 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
             <div className="syllabus-dashboard">
                 {['Prelims', 'GS1', 'GS2', 'GS3', 'GS4', 'Optional'].map(paper => (
                     <div key={paper} className="paper-card">
-                        <div className="paper-title">{paper}</div>
+                        <div className="paper-title" id={`title-${paper}`}>{paper}</div>
                         <div className="progress-container">
                             <div
                                 className="progress-bar"
                                 style={{ width: `${getProgress(paper)}%` }}
+                                role="progressbar"
+                                aria-valuenow={getProgress(paper)}
+                                aria-valuemin={0}
+                                aria-valuemax={100}
+                                aria-labelledby={`title-${paper}`}
                             ></div>
                         </div>
-                        <div className="progress-text">{getProgress(paper)}% Completed</div>
+                        <div className="progress-text" aria-hidden="true">{getProgress(paper)}% Completed</div>
                     </div>
                 ))}
             </div>
@@ -271,9 +280,21 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
             <div className="syllabus-tree">
                 {Object.entries(groupedData).sort().map(([paper, subjects]) => (
                     <div key={paper} className="paper-section">
-                        <div className="paper-header" onClick={() => togglePaper(paper)}>
+                        <div
+                            className="paper-header"
+                            onClick={() => togglePaper(paper)}
+                            role="button"
+                            tabIndex={0}
+                            aria-expanded={expandedPapers[paper]}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    togglePaper(paper);
+                                }
+                            }}
+                        >
                             <h2>{paper}</h2>
-                            <span>{expandedPapers[paper] ? '▼' : '▶'}</span>
+                            <span aria-hidden="true">{expandedPapers[paper] ? '▼' : '▶'}</span>
                         </div>
 
                         {expandedPapers[paper] && (
@@ -282,7 +303,19 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                                     const subjectKey = `${paper}-${subject}`;
                                     return (
                                         <div key={subjectKey} className="subject-item">
-                                            <div className="subject-header" onClick={() => toggleSubject(subjectKey)}>
+                                            <div
+                                                className="subject-header"
+                                                onClick={() => toggleSubject(subjectKey)}
+                                                role="button"
+                                                tabIndex={0}
+                                                aria-expanded={!!expandedSubjects[subjectKey]}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' || e.key === ' ') {
+                                                        e.preventDefault();
+                                                        toggleSubject(subjectKey);
+                                                    }
+                                                }}
+                                            >
                                                 <span>{subject}</span>
                                                 <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>
                                                     {subjectTopics.filter(t => t.status === 'Completed').length}/{subjectTopics.length} Done
