@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import './AnkiDojo.css';
 import { audioManager } from '../../util/AudioManager';
 import { ebisuScheduler } from './ebisuAlgorithm';
+import { sanitizeHtml } from '../../util/security';
 
 interface AnkiCard {
     id: number;
@@ -269,7 +270,7 @@ const AnkiDojo: React.FC = () => {
                                 <div className="card-label">Question</div>
                                 <div
                                     className="card-content"
-                                    dangerouslySetInnerHTML={{ __html: currentCard.question }}
+                                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(currentCard.question) }}
                                 />
                                 {!isFlipped && <div className="tap-hint">👆 Tap to reveal answer</div>}
                             </div>
@@ -279,7 +280,7 @@ const AnkiDojo: React.FC = () => {
                                 <div className="card-label">Answer</div>
                                 <div
                                     className="card-content"
-                                    dangerouslySetInnerHTML={{ __html: currentCard.answer }}
+                                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(currentCard.answer) }}
                                 />
                             </div>
                         </div>
