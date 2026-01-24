@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_cors import CORS
 from app.db import get_db
 import json
+import time
 from datetime import datetime
 
 bp = Blueprint('pyq', __name__, url_prefix='/api/pyq')
@@ -218,13 +219,31 @@ def get_analytics():
 # Key: IP Address, Value: timestamp of last request
 _strategos_rate_limit = {}
 
+def get_client_ip():
+    """Get the real client IP, considering proxies"""
+    x_forwarded_for = request.headers.get('X-Forwarded-For')
+    if x_forwarded_for:
+        return x_forwarded_for.split(',')[0].strip()
+    return request.remote_addr
+
+def cleanup_rate_limit(cooldown=60):
+    """Remove stale entries from rate limiter"""
+    current_time = time.time()
+    # Remove entries older than 60 seconds
+    to_remove = [ip for ip, timestamp in _strategos_rate_limit.items() if current_time - timestamp > cooldown]
+    for ip in to_remove:
+        del _strategos_rate_limit[ip]
+
 @bp.route('/strategos/<int:question_id>', methods=['POST'])
 def ask_strategos(question_id):
     """Ask AI for tactical breakdown of a question"""
     try:
-        # 1. Rate Limiting Check (Simple)
-        import time
-        client_ip = request.remote_addr
+        # 1. Rate Limiting Check
+        # Cleanup if too large
+        if len(_strategos_rate_limit) > 1000:
+            cleanup_rate_limit()
+
+        client_ip = get_client_ip()
         last_req = _strategos_rate_limit.get(client_ip, 0)
         current_time = time.time()
 
