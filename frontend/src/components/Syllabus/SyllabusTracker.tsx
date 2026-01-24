@@ -256,7 +256,14 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                 {['Prelims', 'GS1', 'GS2', 'GS3', 'GS4', 'Optional'].map(paper => (
                     <div key={paper} className="paper-card">
                         <div className="paper-title">{paper}</div>
-                        <div className="progress-container">
+                        <div
+                            className="progress-container"
+                            role="progressbar"
+                            aria-valuenow={getProgress(paper)}
+                            aria-valuemin={0}
+                            aria-valuemax={100}
+                            aria-label={`Syllabus completion for ${paper}`}
+                        >
                             <div
                                 className="progress-bar"
                                 style={{ width: `${getProgress(paper)}%` }}
@@ -271,10 +278,15 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
             <div className="syllabus-tree">
                 {Object.entries(groupedData).sort().map(([paper, subjects]) => (
                     <div key={paper} className="paper-section">
-                        <div className="paper-header" onClick={() => togglePaper(paper)}>
+                        <button
+                            className="paper-header"
+                            type="button"
+                            onClick={() => togglePaper(paper)}
+                            aria-expanded={expandedPapers[paper]}
+                        >
                             <h2>{paper}</h2>
                             <span>{expandedPapers[paper] ? '▼' : '▶'}</span>
-                        </div>
+                        </button>
 
                         {expandedPapers[paper] && (
                             <div className="subject-list">
@@ -282,12 +294,17 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                                     const subjectKey = `${paper}-${subject}`;
                                     return (
                                         <div key={subjectKey} className="subject-item">
-                                            <div className="subject-header" onClick={() => toggleSubject(subjectKey)}>
+                                            <button
+                                                className="subject-header"
+                                                type="button"
+                                                onClick={() => toggleSubject(subjectKey)}
+                                                aria-expanded={expandedSubjects[subjectKey]}
+                                            >
                                                 <span>{subject}</span>
                                                 <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>
                                                     {subjectTopics.filter(t => t.status === 'Completed').length}/{subjectTopics.length} Done
                                                 </span>
-                                            </div>
+                                            </button>
 
                                             {expandedSubjects[subjectKey] && (
                                                 <div className="topic-list">
