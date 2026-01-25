@@ -124,6 +124,16 @@
 }
 
 .paper-header {
+    /* Reset button defaults */
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    font: inherit;
+    text-align: inherit;
+    width: 100%;
+    color: inherit;
+    margin: 0;
+
     background: rgba(30, 41, 59, 0.4);
     padding: 1.2rem 1.5rem;
     cursor: pointer;
@@ -154,12 +164,22 @@
 }
 
 .subject-header {
+    /* Reset button defaults */
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    font: inherit;
+    text-align: inherit;
+    width: 100%;
+    color: inherit;
+    margin: 0;
+
     padding: 1rem 1.5rem;
     padding-left: 2.5rem;
     /* Indent */
     cursor: pointer;
     font-weight: 600;
-    color: var(--color-text-primary);
+    /* color inherited */
     display: flex;
     justify-content: space-between;
     align-items: center;
