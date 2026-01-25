@@ -2,7 +2,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import LevelUpModal from './LevelUpModal';
 import { vi, describe, it, expect } from 'vitest';
-import React from 'react';
 
 describe('LevelUpModal', () => {
     const mockOnClose = vi.fn();
