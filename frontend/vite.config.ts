@@ -1,20 +1,19 @@
-import { defineConfig, splitVendorChunkPlugin } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    react(),
-    splitVendorChunkPlugin()
+    react()
   ],
   build: {
     rollupOptions: {
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['framer-motion', '@mui/material', '@mui/icons-material'],
+          'ui-vendor': ['framer-motion', 'react-icons'],
           'chart-vendor': ['recharts', 'd3'],
-          'map-vendor': ['d3-geo', 'd3-selection', 'd3-zoom']
+          'map-vendor': ['leaflet', 'react-leaflet']
         }
       }
     },
