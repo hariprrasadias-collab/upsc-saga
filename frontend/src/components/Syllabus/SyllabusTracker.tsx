@@ -29,6 +29,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
     const [showNotesModal, setShowNotesModal] = useState(false);
     const [currentTopicId, setCurrentTopicId] = useState<number | null>(null);
     const [notesText, setNotesText] = useState('');
+    const [isNotesLoading, setIsNotesLoading] = useState(false);
 
     // Brain Audit State
     const [brainInsight, setBrainInsight] = useState<string | null>(null);
@@ -121,17 +122,40 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         }
     }, []);
 
-    const openNotes = useCallback((topic: Topic) => {
+    const openNotes = useCallback(async (topic: Topic) => {
         setCurrentTopicId(topic.id);
-        setNotesText(topic.notes || '');
         setShowNotesModal(true);
+        setIsNotesLoading(true);
+        setNotesText(''); // Clear previous notes
+
+        if (topic.notes) {
+            // If we already have notes loaded (unlikely with new opt, but safe)
+            setNotesText(topic.notes);
+            setIsNotesLoading(false);
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/syllabus/${topic.id}/notes`);
+            const data = await res.json();
+            setNotesText(data.notes || '');
+        } catch (err) {
+            console.error("Failed to load notes", err);
+            setNotesText('Error loading notes.');
+        } finally {
+            setIsNotesLoading(false);
+        }
     }, []);
 
     const saveNotes = async () => {
         if (!currentTopicId) return;
 
         // Optimistic update
-        setTopics(prev => prev.map(t => t.id === currentTopicId ? { ...t, notes: notesText } : t));
+        setTopics(prev => prev.map(t => t.id === currentTopicId ? {
+            ...t,
+            notes: notesText,
+            has_notes: notesText && notesText.length > 0 ? 1 : 0
+        } : t));
         setShowNotesModal(false);
 
         try {
@@ -317,15 +341,19 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                 <div className="notes-modal-overlay">
                     <div className="notes-modal">
                         <h3>Topic Notes</h3>
-                        <textarea
-                            className="notes-textarea"
-                            value={notesText}
-                            onChange={(e) => setNotesText(e.target.value)}
-                            placeholder="Add your notes, strategy, or resource links here..."
-                        />
+                        {isNotesLoading ? (
+                            <div className="loading-spinner">Loading Notes...</div>
+                        ) : (
+                            <textarea
+                                className="notes-textarea"
+                                value={notesText}
+                                onChange={(e) => setNotesText(e.target.value)}
+                                placeholder="Add your notes, strategy, or resource links here..."
+                            />
+                        )}
                         <div className="modal-actions">
                             <button className="cancel-btn" onClick={() => setShowNotesModal(false)}>Cancel</button>
-                            <button className="save-btn" onClick={saveNotes}>Save Notes</button>
+                            <button className="save-btn" onClick={saveNotes} disabled={isNotesLoading}>Save Notes</button>
                         </div>
                     </div>
                 </div>
