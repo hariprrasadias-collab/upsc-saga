@@ -1,7 +1,7 @@
 import React from 'react';
 import './LevelUpModal.css';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface LevelUpModalProps {
     newLevel: number;
@@ -11,6 +11,24 @@ interface LevelUpModalProps {
 
 const LevelUpModal: React.FC<LevelUpModalProps> = ({ newLevel, lore, onClose }) => {
     const [displayedLore, setDisplayedLore] = useState('');
+    const modalRef = useRef<HTMLDivElement>(null);
+
+    // Focus management and Escape key listener
+    useEffect(() => {
+        // Focus the modal container on mount so screen readers announce it
+        if (modalRef.current) {
+            modalRef.current.focus();
+        }
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [onClose]);
 
     // Typing effect for lore
     useEffect(() => {
@@ -25,14 +43,22 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ newLevel, lore, onClose }) 
     }, [lore]);
 
     return (
-        <div className="levelup-overlay">
+        <div
+            className="levelup-overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="levelup-title"
+            tabIndex={-1}
+            ref={modalRef}
+        >
             <div className="levelup-content">
-                <h1 className="levelup-title">LEVEL UP</h1>
+                <h1 id="levelup-title" className="levelup-title">LEVEL UP</h1>
                 <h2 className="levelup-sub">YOU ARE NOW LEVEL {newLevel}</h2>
                 
                 {lore && (
                     <div className="levelup-lore">
-                        <p>{displayedLore}</p>
+                        <p aria-hidden="true">{displayedLore}</p>
+                        <span className="sr-only">{lore}</span>
                     </div>
                 )}
 
