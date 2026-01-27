@@ -55,17 +55,17 @@ const FlashcardReview: React.FC<FlashcardReviewProps> = ({ deckId, onFinish }) =
         const card = cards[currentIndex];
         const timeSpent = Math.floor((Date.now() - sessionStart) / 1000);
 
-        try {
-            await fetch(`http://localhost:5000/api/flashcards/${card.id}/review`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ rating, time_taken: timeSpent })
-            });
+        // Optimistic UI update: Move to next card immediately
+        moveToNext();
 
-            moveToNext();
-        } catch (err) {
+        // Send request in background
+        fetch(`http://localhost:5000/api/flashcards/${card.id}/review`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ rating, time_taken: timeSpent })
+        }).catch(err => {
             console.error('Failed to record review:', err);
-        }
+        });
     };
 
     const moveToNext = () => {
