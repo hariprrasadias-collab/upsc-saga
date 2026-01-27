@@ -50,16 +50,50 @@ def google_status():
     creds = get_credentials()
     return jsonify({"connected": creds is not None and creds.valid})
 
+def get_flow(state=None, redirect_uri=None):
+    """Helper to create Flow from file or env vars"""
+    # 1. Try file first
+    if os.path.exists(CREDENTIALS_FILE):
+        return Flow.from_client_secrets_file(
+            CREDENTIALS_FILE,
+            scopes=SCOPES,
+            state=state,
+            redirect_uri=redirect_uri
+        )
+
+    # 2. Try Environment Variables
+    client_id = os.environ.get('GOOGLE_CLIENT_ID')
+    client_secret = os.environ.get('GOOGLE_CLIENT_SECRET')
+    project_id = os.environ.get('GOOGLE_PROJECT_ID', 'gen-lang-client-0168569830')
+
+    if client_id and client_secret:
+        config = {
+            "installed": {
+                "client_id": client_id,
+                "project_id": project_id,
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                "client_secret": client_secret,
+                "redirect_uris": [redirect_uri] if redirect_uri else ["http://localhost"]
+            }
+        }
+        return Flow.from_client_config(
+            config,
+            scopes=SCOPES,
+            state=state,
+            redirect_uri=redirect_uri
+        )
+
+    return None
+
 @warmap.route('/api/warmap/google-auth')
 def google_auth():
-    if not os.path.exists(CREDENTIALS_FILE):
-        return jsonify({"error": "credentials.json not found. Please configure Google Cloud credentials."}), 404
+    flow = get_flow(redirect_uri=url_for('warmap.google_callback', _external=True))
 
-    flow = Flow.from_client_secrets_file(
-        CREDENTIALS_FILE,
-        scopes=SCOPES,
-        redirect_uri=url_for('warmap.google_callback', _external=True)
-    )
+    if not flow:
+        return jsonify({"error": "Google Cloud credentials not found. Please configure credentials.json or GOOGLE_CLIENT_ID/SECRET env vars."}), 404
+
     authorization_url, state = flow.authorization_url(
         access_type='offline',
         include_granted_scopes='true'
@@ -74,12 +108,12 @@ def google_callback():
         return jsonify({"error": "Invalid state parameter"}), 400
 
     try:
-        flow = Flow.from_client_secrets_file(
-            CREDENTIALS_FILE,
-            scopes=SCOPES,
+        flow = get_flow(
             state=state,
             redirect_uri=url_for('warmap.google_callback', _external=True)
         )
+        if not flow:
+             return jsonify({"error": "Credentials missing during callback"}), 500
         flow.fetch_token(authorization_response=request.url)
         creds = flow.credentials
         
