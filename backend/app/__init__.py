@@ -3,6 +3,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_compress import Compress
 from flask_caching import Cache
+from werkzeug.middleware.proxy_fix import ProxyFix
 import logging
 from logging.handlers import RotatingFileHandler
 import os
@@ -13,6 +14,9 @@ cache = Cache()
 
 def create_app():
     app = Flask(__name__)
+    # Handle Proxy Headers (Render/Load Balancer)
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+
     app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
     CORS(app, resources={r"/*": {"origins": "*"}})
     Compress(app) # Enable Gzip compression

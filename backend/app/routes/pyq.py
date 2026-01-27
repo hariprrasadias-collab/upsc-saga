@@ -3,6 +3,7 @@ from flask_cors import CORS
 from app.db import get_db
 import json
 from datetime import datetime
+from app.utils.security import rate_limit
 
 bp = Blueprint('pyq', __name__, url_prefix='/api/pyq')
 CORS(bp)
@@ -214,25 +215,11 @@ def get_analytics():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# In-memory rate limiter (Simple Dictionary)
-# Key: IP Address, Value: timestamp of last request
-_strategos_rate_limit = {}
-
 @bp.route('/strategos/<int:question_id>', methods=['POST'])
+@rate_limit(limit=5)
 def ask_strategos(question_id):
     """Ask AI for tactical breakdown of a question"""
     try:
-        # 1. Rate Limiting Check (Simple)
-        import time
-        client_ip = request.remote_addr
-        last_req = _strategos_rate_limit.get(client_ip, 0)
-        current_time = time.time()
-
-        if current_time - last_req < 5: # 5 seconds cooldown
-            return jsonify({'success': False, 'error': 'Strategos is thinking. Please wait 5 seconds.'}), 429
-
-        _strategos_rate_limit[client_ip] = current_time
-
         conn = get_db()
         question = conn.execute("SELECT * FROM pyq_questions WHERE id = ?", (question_id,)).fetchone()
 

@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.services.brain_service import brain_service
+from app.utils.security import rate_limit
 
 brain_bp = Blueprint('brain', __name__)
 
@@ -20,6 +21,7 @@ def ingest_directive():
         return jsonify({"success": False, "message": str(e)}), 500
 
 @brain_bp.route('/think', methods=['POST'])
+@rate_limit(limit=10)
 def think():
     """
     Main endpoint for Brain interaction.
