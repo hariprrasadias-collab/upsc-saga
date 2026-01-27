@@ -13,7 +13,10 @@ def get_syllabus():
     try:
         conn = get_db()
         topics = conn.execute('''
-            SELECT t.*, r.revision_count, r.next_revision_date, r.last_revised_at
+            SELECT
+                t.id, t.paper, t.subject, t.topic, t.subtopic, t.status, t.last_updated,
+                (CASE WHEN t.notes IS NOT NULL AND t.notes != '' THEN 1 ELSE 0 END) as has_notes,
+                r.revision_count, r.next_revision_date, r.last_revised_at
             FROM syllabus_topics t
             LEFT JOIN topic_revisions r ON t.id = r.topic_id
             ORDER BY t.paper, t.subject, t.id
@@ -52,14 +55,19 @@ def update_status(id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@bp.route('/<int:id>/notes', methods=['POST'])
+@bp.route('/<int:id>/notes', methods=['GET', 'POST'])
 def update_notes(id):
-    """Update notes for a topic"""
+    """Get or Update notes for a topic"""
     try:
+        conn = get_db()
+
+        if request.method == 'GET':
+            row = conn.execute("SELECT notes FROM syllabus_topics WHERE id = ?", (id,)).fetchone()
+            return jsonify({'id': id, 'notes': row['notes'] if row else ''})
+
         data = request.json
         notes = data.get('notes')
 
-        conn = get_db()
         conn.execute("UPDATE syllabus_topics SET notes = ?, last_updated = CURRENT_TIMESTAMP WHERE id = ?", (notes, id))
         conn.commit()
 
