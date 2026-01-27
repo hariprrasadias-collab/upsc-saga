@@ -25,6 +25,7 @@ EXPOSE 5000
 # Define environment variable
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
+ENV PYTHONPATH=/app
 
 # Run app.py when the container launches
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:create_app()"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "wsgi:app"]

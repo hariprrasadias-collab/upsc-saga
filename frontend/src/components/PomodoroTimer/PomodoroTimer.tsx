@@ -20,7 +20,7 @@ const FlipCard = ({ digit }: { digit: string }) => {
 
     useEffect(() => {
         if (digit !== prevDigit) {
-            setFlipping(true);
+            setFlipping(true); // eslint-disable-line react-hooks/set-state-in-effect
             const timer = setTimeout(() => {
                 setFlipping(false);
                 setPrevDigit(digit);
@@ -85,6 +85,27 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
 
     const wasRunningRef = useRef(isRunning);
     const prevTimeRef = useRef(timeLeft);
+
+    const formatTime = (seconds: number): string => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    };
+
+    const formatTotalTime = (seconds: number): string => {
+        const hours = Math.floor(seconds / 3600);
+        const mins = Math.floor((seconds % 3600) / 60);
+        return `${hours}h ${mins}m`;
+    };
+
+    const getProgress = (): number => {
+        let total = 25 * 60;
+        if (mode === 'shortBreak') total = 5 * 60;
+        if (mode === 'longBreak') total = 15 * 60;
+        if (timeLeft > total) total = timeLeft;
+        if (total === 0) return 0;
+        return ((total - timeLeft) / total) * 100;
+    };
 
     useEffect(() => {
         const originalTitle = document.title;
@@ -164,27 +185,6 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
         prevTimeRef.current = timeLeft;
     }, [isRunning, timeLeft, mode]);
 
-    const formatTime = (seconds: number): string => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    };
-
-    const formatTotalTime = (seconds: number): string => {
-        const hours = Math.floor(seconds / 3600);
-        const mins = Math.floor((seconds % 3600) / 60);
-        return `${hours}h ${mins}m`;
-    };
-
-    const getProgress = (): number => {
-        let total = 25 * 60;
-        if (mode === 'shortBreak') total = 5 * 60;
-        if (mode === 'longBreak') total = 15 * 60;
-        if (timeLeft > total) total = timeLeft;
-        if (total === 0) return 0;
-        return ((total - timeLeft) / total) * 100;
-    };
-
     const handleEditSave = () => {
         const mins = parseInt(editMinutes);
         if (!isNaN(mins) && mins > 0) {
@@ -193,9 +193,31 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
         }
     };
 
+    const [confettiParticles, setConfettiParticles] = useState<{ id: number, left: string, delay: string, color: string }[]>([]);
+
+    useEffect(() => {
+        setConfettiParticles([...Array(50)].map((_, i) => ({
+            id: i,
+            left: `${Math.random() * 100}%`,
+            delay: `${Math.random() * 0.5}s`,
+            color: ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6'][Math.floor(Math.random() * 5)]
+        })));
+    }, []);
+
     if (isMinimized) {
         return (
-            <div className={`pomodoro-minimized ${className || ''}`} onClick={() => setIsMinimized(false)}>
+            <div
+                className={`pomodoro-minimized ${className || ''}`}
+                onClick={() => setIsMinimized(false)}
+                role="button"
+                aria-label="Expand Timer"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        setIsMinimized(false);
+                    }
+                }}
+            >
                 <div className={`pomodoro-orb ${isRunning ? 'pulsing' : ''}`}>
                     <span className="pomodoro-icon">{mode === 'work' ? '⚔️' : '🛡️'}</span>
                 </div>
@@ -209,11 +231,11 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
         <div className={`pomodoro-widget ${className || ''} ${isFullscreen ? 'fullscreen' : ''}`}>
             {showConfetti && (
                 <div className="confetti-container">
-                    {[...Array(50)].map((_, i) => (
-                        <div key={i} className="confetti" style={{
-                            left: `${Math.random() * 100}%`,
-                            animationDelay: `${Math.random() * 0.5}s`,
-                            backgroundColor: ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6'][Math.floor(Math.random() * 5)]
+                    {confettiParticles.map((particle) => (
+                        <div key={particle.id} className="confetti" style={{
+                            left: particle.left,
+                            animationDelay: particle.delay,
+                            backgroundColor: particle.color
                         }} />
                     ))}
                 </div>
@@ -222,15 +244,50 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
             <div className="pomodoro-header">
                 <h3>{mode === 'work' ? '⚔️ BATTLE TIME' : '🛡️ RESPITE'}</h3>
                 <div className="pomodoro-controls">
-                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
+                    <button
+                        onClick={() => setIsFullscreen(!isFullscreen)}
+                        className="settings-btn"
+                        title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+                        aria-label={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+                    >
                         {isFullscreen ? '↙️' : '⛶'}
                     </button>
                     {isFullscreen && (
-                        <button onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close">✕</button>
+                        <button
+                            onClick={() => setIsFullscreen(false)}
+                            className="settings-btn close-fullscreen"
+                            title="Close"
+                            aria-label="Close Fullscreen"
+                        >
+                            ✕
+                        </button>
                     )}
-                    <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" title="History">📊</button>
-                    <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" title="Settings">⚙️</button>
-                    <button onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize">−</button>
+                    <button
+                        onClick={() => setShowHistory(!showHistory)}
+                        className="settings-btn"
+                        title="History"
+                        aria-label="Toggle History"
+                        aria-pressed={showHistory}
+                    >
+                        📊
+                    </button>
+                    <button
+                        onClick={() => setShowSettings(!showSettings)}
+                        className="settings-btn"
+                        title="Settings"
+                        aria-label="Toggle Settings"
+                        aria-pressed={showSettings}
+                    >
+                        ⚙️
+                    </button>
+                    <button
+                        onClick={() => setIsMinimized(true)}
+                        className="minimize-btn"
+                        title="Minimize"
+                        aria-label="Minimize Timer"
+                    >
+                        −
+                    </button>
                 </div>
             </div>
 
@@ -259,10 +316,28 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
                 </div>
             </div>
 
-            <div className="pomodoro-modes">
-                <button className={`mode-btn ${mode === 'work' ? 'active' : ''}`} onClick={() => switchMode('work')}>BATTLE</button>
-                <button className={`mode-btn ${mode === 'shortBreak' ? 'active' : ''}`} onClick={() => switchMode('shortBreak')}>REST</button>
-                <button className={`mode-btn ${mode === 'longBreak' ? 'active' : ''}`} onClick={() => switchMode('longBreak')}>FEAST</button>
+            <div className="pomodoro-modes" role="group" aria-label="Timer Modes">
+                <button
+                    className={`mode-btn ${mode === 'work' ? 'active' : ''}`}
+                    onClick={() => switchMode('work')}
+                    aria-pressed={mode === 'work'}
+                >
+                    BATTLE
+                </button>
+                <button
+                    className={`mode-btn ${mode === 'shortBreak' ? 'active' : ''}`}
+                    onClick={() => switchMode('shortBreak')}
+                    aria-pressed={mode === 'shortBreak'}
+                >
+                    REST
+                </button>
+                <button
+                    className={`mode-btn ${mode === 'longBreak' ? 'active' : ''}`}
+                    onClick={() => switchMode('longBreak')}
+                    aria-pressed={mode === 'longBreak'}
+                >
+                    FEAST
+                </button>
             </div>
 
             <div className="pomodoro-timer-display">
@@ -356,8 +431,17 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
             </div>
 
             {showSettings && (
-                <div className="pomodoro-settings-panel">
-                    <h4>⚙️ Settings</h4>
+                <div className="pomodoro-settings-panel" role="dialog" aria-label="Settings">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                        <h4 style={{ margin: 0 }}>⚙️ Settings</h4>
+                        <button
+                            onClick={() => setShowSettings(false)}
+                            style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: '1.2rem', padding: '0 0.5rem' }}
+                            aria-label="Close Settings"
+                        >
+                            ✕
+                        </button>
+                    </div>
                     <div className="setting-item">
                         <label>
                             <input type="checkbox" checked={settings.autoStartBreaks}
