@@ -8,6 +8,7 @@
     justify-content: center;
     flex-direction: column;
     animation: fadeIn 0.5s;
+    outline: none; /* Removed focus ring as it's a full-screen overlay */
 }
 
 .levelup-content {
