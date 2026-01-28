@@ -1,6 +1,9 @@
 from functools import wraps
 from flask import request, jsonify
-from app import cache
+
+# Use relative import to avoid shadowing 'app' package with 'app.py' module
+# This imports 'cache' from 'app/__init__.py'
+from .. import cache
 
 def rate_limit(limit, per):
     """
@@ -15,11 +18,12 @@ def rate_limit(limit, per):
             identifier = request.remote_addr
             key = f"rate_limit:{request.endpoint}:{identifier}"
 
+            # SimpleCache get/set
             current = cache.get(key)
             try:
                 count = int(current) if current is not None else 0
             except (ValueError, TypeError):
-                count = limit # Fail safe: block if corrupt
+                count = limit # Fail safe
 
             if count >= limit:
                 return jsonify({
@@ -27,9 +31,6 @@ def rate_limit(limit, per):
                     'error': f'Rate limit exceeded. Try again in {per} seconds.'
                 }), 429
 
-            # Increment and set
-            # Note: This resets the timeout window on every successful request.
-            # For limit=1, this acts as a cooldown from the last successful request.
             cache.set(key, count + 1, timeout=per)
 
             return f(*args, **kwargs)
