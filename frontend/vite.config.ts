@@ -5,16 +5,14 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [
     react(),
-    splitVendorChunkPlugin()
   ],
   build: {
     rollupOptions: {
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['framer-motion', '@mui/material', '@mui/icons-material'],
-          'chart-vendor': ['recharts', 'd3'],
-          'map-vendor': ['d3-geo', 'd3-selection', 'd3-zoom']
+          'ui-vendor': ['framer-motion'],
+          'chart-vendor': ['recharts', 'd3']
         }
       }
     },

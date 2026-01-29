@@ -1,7 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './LevelUpModal.css';
-
-import { useState, useEffect } from 'react';
 
 interface LevelUpModalProps {
     newLevel: number;
@@ -11,6 +9,24 @@ interface LevelUpModalProps {
 
 const LevelUpModal: React.FC<LevelUpModalProps> = ({ newLevel, lore, onClose }) => {
     const [displayedLore, setDisplayedLore] = useState('');
+    const overlayRef = useRef<HTMLDivElement>(null);
+
+    // Focus management and Escape key listener
+    useEffect(() => {
+        // Focus the overlay when mounted
+        if (overlayRef.current) {
+            overlayRef.current.focus();
+        }
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [onClose]);
 
     // Typing effect for lore
     useEffect(() => {
@@ -25,9 +41,16 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ newLevel, lore, onClose }) 
     }, [lore]);
 
     return (
-        <div className="levelup-overlay">
+        <div
+            className="levelup-overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="levelup-title"
+            tabIndex={-1}
+            ref={overlayRef}
+        >
             <div className="levelup-content">
-                <h1 className="levelup-title">LEVEL UP</h1>
+                <h1 className="levelup-title" id="levelup-title">LEVEL UP</h1>
                 <h2 className="levelup-sub">YOU ARE NOW LEVEL {newLevel}</h2>
                 
                 {lore && (
