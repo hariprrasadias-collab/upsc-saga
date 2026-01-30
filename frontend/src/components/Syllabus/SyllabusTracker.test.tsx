@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import SyllabusTracker from './SyllabusTracker';
@@ -40,8 +39,8 @@ const mockTopics = [
 
 describe('SyllabusTracker', () => {
   beforeEach(() => {
-    global.fetch = vi.fn();
-    (global.fetch as any).mockResolvedValue({
+    globalThis.fetch = vi.fn();
+    (globalThis.fetch as any).mockResolvedValue({
       ok: true,
       json: async () => mockTopics
     });
@@ -64,7 +63,7 @@ describe('SyllabusTracker', () => {
     await waitFor(() => expect(screen.getByText('Ancient History')).toBeInTheDocument());
 
     // Setup mock for notes fetch
-    (global.fetch as any).mockImplementation((url: string) => {
+    (globalThis.fetch as any).mockImplementation((url: string) => {
       if (url.includes('/notes') && url.includes('/1/')) {
         return Promise.resolve({
           ok: true,
@@ -100,7 +99,7 @@ describe('SyllabusTracker', () => {
 
     await waitFor(() => expect(screen.getByText('Modern History')).toBeInTheDocument());
 
-    const fetchSpy = vi.spyOn(global, 'fetch');
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
 
     const notesBtns = screen.getAllByRole('button', { name: /Notes for/i });
     fireEvent.click(notesBtns[1]); // Click second one (Modern History)
