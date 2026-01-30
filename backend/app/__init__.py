@@ -31,6 +31,7 @@ def create_app():
 
     # Security: Load CORS origins from environment
     cors_env = os.environ.get('CORS_ALLOWED_ORIGINS', '*')
+    # Robust parsing: filter empty strings
     cors_origins = [o.strip() for o in cors_env.split(',') if o.strip()]
     if not cors_origins:
         cors_origins = ['*']
