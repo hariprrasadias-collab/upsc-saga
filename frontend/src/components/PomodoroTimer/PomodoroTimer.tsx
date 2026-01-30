@@ -195,13 +195,19 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
 
     if (isMinimized) {
         return (
-            <div className={`pomodoro-minimized ${className || ''}`} onClick={() => setIsMinimized(false)}>
+            <button
+                type="button"
+                className={`pomodoro-minimized ${className || ''}`}
+                onClick={() => setIsMinimized(false)}
+                aria-label="Expand Pomodoro Timer"
+                aria-expanded="false"
+            >
                 <div className={`pomodoro-orb ${isRunning ? 'pulsing' : ''}`}>
                     <span className="pomodoro-icon">{mode === 'work' ? '⚔️' : '🛡️'}</span>
                 </div>
                 <span className="pomodoro-time">{formatTime(timeLeft)}</span>
                 <span className="keyboard-hint" title="Keyboard: Space=Play/Pause, R=Reset, 1/2/3=Modes, S=Settings">⌨️</span>
-            </div>
+            </button>
         );
     }
 
@@ -222,15 +228,50 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
             <div className="pomodoro-header">
                 <h3>{mode === 'work' ? '⚔️ BATTLE TIME' : '🛡️ RESPITE'}</h3>
                 <div className="pomodoro-controls">
-                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
+                    <button
+                        onClick={() => setIsFullscreen(!isFullscreen)}
+                        className="settings-btn"
+                        title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+                        aria-label={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+                    >
                         {isFullscreen ? '↙️' : '⛶'}
                     </button>
                     {isFullscreen && (
-                        <button onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close">✕</button>
+                        <button
+                            onClick={() => setIsFullscreen(false)}
+                            className="settings-btn close-fullscreen"
+                            title="Close"
+                            aria-label="Close Fullscreen"
+                        >
+                            ✕
+                        </button>
                     )}
-                    <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" title="History">📊</button>
-                    <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" title="Settings">⚙️</button>
-                    <button onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize">−</button>
+                    <button
+                        onClick={() => setShowHistory(!showHistory)}
+                        className="settings-btn"
+                        title="History"
+                        aria-label="Toggle History"
+                        aria-expanded={showHistory}
+                    >
+                        📊
+                    </button>
+                    <button
+                        onClick={() => setShowSettings(!showSettings)}
+                        className="settings-btn"
+                        title="Settings"
+                        aria-label="Toggle Settings"
+                        aria-expanded={showSettings}
+                    >
+                        ⚙️
+                    </button>
+                    <button
+                        onClick={() => setIsMinimized(true)}
+                        className="minimize-btn"
+                        title="Minimize"
+                        aria-label="Minimize Timer"
+                    >
+                        −
+                    </button>
                 </div>
             </div>
 
@@ -329,7 +370,7 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
                                     <button className="edit-time-btn" onClick={() => {
                                         setEditMinutes(Math.floor(timeLeft / 60).toString());
                                         setIsEditing(true);
-                                    }} title="Edit Timer">✎</button>
+                                    }} title="Edit Timer" aria-label="Edit Timer">✎</button>
                                 )}
                             </>
                         )}
