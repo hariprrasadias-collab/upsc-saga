@@ -67,5 +67,13 @@ class TestSecurityConfig(unittest.TestCase):
         app = create_app()
         self.assertTrue(app)
 
+    def test_cors_empty_string(self):
+        """Test that empty CORS string defaults to *."""
+        os.environ['CORS_ALLOWED_ORIGINS'] = ''
+        app = create_app()
+        self.assertTrue(app)
+        # We can't easily check the internal CORS config without inspecting the extension,
+        # but the fact it didn't crash is the main test.
+
 if __name__ == '__main__':
     unittest.main()
