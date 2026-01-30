@@ -8,6 +8,7 @@ from logging.handlers import RotatingFileHandler
 import os
 import threading
 import time
+import secrets
 
 cache = Cache()
 
@@ -21,9 +22,12 @@ def create_app():
     else:
         # Check if we are in production
         if os.environ.get('FLASK_ENV') == 'production':
-             raise RuntimeError("SECRET_KEY environment variable is required in production!")
-        app.secret_key = 'dev_secret_key_upsc_saga'
-        print("⚠️  WARNING: Using default development SECRET_KEY. Unsafe for production.")
+            # Generate a random key to prevent crash, but warn about session persistence
+            app.secret_key = secrets.token_hex(32)
+            print("⚠️  CRITICAL: SECRET_KEY missing in production! Generated temporary key. Sessions will not persist across restarts.")
+        else:
+            app.secret_key = 'dev_secret_key_upsc_saga'
+            print("⚠️  WARNING: Using default development SECRET_KEY. Unsafe for production.")
 
     # Security: Load CORS origins from environment
     cors_origins = [o.strip() for o in os.environ.get('CORS_ALLOWED_ORIGINS', '*').split(',')]

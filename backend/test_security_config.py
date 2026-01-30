@@ -44,12 +44,14 @@ class TestSecurityConfig(unittest.TestCase):
         self.assertEqual(app.secret_key, 'dev_secret_key_upsc_saga')
 
     def test_prod_missing_secret(self):
-        """Test that production environment raises error if SECRET_KEY is missing."""
+        """Test that production environment generates a random key if SECRET_KEY is missing."""
         os.environ.pop('SECRET_KEY', None)
         os.environ['FLASK_ENV'] = 'production'
 
-        with self.assertRaisesRegex(RuntimeError, "SECRET_KEY environment variable is required"):
-            create_app()
+        app = create_app()
+        self.assertIsNotNone(app.secret_key)
+        self.assertNotEqual(app.secret_key, 'dev_secret_key_upsc_saga')
+        self.assertNotEqual(app.secret_key, '')
 
     def test_prod_with_secret(self):
         """Test that production environment uses provided SECRET_KEY."""
