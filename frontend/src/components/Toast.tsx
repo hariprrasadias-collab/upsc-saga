@@ -18,15 +18,20 @@ const Toast: React.FC<ToastProps> = ({
     onClose
 }) => {
     const [isExiting, setIsExiting] = useState(false);
+    const [isPaused, setIsPaused] = useState(false);
 
     useEffect(() => {
+        if (isPaused) {
+            return;
+        }
+
         const timer = setTimeout(() => {
             setIsExiting(true);
             setTimeout(onClose, 300); // Match exit animation duration
         }, duration);
 
         return () => clearTimeout(timer);
-    }, [duration, onClose]);
+    }, [duration, onClose, isPaused]);
 
     const getIcon = () => {
         switch (type) {
@@ -45,6 +50,11 @@ const Toast: React.FC<ToastProps> = ({
             className={`toast toast-${type} ${isExiting ? 'toast-exit' : 'toast-enter'}`}
             role={isUrgent ? 'alert' : 'status'}
             aria-live={isUrgent ? 'assertive' : 'polite'}
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            onFocus={() => setIsPaused(true)}
+            onBlur={() => setIsPaused(false)}
+            style={{ '--toast-duration': `${duration}ms` } as React.CSSProperties}
         >
             <div className="toast-icon" aria-hidden="true">{getIcon()}</div>
             <div className="toast-message">{message}</div>

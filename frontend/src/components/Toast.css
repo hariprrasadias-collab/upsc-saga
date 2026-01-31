@@ -168,7 +168,12 @@
     height: 3px;
     background: currentColor;
     width: 100%;
-    animation: shrinkProgress 3s linear;
+    animation: shrinkProgress var(--toast-duration, 3000ms) linear;
+}
+
+.toast:hover::after,
+.toast:focus-within::after {
+    animation-play-state: paused;
 }
 
 .toast-success::after {
