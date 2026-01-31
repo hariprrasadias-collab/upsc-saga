@@ -1,7 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './LevelUpModal.css';
-
-import { useState, useEffect } from 'react';
 
 interface LevelUpModalProps {
     newLevel: number;
@@ -11,6 +9,24 @@ interface LevelUpModalProps {
 
 const LevelUpModal: React.FC<LevelUpModalProps> = ({ newLevel, lore, onClose }) => {
     const [displayedLore, setDisplayedLore] = useState('');
+    const continueButtonRef = useRef<HTMLButtonElement>(null);
+
+    // Focus management and Keyboard support
+    useEffect(() => {
+        // Focus the primary action button on mount
+        if (continueButtonRef.current) {
+            continueButtonRef.current.focus();
+        }
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [onClose]);
 
     // Typing effect for lore
     useEffect(() => {
@@ -25,10 +41,16 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ newLevel, lore, onClose }) 
     }, [lore]);
 
     return (
-        <div className="levelup-overlay">
+        <div
+            className="levelup-overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="levelup-title"
+            aria-describedby="levelup-sub"
+        >
             <div className="levelup-content">
-                <h1 className="levelup-title">LEVEL UP</h1>
-                <h2 className="levelup-sub">YOU ARE NOW LEVEL {newLevel}</h2>
+                <h1 id="levelup-title" className="levelup-title">LEVEL UP</h1>
+                <h2 id="levelup-sub" className="levelup-sub">YOU ARE NOW LEVEL {newLevel}</h2>
                 
                 {lore && (
                     <div className="levelup-lore">
@@ -41,7 +63,11 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ newLevel, lore, onClose }) 
                     <div className="reward-badge">+ Stat Point Unlocked</div>
                 </div>
 
-                <button className="continue-btn" onClick={onClose}>
+                <button
+                    ref={continueButtonRef}
+                    className="continue-btn"
+                    onClick={onClose}
+                >
                     CONTINUE THE JOURNEY
                 </button>
             </div>
