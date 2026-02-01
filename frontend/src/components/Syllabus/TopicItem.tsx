@@ -30,7 +30,7 @@ const TopicItem: React.FC<TopicItemProps> = memo(({
             </div>
             <div className="topic-actions">
                 <button
-                    className={`notes-btn ${topic.notes ? 'has-notes' : ''}`}
+                    className={`notes-btn ${topic.has_notes || topic.notes ? 'has-notes' : ''}`}
                     onClick={() => onOpenNotes(topic)}
                     title="Add/View Notes"
                     aria-label={`Notes for ${topic.topic}`}
