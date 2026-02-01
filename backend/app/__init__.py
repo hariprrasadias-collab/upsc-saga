@@ -9,10 +9,13 @@ import os
 import threading
 import time
 import secrets
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
+try:
+    from dotenv import load_dotenv
+    # Load environment variables
+    load_dotenv()
+except ImportError:
+    # If python-dotenv is not installed, assume environment variables are set externally
+    pass
 
 cache = Cache()
 
