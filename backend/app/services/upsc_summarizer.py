@@ -8,6 +8,9 @@ import os
 import json
 import re
 import time
+import socket
+import ipaddress
+from urllib.parse import urlparse
 from dotenv import load_dotenv
 from app.services.model_manager import model_manager
 
@@ -278,9 +281,46 @@ def extract_image_from_article(link):
         print(f"Image extraction failed for {link}: {e}")
         return None
 
+def validate_url(url):
+    """Validate URL to prevent SSRF attacks."""
+    try:
+        parsed = urlparse(url)
+
+        # 1. Check Scheme
+        if parsed.scheme not in ('http', 'https'):
+            raise ValueError(f"Invalid scheme: {parsed.scheme}")
+
+        hostname = parsed.hostname
+        if not hostname:
+            raise ValueError("No hostname found")
+
+        # 2. Check for Localhost/Private IPs explicitly
+        if hostname.lower() in ('localhost', '127.0.0.1', '::1', '0.0.0.0'):
+             raise ValueError("Access to localhost is forbidden")
+
+        # 3. Resolve and Check IP
+        # Note: This is a basic check. For full DNS Rebinding protection,
+        # one would need to verify the IP after connection.
+        try:
+            ip_str = socket.gethostbyname(hostname)
+            ip = ipaddress.ip_address(ip_str)
+
+            if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
+                 raise ValueError(f"Resolved to private IP: {ip_str}")
+
+        except socket.gaierror:
+            # Let requests handle the connection error if DNS fails
+            pass
+
+    except Exception as e:
+        raise ValueError(f"URL Validation Failed: {str(e)}")
+
 def fetch_article_content(url):
     """Fetch full article content from URL."""
     try:
+        # Security Check: Prevent SSRF
+        validate_url(url)
+
         import requests
         from bs4 import BeautifulSoup
         
@@ -290,7 +330,8 @@ def fetch_article_content(url):
             'Accept-Language': 'en-US,en;q=0.9',
             'Referer': 'https://www.google.com/'
         }
-        response = requests.get(url, headers=headers, timeout=15)
+        # Disable redirects to prevent SSRF bypass
+        response = requests.get(url, headers=headers, timeout=15, allow_redirects=False)
         soup = BeautifulSoup(response.content, 'html.parser')
         
         # Remove junk elements
