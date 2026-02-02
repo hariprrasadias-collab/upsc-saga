@@ -215,18 +215,16 @@ def get_due_cards():
         
         # Get cards with their latest review session
         query = '''
-            SELECT f.*,
-                   rs.halflife, rs.alpha, rs.beta, rs.next_review, rs.reviewed_at
-            FROM flashcards f
-            LEFT JOIN (
-                SELECT flashcard_id, halflife, alpha, beta, next_review, reviewed_at
+            WITH LatestReviews AS (
+                SELECT
+                    flashcard_id, halflife, alpha, beta, next_review, reviewed_at,
+                    ROW_NUMBER() OVER (PARTITION BY flashcard_id ORDER BY reviewed_at DESC) as rn
                 FROM review_sessions
-                WHERE (flashcard_id, reviewed_at) IN (
-                    SELECT flashcard_id, MAX(reviewed_at)
-                    FROM review_sessions
-                    GROUP BY flashcard_id
-                )
-            ) rs ON f.id = rs.flashcard_id
+            )
+            SELECT f.*,
+                   lr.halflife, lr.alpha, lr.beta, lr.next_review, lr.reviewed_at
+            FROM flashcards f
+            LEFT JOIN LatestReviews lr ON f.id = lr.flashcard_id AND lr.rn = 1
             WHERE 1=1
         '''
         
@@ -366,28 +364,33 @@ def get_analytics():
         # Total cards
         total = conn.execute('SELECT COUNT(*) FROM flashcards').fetchone()[0]
         
-        # Get maturity breakdown
-        all_cards = conn.execute('''
-            SELECT f.id, rs.halflife, rs.alpha, rs.beta
-            FROM flashcards f
-            LEFT JOIN (
-                SELECT flashcard_id, halflife, alpha, beta
+        # Get maturity breakdown - Optimized with Window Functions
+        maturity_stats = conn.execute('''
+            WITH LatestReviews AS (
+                SELECT
+                    flashcard_id,
+                    halflife,
+                    ROW_NUMBER() OVER (PARTITION BY flashcard_id ORDER BY reviewed_at DESC) as rn
                 FROM review_sessions
-                WHERE (flashcard_id, reviewed_at) IN (
-                    SELECT flashcard_id, MAX(reviewed_at)
-                    FROM review_sessions
-                    GROUP BY flashcard_id
-                )
-            ) rs ON f.id = rs.flashcard_id
+            )
+            SELECT
+                CASE
+                    WHEN lr.halflife IS NULL OR lr.halflife < 1 THEN 'new'
+                    WHEN lr.halflife < 7 THEN 'learning'
+                    WHEN lr.halflife < 30 THEN 'young'
+                    WHEN lr.halflife < 180 THEN 'mature'
+                    ELSE 'mastered'
+                END as maturity,
+                COUNT(*) as count
+            FROM flashcards f
+            LEFT JOIN LatestReviews lr ON f.id = lr.flashcard_id AND lr.rn = 1
+            GROUP BY maturity
         ''').fetchall()
         
         maturity_counts = {'new': 0, 'learning': 0, 'young': 0, 'mature': 0, 'mastered': 0}
-        for card in all_cards:
-            if card['halflife'] is None:
-                maturity_counts['new'] += 1
-            else:
-                maturity = get_card_maturity(card['alpha'], card['beta'], card['halflife'])
-                maturity_counts[maturity] += 1
+        for row in maturity_stats:
+            if row['maturity'] in maturity_counts:
+                maturity_counts[row['maturity']] = row['count']
         
         # Review streak (days with at least one review)
         recent_days = conn.execute('''
