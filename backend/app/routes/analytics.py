@@ -146,22 +146,22 @@ def get_time_distribution():
         # Get all activity dates
         activities = {}
         
-        # Group by date
-        dates = conn.execute('''
-            SELECT DATE(submitted_at) as date FROM test_attempts
-            WHERE user_id = ? AND submitted_at >= ?
-            UNION ALL
-            SELECT DATE(submitted_at) FROM user_answers
-            WHERE user_id = ? AND submitted_at >= ?
-            UNION ALL
-            SELECT DATE(reviewed_at) FROM review_sessions
-            WHERE user_id = ? AND reviewed_at >= ?
+        # Group and count by date in SQL (Optimized)
+        rows = conn.execute('''
+            SELECT date, COUNT(*) as count FROM (
+                SELECT DATE(submitted_at) as date FROM test_attempts
+                WHERE user_id = ? AND submitted_at >= ?
+                UNION ALL
+                SELECT DATE(submitted_at) FROM user_answers
+                WHERE user_id = ? AND submitted_at >= ?
+                UNION ALL
+                SELECT DATE(reviewed_at) FROM review_sessions
+                WHERE user_id = ? AND reviewed_at >= ?
+            ) GROUP BY date
         ''', (user_id, start_date, user_id, start_date, user_id, start_date)).fetchall()
         
-        # Count activities per date
-        for row in dates:
-            date = row['date']
-            activities[date] = activities.get(date, 0) + 1
+        for row in rows:
+            activities[row['date']] = row['count']
         
         # Convert to heatmap format: [{date, value}]
         heatmap_data = [
@@ -324,18 +324,20 @@ def get_progress_trend():
         
         if metric == 'syllabus':
             # Syllabus completion over time (cumulative)
+            # Optimized to run queries once instead of inside loop (O(N) -> O(1))
+            completed = conn.execute('''
+                SELECT COUNT(*) FROM syllabus_topics
+                WHERE status = 'Completed'
+            ''').fetchone()[0]
+
+            total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
+            percentage = round((completed / total * 100) if total > 0 else 0, 1)
+
             for i in range(days + 1):
                 date = start_date + timedelta(days=i)
-                completed = conn.execute('''
-                    SELECT COUNT(*) FROM syllabus_topics
-                    WHERE status = 'Completed'
-                ''').fetchone()[0]
-                
-                total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
-                
                 trend_data.append({
                     'date': date.isoformat(),
-                    'value': round((completed / total * 100) if total > 0 else 0, 1)
+                    'value': percentage
                 })
         
         elif metric == 'mock_score':
