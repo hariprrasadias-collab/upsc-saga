@@ -336,8 +336,20 @@ def get_progress_trend():
             # Parse dates
             completed_dates = []
             for row in completed_dates_rows:
-                # Use index access to be safe against different row factories
-                ts = row[0]
+                ts = None
+                try:
+                    # Try index access first (safest for standard cursors)
+                    ts = row[0]
+                except (IndexError, TypeError, KeyError):
+                    try:
+                        # Fallback to key access (for sqlite3.Row if index fails)
+                        ts = row['last_updated']
+                    except:
+                        pass
+
+                if not ts:
+                    continue
+
                 try:
                     # Handle string format 'YYYY-MM-DD...'
                     if isinstance(ts, str):
