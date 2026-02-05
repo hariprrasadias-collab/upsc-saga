@@ -325,7 +325,8 @@ def get_progress_trend():
         if metric == 'syllabus':
             # Syllabus completion over time (cumulative) - Optimized
             # Get total topics once
-            total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
+            total_row = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()
+            total = total_row[0] if total_row else 0
 
             # Get completion dates for all currently completed topics
             completed_dates_rows = conn.execute('''
@@ -336,28 +337,21 @@ def get_progress_trend():
             # Parse dates
             completed_dates = []
             for row in completed_dates_rows:
-                ts = None
                 try:
-                    # Try index access first (safest for standard cursors)
+                    # Robust extraction: access by index 0
                     ts = row[0]
-                except (IndexError, TypeError, KeyError):
-                    try:
-                        # Fallback to key access (for sqlite3.Row if index fails)
-                        ts = row['last_updated']
-                    except:
-                        pass
 
-                if not ts:
-                    continue
+                    if not ts:
+                        continue
 
-                try:
                     # Handle string format 'YYYY-MM-DD...'
                     if isinstance(ts, str):
                         d = datetime.strptime(ts[:10], "%Y-%m-%d").date()
                         completed_dates.append(d)
                     elif isinstance(ts, datetime):
                         completed_dates.append(ts.date())
-                except:
+                except Exception:
+                    # Skip malformed rows
                     pass
 
             completed_dates.sort()
