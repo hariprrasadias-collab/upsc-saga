@@ -147,6 +147,7 @@ const RitualsPanel: React.FC = () => {
                     type="checkbox"
                     checked={task.status === 'completed'}
                     onChange={() => toggleCSVTaskStatus(task)}
+                    aria-label={`Complete ${task.subject} - ${task.activity}`}
                   />
                   <span className="checkbox-custom"></span>
                 </label>
@@ -166,6 +167,7 @@ const RitualsPanel: React.FC = () => {
                     checked={task.isCompleted}
                     onChange={() => completeTask(task.id)}
                     disabled={task.isCompleted}
+                    aria-label={`Complete ${task.title}`}
                   />
                   <span className="checkbox-custom"></span>
                 </label>
