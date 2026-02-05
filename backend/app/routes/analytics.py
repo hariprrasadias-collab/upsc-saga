@@ -336,7 +336,8 @@ def get_progress_trend():
             # Parse dates
             completed_dates = []
             for row in completed_dates_rows:
-                ts = row['last_updated']
+                # Use index access to be safe against different row factories
+                ts = row[0]
                 try:
                     # Handle string format 'YYYY-MM-DD...'
                     if isinstance(ts, str):
