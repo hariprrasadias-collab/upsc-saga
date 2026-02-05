@@ -26,5 +26,8 @@ EXPOSE 5000
 ENV FLASK_APP=wsgi.py
 ENV FLASK_ENV=production
 
-# Run wsgi.py when the container launches
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "wsgi:app"]
+# Make start script executable
+RUN chmod +x start.sh
+
+# Run start.sh when the container launches
+CMD ["./start.sh"]
