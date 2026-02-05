@@ -6,24 +6,43 @@ from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
+from app.db import get_db
 
 warmap = Blueprint('warmap', __name__)
 
 # Configuration
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-CREDENTIALS_FILE = os.path.join(BASE_DIR, 'credentials.json')
 TOKEN_FILE = os.path.join(BASE_DIR, 'token.json')
 SCOPES = ['https://www.googleapis.com/auth/calendar.events']
 # Allow HTTP for local development
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-# Relax scope validation as Google may return more scopes than requested (e.g. if user previously granted readonly)
+# Relax scope validation as Google may return more scopes than requested
 os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
+
+def get_google_client_config():
+    """Constructs Google client config from environment variables."""
+    client_id = os.environ.get('GOOGLE_CLIENT_ID')
+    client_secret = os.environ.get('GOOGLE_CLIENT_SECRET')
+    project_id = os.environ.get('GOOGLE_PROJECT_ID')
+
+    if not client_id or not client_secret:
+        return None
+
+    return {
+        "installed": {
+            "client_id": client_id,
+            "project_id": project_id,
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_secret": client_secret,
+            "redirect_uris": ["http://localhost"]
+        }
+    }
 
 def get_credentials():
     creds = None
-    # The file token.json stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
+    # The file token.json stores the user's access and refresh tokens
     if os.path.exists(TOKEN_FILE):
         try:
             creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
@@ -52,11 +71,12 @@ def google_status():
 
 @warmap.route('/api/warmap/google-auth')
 def google_auth():
-    if not os.path.exists(CREDENTIALS_FILE):
-        return jsonify({"error": "credentials.json not found. Please configure Google Cloud credentials."}), 404
+    client_config = get_google_client_config()
+    if not client_config:
+        return jsonify({"error": "Google credentials not configured. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables."}), 500
 
-    flow = Flow.from_client_secrets_file(
-        CREDENTIALS_FILE,
+    flow = Flow.from_client_config(
+        client_config,
         scopes=SCOPES,
         redirect_uri=url_for('warmap.google_callback', _external=True)
     )
@@ -73,9 +93,13 @@ def google_callback():
     if not state or state != request.args.get('state'):
         return jsonify({"error": "Invalid state parameter"}), 400
 
+    client_config = get_google_client_config()
+    if not client_config:
+         return jsonify({"error": "Google credentials not configured."}), 500
+
     try:
-        flow = Flow.from_client_secrets_file(
-            CREDENTIALS_FILE,
+        flow = Flow.from_client_config(
+            client_config,
             scopes=SCOPES,
             state=state,
             redirect_uri=url_for('warmap.google_callback', _external=True)
@@ -171,8 +195,6 @@ def create_google_calendar_event(title, start_time, end_time, description=None):
 # ============================================================================
 # NEW ROUTES FOR GOOGLE CALENDAR EVENT MANAGEMENT
 # ============================================================================
-
-from app.db import get_db
 
 @warmap.route('/api/warmap/google-events/<event_id>/complete', methods=['POST'])
 def complete_google_event(event_id):
