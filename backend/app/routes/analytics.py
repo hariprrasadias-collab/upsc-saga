@@ -323,19 +323,50 @@ def get_progress_trend():
         trend_data = []
         
         if metric == 'syllabus':
-            # Syllabus completion over time (cumulative)
+            # Syllabus completion over time (cumulative) - Optimized
+            # Get total topics once
+            total_row = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()
+            total = total_row[0] if total_row else 0
+
+            # Get completion dates for all currently completed topics
+            completed_dates_rows = conn.execute('''
+                SELECT last_updated FROM syllabus_topics
+                WHERE status = 'Completed'
+            ''').fetchall()
+
+            # Parse dates
+            completed_dates = []
+            for row in completed_dates_rows:
+                try:
+                    # Robust extraction: access by index 0
+                    ts = row[0]
+
+                    if not ts:
+                        continue
+
+                    # Handle string format 'YYYY-MM-DD...'
+                    if isinstance(ts, str):
+                        d = datetime.strptime(ts[:10], "%Y-%m-%d").date()
+                        completed_dates.append(d)
+                    elif isinstance(ts, datetime):
+                        completed_dates.append(ts.date())
+                except Exception:
+                    # Skip malformed rows
+                    pass
+
+            completed_dates.sort()
+
+            # Build trend
             for i in range(days + 1):
                 date = start_date + timedelta(days=i)
-                completed = conn.execute('''
-                    SELECT COUNT(*) FROM syllabus_topics
-                    WHERE status = 'Completed'
-                ''').fetchone()[0]
                 
-                total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
+                # Count topics completed on or before this date
+                # Optimized: We assume 'last_updated' is the completion date proxy
+                count = sum(1 for d in completed_dates if d <= date)
                 
                 trend_data.append({
                     'date': date.isoformat(),
-                    'value': round((completed / total * 100) if total > 0 else 0, 1)
+                    'value': round((count / total * 100) if total > 0 else 0, 1)
                 })
         
         elif metric == 'mock_score':
