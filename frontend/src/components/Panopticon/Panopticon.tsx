@@ -50,18 +50,23 @@ const Panopticon: React.FC = () => {
         setIsThinking(true);
         try {
             // Use latest metrics if available
-            const latest = metrics[0] || {};
-            const payload = {
-                metrics: {
-                    sleep: latest.sleep_hours,
-                    energy: latest.energy_level,
-                    mood: latest.mood_score
+            const latest = metrics[0];
+            if (latest) {
+                const payload = {
+                    metrics: {
+                        sleep: latest.sleep_hours,
+                        energy: latest.energy_level,
+                        mood: latest.mood_score
+                    }
+                };
+                const result = await brainService.executeAction('SUGGEST_BIOHACK', payload);
+                if (result.success) {
+                    setBiohack(result.suggestion);
                 }
-            };
-            const result = await brainService.executeAction('SUGGEST_BIOHACK', payload);
-            if (result.success) {
-                setBiohack(result.suggestion);
+            } else {
+                 console.warn("No metrics available for biohack analysis");
             }
+
         } catch (err) {
             console.error(err);
         } finally {
