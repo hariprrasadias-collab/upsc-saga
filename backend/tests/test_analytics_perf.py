@@ -5,32 +5,39 @@ import tempfile
 import json
 from datetime import datetime, timedelta
 import sys
+from unittest.mock import patch
 
 # Ensure we can import app
 sys.path.append(os.getcwd())
 if 'backend' not in os.getcwd():
      sys.path.append(os.path.join(os.getcwd(), 'backend'))
 
-# Create a temp file for DB
-db_fd, db_path = tempfile.mkstemp()
-os.close(db_fd)
-os.environ['DATABASE_PATH'] = db_path
-
+# Import app modules normally
 try:
     from app import create_app
     from app.db import get_db
+    import app.db as db_module # Import the module to patch
 except ImportError:
     sys.path.append(os.path.join(os.getcwd(), 'backend'))
     from app import create_app
     from app.db import get_db
+    import app.db as db_module
 
 class AnalyticsPerfTest(unittest.TestCase):
     def setUp(self):
+        # Create temp file for DB
+        self.db_fd, self.db_path = tempfile.mkstemp()
+
+        # Patch the DATABASE global in app.db
+        self.patcher = patch('app.db.DATABASE', self.db_path)
+        self.patcher.start()
+
         self.app = create_app()
         self.client = self.app.test_client()
         self.ctx = self.app.app_context()
         self.ctx.push()
 
+        # Verify we are using the temp DB
         self.conn = get_db()
 
         # Manually create table since create_app doesn't call init_syllabus_tables
@@ -57,11 +64,10 @@ class AnalyticsPerfTest(unittest.TestCase):
 
     def tearDown(self):
         self.ctx.pop()
-
-    @classmethod
-    def tearDownClass(cls):
-        if os.path.exists(db_path):
-            os.remove(db_path)
+        self.patcher.stop()
+        os.close(self.db_fd)
+        if os.path.exists(self.db_path):
+            os.remove(self.db_path)
 
     def populate_data(self):
         # Insert test data
