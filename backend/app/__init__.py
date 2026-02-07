@@ -8,13 +8,22 @@ from logging.handlers import RotatingFileHandler
 import os
 import threading
 import time
+from dotenv import load_dotenv
+
+load_dotenv()
 
 cache = Cache()
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
-    CORS(app, resources={r"/*": {"origins": "*"}})
+    app.secret_key = os.environ.get('SECRET_KEY', 'dev_secret_key_upsc_saga')  # Required for session
+
+    # CORS Configuration
+    cors_origins = os.environ.get('CORS_ALLOWED_ORIGINS', '*')
+    if cors_origins != '*':
+        cors_origins = [origin.strip() for origin in cors_origins.split(',')]
+
+    CORS(app, resources={r"/*": {"origins": cors_origins}})
     Compress(app) # Enable Gzip compression
 
     # --- LOGGING & AUTONOMOUS REPAIR SETUP ---
