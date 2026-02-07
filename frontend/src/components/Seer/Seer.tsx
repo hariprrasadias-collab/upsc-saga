@@ -14,6 +14,7 @@ interface SeerData {
 interface WeightageData {
     subject: string;
     count: number;
+    [key: string]: any;
 }
 
 interface TrendData {
@@ -157,11 +158,11 @@ const Seer: React.FC = () => {
                         <ResponsiveContainer>
                             <PieChart>
                                 <Pie
-                                    data={topWeightage as any}
+                                    data={topWeightage}
                                     cx="50%"
                                     cy="42%"
                                     labelLine={true}
-                                    label={({ subject, percent }: any) => `${subject}: ${((percent || 0) * 100).toFixed(0)}%`}
+                                    label={({ name, percent }: { name?: string; percent?: number }) => `${name || ''}: ${((percent || 0) * 100).toFixed(0)}%`}
                                     outerRadius={95}
                                     fill="#8884d8"
                                     dataKey="count"
@@ -173,7 +174,7 @@ const Seer: React.FC = () => {
                                 </Pie>
                                 <Tooltip
                                     contentStyle={{ backgroundColor: '#001f3f', borderColor: '#7fdbff', color: '#fff' }}
-                                    formatter={(value: number, name: string) => [value, name]}
+                                    formatter={(value: any, name: any) => [value, name]}
                                 />
                                 <Legend
                                     verticalAlign="bottom"
