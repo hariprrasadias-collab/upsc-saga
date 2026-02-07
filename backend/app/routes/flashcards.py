@@ -214,19 +214,18 @@ def get_due_cards():
         conn = get_db()
         
         # Get cards with their latest review session
+        # Optimized with Window Function to avoid expensive subquery
         query = '''
+            WITH LatestReviews AS (
+                SELECT
+                    flashcard_id, halflife, alpha, beta, next_review, reviewed_at,
+                    ROW_NUMBER() OVER (PARTITION BY flashcard_id ORDER BY reviewed_at DESC) as rn
+                FROM review_sessions
+            )
             SELECT f.*,
                    rs.halflife, rs.alpha, rs.beta, rs.next_review, rs.reviewed_at
             FROM flashcards f
-            LEFT JOIN (
-                SELECT flashcard_id, halflife, alpha, beta, next_review, reviewed_at
-                FROM review_sessions
-                WHERE (flashcard_id, reviewed_at) IN (
-                    SELECT flashcard_id, MAX(reviewed_at)
-                    FROM review_sessions
-                    GROUP BY flashcard_id
-                )
-            ) rs ON f.id = rs.flashcard_id
+            LEFT JOIN LatestReviews rs ON f.id = rs.flashcard_id AND rs.rn = 1
             WHERE 1=1
         '''
         
@@ -368,17 +367,15 @@ def get_analytics():
         
         # Get maturity breakdown
         all_cards = conn.execute('''
+            WITH LatestReviews AS (
+                SELECT
+                    flashcard_id, halflife, alpha, beta,
+                    ROW_NUMBER() OVER (PARTITION BY flashcard_id ORDER BY reviewed_at DESC) as rn
+                FROM review_sessions
+            )
             SELECT f.id, rs.halflife, rs.alpha, rs.beta
             FROM flashcards f
-            LEFT JOIN (
-                SELECT flashcard_id, halflife, alpha, beta
-                FROM review_sessions
-                WHERE (flashcard_id, reviewed_at) IN (
-                    SELECT flashcard_id, MAX(reviewed_at)
-                    FROM review_sessions
-                    GROUP BY flashcard_id
-                )
-            ) rs ON f.id = rs.flashcard_id
+            LEFT JOIN LatestReviews rs ON f.id = rs.flashcard_id AND rs.rn = 1
         ''').fetchall()
         
         maturity_counts = {'new': 0, 'learning': 0, 'young': 0, 'mature': 0, 'mastered': 0}
