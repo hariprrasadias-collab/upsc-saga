@@ -7,30 +7,28 @@ from datetime import datetime, timedelta
 import sys
 from unittest.mock import patch
 
-# Ensure we can import app
-sys.path.append(os.getcwd())
-if 'backend' not in os.getcwd():
-     sys.path.append(os.path.join(os.getcwd(), 'backend'))
-
-# Import app modules normally
-try:
-    from app import create_app
-    from app.db import get_db
-    import app.db as db_module # Import the module to patch
-except ImportError:
-    sys.path.append(os.path.join(os.getcwd(), 'backend'))
-    from app import create_app
-    from app.db import get_db
-    import app.db as db_module
-
 class AnalyticsPerfTest(unittest.TestCase):
     def setUp(self):
+        # Move imports here to avoid module-level execution/side-effects
+        # Ensure we can import app
+        sys.path.append(os.getcwd())
+        if 'backend' not in os.getcwd():
+            sys.path.append(os.path.join(os.getcwd(), 'backend'))
+
         # Create temp file for DB
         self.db_fd, self.db_path = tempfile.mkstemp()
 
-        # Patch the DATABASE global in app.db
+        # Patch the DATABASE global in app.db before importing/creating app
         self.patcher = patch('app.db.DATABASE', self.db_path)
         self.patcher.start()
+
+        try:
+            from app import create_app
+            from app.db import get_db
+        except ImportError:
+            sys.path.append(os.path.join(os.getcwd(), 'backend'))
+            from app import create_app
+            from app.db import get_db
 
         self.app = create_app()
         self.client = self.app.test_client()
