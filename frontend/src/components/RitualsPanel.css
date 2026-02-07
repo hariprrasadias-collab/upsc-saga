@@ -140,6 +140,13 @@
   font-weight: bold;
 }
 
+/* Focus State for Keyboard Accessibility */
+.checkbox-label input:focus-visible ~ .checkbox-custom {
+  outline: 2px solid #d4a574;
+  outline-offset: 2px;
+  box-shadow: 0 0 8px rgba(212, 165, 116, 0.8);
+}
+
 /* Task Info Container */
 .task-info {
   display: flex;
