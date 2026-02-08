@@ -330,11 +330,12 @@ def get_progress_trend():
             completions = conn.execute('''
                 SELECT DATE(last_updated) as date, COUNT(*) as count
                 FROM syllabus_topics
-                WHERE status = 'Completed'
+                WHERE status = 'Completed' AND last_updated IS NOT NULL
                 GROUP BY DATE(last_updated)
             ''').fetchall()
 
-            completion_map = {row['date']: row['count'] for row in completions}
+            # Filter out any potential None dates just in case
+            completion_map = {row['date']: row['count'] for row in completions if row['date']}
 
             # Calculate initial count (topics completed before start_date)
             start_date_str = start_date.isoformat()
