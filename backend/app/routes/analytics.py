@@ -324,18 +324,37 @@ def get_progress_trend():
         
         if metric == 'syllabus':
             # Syllabus completion over time (cumulative)
+            total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
+
+            # Get historical completions grouped by date to avoid N+1 queries
+            completions = conn.execute('''
+                SELECT DATE(last_updated) as date, COUNT(*) as count
+                FROM syllabus_topics
+                WHERE status = 'Completed'
+                GROUP BY DATE(last_updated)
+            ''').fetchall()
+
+            completion_map = {row['date']: row['count'] for row in completions}
+
+            # Calculate initial count (topics completed before start_date)
+            start_date_str = start_date.isoformat()
+            current_completed = sum(
+                count for date_str, count in completion_map.items()
+                if date_str < start_date_str
+            )
+
             for i in range(days + 1):
-                date = start_date + timedelta(days=i)
-                completed = conn.execute('''
-                    SELECT COUNT(*) FROM syllabus_topics
-                    WHERE status = 'Completed'
-                ''').fetchone()[0]
+                date_obj = start_date + timedelta(days=i)
+                date_str = date_obj.isoformat()
+
+                if date_str in completion_map:
+                    current_completed += completion_map[date_str]
                 
-                total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
+                percentage = round((current_completed / total * 100), 1) if total > 0 else 0
                 
                 trend_data.append({
-                    'date': date.isoformat(),
-                    'value': round((completed / total * 100) if total > 0 else 0, 1)
+                    'date': date_str,
+                    'value': percentage
                 })
         
         elif metric == 'mock_score':
