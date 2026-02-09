@@ -2,3 +2,8 @@
 **Vulnerability:** Found a SQL injection vulnerability where a `limit` parameter from JSON input was directly interpolated into a SQL query string (`query += f" LIMIT {limit}"`).
 **Learning:** Even simple integer parameters like `limit` or `offset` can be vectors for injection if not validated or parameterized. Developers often overlook these believing they will always be numbers.
 **Prevention:** Always cast numeric inputs to their respective types (int/float) and use parameterized queries (`LIMIT ?`) even for standard SQL clauses. Never trust input types from JSON.
+
+## 2025-05-15 - Admin Auth Bypass on DB Failure
+**Vulnerability:** The `is_admin` check in `backend/app/routes/admin.py` defaulted to allowing access for user ID 1 if a database exception occurred. Since the authentication system currently treats all users as user ID 1, this created a potential privilege escalation vector during database outages.
+**Learning:** Defaulting to a "safe" user (like the initial admin) during errors is dangerous if that user has elevated privileges or if authentication is weak. Security checks must always fail closed (deny access).
+**Prevention:** Always use a "fail secure" pattern: `try...except...return False`. Never return `True` in an exception block for security checks.
