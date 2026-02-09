@@ -12,3 +12,8 @@
 **Vulnerability:** A Render deployment failed because `backend/app.py` conflicted with the `app` package directory during import. This is a common Python pitfall when a script name matches a package name in the same directory.
 **Learning:** Avoid naming entrypoint scripts identical to package names (e.g., don't name your main script `app.py` if you have an `app/` package). Use unambiguous names like `wsgi.py` or `main.py`.
 **Prevention:** Renamed `backend/app.py` to `backend/wsgi.py` and updated Dockerfile/Start Commands to reference `wsgi:app`.
+
+## 2025-05-15 - Missing Dependency (beautifulsoup4)
+**Vulnerability:** A deployment failure occurred because `beautifulsoup4` was missing from `backend/requirements.txt`, despite being imported by `app.services.upsc_summarizer`. This caused startup crashes when the module was loaded.
+**Learning:** Always verify that all imports in the codebase are present in `requirements.txt`. Use tools or scripts to scan for missing dependencies before deployment.
+**Prevention:** Added `beautifulsoup4` to `requirements.txt`. Future prevention: Add a pre-commit hook or CI step to check for missing dependencies.
