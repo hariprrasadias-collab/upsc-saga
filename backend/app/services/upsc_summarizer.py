@@ -8,6 +8,9 @@ import os
 import json
 import re
 import time
+import socket
+import ipaddress
+from urllib.parse import urlparse, urljoin
 from dotenv import load_dotenv
 from app.services.model_manager import model_manager
 
@@ -27,6 +30,36 @@ SUBJECTS = [
     'Geography', 'Ethics', 'Current Affairs'
 ]
 
+def is_safe_url(url):
+    """
+    Validates that a URL is safe to fetch (SSRF protection).
+    Ensures the scheme is http/https and the hostname resolves to a public IP.
+    """
+    try:
+        parsed = urlparse(url)
+        if parsed.scheme not in ('http', 'https'):
+            return False
+
+        hostname = parsed.hostname
+        if not hostname:
+            return False
+
+        # Resolve hostname to IP
+        try:
+            ip_str = socket.gethostbyname(hostname)
+        except socket.gaierror:
+            return False # Can't resolve
+
+        ip = ipaddress.ip_address(ip_str)
+
+        # Check against private, loopback, and reserved ranges
+        if ip.is_loopback or ip.is_private or ip.is_link_local or ip.is_multicast or ip.is_reserved:
+            return False
+
+        return True
+    except Exception:
+        return False
+
 def retry_with_backoff(func, *args, **kwargs):
     """Retry a function with exponential backoff for rate limits."""
     max_retries = 3
@@ -35,15 +68,12 @@ def retry_with_backoff(func, *args, **kwargs):
     for attempt in range(max_retries):
         try:
             return func(*args, **kwargs)
-        except google_exceptions.ResourceExhausted:
-            if attempt == max_retries - 1:
-                raise  # Re-raise if last attempt fails
-            
-            delay = base_delay * (2 ** attempt)
-            print(f"⚠️ Quota exceeded. Retrying in {delay} seconds...")
-            time.sleep(delay)
-        except Exception as e:
-            raise e  # Re-raise other exceptions immediately
+        except Exception as e: # Simplified exception handling as google_exceptions not imported
+             if attempt == max_retries - 1:
+                raise
+             delay = base_delay * (2 ** attempt)
+             print(f"⚠️ Error. Retrying in {delay} seconds...")
+             time.sleep(delay)
 
 def get_gemini_text(response):
     """Safely extract text from Gemini response, handling safety blocks."""
@@ -262,7 +292,27 @@ def extract_image_from_article(link):
     try:
         import requests
         from bs4 import BeautifulSoup
-        response = requests.get(link, timeout=10)
+
+        # SSRF Check: Validate initial URL
+        if not is_safe_url(link):
+             print(f"Blocked unsafe URL for image extraction: {link}")
+             return None
+
+        # Basic request - no complex redirect logic needed here as it's secondary
+        # But for consistency, we should be safe.
+        response = requests.get(link, timeout=10, allow_redirects=False)
+        if response.is_redirect:
+            # Follow one hop if safe
+            loc = response.headers.get('Location')
+            if loc:
+                link = urljoin(link, loc)
+                if is_safe_url(link):
+                     response = requests.get(link, timeout=10)
+                else:
+                     return None
+            else:
+                 return None
+
         soup = BeautifulSoup(response.content, 'html.parser')
         og_image = soup.find('meta', property='og:image')
         if og_image and og_image.get('content'):
@@ -279,18 +329,48 @@ def extract_image_from_article(link):
         return None
 
 def fetch_article_content(url):
-    """Fetch full article content from URL."""
+    """Fetch full article content from URL with SSRF protection."""
     try:
         import requests
         from bs4 import BeautifulSoup
         
+        # SSRF Check: Validate initial URL
+        if not is_safe_url(url):
+             print(f"Blocked unsafe URL: {url}")
+             return ""
+
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
             'Accept-Language': 'en-US,en;q=0.9',
             'Referer': 'https://www.google.com/'
         }
-        response = requests.get(url, headers=headers, timeout=15)
+
+        # Disable auto-redirects to check each hop
+        response = requests.get(url, headers=headers, timeout=15, allow_redirects=False)
+
+        # Handle redirects manually (up to 3 times)
+        redirects = 0
+        while response.is_redirect and redirects < 3:
+            location = response.headers.get('Location')
+            if not location:
+                break
+
+            next_url = urljoin(url, location)
+
+            if not is_safe_url(next_url):
+                print(f"Blocked unsafe redirect to: {next_url}")
+                return ""
+
+            url = next_url
+            response = requests.get(url, headers=headers, timeout=15, allow_redirects=False)
+            redirects += 1
+
+        # If still redirecting after max retries, treat as failed or just take what we have
+        if response.is_redirect:
+             print(f"Max redirects exceeded for {url}")
+             return ""
+
         soup = BeautifulSoup(response.content, 'html.parser')
         
         # Remove junk elements
@@ -497,6 +577,3 @@ MNEMONIC:"""
     except Exception as e:
         print(f"Error generating mnemonic: {e}")
         return f"⚠️ Error generating mnemonic: {str(e)}. Please check your Gemini API configuration."
-
-
-
