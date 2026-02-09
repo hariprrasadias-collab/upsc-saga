@@ -124,6 +124,13 @@
   box-shadow: 0 0 8px rgba(95, 179, 232, 0.2);
 }
 
+/* Focus styles for keyboard accessibility */
+.checkbox-label input:focus-visible + .checkbox-custom {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(212, 165, 116, 0.8), 0 0 8px rgba(95, 179, 232, 0.4);
+  border-color: #d4a574;
+}
+
 .checkbox-label input:checked~.checkbox-custom {
   background: linear-gradient(135deg, rgba(95, 179, 232, 0.3) 0%, rgba(212, 165, 116, 0.2) 100%);
   border-color: rgba(212, 165, 116, 0.5);
@@ -207,6 +214,11 @@
 .add-ritual-btn:active {
   transform: translateY(0);
   box-shadow: 0 2px 8px rgba(212, 165, 116, 0.2);
+}
+
+.add-ritual-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(95, 179, 232, 0.6), 0 6px 16px rgba(212, 165, 116, 0.4);
 }
 
 /* Responsive Design */
