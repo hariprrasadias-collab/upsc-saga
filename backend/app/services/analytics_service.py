@@ -344,3 +344,75 @@ def generate_weekly_performance_review(conn, user_id):
         return json.loads(text)
     except Exception as e:
         return {"error": str(e)}
+
+def get_all_subjects_performance(conn, user_id):
+    """
+    Aggregate all metrics for all subjects in bulk (Optimized)
+    """
+    subjects = ['GS1', 'GS2', 'GS3', 'GS4', 'Prelims', 'Optional']
+    results = {s: {
+        'subject': s,
+        'mock_avg': 0,
+        'answer_avg': 0,
+        'syllabus_pct': 0,
+        'pyq_attempted': 0,
+        'flashcard_mastered': 0
+    } for s in subjects}
+
+    try:
+        # Mock tests
+        mock_avgs = conn.execute('''
+            SELECT mt.subject, AVG(mta.score) as avg_score
+            FROM test_attempts mta
+            JOIN mock_tests mt ON mta.test_id = mt.id
+            WHERE mta.user_id = ?
+            GROUP BY mt.subject
+        ''', (user_id,)).fetchall()
+        for row in mock_avgs:
+            subj = row['subject']
+            if subj in results:
+                score = row['avg_score']
+                results[subj]['mock_avg'] = round(score, 1) if score else 0
+    except Exception as e:
+        print(f"Error fetching mock stats: {e}")
+
+    try:
+        # Answer writing
+        answer_avgs = conn.execute('''
+            SELECT aq.subject, AVG(ae.overall_score) as avg_score
+            FROM answer_evaluations ae
+            JOIN user_answers ua ON ae.answer_id = ua.id
+            JOIN answer_questions aq ON ua.prompt_id = aq.id
+            WHERE ua.user_id = ?
+            GROUP BY aq.subject
+        ''', (user_id,)).fetchall()
+        for row in answer_avgs:
+            subj = row['subject']
+            if subj in results:
+                score = row['avg_score']
+                results[subj]['answer_avg'] = round(score, 1) if score else 0
+    except Exception as e:
+        print(f"Error fetching answer stats: {e}")
+
+    try:
+        # Syllabus completion
+        syllabus_stats = conn.execute('''
+            SELECT
+                subject,
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+            FROM syllabus_topics
+            GROUP BY subject
+        ''').fetchall()
+
+        for row in syllabus_stats:
+            subj = row['subject']
+            if subj in results:
+                total = row['total']
+                completed = row['completed'] or 0
+                if total > 0:
+                    results[subj]['syllabus_pct'] = round((completed / total) * 100, 1)
+    except Exception as e:
+        print(f"Error fetching syllabus stats: {e}")
+
+    return list(results.values())
