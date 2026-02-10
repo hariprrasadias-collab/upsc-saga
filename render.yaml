@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: backend
+    env: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: DATABASE_PATH
+        value: /var/data/upsc_saga.db
+    disk:
+      name: data
+      mountPath: /var/data
+      sizeGB: 1
