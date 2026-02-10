@@ -13,7 +13,8 @@ cache = Cache()
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
+    # Set secret key from environment variable, falling back to dev key only for development
+    app.secret_key = os.environ.get('SECRET_KEY', 'dev_secret_key_upsc_saga')
     CORS(app, resources={r"/*": {"origins": "*"}})
     Compress(app) # Enable Gzip compression
 
