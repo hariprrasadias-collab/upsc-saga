@@ -323,19 +323,35 @@ def get_progress_trend():
         trend_data = []
         
         if metric == 'syllabus':
-            # Syllabus completion over time (cumulative)
+            # Optimize: Syllabus completion over time (cumulative)
+            # Fetch total count once
+            total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
+
+            # Fetch daily completions efficiently using GROUP BY
+            daily_completions = conn.execute('''
+                SELECT DATE(last_updated) as day, COUNT(*) as cnt
+                FROM syllabus_topics
+                WHERE status = 'Completed' AND last_updated IS NOT NULL
+                GROUP BY DATE(last_updated)
+            ''').fetchall()
+
+            # Create a map of date -> count
+            daily_map = {row['day']: row['cnt'] for row in daily_completions}
+
+            # Calculate initial completed count before start_date
+            start_str = start_date.isoformat()
+            current_completed = sum(cnt for day, cnt in daily_map.items() if day < start_str)
+
             for i in range(days + 1):
-                date = start_date + timedelta(days=i)
-                completed = conn.execute('''
-                    SELECT COUNT(*) FROM syllabus_topics
-                    WHERE status = 'Completed'
-                ''').fetchone()[0]
+                date_obj = start_date + timedelta(days=i)
+                date_str = date_obj.isoformat()
                 
-                total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
+                # Add counts for this specific date
+                current_completed += daily_map.get(date_str, 0)
                 
                 trend_data.append({
-                    'date': date.isoformat(),
-                    'value': round((completed / total * 100) if total > 0 else 0, 1)
+                    'date': date_str,
+                    'value': round((current_completed / total * 100) if total > 0 else 0, 1)
                 })
         
         elif metric == 'mock_score':
