@@ -11,4 +11,4 @@
 ## 2025-02-27 - Test Import Side Effects in CI
 **Vulnerability:** Not a direct vulnerability, but a deployment risk. Top-level imports of app modules in tests caused CI/CD pipeline failures because the app context (DB, config) wasn't available during test discovery.
 **Learning:** Importing application code at the top level of test files can trigger initialization logic (like DB connections) that fails in build environments, breaking deployment.
-**Prevention:** Use lazy imports inside test methods or `setUp` for application code. Avoid global/module-level side effects in test files.
+**Prevention:** Use lazy imports inside test methods or `setUp` for application code. Avoid global/module-level side effects in test files. Relocate tests that require complex setups (like database connections) outside of the main test suite if CI cannot support them, or use proper test fixtures.
