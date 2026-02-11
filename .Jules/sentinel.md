@@ -7,3 +7,8 @@
 **Vulnerability:** Found a "Fail Open" vulnerability where an exception handler in `is_admin` granted access to `user_id=1` on database failure.
 **Learning:** Developers sometimes implement insecure fallbacks for local development convenience that can become critical vulnerabilities in production if they bypass security checks on system failure.
 **Prevention:** Strictly enforce "Fail Secure" principles. Access control functions must return `False` (deny access) on any error or exception. Avoid hardcoded bypasses for specific user IDs.
+
+## 2025-02-27 - Test Import Side Effects in CI
+**Vulnerability:** Not a direct vulnerability, but a deployment risk. Top-level imports of app modules in tests caused CI/CD pipeline failures because the app context (DB, config) wasn't available during test discovery.
+**Learning:** Importing application code at the top level of test files can trigger initialization logic (like DB connections) that fails in build environments, breaking deployment.
+**Prevention:** Use lazy imports inside test methods or `setUp` for application code. Avoid global/module-level side effects in test files.
