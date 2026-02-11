@@ -12,3 +12,8 @@
 **Vulnerability:** Not a direct vulnerability, but a deployment risk. Top-level imports of app modules in tests caused CI/CD pipeline failures because the app context (DB, config) wasn't available during test discovery.
 **Learning:** Importing application code at the top level of test files can trigger initialization logic (like DB connections) that fails in build environments, breaking deployment.
 **Prevention:** Use lazy imports inside test methods or `setUp` for application code. Avoid global/module-level side effects in test files. Relocate tests that require complex setups (like database connections) outside of the main test suite if CI cannot support them, or use proper test fixtures.
+
+## 2025-02-27 - Module Shadowing in Gunicorn
+**Vulnerability:** Deployment failure due to import shadowing. Naming the entry point `app.py` when there is a package named `app` caused Gunicorn to fail importing the application factory correctly, as `import app` became ambiguous or circular.
+**Learning:** Avoid naming the entry point script the same as the main package directory (e.g., `app.py` vs `app/`). This confuses import resolution, especially in production environments like Gunicorn/Docker.
+**Prevention:** Use a distinct name for the entry point, such as `wsgi.py` or `main.py`, to clearly separate the script from the application package.
