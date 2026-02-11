@@ -10,6 +10,7 @@ Flask-Compress
 Flask-Caching
 flask-cors
 requests
+beautifulsoup4
 feedparser
 google-auth-oauthlib
 openai
