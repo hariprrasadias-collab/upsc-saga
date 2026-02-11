@@ -324,18 +324,46 @@ def get_progress_trend():
         
         if metric == 'syllabus':
             # Syllabus completion over time (cumulative)
-            for i in range(days + 1):
-                date = start_date + timedelta(days=i)
-                completed = conn.execute('''
+            # OPTIMIZED: Replaced N+1 loop with 3 constant queries
+
+            # 1. Get total syllabus topics
+            total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
+
+            changes_dict = {}
+            cumulative = 0
+
+            if total > 0:
+                # 2. Get initial completion count before the start date
+                # Include topics with NULL last_updated in the initial count (assume old completion)
+                initial_completed = conn.execute('''
                     SELECT COUNT(*) FROM syllabus_topics
-                    WHERE status = 'Completed'
-                ''').fetchone()[0]
+                    WHERE status = 'Completed' AND (last_updated IS NULL OR DATE(last_updated) < ?)
+                ''', (start_date.isoformat(),)).fetchone()[0]
+
+                cumulative = initial_completed
+
+                # 3. Get daily completion changes during the requested period
+                daily_changes = conn.execute('''
+                    SELECT DATE(last_updated) as date, COUNT(*) as count
+                    FROM syllabus_topics
+                    WHERE status = 'Completed' AND DATE(last_updated) >= ?
+                    GROUP BY DATE(last_updated)
+                ''', (start_date.isoformat(),)).fetchall()
+
+                changes_dict = {row['date']: row['count'] for row in daily_changes}
+
+            for i in range(days + 1):
+                date_obj = start_date + timedelta(days=i)
+                date_str = date_obj.isoformat()
+
+                if date_str in changes_dict:
+                    cumulative += changes_dict[date_str]
                 
-                total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
+                val = round((cumulative / total * 100), 1) if total > 0 else 0
                 
                 trend_data.append({
-                    'date': date.isoformat(),
-                    'value': round((completed / total * 100) if total > 0 else 0, 1)
+                    'date': date_str,
+                    'value': val
                 })
         
         elif metric == 'mock_score':
