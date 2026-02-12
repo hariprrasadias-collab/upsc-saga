@@ -323,19 +323,45 @@ def get_progress_trend():
         trend_data = []
         
         if metric == 'syllabus':
+            # Bolt Optimization: Replaced N+1 query loop with single aggregation (60+ queries -> 2)
             # Syllabus completion over time (cumulative)
+            total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
+
+            # Get daily completions using last_updated as a proxy for completion date
+            daily_completions = conn.execute('''
+                SELECT DATE(last_updated) as date, COUNT(*) as count
+                FROM syllabus_topics
+                WHERE status = 'Completed'
+                GROUP BY DATE(last_updated)
+            ''').fetchall()
+
+            # Create a map for O(1) lookup: 'YYYY-MM-DD' -> count
+            daily_map = {}
+            # Count completed items before the start date to set initial baseline
+            current_completed = 0
+            start_date_str = start_date.isoformat()
+
+            for row in daily_completions:
+                r_date = row['date']
+                count = row['count']
+                if not r_date:
+                    # Treat NULL dates as completed long ago
+                    current_completed += count
+                elif r_date < start_date_str:
+                    current_completed += count
+                else:
+                    daily_map[r_date] = count
+
             for i in range(days + 1):
-                date = start_date + timedelta(days=i)
-                completed = conn.execute('''
-                    SELECT COUNT(*) FROM syllabus_topics
-                    WHERE status = 'Completed'
-                ''').fetchone()[0]
+                date_obj = start_date + timedelta(days=i)
+                date_str = date_obj.isoformat()
                 
-                total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
+                if date_str in daily_map:
+                    current_completed += daily_map[date_str]
                 
                 trend_data.append({
-                    'date': date.isoformat(),
-                    'value': round((completed / total * 100) if total > 0 else 0, 1)
+                    'date': date_str,
+                    'value': round((current_completed / total * 100) if total > 0 else 0, 1)
                 })
         
         elif metric == 'mock_score':
