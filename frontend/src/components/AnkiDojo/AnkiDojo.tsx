@@ -262,6 +262,16 @@ const AnkiDojo: React.FC = () => {
                     <div
                         className={`flip-card ${isFlipped ? 'flipped' : ''}`}
                         onClick={handleCardClick}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={isFlipped ? "Flashcard Answer" : "Flashcard Question. Press Enter to reveal answer."}
+                        aria-pressed={isFlipped}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                handleCardClick();
+                            }
+                        }}
                     >
                         <div className="flip-card-inner">
                             {/* Front */}
