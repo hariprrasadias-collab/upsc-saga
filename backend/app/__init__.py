@@ -17,7 +17,7 @@ def create_app():
     # SECURITY: Load SECRET_KEY from environment, with dev fallback
     app.secret_key = os.environ.get('SECRET_KEY', 'dev_secret_key_upsc_saga')
     if app.secret_key == 'dev_secret_key_upsc_saga' and os.environ.get('FLASK_ENV') == 'production':
-        app.logger.critical("🚨 SECURITY WARNING: Using default SECRET_KEY in production! Please set SECRET_KEY environment variable.")
+        app.logger.critical("SECURITY WARNING: Using default SECRET_KEY in production! Please set SECRET_KEY environment variable.")
 
     CORS(app, resources={r"/*": {"origins": "*"}})
     Compress(app) # Enable Gzip compression
