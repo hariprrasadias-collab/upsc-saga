@@ -9,6 +9,7 @@ interface HeatmapData {
     size: number;
     intensity: number; // 0-100, maps to color
     children?: HeatmapData[];
+    [key: string]: any; // Required for Recharts Treemap compatibility
 }
 
 interface HeatmapRendererProps {
