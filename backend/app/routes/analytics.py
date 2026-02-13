@@ -324,18 +324,17 @@ def get_progress_trend():
         
         if metric == 'syllabus':
             # Syllabus completion over time (cumulative)
+            # Optimization: Fetch counts once as they don't depend on the loop variable 'date'
+            completed_count = conn.execute("SELECT COUNT(*) FROM syllabus_topics WHERE status = 'Completed'").fetchone()[0]
+            total_count = conn.execute("SELECT COUNT(*) FROM syllabus_topics").fetchone()[0]
+
+            completion_percentage = round((completed_count / total_count * 100) if total_count > 0 else 0, 1)
+
             for i in range(days + 1):
                 date = start_date + timedelta(days=i)
-                completed = conn.execute('''
-                    SELECT COUNT(*) FROM syllabus_topics
-                    WHERE status = 'Completed'
-                ''').fetchone()[0]
-                
-                total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
-                
                 trend_data.append({
                     'date': date.isoformat(),
-                    'value': round((completed / total * 100) if total > 0 else 0, 1)
+                    'value': completion_percentage
                 })
         
         elif metric == 'mock_score':
