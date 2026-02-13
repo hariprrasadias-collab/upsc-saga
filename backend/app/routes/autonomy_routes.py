@@ -296,8 +296,23 @@ def trigger_evolution():
             if not os.path.isabs(target_file):
                 target_file = os.path.join(os.getcwd(), target_file)
 
-        if not os.path.exists(target_file):
+        # SECURITY: Enforce confinement to project root to prevent path traversal
+        project_root = os.path.abspath(os.getcwd())
+        target_abs = os.path.abspath(target_file)
+
+        # Use commonpath to ensure target is truly inside project_root (handles trailing slashes/edge cases)
+        try:
+            if os.path.commonpath([project_root, target_abs]) != project_root:
+                return jsonify({'error': 'Access denied: Path traversal attempt detected'}), 403
+        except ValueError:
+            # Can happen on Windows if drives differ
+            return jsonify({'error': 'Access denied: Invalid path'}), 403
+
+        if not os.path.exists(target_abs):
             return jsonify({'error': f'File not found: {target_file}'}), 404
+
+        # Use the verified absolute path
+        target_file = target_abs
 
         # Trigger in background
         import threading
