@@ -112,6 +112,12 @@
     cursor: pointer;
 }
 
+.flip-card:focus-visible {
+    outline: 3px solid var(--color-accent-blue);
+    outline-offset: 4px;
+    border-radius: 16px;
+}
+
 .flip-card-inner {
     position: relative;
     width: 100%;
