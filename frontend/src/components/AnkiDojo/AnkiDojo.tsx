@@ -1,5 +1,5 @@
 // /frontend/src/components/AnkiDojo/AnkiDojo.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './AnkiDojo.css';
 import { audioManager } from '../../util/AudioManager';
 import { ebisuScheduler } from './ebisuAlgorithm';
@@ -34,10 +34,10 @@ const AnkiDojo: React.FC = () => {
     }, []);
 
     // Save Ebisu state to localStorage whenever it changes
-    const saveEbisuState = () => {
+    const saveEbisuState = useCallback(() => {
         const state = ebisuScheduler.exportState();
         localStorage.setItem('ebisuState', state);
-    };
+    }, []);
 
     // 1. Load the Queue (List of Due IDs) - NOW ALSO TRIGGERS ON refetchTrigger
     useEffect(() => {
@@ -92,7 +92,7 @@ const AnkiDojo: React.FC = () => {
     }, [queue, currentCard]);
 
     // 3. Handle User Answer with Ebisu algorithm
-    const handleAnswer = async (ease: number) => {
+    const handleAnswer = useCallback(async (ease: number) => {
         if (!currentCard) return;
 
         const isCorrect = ease >= 3; // Good or Easy
@@ -133,7 +133,7 @@ const AnkiDojo: React.FC = () => {
         } catch {
             // Error submitting answer
         }
-    };
+    }, [currentCard, studyMode, saveEbisuState]);
 
     const handleCardClick = () => {
         if (!isFlipped) {
@@ -141,6 +141,31 @@ const AnkiDojo: React.FC = () => {
             audioManager.play('click');
         }
     };
+
+    // Handle card key interactions (Enter/Space to flip)
+    const handleCardKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleCardClick();
+        }
+    };
+
+    // Handle global keyboard shortcuts for answering
+    useEffect(() => {
+        const handleGlobalKeyDown = (e: KeyboardEvent) => {
+            if (!isFlipped || !currentCard) return;
+
+            switch (e.key) {
+                case '1': handleAnswer(1); break;
+                case '2': handleAnswer(2); break;
+                case '3': handleAnswer(3); break;
+                case '4': handleAnswer(4); break;
+            }
+        };
+
+        window.addEventListener('keydown', handleGlobalKeyDown);
+        return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+    }, [isFlipped, currentCard, handleAnswer]);
 
     // Handle mode switch with confirmation if mid-session
     const handleModeSwitch = (newMode: StudyMode) => {
@@ -247,11 +272,18 @@ const AnkiDojo: React.FC = () => {
             </div>
 
             {/* Progress Bar */}
-            <div className="progress-container">
+            <div
+                className="progress-container"
+                role="progressbar"
+                aria-valuenow={Math.round(progressPercent)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label="Session Progress"
+            >
                 <div className="progress-bar">
                     <div className="progress-fill" style={{ width: `${progressPercent}%` }}></div>
                 </div>
-                <div className="progress-text">
+                <div className="progress-text" aria-live="polite">
                     {totalStudied} / {sessionCards.length} studied • {Math.round(accuracyPercent)}% accuracy
                 </div>
             </div>
@@ -262,6 +294,11 @@ const AnkiDojo: React.FC = () => {
                     <div
                         className={`flip-card ${isFlipped ? 'flipped' : ''}`}
                         onClick={handleCardClick}
+                        onKeyDown={handleCardKeyDown}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={isFlipped ? "Flashcard Answer" : "Flashcard Question. Press Enter or Space to reveal answer."}
+                        aria-expanded={isFlipped}
                     >
                         <div className="flip-card-inner">
                             {/* Front */}
@@ -288,19 +325,19 @@ const AnkiDojo: React.FC = () => {
                     {/* Answer Buttons - Only show when flipped */}
                     {isFlipped && (
                         <div className="answer-buttons">
-                            <button className="ans-btn wrong" onClick={() => handleAnswer(1)}>
+                            <button className="ans-btn wrong" onClick={() => handleAnswer(1)} aria-keyshortcuts="1" title="Shortcut: 1">
                                 <span className="emoji">❌</span>
                                 <span>Wrong</span>
                             </button>
-                            <button className="ans-btn hard" onClick={() => handleAnswer(2)}>
+                            <button className="ans-btn hard" onClick={() => handleAnswer(2)} aria-keyshortcuts="2" title="Shortcut: 2">
                                 <span className="emoji">😓</span>
                                 <span>Hard</span>
                             </button>
-                            <button className="ans-btn good" onClick={() => handleAnswer(3)}>
+                            <button className="ans-btn good" onClick={() => handleAnswer(3)} aria-keyshortcuts="3" title="Shortcut: 3">
                                 <span className="emoji">👍</span>
                                 <span>Good</span>
                             </button>
-                            <button className="ans-btn easy" onClick={() => handleAnswer(4)}>
+                            <button className="ans-btn easy" onClick={() => handleAnswer(4)} aria-keyshortcuts="4" title="Shortcut: 4">
                                 <span className="emoji">✨</span>
                                 <span>Easy</span>
                             </button>
