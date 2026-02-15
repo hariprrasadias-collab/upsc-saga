@@ -1,6 +1,7 @@
 # Analytics API Routes
 from flask import Blueprint, request, jsonify, session
 from app.db import get_db
+import sqlite3
 from datetime import datetime, timedelta
 from app.services.analytics_service import (
     calculate_study_hours,
@@ -330,12 +331,12 @@ def get_progress_trend():
                     SELECT COUNT(*) FROM syllabus_topics
                     WHERE status = 'Completed'
                 ''').fetchone()[0]
-            except Exception:
+            except (sqlite3.Error, Exception):
                 completed = 0
 
             try:
                 total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
-            except Exception:
+            except (sqlite3.Error, Exception):
                 total = 0
 
             current_value = round((completed / total * 100) if total > 0 else 0, 1)
