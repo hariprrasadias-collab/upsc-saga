@@ -3,6 +3,15 @@ from app.db import get_db
 
 bp = Blueprint('shop', __name__, url_prefix='/api/shop')
 
+# Hardcoded catalog to prevent client-side price manipulation
+SHOP_CATALOG = {
+    'leviathan_axe': {'name': 'Leviathan Axe', 'cost': 200},
+    'chaos_blades': {'name': 'Blades of Chaos', 'cost': 350},
+    'guardian_shield': {'name': 'Guardian Shield', 'cost': 150},
+    'mimir_head': {'name': 'Mimir Upgrade', 'cost': 500},
+    'spartan_rage': {'name': 'Greater Rage', 'cost': 300}
+}
+
 @bp.route('/inventory', methods=['GET'])
 def get_inventory():
     user_id = 1
@@ -18,10 +27,15 @@ def get_inventory():
 def buy_item():
     user_id = 1
     data = request.get_json()
-    cost = data.get('cost')
     
-    if cost < 0:
-        return jsonify({"error": "Invalid cost"}), 400
+    # Securely look up item cost
+    item_id = data.get('item_id')
+    if not item_id or item_id not in SHOP_CATALOG:
+        return jsonify({"error": "Invalid item"}), 400
+
+    item_details = SHOP_CATALOG[item_id]
+    cost = item_details['cost']
+    item_name = item_details['name']
 
     conn = get_db()
     user = conn.execute('SELECT hacksilver FROM users WHERE id = ?', (user_id,)).fetchone()
@@ -33,7 +47,7 @@ def buy_item():
     conn.execute('UPDATE users SET hacksilver = hacksilver - ? WHERE id = ?', (cost, user_id))
     # Add Item
     conn.execute('INSERT INTO inventory (user_id, item_id, item_name, equipped) VALUES (?, ?, ?, 0)',
-                 (user_id, data['item_id'], data['item_name']))
+                 (user_id, item_id, item_name))
     
     conn.commit()
     return jsonify({"message": "Item Purchased", "new_balance": user['hacksilver'] - cost}), 200
