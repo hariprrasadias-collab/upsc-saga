@@ -325,12 +325,18 @@ def get_progress_trend():
         if metric == 'syllabus':
             # Syllabus completion over time (cumulative)
             # Optimized to avoid N+1 queries - current logic returns flat line anyway
-            completed = conn.execute('''
-                SELECT COUNT(*) FROM syllabus_topics
-                WHERE status = 'Completed'
-            ''').fetchone()[0]
+            try:
+                completed = conn.execute('''
+                    SELECT COUNT(*) FROM syllabus_topics
+                    WHERE status = 'Completed'
+                ''').fetchone()[0]
+            except Exception:
+                completed = 0
 
-            total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
+            try:
+                total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
+            except Exception:
+                total = 0
 
             current_value = round((completed / total * 100) if total > 0 else 0, 1)
 
