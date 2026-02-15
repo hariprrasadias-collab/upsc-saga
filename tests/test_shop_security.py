@@ -32,13 +32,9 @@ def client():
             print(f"Cleanup failed: {e}")
 
 def init_db():
+    # create_app() already initializes tables via init_core_tables()
+    # We only need to seed the test user
     conn = sqlite3.connect(TEST_DB_PATH)
-    # Create necessary tables
-    # Ensure inventory has the columns shop.py expects, even if init_core_tables created it differently
-    conn.execute('DROP TABLE IF EXISTS inventory')
-    conn.execute('CREATE TABLE inventory (id INTEGER PRIMARY KEY, user_id INTEGER, item_id TEXT, item_name TEXT, equipped INTEGER)')
-
-    conn.execute('CREATE TABLE IF NOT exists users (id INTEGER PRIMARY KEY, hacksilver INTEGER, current_xp INTEGER)')
 
     # Insert test user
     conn.execute('INSERT OR REPLACE INTO users (id, hacksilver, username) VALUES (1, 1000, "test_user")')
