@@ -9,6 +9,7 @@ interface HeatmapData {
     size: number;
     intensity: number; // 0-100, maps to color
     children?: HeatmapData[];
+    [key: string]: any; // Fix for TreemapDataType index signature
 }
 
 interface HeatmapRendererProps {
@@ -31,7 +32,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 const CustomizedContent = (props: any) => {
-    const { depth, x, y, width, height, index, name, intensity } = props;
+    const { depth, x, y, width, height, name, intensity } = props;
 
     // Determine color based on intensity (Green -> Red)
     // Low intensity (Safe) -> Green
