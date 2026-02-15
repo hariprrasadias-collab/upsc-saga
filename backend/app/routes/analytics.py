@@ -1,6 +1,7 @@
 # Analytics API Routes
 from flask import Blueprint, request, jsonify, session
 from app.db import get_db
+import sqlite3
 from datetime import datetime, timedelta
 from app.services.analytics_service import (
     calculate_study_hours,
@@ -324,18 +325,27 @@ def get_progress_trend():
         
         if metric == 'syllabus':
             # Syllabus completion over time (cumulative)
-            for i in range(days + 1):
-                date = start_date + timedelta(days=i)
+            # Optimized to avoid N+1 queries - current logic returns flat line anyway
+            try:
                 completed = conn.execute('''
                     SELECT COUNT(*) FROM syllabus_topics
                     WHERE status = 'Completed'
                 ''').fetchone()[0]
-                
+            except (sqlite3.Error, Exception):
+                completed = 0
+
+            try:
                 total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
-                
+            except (sqlite3.Error, Exception):
+                total = 0
+
+            current_value = round((completed / total * 100) if total > 0 else 0, 1)
+
+            for i in range(days + 1):
+                date = start_date + timedelta(days=i)
                 trend_data.append({
                     'date': date.isoformat(),
-                    'value': round((completed / total * 100) if total > 0 else 0, 1)
+                    'value': current_value
                 })
         
         elif metric == 'mock_score':
