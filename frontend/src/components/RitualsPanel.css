@@ -130,6 +130,13 @@
   box-shadow: 0 0 10px rgba(95, 179, 232, 0.3);
 }
 
+/* Accessibility: Show focus ring on keyboard navigation */
+.checkbox-label input:focus-visible~.checkbox-custom {
+  outline: 2px solid #d4a574;
+  outline-offset: 2px;
+  box-shadow: 0 0 8px rgba(212, 165, 116, 0.6);
+}
+
 .checkbox-label input:checked~.checkbox-custom::after {
   content: '✓';
   position: absolute;
