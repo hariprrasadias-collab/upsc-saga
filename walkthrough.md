@@ -70,7 +70,7 @@ Performed a comprehensive `grep` scan of the entire backend to ensure no hidden 
         - Switched the "Critic" step to use `FAST` models instead of `PRO` models. This reduces the token cost of predictions by ~40% and speeds up generation, while maintaining quality via the Prompts.
     - `OptimizationEngine`: **FIXED**.
         - Restored missing logic in `_check_adaptive_difficulty`.
-    - **Stability**: Verified application startup via `backend/app.py`. `verify_goals.py` and `verify_intelligent_features.py` passed against live server.
+    - **Stability**: Verified application startup via `backend/wsgi.py`. `verify_goals.py` and `verify_intelligent_features.py` passed against live server.
         - **Intelligent Features**: Confirmed Smart Flashcards, Dynamic Mocks, and Sunday Full Schedules are actively generating.
     - `NightWatchman`: **UPGRADED**.
         - Integrated `SelfReviewService` into the nightly patrol. It now automatically triggers a **Weekly Review** every Sunday, closing the automation loop.
@@ -83,7 +83,7 @@ Performed a comprehensive `grep` scan of the entire backend to ensure no hidden 
         - **Daily Guardrails**: Implemented a hard local limit (`DAILY_LIMIT = 1450`) tracked via `daily_quota.json`.
             - **TimeZone Sync**: Calibrated the reset clock to **Pacific Time (UTC-8)** to match Google's internal servers perfectly.
             - **Idempotency**: Upgraded `NightWatchman` to check for existing reports before running, effectively preventing accidental double-spending of quota on restarts.
-        - **Startup Audit**: Verified `backend/app/__init__.py` and `app.py` to ensure no hidden background threads or heavy initialization logic triggers on server start.
+        - **Startup Audit**: Verified `backend/app/__init__.py` and `wsgi.py` to ensure no hidden background threads or heavy initialization logic triggers on server start.
         - Removed 404-prone models to eliminate error spikes.
 
 ## 5. Next Steps
