@@ -21,7 +21,7 @@
 
 Stop the current backend (Ctrl+C) and restart:
 ```bash
-python app.py
+python wsgi.py
 ```
 
 ### 4. Start Using!
