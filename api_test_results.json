@@ -1,202 +1,179 @@
 {
   "summary": {
     "total": 24,
-    "passed": 12,
-    "failed": 12,
-    "pass_rate": 50.0,
-    "timestamp": "2025-12-11T15:33:56.184963"
+    "passed": 0,
+    "failed": 24,
+    "pass_rate": 0.0,
+    "timestamp": "2026-02-16T10:40:03.727385"
   },
   "results": [
     {
       "test": "TC-API-014: Get analytics overview",
       "method": "GET",
       "endpoint": "/api/analytics/overview?timeframe=all",
-      "status": "PASS",
-      "status_code": 200,
-      "response": "{\n  \"activities_completed\": 65,\n  \"level\": 18,\n  \"max_xp\": 1931,\n  \"streak_days\": 0,\n  \"study_hours\": 18.0,\n  \"xp\": 1080\n}\n"
+      "status": "FAIL",
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/analytics/overview?timeframe=all (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-014b: Get weekly analytics",
       "method": "GET",
       "endpoint": "/api/analytics/overview?timeframe=week",
-      "status": "PASS",
-      "status_code": 200,
-      "response": "{\n  \"activities_completed\": 65,\n  \"level\": 18,\n  \"max_xp\": 1931,\n  \"streak_days\": 0,\n  \"study_hours\": 18.0,\n  \"xp\": 1080\n}\n"
+      "status": "FAIL",
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/analytics/overview?timeframe=week (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-015: Get subject analytics (valid)",
       "method": "GET",
       "endpoint": "/api/analytics/subject/Polity",
       "status": "FAIL",
-      "status_code": 404,
-      "response": "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>\n"
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/analytics/subject/Polity (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-015b: Get subject analytics (invalid)",
       "method": "GET",
       "endpoint": "/api/analytics/subject/InvalidSubject",
       "status": "FAIL",
-      "status_code": 404,
-      "response": "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>\n"
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/analytics/subject/InvalidSubject (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-016: Get all syllabus topics",
       "method": "GET",
       "endpoint": "/api/syllabus/",
-      "status": "PASS",
-      "status_code": 200,
-      "response": "[\n  {\n    \"id\": 222,\n    \"last_revised_at\": null,\n    \"last_updated\": \"2025-11-26 14:56:56\",\n    \"next_revision_date\": null,\n    \"notes\": null,\n    \"paper\": \"GS1\",\n    \"revision_count\": null,\n    \"status\": \"Not Started\",\n    \"subject\": \"Art & Culture\",\n    \"subtopic\": null,\n    \"topic\": \"Indian Culture - Salient aspects of Art Forms\"\n  },\n  {\n    \"id\": 223,\n    \"last_revised_at\": null,\n    \"last_updated\": \"2025-11-26 08:40:30\",\n    \"next_revision_date\": null,\n    \"notes\": null,\n    \"paper\": \"GS1"
+      "status": "FAIL",
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/syllabus/ (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-016b: Get syllabus analytics",
       "method": "GET",
       "endpoint": "/api/syllabus/analytics",
-      "status": "PASS",
-      "status_code": 200,
-      "response": "{\n  \"breakdown\": [\n    {\n      \"count\": 1,\n      \"paper\": \"GS1\",\n      \"status\": \"Completed\"\n    },\n    {\n      \"count\": 23,\n      \"paper\": \"GS1\",\n      \"status\": \"Not Started\"\n    },\n    {\n      \"count\": 28,\n      \"paper\": \"GS2\",\n      \"status\": \"Not Started\"\n    },\n    {\n      \"count\": 33,\n      \"paper\": \"GS3\",\n      \"status\": \"Not Started\"\n    },\n    {\n      \"count\": 31,\n      \"paper\": \"GS4\",\n      \"status\": \"Not Started\"\n    },\n    {\n      \"count\": 10,\n      \"paper\": \"Optional\",\n      \"statu"
+      "status": "FAIL",
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/syllabus/analytics (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-017: Update topic status",
       "method": "POST",
       "endpoint": "/api/syllabus/1/status",
-      "status": "PASS",
-      "status_code": 200,
-      "response": "{\n  \"id\": 1,\n  \"status\": \"Reading\"\n}\n"
+      "status": "FAIL",
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/syllabus/1/status (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-018: Save topic notes",
       "method": "POST",
       "endpoint": "/api/syllabus/1/notes",
-      "status": "PASS",
-      "status_code": 200,
-      "response": "{\n  \"id\": 1,\n  \"notes\": \"Test notes\"\n}\n"
+      "status": "FAIL",
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/syllabus/1/notes (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-018b: Mark topic as revised",
       "method": "POST",
       "endpoint": "/api/syllabus/1/revise",
-      "status": "PASS",
-      "status_code": 200,
-      "response": "{\n  \"next_revision_date\": \"2026-01-01\",\n  \"revision_count\": 4,\n  \"topic_id\": 1\n}\n"
+      "status": "FAIL",
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/syllabus/1/revise (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-003: Get tasks for today",
       "method": "GET",
-      "endpoint": "/api/warmap/tasks?date=2025-12-11",
+      "endpoint": "/api/warmap/tasks?date=2026-02-16",
       "status": "FAIL",
-      "status_code": 404,
-      "response": "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>\n"
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/warmap/tasks?date=2026-02-16 (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-006b: Get Google Calendar status",
       "method": "GET",
       "endpoint": "/api/warmap/status",
-      "status": "PASS",
-      "status_code": 200,
-      "response": "{\n  \"connected\": false\n}\n"
+      "status": "FAIL",
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/warmap/status (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-004: Create new task (positive)",
       "method": "POST",
       "endpoint": "/api/warmap/tasks",
       "status": "FAIL",
-      "status_code": 404,
-      "response": "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>\n"
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/warmap/tasks (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-005: Create task without title (negative)",
       "method": "POST",
       "endpoint": "/api/warmap/tasks",
       "status": "FAIL",
-      "status_code": 404,
-      "response": "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>\n"
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/warmap/tasks (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-009: Get articles list",
       "method": "GET",
       "endpoint": "/api/ravens/articles",
       "status": "FAIL",
-      "status_code": 404,
-      "response": "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>\n"
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/ravens/articles (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-011: Get all bosses",
       "method": "GET",
       "endpoint": "/api/arena/bosses",
-      "status": "PASS",
-      "status_code": 200,
-      "response": "{\n  \"custom_bosses\": [\n    {\n      \"hp\": 0,\n      \"id\": 4,\n      \"loot\": [\n        \"Custom Reward\",\n        \"Glory\"\n      ],\n      \"max_hp\": 0,\n      \"name\": \"The History Final Boss\",\n      \"type\": \"CUSTOM\",\n      \"xp_reward\": 0\n    },\n    {\n      \"hp\": 0,\n      \"id\": 3,\n      \"loot\": [\n        \"Custom Reward\",\n        \"Glory\"\n      ],\n      \"max_hp\": 0,\n      \"name\": \"The History Final Boss\",\n      \"type\": \"CUSTOM\",\n      \"xp_reward\": 0\n    },\n    {\n      \"hp\": 20,\n      \"id\": 2,\n      \"loot\": "
+      "status": "FAIL",
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/arena/bosses (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-011b: Get year bosses",
       "method": "GET",
       "endpoint": "/api/arena/bosses/year",
       "status": "FAIL",
-      "status_code": 404,
-      "response": "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>\n"
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/arena/bosses/year (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-011c: Get subject bosses",
       "method": "GET",
       "endpoint": "/api/arena/bosses/subject",
       "status": "FAIL",
-      "status_code": 404,
-      "response": "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>\n"
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/arena/bosses/subject (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-011d: Get custom bosses",
       "method": "GET",
       "endpoint": "/api/arena/bosses/custom",
       "status": "FAIL",
-      "status_code": 404,
-      "response": "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>\n"
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/arena/bosses/custom (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-019b: Get all decks",
       "method": "GET",
       "endpoint": "/api/flashcards/decks",
-      "status": "PASS",
-      "status_code": 200,
-      "response": "[\n  {\n    \"card_count\": 21,\n    \"color\": \"#3498db\",\n    \"created_at\": \"2025-12-11 07:41:26\",\n    \"description\": null,\n    \"id\": 32,\n    \"name\": \"Auto-Gen: NCERT Class 11: Ch 5 - Legislature (Law Making/Funds/Committees) (Read)\",\n    \"subject\": \"Polity\"\n  },\n  {\n    \"card_count\": 46,\n    \"color\": \"#3498db\",\n    \"created_at\": \"2025-12-08 10:39:52\",\n    \"description\": null,\n    \"id\": 31,\n    \"name\": \"Auto-Gen: NCERT Class 8: Ch 10 - India After Independence (Foundations) (Read)\",\n    \"subject\": \"Hi"
+      "status": "FAIL",
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/flashcards/decks (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-019: Create new deck (positive)",
       "method": "POST",
       "endpoint": "/api/flashcards/decks",
       "status": "FAIL",
-      "status_code": 201,
-      "response": "{\n  \"id\": 33,\n  \"message\": \"Deck created\"\n}\n"
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/flashcards/decks (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-019c: Create deck without name (negative)",
       "method": "POST",
       "endpoint": "/api/flashcards/decks",
       "status": "FAIL",
-      "status_code": 201,
-      "response": "{\n  \"id\": 34,\n  \"message\": \"Deck created\"\n}\n"
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/flashcards/decks (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-023: Get all revision cards",
       "method": "GET",
       "endpoint": "/api/revision/cards",
-      "status": "PASS",
-      "status_code": 200,
-      "response": "{\n  \"cards\": [\n    {\n      \"created_at\": \"2025-12-11 07:41:26\",\n      \"id\": 11,\n      \"one_liner\": \"## CORE THEME: Accountability & Deliberation\\n* **Bicameralism:**\\n    * **Lok Sabha (LS):** Represent People.\",\n      \"title\": \"Revision Note: NCERT Class 11: Ch 5 - Legislature (Law Making/Funds/Committees) (Read)\",\n      \"topic_id\": \"0\"\n    },\n    {\n      \"created_at\": \"2025-12-08 10:41:50\",\n      \"id\": 10,\n      \"one_liner\": \"### India After Independence: The Consolidation Protocol\\n\\n**1.\",\n "
+      "status": "FAIL",
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/revision/cards (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-022: Generate revision card (positive)",
       "method": "POST",
       "endpoint": "/api/revision/one-liner",
       "status": "FAIL",
-      "error": "HTTPConnectionPool(host='localhost', port=5000): Read timed out. (read timeout=5)"
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/revision/one-liner (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     },
     {
       "test": "TC-API-022b: Generate card without title (negative)",
       "method": "POST",
       "endpoint": "/api/revision/one-liner",
-      "status": "PASS",
-      "status_code": 400,
-      "response": "{\n  \"error\": \"Title required\",\n  \"success\": false\n}\n"
+      "status": "FAIL",
+      "error": "HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /api/revision/one-liner (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=5000): Failed to establish a new connection: [Errno 111] Connection refused\"))"
     }
   ]
 }
