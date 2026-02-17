@@ -12,3 +12,8 @@
 **Vulnerability:** "Fail Secure" policy (raising error on missing secret) caused immediate production outage on Render because the environment variable was not yet set.
 **Learning:** Enforcing security requirements via hard crashes can block deployment pipelines if configuration management lags behind code deployment.
 **Prevention:** For session secrets, falling back to a cryptographically secure random key (with session invalidation) preserves availability while mitigating the hardcoded secret risk.
+
+## 2026-02-17 - Render Deployment & Port Binding
+**Vulnerability:** Docker container failed health checks because `gunicorn` bound to hardcoded port 5000 while Render expected it on `$PORT` (10000).
+**Learning:** Cloud platforms inject dynamic `PORT` variables. Docker `CMD` must use shell form (not exec form) to expand environment variables.
+**Prevention:** Use `CMD gunicorn -b 0.0.0.0:${PORT:-5000} ...` in Dockerfile to support dynamic port binding.
