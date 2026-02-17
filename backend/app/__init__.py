@@ -13,7 +13,23 @@ cache = Cache()
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
+
+    # Secure Secret Key Management
+    env_secret = os.environ.get('SECRET_KEY')
+    flask_env = os.environ.get('FLASK_ENV', 'development')
+
+    if env_secret:
+        app.secret_key = env_secret
+    else:
+        if flask_env == 'production':
+            # Fail securely in production
+            print("❌ CRITICAL SECURITY ERROR: SECRET_KEY is missing in production environment!")
+            raise RuntimeError("SECRET_KEY must be set in production environment.")
+        else:
+            # Fallback for development with warning
+            app.secret_key = 'dev_secret_key_upsc_saga'
+            print("⚠️ SECURITY WARNING: Using hardcoded SECRET_KEY. This is unsafe for production.")
+
     CORS(app, resources={r"/*": {"origins": "*"}})
     Compress(app) # Enable Gzip compression
 
