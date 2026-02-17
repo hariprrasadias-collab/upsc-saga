@@ -22,9 +22,9 @@ def create_app():
         app.secret_key = env_secret
     else:
         if flask_env == 'production':
-            # Fail securely in production
-            print("❌ CRITICAL SECURITY ERROR: SECRET_KEY is missing in production environment!")
-            raise RuntimeError("SECRET_KEY must be set in production environment.")
+            # Generate random key for security, but warn about session persistence
+            print("⚠️ SECURITY WARNING: SECRET_KEY is missing in production. Using a random key. Sessions will not persist across restarts.")
+            app.secret_key = os.urandom(24)
         else:
             # Fallback for development with warning
             app.secret_key = 'dev_secret_key_upsc_saga'
