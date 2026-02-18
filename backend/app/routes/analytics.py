@@ -4,7 +4,6 @@ from app.db import get_db
 from datetime import datetime, timedelta
 from app.services.analytics_service import (
     calculate_study_hours,
-    get_subject_performance,
     identify_weak_areas,
     calculate_improvement_rate,
     get_streak_days
@@ -104,22 +103,75 @@ def get_subject_wise():
         conn = get_db()
         
         subjects = ['GS1', 'GS2', 'GS3', 'GS4', 'Prelims', 'Optional']
-        results = []
         
-        for subject in subjects:
-            try:
-                perf = get_subject_performance(conn, user_id, subject)
-                results.append(perf)
-            except:
-                # Return empty data for missing tables
-                results.append({
-                    'subject': subject,
-                    'mock_avg': 0,
-                    'answer_avg': 0,
-                    'syllabus_pct': 0,
-                    'pyq_attempted': 0,
-                    'flashcard_mastered': 0
-                })
+        # Initialize results map with default values
+        results_map = {
+            subject: {
+                'subject': subject,
+                'mock_avg': 0,
+                'answer_avg': 0,
+                'syllabus_pct': 0,
+                'pyq_attempted': 0,
+                'flashcard_mastered': 0
+            } for subject in subjects
+        }
+
+        # 1. Mock Tests Aggregation - Optimized to fetch all subjects in one query
+        try:
+            mock_stats = conn.execute('''
+                SELECT mt.subject, AVG(mta.score) as avg_score
+                FROM test_attempts mta
+                JOIN mock_tests mt ON mta.test_id = mt.id
+                WHERE mta.user_id = ?
+                GROUP BY mt.subject
+            ''', (user_id,)).fetchall()
+
+            for row in mock_stats:
+                subj = row['subject']
+                if subj in results_map:
+                    results_map[subj]['mock_avg'] = round(row['avg_score'] or 0, 1)
+        except Exception as e:
+            # Table might not exist or other DB error
+            print(f"Mock stats aggregation error: {e}")
+
+        # 2. Answer Writing Aggregation
+        try:
+            answer_stats = conn.execute('''
+                SELECT aq.subject, AVG(ae.overall_score) as avg_score
+                FROM answer_evaluations ae
+                JOIN user_answers ua ON ae.answer_id = ua.id
+                JOIN answer_writing_prompts aq ON ua.prompt_id = aq.id
+                WHERE ua.user_id = ?
+                GROUP BY aq.subject
+            ''', (user_id,)).fetchall()
+
+            for row in answer_stats:
+                subj = row['subject']
+                if subj in results_map:
+                    results_map[subj]['answer_avg'] = round(row['avg_score'] or 0, 1)
+        except Exception as e:
+            print(f"Answer stats aggregation error: {e}")
+
+        # 3. Syllabus Aggregation
+        try:
+            syllabus_stats = conn.execute('''
+                SELECT
+                    subject,
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+                FROM syllabus_topics
+                GROUP BY subject
+            ''').fetchall()
+
+            for row in syllabus_stats:
+                subj = row['subject']
+                if subj in results_map and row['total'] > 0:
+                    results_map[subj]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+        except Exception as e:
+            print(f"Syllabus stats aggregation error: {e}")
+
+        # Convert map to list respecting the original order
+        results = [results_map[s] for s in subjects]
         
         return jsonify(results)
     except Exception as e:
