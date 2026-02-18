@@ -1,5 +1,5 @@
 // Toast Notification Component
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './Toast.css';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
@@ -18,15 +18,30 @@ const Toast: React.FC<ToastProps> = ({
     onClose
 }) => {
     const [isExiting, setIsExiting] = useState(false);
+    const [isPaused, setIsPaused] = useState(false);
+    const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+    const startTimeRef = useRef<number>(0);
+    const remainingRef = useRef<number>(duration);
 
     useEffect(() => {
-        const timer = setTimeout(() => {
+        remainingRef.current = duration;
+    }, [duration]);
+
+    useEffect(() => {
+        if (isPaused || isExiting) return;
+
+        startTimeRef.current = Date.now();
+        timerRef.current = setTimeout(() => {
             setIsExiting(true);
             setTimeout(onClose, 300); // Match exit animation duration
-        }, duration);
+        }, remainingRef.current);
 
-        return () => clearTimeout(timer);
-    }, [duration, onClose]);
+        return () => {
+            if (timerRef.current) clearTimeout(timerRef.current);
+            const elapsed = Date.now() - startTimeRef.current;
+            remainingRef.current = Math.max(0, remainingRef.current - elapsed);
+        };
+    }, [isPaused, isExiting, onClose]);
 
     const getIcon = () => {
         switch (type) {
@@ -40,11 +55,18 @@ const Toast: React.FC<ToastProps> = ({
 
     const isUrgent = type === 'error' || type === 'warning';
 
+    const style = {
+        '--toast-duration': `${duration}ms`
+    } as React.CSSProperties;
+
     return (
         <div
             className={`toast toast-${type} ${isExiting ? 'toast-exit' : 'toast-enter'}`}
             role={isUrgent ? 'alert' : 'status'}
             aria-live={isUrgent ? 'assertive' : 'polite'}
+            style={style}
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
         >
             <div className="toast-icon" aria-hidden="true">{getIcon()}</div>
             <div className="toast-message">{message}</div>
