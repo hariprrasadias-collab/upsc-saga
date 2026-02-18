@@ -301,7 +301,7 @@ def get_answer_writing_analytics():
                 SELECT ae.overall_score, DATE(ua.submitted_at) as date, aq.subject
                 FROM answer_evaluations ae
                 JOIN user_answers ua ON ae.answer_id = ua.id
-                JOIN answer_questions aq ON ua.prompt_id = aq.id
+                JOIN answer_writing_prompts aq ON ua.prompt_id = aq.id
                 WHERE ua.user_id = ?
                 ORDER BY ua.submitted_at ASC
             ''', (user_id,)).fetchall()
@@ -318,7 +318,7 @@ def get_answer_writing_analytics():
                 SELECT aq.subject, AVG(ae.overall_score) as avg_score, COUNT(*) as count
                 FROM answer_evaluations ae
                 JOIN user_answers ua ON ae.answer_id = ua.id
-                JOIN answer_questions aq ON ua.prompt_id = aq.id
+                JOIN answer_writing_prompts aq ON ua.prompt_id = aq.id
                 WHERE ua.user_id = ?
                 GROUP BY aq.subject
             ''', (user_id,)).fetchall()
