@@ -28,11 +28,15 @@ def get_inventory():
 def buy_item():
     user_id = 1
     data = request.get_json()
+
+    if not data:
+        return jsonify({"error": "No input data provided"}), 400
+
     item_id = data.get('item_id')
 
     if item_id not in SHOP_CATALOG:
         return jsonify({"error": "Invalid item"}), 400
-    
+
     cost = SHOP_CATALOG[item_id]
 
     conn = get_db()
