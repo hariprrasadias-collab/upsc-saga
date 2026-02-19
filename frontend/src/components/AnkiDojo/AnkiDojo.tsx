@@ -1,5 +1,5 @@
 // /frontend/src/components/AnkiDojo/AnkiDojo.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './AnkiDojo.css';
 import { audioManager } from '../../util/AudioManager';
 import { ebisuScheduler } from './ebisuAlgorithm';
@@ -92,7 +92,7 @@ const AnkiDojo: React.FC = () => {
     }, [queue, currentCard]);
 
     // 3. Handle User Answer with Ebisu algorithm
-    const handleAnswer = async (ease: number) => {
+    const handleAnswer = useCallback(async (ease: number) => {
         if (!currentCard) return;
 
         const isCorrect = ease >= 3; // Good or Easy
@@ -133,7 +133,7 @@ const AnkiDojo: React.FC = () => {
         } catch {
             // Error submitting answer
         }
-    };
+    }, [currentCard, studyMode]); // Added dependencies for useCallback
 
     const handleCardClick = () => {
         if (!isFlipped) {
@@ -141,6 +141,41 @@ const AnkiDojo: React.FC = () => {
             audioManager.play('click');
         }
     };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleCardClick();
+        }
+    };
+
+    // Global keyboard shortcuts for answering
+    useEffect(() => {
+        const handleGlobalKeyDown = (e: KeyboardEvent) => {
+            if (!isFlipped || !currentCard) return;
+
+            switch (e.key) {
+                case '1':
+                    handleAnswer(1);
+                    break;
+                case '2':
+                    handleAnswer(2);
+                    break;
+                case '3':
+                    handleAnswer(3);
+                    break;
+                case '4':
+                    handleAnswer(4);
+                    break;
+                default:
+                    break;
+            }
+        };
+
+        window.addEventListener('keydown', handleGlobalKeyDown);
+        return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+    }, [isFlipped, currentCard, handleAnswer]);
+
 
     // Handle mode switch with confirmation if mid-session
     const handleModeSwitch = (newMode: StudyMode) => {
@@ -262,20 +297,25 @@ const AnkiDojo: React.FC = () => {
                     <div
                         className={`flip-card ${isFlipped ? 'flipped' : ''}`}
                         onClick={handleCardClick}
+                        onKeyDown={handleKeyDown}
+                        tabIndex={0}
+                        role="button"
+                        aria-label={isFlipped ? "Flashcard flipped, showing answer" : "Flashcard, tap to reveal answer"}
+                        aria-pressed={isFlipped}
                     >
                         <div className="flip-card-inner">
                             {/* Front */}
-                            <div className="flip-card-front">
+                            <div className="flip-card-front" aria-hidden={isFlipped}>
                                 <div className="card-label">Question</div>
                                 <div
                                     className="card-content"
                                     dangerouslySetInnerHTML={{ __html: currentCard.question }}
                                 />
-                                {!isFlipped && <div className="tap-hint">👆 Tap to reveal answer</div>}
+                                {!isFlipped && <div className="tap-hint">👆 Tap or press Space/Enter to reveal answer</div>}
                             </div>
 
                             {/* Back */}
-                            <div className="flip-card-back">
+                            <div className="flip-card-back" aria-hidden={!isFlipped}>
                                 <div className="card-label">Answer</div>
                                 <div
                                     className="card-content"
@@ -288,19 +328,39 @@ const AnkiDojo: React.FC = () => {
                     {/* Answer Buttons - Only show when flipped */}
                     {isFlipped && (
                         <div className="answer-buttons">
-                            <button className="ans-btn wrong" onClick={() => handleAnswer(1)}>
+                            <button
+                                className="ans-btn wrong"
+                                onClick={() => handleAnswer(1)}
+                                aria-label="Mark as Wrong (Press 1)"
+                                title="Press 1"
+                            >
                                 <span className="emoji">❌</span>
                                 <span>Wrong</span>
                             </button>
-                            <button className="ans-btn hard" onClick={() => handleAnswer(2)}>
+                            <button
+                                className="ans-btn hard"
+                                onClick={() => handleAnswer(2)}
+                                aria-label="Mark as Hard (Press 2)"
+                                title="Press 2"
+                            >
                                 <span className="emoji">😓</span>
                                 <span>Hard</span>
                             </button>
-                            <button className="ans-btn good" onClick={() => handleAnswer(3)}>
+                            <button
+                                className="ans-btn good"
+                                onClick={() => handleAnswer(3)}
+                                aria-label="Mark as Good (Press 3)"
+                                title="Press 3"
+                            >
                                 <span className="emoji">👍</span>
                                 <span>Good</span>
                             </button>
-                            <button className="ans-btn easy" onClick={() => handleAnswer(4)}>
+                            <button
+                                className="ans-btn easy"
+                                onClick={() => handleAnswer(4)}
+                                aria-label="Mark as Easy (Press 4)"
+                                title="Press 4"
+                            >
                                 <span className="emoji">✨</span>
                                 <span>Easy</span>
                             </button>

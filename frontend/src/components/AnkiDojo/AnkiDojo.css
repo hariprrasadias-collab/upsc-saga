@@ -456,3 +456,15 @@
         font-size: 1.3rem;
     }
 }
+
+/* Accessibility Focus Styles */
+.flip-card:focus-visible {
+    outline: 3px solid var(--color-accent-blue);
+    outline-offset: 8px;
+    border-radius: 16px;
+}
+
+.ans-btn:focus-visible {
+    outline: 3px solid var(--color-accent-blue);
+    outline-offset: 2px;
+}
