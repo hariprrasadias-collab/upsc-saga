@@ -4,7 +4,6 @@ from app.db import get_db
 from app.utils.session import get_current_user_id
 import json
 import time as import_time
-from app.utils.session import get_current_user_id
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -31,10 +30,7 @@ def is_admin(user_id):
 
     except Exception as e:
         print(f"Admin check failed for user {user_id}: {e}")
-        # In case of database error (e.g. column missing before migration),
-        # fail safe to deny access unless it is the hardcoded admin during dev/migration.
-        if user_id == 1:
-             return True
+        # Fail secure: deny access on error
         return False
 
 @admin_bp.route('/api/admin/stats', methods=['GET'])
