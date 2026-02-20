@@ -220,3 +220,6 @@ def create_app():
         init_neural_hash_tables()
 
     return app
+
+# Expose global app instance for gunicorn app:app pattern
+app = create_app()
