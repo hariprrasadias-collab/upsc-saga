@@ -1,6 +1,7 @@
 // Daily Challenge Card Component
 import React, { useState, useEffect } from 'react';
 import './ChallengeCard.css';
+import { useToast, ToastContainer } from '../Toast';
 
 interface Challenge {
     id: number;
@@ -17,6 +18,8 @@ const ChallengeCard: React.FC = () => {
     const [challenge, setChallenge] = useState<Challenge | null>(null);
     const [loading, setLoading] = useState(true);
     const [streak, setStreak] = useState(0);
+    const [isCompleting, setIsCompleting] = useState(false);
+    const { toasts, addToast, removeToast } = useToast();
 
     useEffect(() => {
         fetchChallenge();
@@ -50,8 +53,9 @@ const ChallengeCard: React.FC = () => {
     };
 
     const handleComplete = async () => {
-        if (!challenge || challenge.completed) return;
+        if (!challenge || challenge.completed || isCompleting) return;
 
+        setIsCompleting(true);
         try {
             const res = await fetch('http://localhost:5000/api/challenges/complete', {
                 method: 'POST'
@@ -59,15 +63,22 @@ const ChallengeCard: React.FC = () => {
 
             if (res.ok) {
                 const data = await res.json();
-                alert(`Challenge completed! +${data.xp_awarded} XP`);
+                addToast(`Challenge completed! +${data.xp_awarded} XP`, 'success');
                 fetchChallenge();
                 fetchStreak();
 
-                // Refresh page stats
-                window.location.reload();
+                // Refresh page stats after a delay to let the toast show
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                addToast('Failed to complete challenge.', 'error');
             }
         } catch (err) {
             console.error('Error completing challenge:', err);
+            addToast('Error connecting to server.', 'error');
+        } finally {
+            setIsCompleting(false);
         }
     };
 
@@ -90,45 +101,57 @@ const ChallengeCard: React.FC = () => {
     const progress = challenge.completed ? 100 : (challenge.progress / challenge.target_value) * 100;
 
     return (
-        <div className={`challenge-card ${challenge.completed ? 'completed' : ''}`}>
-            <div className="challenge-header">
-                <h3>🎯 Daily Challenge</h3>
-                <div className="streak-badge">
-                    🔥 {streak} day{streak !== 1 ? 's' : ''}
-                </div>
-            </div>
-
-            <div className="challenge-body">
-                <h4>{challenge.title}</h4>
-                <p>{challenge.description}</p>
-
-                <div className="challenge-progress">
-                    <div className="progress-bar">
-                        <div
-                            className="progress-fill"
-                            style={{ width: `${progress}%` }}
-                        ></div>
+        <>
+            <ToastContainer toasts={toasts} removeToast={removeToast} />
+            <div className={`challenge-card ${challenge.completed ? 'completed' : ''}`}>
+                <div className="challenge-header">
+                    <h3>🎯 Daily Challenge</h3>
+                    <div className="streak-badge">
+                        🔥 {streak} day{streak !== 1 ? 's' : ''}
                     </div>
-                    <span className="progress-text">
-                        {challenge.progress} / {challenge.target_value}
-                    </span>
                 </div>
 
-                <div className="challenge-footer">
-                    <span className="reward">+{challenge.xp_reward} XP</span>
-                    {challenge.completed ? (
-                        <div className="completed-badge">✅ Completed</div>
-                    ) : (
-                        <button
-                            className="complete-btn"
-                            onClick={handleComplete}
+                <div className="challenge-body">
+                    <h4>{challenge.title}</h4>
+                    <p>{challenge.description}</p>
+
+                    <div className="challenge-progress">
+                        <div
+                            className="progress-bar"
+                            role="progressbar"
+                            aria-valuenow={challenge.progress}
+                            aria-valuemin={0}
+                            aria-valuemax={challenge.target_value}
+                            aria-label="Daily Challenge Progress"
                         >
-                            Mark Complete
-                        </button>
-                    )}
+                            <div
+                                className="progress-fill"
+                                style={{ width: `${progress}%` }}
+                            ></div>
+                        </div>
+                        <span className="progress-text">
+                            {challenge.progress} / {challenge.target_value}
+                        </span>
+                    </div>
+
+                    <div className="challenge-footer">
+                        <span className="reward">+{challenge.xp_reward} XP</span>
+                        {challenge.completed ? (
+                            <div className="completed-badge">✅ Completed</div>
+                        ) : (
+                            <button
+                                className="complete-btn"
+                                onClick={handleComplete}
+                                disabled={isCompleting}
+                                aria-busy={isCompleting}
+                            >
+                                {isCompleting ? 'Completing...' : 'Mark Complete'}
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

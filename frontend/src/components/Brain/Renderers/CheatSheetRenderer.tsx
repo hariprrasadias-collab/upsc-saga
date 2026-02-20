@@ -159,6 +159,7 @@ const CheatSheetRenderer: React.FC<CheatSheetRendererProps> = ({ content }) => {
         if (!containerRef.current || !data) return;
 
         const element = containerRef.current;
+        // @ts-ignore
         const canvas = await html2canvas(element, { backgroundColor: '#1a1a1a' });
         const imgData = canvas.toDataURL('image/png');
 

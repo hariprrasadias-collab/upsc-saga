@@ -5,7 +5,9 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
 // Fix for Leaflet marker icons in React
+// @ts-ignore
 import icon from 'leaflet/dist/images/marker-icon.png';
+// @ts-ignore
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
 const DefaultIcon = L.icon({
