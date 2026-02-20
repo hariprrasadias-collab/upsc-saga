@@ -14,7 +14,7 @@ const StudyTimer: React.FC = () => {
 
     useEffect(() => {
         if (isActive && !isPaused) {
-            intervalRef.current = setInterval(() => {
+            intervalRef.current = window.setInterval(() => {
                 setSeconds((s) => s + 1);
             }, 1000);
         } else {
