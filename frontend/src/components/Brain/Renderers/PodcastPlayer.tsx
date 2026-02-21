@@ -219,7 +219,7 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
             const pool = enVoices.length > 0 ? enVoices : voices;
 
             const isStudent = line.speaker.toLowerCase().includes('student') || line.speaker.toLowerCase().includes('curious');
-            const isExpert = line.speaker.toLowerCase().includes('expert') || line.speaker.toLowerCase().includes('professor') || line.speaker.toLowerCase().includes('host');
+            // Removed unused isExpert variable here
 
             // Find Voices - Try "Google" or "Natural" first
             const googleFemale = pool.find(v => v.name.includes('Google US English') || v.name.includes('Google UK English Female'));
