@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './RitualsPanel.css'; // Reuse existing styles or add new ones
+import { useState, useEffect, useRef } from 'react';
+import './RitualsPanel.css';
 import { useGlobal } from '../contexts/GlobalContext';
 import { API_BASE_URL } from '../config';
-import { ToastContainer, useToast } from './Toast';
+import { useToast, ToastContainer } from './Toast';
 
-const StudyTimer: React.FC = () => {
+const StudyTimer = () => {
     const { refreshDashboard } = useGlobal();
     const { toasts, addToast, removeToast } = useToast();
     const [seconds, setSeconds] = useState(0);
@@ -14,8 +14,8 @@ const StudyTimer: React.FC = () => {
 
     useEffect(() => {
         if (isActive && !isPaused) {
-            intervalRef.current = setInterval(() => {
-                setSeconds((s) => s + 1);
+            intervalRef.current = window.setInterval(() => {
+                setSeconds(s => s + 1);
             }, 1000);
         } else {
             if (intervalRef.current) clearInterval(intervalRef.current);
@@ -37,19 +37,17 @@ const StudyTimer: React.FC = () => {
     const handleStop = async () => {
         setIsActive(false);
         setIsPaused(false);
-
         if (seconds < 60) {
             addToast("Session too short to log (min 1 minute).", "warning");
             setSeconds(0);
             return;
         }
-
         const minutes = Math.floor(seconds / 60);
         try {
             const res = await fetch(`${API_BASE_URL}/api/tasks/log-study`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ minutes })
+                body: JSON.stringify({ minutes: minutes })
             });
 
             if (res.ok) {
@@ -63,7 +61,6 @@ const StudyTimer: React.FC = () => {
             console.error('Error logging study:', err);
             addToast("Error connecting to server.", "error");
         }
-
         setSeconds(0);
     };
 
@@ -81,37 +78,21 @@ const StudyTimer: React.FC = () => {
             <div className="timer-display">{formatTime(seconds)}</div>
             <div className="timer-controls">
                 {!isActive ? (
-                    <button
-                        className="timer-btn start"
-                        onClick={handleStart}
-                        aria-label="Start study timer"
-                    >
+                    <button className="timer-btn start" onClick={handleStart} aria-label="Start study timer">
                         START
                     </button>
                 ) : (
                     <>
                         {isPaused ? (
-                            <button
-                                className="timer-btn resume"
-                                onClick={handleStart}
-                                aria-label="Resume study timer"
-                            >
+                            <button className="timer-btn resume" onClick={handleStart} aria-label="Resume study timer">
                                 RESUME
                             </button>
                         ) : (
-                            <button
-                                className="timer-btn pause"
-                                onClick={handlePause}
-                                aria-label="Pause study timer"
-                            >
+                            <button className="timer-btn pause" onClick={handlePause} aria-label="Pause study timer">
                                 PAUSE
                             </button>
                         )}
-                        <button
-                            className="timer-btn stop"
-                            onClick={handleStop}
-                            aria-label="Finish study session and log time"
-                        >
+                        <button className="timer-btn stop" onClick={handleStop} aria-label="Finish study session and log time">
                             FINISH
                         </button>
                     </>
