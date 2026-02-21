@@ -8,7 +8,7 @@ def invoke(action, **params):
     """Generic wrapper to call AnkiConnect."""
     requestJson = json.dumps({'action': action, 'params': params, 'version': 6})
     try:
-        response = requests.post(ANKI_CONNECT_URL, data=requestJson).json()
+        response = requests.post(ANKI_CONNECT_URL, data=requestJson, timeout=1).json()
         if len(response) != 2:
             raise Exception('response has an unexpected number of fields')
         if 'error' not in response:
@@ -20,8 +20,33 @@ def invoke(action, **params):
         return response['result']
     except Exception as e:
         # We print the specific error but don't crash the app
-        # print(f"AnkiConnect Error ({action}): {e}") 
-        return None
+        print(f"AnkiConnect Error ({action}): {e}. Using Mock Data.")
+        return mock_invoke(action, **params)
+
+def mock_invoke(action, **params):
+    """Returns mock data for testing/development when Anki is not available."""
+    if action == 'findCards':
+        # Return a list of mock card IDs
+        return [101, 102, 103]
+
+    if action == 'cardsInfo':
+        cards = params.get('cards', [])
+        return [{
+            'cardId': card_id,
+            'question': f'<h3>Mock Question {card_id}</h3><p>What is the capital of France?</p>',
+            'answer': f'<h3>Mock Answer {card_id}</h3><p>Paris</p>',
+            'deckName': 'UPSC',
+            'modelName': 'Basic'
+        } for card_id in cards]
+
+    if action == 'answerCards':
+        return [True] * len(params.get('answers', []))
+
+    if action == 'getDeckStats':
+        # Return mock stats
+        return {'1': {'new_count': 5, 'learn_count': 2, 'review_count': 3}}
+
+    return None
 
 def get_due_card_ids(deck_name="UPSC"):
     """Gets a list of card IDs that are due for review OR new cards ready to learn."""
