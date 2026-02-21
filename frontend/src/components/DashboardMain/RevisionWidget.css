@@ -174,18 +174,6 @@
     animation-delay: 0.5s;
 }
 
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
 .due-item::before {
     content: '';
     position: absolute;
@@ -305,205 +293,9 @@
     font-size: 0.8rem;
     color: #8b9bb4;
     margin-top: 12px;
-
-    .due-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        padding: 14px 16px;
-        border-radius: 2px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-        animation: slideIn 0.5s ease-out backwards;
-    }
-
-    /* Completion Animation (Burn Away) */
-    .due-item.completing {
-        animation: burnAway 0.8s forwards ease-in-out;
-        pointer-events: none;
-    }
-
-    @keyframes burnAway {
-        0% {
-            opacity: 1;
-            transform: scale(1);
-            filter: brightness(1);
-        }
-
-        40% {
-            opacity: 0.8;
-            transform: scale(0.98);
-            filter: brightness(2) sepia(1) hue-rotate(-30deg) saturate(5);
-            /* Bright orange burn */
-            background: rgba(231, 76, 60, 0.4);
-        }
-
-        100% {
-            opacity: 0;
-            transform: scale(0.9) translateX(50px);
-            filter: brightness(0) blur(10px);
-        }
-    }
-
-    /* Staggered Animation */
-    .due-item:nth-child(1) {
-        animation-delay: 0.1s;
-    }
-
-    .due-item:nth-child(2) {
-        animation-delay: 0.2s;
-    }
-
-    .due-item:nth-child(3) {
-        animation-delay: 0.3s;
-    }
-
-    .due-item:nth-child(4) {
-        animation-delay: 0.4s;
-    }
-
-    .due-item:nth-child(5) {
-        animation-delay: 0.5s;
-    }
-
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateX(-10px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    .due-item::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 2px;
-        background: rgba(212, 165, 116, 0.3);
-        transition: width 0.3s ease, background 0.3s ease;
-    }
-
-    .due-item:hover {
-        background: linear-gradient(90deg, rgba(212, 165, 116, 0.08), rgba(212, 165, 116, 0.02));
-        border-color: rgba(212, 165, 116, 0.3);
-        transform: translateX(4px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    }
-
-    .due-item:hover::before {
-        width: 4px;
-        background: #d4a574;
-        box-shadow: 0 0 10px rgba(212, 165, 116, 0.5);
-    }
-
-    .due-info {
-        flex: 1;
-    }
-
-    .due-subject {
-        font-size: 0.7rem;
-        color: #8b9bb4;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 6px;
-        font-family: 'Cinzel', serif;
-        opacity: 0.8;
-    }
-
-    .due-title {
-        font-size: 0.95rem;
-        color: #ecf0f1;
-        font-weight: 500;
-        line-height: 1.4;
-        font-family: 'Inter', sans-serif;
-    }
-
-    .due-date {
-        font-size: 0.75rem;
-        color: #7f8c8d;
-        margin-top: 6px;
-        font-style: italic;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    /* Highlight "Today" */
-    .due-date:contains("Today") {
-        color: #e74c3c;
-        font-weight: 600;
-        text-shadow: 0 0 5px rgba(231, 76, 60, 0.3);
-    }
-
-    .quick-revise-btn {
-        background: rgba(0, 0, 0, 0.3);
-        border: 1px solid rgba(212, 165, 116, 0.3);
-        color: #d4a574;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.4s ease;
-        margin-left: 16px;
-        font-size: 1rem;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    }
-
-    .quick-revise-btn::after {
-        content: '';
-        position: absolute;
-        inset: 2px;
-        border: 1px dashed rgba(212, 165, 116, 0.3);
-        border-radius: 50%;
-        animation: rotateSlow 10s linear infinite;
-    }
-
-    @keyframes rotateSlow {
-        from {
-            transform: rotate(0deg);
-        }
-
-        to {
-            transform: rotate(360deg);
-        }
-    }
-
-    .quick-revise-btn:hover {
-        border-color: #d4a574;
-        color: #fff;
-        transform: scale(1.1);
-        box-shadow: 0 0 15px rgba(212, 165, 116, 0.6);
-        background: rgba(212, 165, 116, 0.1);
-    }
-
-    .quick-revise-btn:hover::after {
-        border-color: rgba(255, 255, 255, 0.5);
-        animation-duration: 3s;
-    }
-
-    .more-count {
-        text-align: center;
-        font-size: 0.8rem;
-        color: #8b9bb4;
-        margin-top: 12px;
-        font-style: italic;
-        opacity: 0.6;
-        font-family: 'Cinzel', serif;
-    }
+    font-style: italic;
+    opacity: 0.6;
+    font-family: 'Cinzel', serif;
 }
     .revision-empty-state {
         text-align: center;
@@ -523,3 +315,14 @@
         margin: auto;
         box-shadow: 0 0 20px rgba(212, 165, 116, 0.2);
     }
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}

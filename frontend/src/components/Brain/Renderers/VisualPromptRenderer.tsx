@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Renderers.css';
-import { FaDownload, FaCopy, FaRocket, FaMagic, FaCog, FaChevronDown, FaChevronUp, FaRandom, FaExpand, FaBan, FaPalette, FaSave, FaThLarge, FaSquare, FaMicrophone, FaBolt, FaFileAlt } from 'react-icons/fa';
+import { FaDownload, FaCopy, FaRocket, FaMagic, FaCog, FaChevronDown, FaChevronUp, FaRandom, FaExpand, FaPalette, FaSave, FaThLarge, FaSquare, FaMicrophone, FaBolt, FaFileAlt } from 'react-icons/fa';
 
 interface VisualPromptRendererProps {
     content: string; // The raw prompt text

@@ -1,5 +1,5 @@
 // /frontend/src/components/AnkiDojo/AnkiDojo.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './AnkiDojo.css';
 import { audioManager } from '../../util/AudioManager';
 import { ebisuScheduler } from './ebisuAlgorithm';
@@ -92,7 +92,7 @@ const AnkiDojo: React.FC = () => {
     }, [queue, currentCard]);
 
     // 3. Handle User Answer with Ebisu algorithm
-    const handleAnswer = async (ease: number) => {
+    const handleAnswer = useCallback(async (ease: number) => {
         if (!currentCard) return;
 
         const isCorrect = ease >= 3; // Good or Easy
@@ -133,14 +133,49 @@ const AnkiDojo: React.FC = () => {
         } catch {
             // Error submitting answer
         }
-    };
+    }, [currentCard, studyMode]);
 
-    const handleCardClick = () => {
+    const handleCardClick = useCallback(() => {
         if (!isFlipped) {
             setIsFlipped(true);
             audioManager.play('click');
         }
-    };
+    }, [isFlipped]);
+
+    // Keyboard Shortcuts Listener
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Ignore if modifier keys are pressed
+            if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+            const target = e.target as HTMLElement;
+
+            // Ignore if focus is in an input or text area
+            if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) return;
+
+            if (e.key === ' ' || e.key === 'Enter') {
+                // Ignore if focus is on an interactive element (button, link, etc)
+                // This prevents blocking native click behavior for buttons
+                if (target.matches && target.matches('button, a, [role="button"], [tabindex]:not([tabindex="-1"])')) {
+                    return;
+                }
+
+                e.preventDefault();
+                handleCardClick();
+            } else if (isFlipped && currentCard) {
+                switch (e.key) {
+                    case '1': handleAnswer(1); break;
+                    case '2': handleAnswer(2); break;
+                    case '3': handleAnswer(3); break;
+                    case '4': handleAnswer(4); break;
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isFlipped, currentCard, handleAnswer, handleCardClick]);
+
 
     // Handle mode switch with confirmation if mid-session
     const handleModeSwitch = (newMode: StudyMode) => {
@@ -262,6 +297,15 @@ const AnkiDojo: React.FC = () => {
                     <div
                         className={`flip-card ${isFlipped ? 'flipped' : ''}`}
                         onClick={handleCardClick}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                handleCardClick();
+                            }
+                        }}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={isFlipped ? "Flashcard showing answer" : "Flashcard question. Press Space or Enter to reveal answer."}
                     >
                         <div className="flip-card-inner">
                             {/* Front */}
@@ -271,7 +315,7 @@ const AnkiDojo: React.FC = () => {
                                     className="card-content"
                                     dangerouslySetInnerHTML={{ __html: currentCard.question }}
                                 />
-                                {!isFlipped && <div className="tap-hint">👆 Tap to reveal answer</div>}
+                                {!isFlipped && <div className="tap-hint">👆 Tap or Press Space to reveal</div>}
                             </div>
 
                             {/* Back */}
@@ -288,19 +332,43 @@ const AnkiDojo: React.FC = () => {
                     {/* Answer Buttons - Only show when flipped */}
                     {isFlipped && (
                         <div className="answer-buttons">
-                            <button className="ans-btn wrong" onClick={() => handleAnswer(1)}>
+                            <button
+                                className="ans-btn wrong"
+                                onClick={() => handleAnswer(1)}
+                                title="Shortcut: 1"
+                                aria-keyshortcuts="1"
+                                aria-label="Mark as Wrong (Shortcut: 1)"
+                            >
                                 <span className="emoji">❌</span>
                                 <span>Wrong</span>
                             </button>
-                            <button className="ans-btn hard" onClick={() => handleAnswer(2)}>
+                            <button
+                                className="ans-btn hard"
+                                onClick={() => handleAnswer(2)}
+                                title="Shortcut: 2"
+                                aria-keyshortcuts="2"
+                                aria-label="Mark as Hard (Shortcut: 2)"
+                            >
                                 <span className="emoji">😓</span>
                                 <span>Hard</span>
                             </button>
-                            <button className="ans-btn good" onClick={() => handleAnswer(3)}>
+                            <button
+                                className="ans-btn good"
+                                onClick={() => handleAnswer(3)}
+                                title="Shortcut: 3"
+                                aria-keyshortcuts="3"
+                                aria-label="Mark as Good (Shortcut: 3)"
+                            >
                                 <span className="emoji">👍</span>
                                 <span>Good</span>
                             </button>
-                            <button className="ans-btn easy" onClick={() => handleAnswer(4)}>
+                            <button
+                                className="ans-btn easy"
+                                onClick={() => handleAnswer(4)}
+                                title="Shortcut: 4"
+                                aria-keyshortcuts="4"
+                                aria-label="Mark as Easy (Shortcut: 4)"
+                            >
                                 <span className="emoji">✨</span>
                                 <span>Easy</span>
                             </button>
