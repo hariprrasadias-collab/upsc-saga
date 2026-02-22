@@ -47,6 +47,19 @@ We use Fly.io because it supports persistent storage volumes, which are required
    Once deployed, Fly.io will give you a URL (e.g., `https://upsc-saga-backend-yourname.fly.dev`).
    **Copy this URL.** You will need it for the frontend.
 
+### Alternative: Backend Deployment (Render)
+
+If you prefer Render for the backend:
+1. Create a **Web Service** on Render.
+2. Connect your GitHub repository.
+3. Use the following settings:
+   - **Root Directory**: `backend`
+   - **Runtime**: Python 3
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `gunicorn wsgi:app`
+
+   *Note: Render Web Services do not have persistent storage by default. Your SQLite database will reset on redeployment.*
+
 ---
 
 ## Part 2: Frontend Deployment (Vercel)
