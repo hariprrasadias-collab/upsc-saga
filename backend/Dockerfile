@@ -27,4 +27,5 @@ ENV FLASK_APP=wsgi.py
 ENV FLASK_ENV=production
 
 # Run app.py when the container launches
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "wsgi:app"]
+# Use shell form to allow environment variable expansion (Render sets PORT)
+CMD gunicorn -w 4 -b 0.0.0.0:${PORT:-5000} wsgi:app
