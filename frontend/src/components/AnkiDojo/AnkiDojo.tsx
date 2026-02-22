@@ -142,6 +142,35 @@ const AnkiDojo: React.FC = () => {
         }
     };
 
+    // Keyboard Shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Ignore if typing in an input
+            if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+            if (!currentCard) return;
+
+            if (!isFlipped) {
+                if (e.code === 'Space' || e.code === 'Enter') {
+                    e.preventDefault(); // Prevent scrolling
+                    handleCardClick();
+                }
+            } else {
+                switch (e.key) {
+                    case '1': handleAnswer(1); break;
+                    case '2': handleAnswer(2); break;
+                    case '3': handleAnswer(3); break;
+                    case '4': handleAnswer(4); break;
+                    default: break;
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentCard, isFlipped]);
+
     // Handle mode switch with confirmation if mid-session
     const handleModeSwitch = (newMode: StudyMode) => {
         if (totalStudied > 0) {
@@ -262,6 +291,16 @@ const AnkiDojo: React.FC = () => {
                     <div
                         className={`flip-card ${isFlipped ? 'flipped' : ''}`}
                         onClick={handleCardClick}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={isFlipped ? "Card flipped" : "Card question, press Space to flip"}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleCardClick();
+                            }
+                        }}
                     >
                         <div className="flip-card-inner">
                             {/* Front */}
@@ -288,26 +327,37 @@ const AnkiDojo: React.FC = () => {
                     {/* Answer Buttons - Only show when flipped */}
                     {isFlipped && (
                         <div className="answer-buttons">
-                            <button className="ans-btn wrong" onClick={() => handleAnswer(1)}>
+                            <button className="ans-btn wrong" onClick={() => handleAnswer(1)} aria-label="Wrong (Press 1)">
                                 <span className="emoji">❌</span>
                                 <span>Wrong</span>
+                                <span className="key-hint">1</span>
                             </button>
-                            <button className="ans-btn hard" onClick={() => handleAnswer(2)}>
+                            <button className="ans-btn hard" onClick={() => handleAnswer(2)} aria-label="Hard (Press 2)">
                                 <span className="emoji">😓</span>
                                 <span>Hard</span>
+                                <span className="key-hint">2</span>
                             </button>
-                            <button className="ans-btn good" onClick={() => handleAnswer(3)}>
+                            <button className="ans-btn good" onClick={() => handleAnswer(3)} aria-label="Good (Press 3)">
                                 <span className="emoji">👍</span>
                                 <span>Good</span>
+                                <span className="key-hint">3</span>
                             </button>
-                            <button className="ans-btn easy" onClick={() => handleAnswer(4)}>
+                            <button className="ans-btn easy" onClick={() => handleAnswer(4)} aria-label="Easy (Press 4)">
                                 <span className="emoji">✨</span>
                                 <span>Easy</span>
+                                <span className="key-hint">4</span>
                             </button>
                         </div>
                     )}
                 </div>
             )}
+
+            {/* Keyboard Shortcuts Hint */}
+            <div className="keyboard-shortcuts-hint">
+                <p>
+                    <span className="key-badge">Space</span> to flip &bull; <span className="key-badge">1</span>-<span className="key-badge">4</span> to rate
+                </p>
+            </div>
         </div>
     );
 };
