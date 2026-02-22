@@ -13,7 +13,16 @@ cache = Cache()
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
+    # SENTINEL: Use environment variable for SECRET_KEY to prevent hardcoded secrets in production
+    app.secret_key = os.environ.get('SECRET_KEY', 'dev_secret_key_upsc_saga')  # Required for session
+
+    if app.secret_key == 'dev_secret_key_upsc_saga':
+        # Log warning if using default key (especially important if in production)
+        if os.environ.get('FLASK_ENV') == 'production':
+            app.logger.critical("🚨 SECURITY ALERT: Using default development SECRET_KEY in PRODUCTION! Sessions are vulnerable.")
+        else:
+            print("⚠️  WARNING: Using default development SECRET_KEY. Set SECRET_KEY environment variable in production!")
+
     CORS(app, resources={r"/*": {"origins": "*"}})
     Compress(app) # Enable Gzip compression
 
