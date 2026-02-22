@@ -3,11 +3,20 @@ FROM node:18-alpine as build
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+# Install pnpm
+RUN npm install -g pnpm
 
+# Copy package files
+COPY package.json pnpm-lock.yaml ./
+
+# Install dependencies (frozen-lockfile is default for pnpm install in CI/docker)
+RUN pnpm install
+
+# Copy source code
 COPY . .
-RUN npm run build
+
+# Build the application
+RUN pnpm run build
 
 # Stage 2: Serve the React application using Nginx
 FROM nginx:alpine

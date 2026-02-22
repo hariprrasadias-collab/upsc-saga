@@ -3,10 +3,9 @@ import './Renderers.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     FaSearch, FaSortAlphaDown, FaSortAlphaUp, FaList, FaStream,
-    FaExpandAlt, FaPlay, FaPause, FaStepForward, FaStepBackward,
-    FaCompressAlt
+    FaExpandAlt, FaPlay, FaPause
 } from 'react-icons/fa';
-import MarkdownRenderer from '../../Shared/MarkdownRenderer';
+// import MarkdownRenderer from '../../Shared/MarkdownRenderer';
 
 interface TimelineEvent {
     id: string; // Unique ID for keys
