@@ -219,7 +219,7 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
             const pool = enVoices.length > 0 ? enVoices : voices;
 
             const isStudent = line.speaker.toLowerCase().includes('student') || line.speaker.toLowerCase().includes('curious');
-            const isExpert = line.speaker.toLowerCase().includes('expert') || line.speaker.toLowerCase().includes('professor') || line.speaker.toLowerCase().includes('host');
+            // isExpert is unused, removed.
 
             // Find Voices - Try "Google" or "Natural" first
             const googleFemale = pool.find(v => v.name.includes('Google US English') || v.name.includes('Google UK English Female'));
@@ -299,7 +299,7 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
                 if (navigator.vibrate) navigator.vibrate(50);
             }
 
-             // Haptics for Keywords
+            // Haptics for Keywords
             if (rawText.includes('important') || rawText.includes('key')) {
                 if (navigator.vibrate) navigator.vibrate(30);
             }
@@ -386,11 +386,11 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
                     const y = e.clientY - rect.top;
                     const centerX = rect.width / 2;
                     const centerY = rect.height / 2;
-                    
+
                     // Tilt Calculation
                     const rotateX = ((y - centerY) / centerY) * -5; // Max 5deg
                     const rotateY = ((x - centerX) / centerX) * 5;
-                    
+
                     el.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${isPlaying ? 1.02 : 1})`;
                 }}
                 onMouseLeave={(e) => {
@@ -398,7 +398,7 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
                 }}
                 style={{
                     flex: isZenMode ? 1 : '0 0 auto',
-                    transition: 'transform 0.1s ease-out, opacity 0.5s, box-shadow 0.5s', 
+                    transition: 'transform 0.1s ease-out, opacity 0.5s, box-shadow 0.5s',
                     transform: isPlaying
                         ? (isExpertSpeaking ? 'scale(1.05) translateX(-10px)' : (isStudentSpeaking ? 'scale(1.05) translateX(10px)' : 'scale(1)'))
                         : 'scale(1)',
@@ -444,14 +444,14 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
                             border: '1px solid rgba(255,255,255,0.15)',
                             boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
                         }}>
-                             {dialogue[currentLineIndex].text.split(' ').map((word, i) => {
+                            {dialogue[currentLineIndex].text.split(' ').map((word, i) => {
                                 // Keyword Detection (Capitalized or Specific)
                                 const clean = word.replace(/[^a-zA-Z]/g, '');
                                 const isKey = /^[A-Z][a-z]+/.test(clean) && clean.length > 3;
                                 const isImpact = ['?', '!', 'crucial', 'important', 'key', 'must'].some(k => word.toLowerCase().includes(k));
-                                
+
                                 return (
-                                    <span key={i} style={{ 
+                                    <span key={i} style={{
                                         color: isKey ? '#ffd700' : (isImpact ? '#ff4d4d' : 'inherit'),
                                         textShadow: isKey ? '0 0 10px rgba(255, 215, 0, 0.5)' : 'none',
                                         display: 'inline-block',
@@ -501,7 +501,7 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
                             <div key={i} className="wave-circle" style={{
                                 animationDelay: `${i * 0.2}s`,
                                 background: isStudentSpeaking ? '#a371f7' : '#00fff2',
-                                height: `${40 + (Math.random() * 40)}px`, 
+                                height: `${40 + (Math.random() * 40)}px`,
                                 opacity: 0.8
                             }}></div>
                         ))
@@ -571,10 +571,10 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
                         {isPlaying ? '⏸' : '▶'}
                     </button>
 
-                    <button className="speed-btn" onClick={handleSpeedToggle} title="Playback Speed" style={{ 
-                        background: 'rgba(255,255,255,0.1)', 
-                        border: '1px solid rgba(255,255,255,0.2)', 
-                        color: 'white', 
+                    <button className="speed-btn" onClick={handleSpeedToggle} title="Playback Speed" style={{
+                        background: 'rgba(255,255,255,0.1)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        color: 'white',
                         padding: '8px 12px',
                         borderRadius: '20px',
                         cursor: 'pointer',
@@ -603,18 +603,18 @@ const PodcastPlayer: React.FC<PodcastRendererProps> = ({ content, title }) => {
                             }}
                         >
                             {/* Animated Bars Effect */}
-                             {[...Array(20)].map((_, i) => (
-                                <div key={i} className={`wave-bar ${isPlaying ? 'animating' : ''}`} 
-                                    style={{ 
+                            {[...Array(20)].map((_, i) => (
+                                <div key={i} className={`wave-bar ${isPlaying ? 'animating' : ''}`}
+                                    style={{
                                         animationDelay: `${i * 0.05}s`,
                                         height: '100%',
                                         width: '2px',
                                         background: 'rgba(255,255,255,0.2)',
                                         display: 'inline-block',
                                         marginRight: '2px'
-                                    }} 
+                                    }}
                                 />
-                             ))}
+                            ))}
                         </div>
                     </div>
 

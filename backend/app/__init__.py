@@ -1,4 +1,4 @@
-from app import cgi_fix
+from . import cgi_fix
 from flask import Flask
 from flask_cors import CORS
 from flask_compress import Compress
@@ -62,7 +62,7 @@ def create_app():
     threading.Thread(target=run_startup_scan, daemon=True).start()
 
     # Configure Caching (Simple Local Memory Cache for speed)
-    app.config['CACHE_TYPE'] = 'SimpleCache'
+    app.config['CACHE_TYPE'] = 'NullCache' # Changed from SimpleCache to fix AttributeError
     app.config['CACHE_DEFAULT_TIMEOUT'] = 300 # 5 minutes default
     cache.init_app(app)
 

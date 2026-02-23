@@ -3,10 +3,9 @@ import './Renderers.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     FaSearch, FaSortAlphaDown, FaSortAlphaUp, FaList, FaStream,
-    FaExpandAlt, FaPlay, FaPause, FaStepForward, FaStepBackward,
-    FaCompressAlt
+    FaExpandAlt, FaPlay, FaPause
 } from 'react-icons/fa';
-import MarkdownRenderer from '../../Shared/MarkdownRenderer';
+
 
 interface TimelineEvent {
     id: string; // Unique ID for keys
@@ -70,9 +69,9 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
                     title = rest.substring(0, splitIndex).trim();
                     desc = rest.substring(splitIndex + 3).trim();
                 } else if (rest.includes(': ')) {
-                     const parts = rest.split(': ');
-                     title = parts[0].trim();
-                     desc = parts.slice(1).join(': ').trim();
+                    const parts = rest.split(': ');
+                    title = parts[0].trim();
+                    desc = parts.slice(1).join(': ').trim();
                 }
 
                 // Range parsing
@@ -112,9 +111,9 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
         uniqueEras.add('all');
         allEvents.forEach(e => {
             if (e.numericYear !== 0) {
-               const century = Math.floor((Math.abs(e.numericYear) - 1) / 100) + 1;
-               const eraLabel = e.numericYear < 0 ? `${century}c BC` : `${century}c AD`;
-               uniqueEras.add(eraLabel);
+                const century = Math.floor((Math.abs(e.numericYear) - 1) / 100) + 1;
+                const eraLabel = e.numericYear < 0 ? `${century}c BC` : `${century}c AD`;
+                uniqueEras.add(eraLabel);
             }
         });
         return Array.from(uniqueEras).sort((a, b) => {
@@ -181,7 +180,7 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
             <>
                 {parts.map((part, i) =>
                     part.toLowerCase() === highlight.toLowerCase() ?
-                    <span key={i} className="search-highlight">{part}</span> : part
+                        <span key={i} className="search-highlight">{part}</span> : part
                 )}
             </>
         );
@@ -226,9 +225,9 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
                     // Calculate duration width if endYear exists
                     let durationWidth = 0;
                     if (evt.endYear && evt.numericYear) {
-                         // extremely simplified pixel mapping
-                         durationWidth = (evt.endYear - evt.numericYear) * 10 * zoomLevel;
-                         if (durationWidth < 0) durationWidth = 0;
+                        // extremely simplified pixel mapping
+                        durationWidth = (evt.endYear - evt.numericYear) * 10 * zoomLevel;
+                        if (durationWidth < 0) durationWidth = 0;
                     }
 
                     return (
@@ -297,7 +296,7 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
                 </div>
 
                 <div className="control-group view-toggles">
-                     {/* Presentation Toggle */}
+                    {/* Presentation Toggle */}
                     <button
                         className={`view-btn play-btn ${isPlaying ? 'active-pulse' : ''}`}
                         onClick={() => {

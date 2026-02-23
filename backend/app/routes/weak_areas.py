@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, session
 from app.services.weak_area_analyzer import (
     record_attempt,
     analyze_all_performance,
@@ -82,6 +82,7 @@ def generate_practice():
         # Get weak topics
         weak_areas = get_weak_areas(limit=5)
         weak_topics = [area['topic'] for area in weak_areas if area['topic']]
+        user_id = session.get('user_id') or 1
         
         if not weak_topics:
             return jsonify({

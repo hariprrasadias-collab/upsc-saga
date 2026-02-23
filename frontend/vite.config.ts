@@ -12,9 +12,9 @@ export default defineConfig({
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['framer-motion', '@mui/material', '@mui/icons-material'],
+          'ui-vendor': ['framer-motion', 'react-icons'],
           'chart-vendor': ['recharts', 'd3'],
-          'map-vendor': ['d3-geo', 'd3-selection', 'd3-zoom']
+          'map-vendor': ['leaflet', 'react-leaflet']
         }
       }
     },

@@ -9,6 +9,7 @@ interface HeatmapData {
     size: number;
     intensity: number; // 0-100, maps to color
     children?: HeatmapData[];
+    [key: string]: any; // Allow other properties for Recharts
 }
 
 interface HeatmapRendererProps {
@@ -31,7 +32,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 const CustomizedContent = (props: any) => {
-    const { depth, x, y, width, height, index, name, intensity } = props;
+    const { depth, x, y, width, height, name, intensity } = props;
 
     // Determine color based on intensity (Green -> Red)
     // Low intensity (Safe) -> Green
@@ -106,10 +107,10 @@ const HeatmapRenderer: React.FC<HeatmapRendererProps> = ({ content, title }) => 
                 </ResponsiveContainer>
             </div>
             <div className="heatmap-legend">
-                <div className="legend-item"><span style={{background: '#4caf50'}}></span> Safe</div>
-                <div className="legend-item"><span style={{background: '#ffeb3b'}}></span> Monitor</div>
-                <div className="legend-item"><span style={{background: '#ff9800'}}></span> Risk</div>
-                <div className="legend-item"><span style={{background: '#f44336'}}></span> Critical</div>
+                <div className="legend-item"><span style={{ background: '#4caf50' }}></span> Safe</div>
+                <div className="legend-item"><span style={{ background: '#ffeb3b' }}></span> Monitor</div>
+                <div className="legend-item"><span style={{ background: '#ff9800' }}></span> Risk</div>
+                <div className="legend-item"><span style={{ background: '#f44336' }}></span> Critical</div>
             </div>
         </div>
     );

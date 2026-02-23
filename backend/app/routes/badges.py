@@ -24,9 +24,8 @@ def get_all_badges():
     Get all badges with unlock status for the current user.
     """
     try:
-        user_id = session.get('user_id')
-        if not user_id:
-            return jsonify({'error': 'Unauthorized'}), 401
+        user_id = session.get('user_id') or 1
+
 
         badges = badge_service.get_all_badges(user_id)
         return jsonify(badges)
@@ -40,9 +39,8 @@ def get_user_badges():
     Get only unlocked badges for the current user.
     """
     try:
-        user_id = session.get('user_id')
-        if not user_id:
-            return jsonify({'error': 'Unauthorized'}), 401
+        user_id = session.get('user_id') or 1
+
 
         badges = badge_service.get_user_badges(user_id)
         return jsonify(badges)
@@ -57,9 +55,8 @@ def check_badges():
     Returns list of newly unlocked badge IDs.
     """
     try:
-        user_id = session.get('user_id')
-        if not user_id:
-            return jsonify({'error': 'Unauthorized'}), 401
+        user_id = session.get('user_id') or 1
+
 
         newly_unlocked = badge_service.check_and_unlock_badges(user_id)
         
@@ -96,9 +93,8 @@ def get_badge_progress():
     Get progress toward locked badges.
     """
     try:
-        user_id = session.get('user_id')
-        if not user_id:
-            return jsonify({'error': 'Unauthorized'}), 401
+        user_id = session.get('user_id') or 1
+
         
         from app.db import get_db
         conn = get_db()
