@@ -15,6 +15,7 @@ import SubjectBookRenderer from './Renderers/SubjectBookRenderer';
 import InterviewSimulator from './Renderers/InterviewSimulator';
 import HeatmapRenderer from './Renderers/HeatmapRenderer';
 import SelfReviewRenderer from './Renderers/SelfReviewRenderer';
+import { API_BASE_URL } from '../../config';
 
 interface AIContent {
     id: number;
@@ -45,7 +46,7 @@ const BrainVault: React.FC = () => {
     const fetchContent = async () => {
         setLoading(true);
         try {
-            let url = 'http://localhost:5000/api/automation/content';
+            let url = `${API_BASE_URL}/api/automation/content`;
             if (filterType !== 'all') {
                 url += `?type=${filterType}`;
             }
@@ -71,7 +72,7 @@ const BrainVault: React.FC = () => {
         if (!window.confirm("Delete this artifact from the Neural Storage?")) return;
 
         try {
-            await fetch(`http://localhost:5000/api/automation/content/${id}`, { method: 'DELETE' });
+            await fetch(`${API_BASE_URL}/api/automation/content/${id}`, { method: 'DELETE' });
             setContentList(prev => prev.filter(item => item.id !== id));
             if (selectedContent?.id === id) setSelectedContent(null);
         } catch (error) {
@@ -121,8 +122,6 @@ const BrainVault: React.FC = () => {
                 return <MapRenderer content={item.content} metadata={item.metadata} />;
             case 'cheat_sheet':
                 return <CheatSheetRenderer content={item.content} />;
-            case 'eli5':
-                return <ELI5Renderer content={item.content} />;
             case 'pitfalls':
                 return <PitfallRenderer content={item.content} />;
             case 'quote_bank':

@@ -5,6 +5,7 @@ import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
     PieChart, Pie, Cell, BarChart, Bar, Legend
 } from 'recharts';
+import { API_BASE_URL } from '../../config';
 
 interface SeerData {
     radar_data: Array<{ subject: string; A: number }>;
@@ -33,9 +34,9 @@ const Seer: React.FC = () => {
         const fetchData = async () => {
             try {
                 const [seerRes, weightRes, trendRes] = await Promise.all([
-                    fetch('http://localhost:5000/api/seer'),
-                    fetch('http://localhost:5000/api/seer/weightage'),
-                    fetch('http://localhost:5000/api/seer/trends')
+                    fetch(`${API_BASE_URL}/api/seer`),
+                    fetch(`${API_BASE_URL}/api/seer/weightage`),
+                    fetch(`${API_BASE_URL}/api/seer/trends`)
                 ]);
 
                 const seerData = await seerRes.json();
@@ -173,7 +174,7 @@ const Seer: React.FC = () => {
                                 </Pie>
                                 <Tooltip
                                     contentStyle={{ backgroundColor: '#001f3f', borderColor: '#7fdbff', color: '#fff' }}
-                                    formatter={(value: number, name: string) => [value, name]}
+                                    formatter={(value: any, name: any) => [value, name]}
                                 />
                                 <Legend
                                     verticalAlign="bottom"

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './RevisionCurve.css';
+import { API_BASE_URL } from '../../config';
 
 interface CurveData {
     interval: string;
@@ -18,7 +19,7 @@ const RevisionCurve: React.FC = () => {
 
     const fetchCurveData = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/analytics/visualizations/revision-curve');
+            const res = await fetch(`${API_BASE_URL}/api/analytics/visualizations/revision-curve`);
             const data = await res.json();
 
             if (Array.isArray(data)) {
@@ -77,7 +78,7 @@ const RevisionCurve: React.FC = () => {
                                 borderRadius: '6px',
                                 color: '#d4a574'
                             }}
-                            formatter={(value: any, name: string) => {
+                            formatter={(value: any, name: any) => {
                                 if (name === 'retention') return [`${value}%`, 'Retention Rate'];
                                 if (name === 'reviews') return [value, 'Review Count'];
                                 return [value, name];
