@@ -13,8 +13,22 @@ cache = Cache()
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
-    CORS(app, resources={r"/*": {"origins": "*"}})
+
+    # Secure Configuration
+    app.secret_key = os.environ.get('SECRET_KEY')
+    if not app.secret_key:
+        if os.environ.get('FLASK_ENV') == 'production':
+            import secrets
+            app.secret_key = secrets.token_hex(32)
+            print("🚨 CRITICAL: SECRET_KEY not set in production. Using ephemeral random key. Sessions will be invalidated on restart.")
+        else:
+            app.secret_key = 'dev_secret_key_upsc_saga'
+            print("⚠️ WARNING: Using default development secret key. Set SECRET_KEY in production.")
+
+    # Secure CORS
+    allowed_origins = [o.strip() for o in os.environ.get('CORS_ALLOWED_ORIGINS', '*').split(',') if o.strip()]
+    CORS(app, resources={r"/*": {"origins": allowed_origins}})
+
     Compress(app) # Enable Gzip compression
 
     # --- LOGGING & AUTONOMOUS REPAIR SETUP ---
