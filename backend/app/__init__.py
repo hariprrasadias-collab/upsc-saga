@@ -8,13 +8,35 @@ from logging.handlers import RotatingFileHandler
 import os
 import threading
 import time
+import secrets
 
 cache = Cache()
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
-    CORS(app, resources={r"/*": {"origins": "*"}})
+
+    # Security: Load SECRET_KEY from environment
+    env_secret = os.environ.get('SECRET_KEY')
+    if env_secret:
+        app.secret_key = env_secret
+    else:
+        # Check if we are in production
+        if os.environ.get('FLASK_ENV') == 'production':
+            # Generate a random key to prevent crash, but warn about session persistence
+            app.secret_key = secrets.token_hex(32)
+            print("⚠️  CRITICAL: SECRET_KEY missing in production! Generated temporary key. Sessions will not persist across restarts.")
+        else:
+            app.secret_key = 'dev_secret_key_upsc_saga'
+            print("⚠️  WARNING: Using default development SECRET_KEY. Unsafe for production.")
+
+    # Security: Load CORS origins from environment
+    cors_env = os.environ.get('CORS_ALLOWED_ORIGINS', '*')
+    # Robust parsing: filter empty strings
+    cors_origins = [o.strip() for o in cors_env.split(',') if o.strip()]
+    if not cors_origins:
+        cors_origins = ['*']
+    CORS(app, resources={r"/*": {"origins": cors_origins}})
+
     Compress(app) # Enable Gzip compression
 
     # --- LOGGING & AUTONOMOUS REPAIR SETUP ---
