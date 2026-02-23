@@ -25,6 +25,9 @@ EXPOSE 5000
 # Define environment variable
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
+ENV PORT=5000
 
 # Run app.py when the container launches
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:create_app()"]
+# 1. Initialize DB (single process)
+# 2. Run Gunicorn (skip init, reduce workers for memory safety)
+CMD ["sh", "-c", "python3 -c 'from app import create_app; create_app()' && SKIP_DB_INIT=true gunicorn -w 2 -b 0.0.0.0:${PORT} app:create_app()"]

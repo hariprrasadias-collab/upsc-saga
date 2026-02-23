@@ -13,20 +13,26 @@ cache = Cache()
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
+    app.secret_key = os.environ.get('SECRET_KEY') or 'dev_secret_key_upsc_saga'
+    if not os.environ.get('SECRET_KEY'):
+        print("WARNING: Using default development secret key. Set SECRET_KEY in environment for production security.", flush=True)
     CORS(app, resources={r"/*": {"origins": "*"}})
     Compress(app) # Enable Gzip compression
 
     # --- LOGGING & AUTONOMOUS REPAIR SETUP ---
-    if not os.path.exists('logs'):
-        os.makedirs('logs', exist_ok=True)
+    try:
+        if not os.path.exists('logs'):
+            os.makedirs('logs', exist_ok=True)
 
-    file_handler = RotatingFileHandler('logs/app.log', maxBytes=1024*1024, backupCount=10)
-    file_handler.setFormatter(logging.Formatter(
-        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-    ))
-    file_handler.setLevel(logging.ERROR)
-    app.logger.addHandler(file_handler)
+        file_handler = RotatingFileHandler('logs/app.log', maxBytes=1024*1024, backupCount=10)
+        file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+        ))
+        file_handler.setLevel(logging.ERROR)
+        app.logger.addHandler(file_handler)
+    except OSError as e:
+        print(f"WARNING: File logging disabled due to error: {e}", flush=True)
+
     app.logger.setLevel(logging.INFO) # Ensure we capture info too if needed
 
     # Global Error Handler for Hephaestus
@@ -96,17 +102,19 @@ def create_app():
     from app.db_models.syllabus import init_syllabus_tables
 
     with app.app_context():
-        init_core_tables() # Core first (users)
-        init_tasks_table() # Ensure tasks table exists
-        init_study_plan_tables()
-        init_autonomous_brain_tables()
-        init_gamification_tables()
-        
-        # Initialize Automation Tables (Socratic, Triangulation, etc.)
-        from app.db_models.automation_storage import init_automation_tables
-        init_automation_tables()
-        
-        init_indexes() # Ensure performance indexes
+        if not os.environ.get('SKIP_DB_INIT'):
+            init_core_tables() # Core first (users)
+            init_tasks_table() # Ensure tasks table exists
+            init_study_plan_tables()
+            init_autonomous_brain_tables()
+            init_gamification_tables()
+
+            # Initialize Automation Tables (Socratic, Triangulation, etc.)
+            from app.db_models.automation_storage import init_automation_tables
+            init_automation_tables()
+
+            init_indexes() # Ensure performance indexes
+            print("✅ Database tables initialized successfully.", flush=True)
 
     # Import blueprints
     from .routes import (
@@ -213,10 +221,12 @@ def create_app():
     from app.db import DATABASE
     
     with app.app_context():
-        init_mind_palace_tables()
-        init_watchman_tables()
-        init_panopticon_tables(DATABASE)
-        init_foresight_tables()
-        init_neural_hash_tables()
+        if not os.environ.get('SKIP_DB_INIT'):
+            init_mind_palace_tables()
+            init_watchman_tables()
+            init_panopticon_tables(DATABASE)
+            init_foresight_tables()
+            init_neural_hash_tables()
+            print("✅ Advanced modules initialized successfully.", flush=True)
 
     return app
