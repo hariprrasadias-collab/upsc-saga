@@ -102,17 +102,19 @@ def create_app():
     from app.db_models.syllabus import init_syllabus_tables
 
     with app.app_context():
-        init_core_tables() # Core first (users)
-        init_tasks_table() # Ensure tasks table exists
-        init_study_plan_tables()
-        init_autonomous_brain_tables()
-        init_gamification_tables()
-        
-        # Initialize Automation Tables (Socratic, Triangulation, etc.)
-        from app.db_models.automation_storage import init_automation_tables
-        init_automation_tables()
-        
-        init_indexes() # Ensure performance indexes
+        if not os.environ.get('SKIP_DB_INIT'):
+            init_core_tables() # Core first (users)
+            init_tasks_table() # Ensure tasks table exists
+            init_study_plan_tables()
+            init_autonomous_brain_tables()
+            init_gamification_tables()
+
+            # Initialize Automation Tables (Socratic, Triangulation, etc.)
+            from app.db_models.automation_storage import init_automation_tables
+            init_automation_tables()
+
+            init_indexes() # Ensure performance indexes
+            print("✅ Database tables initialized successfully.", flush=True)
 
     # Import blueprints
     from .routes import (
@@ -219,10 +221,12 @@ def create_app():
     from app.db import DATABASE
     
     with app.app_context():
-        init_mind_palace_tables()
-        init_watchman_tables()
-        init_panopticon_tables(DATABASE)
-        init_foresight_tables()
-        init_neural_hash_tables()
+        if not os.environ.get('SKIP_DB_INIT'):
+            init_mind_palace_tables()
+            init_watchman_tables()
+            init_panopticon_tables(DATABASE)
+            init_foresight_tables()
+            init_neural_hash_tables()
+            print("✅ Advanced modules initialized successfully.", flush=True)
 
     return app
