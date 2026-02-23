@@ -7,3 +7,8 @@
 **Vulnerability:** Found a hardcoded `SECRET_KEY` in `backend/app/__init__.py`. This compromises session integrity if deployed.
 **Learning:** Developers often hardcode secrets for convenience during initial development. Using `os.environ.get('KEY', 'default')` provides a safe transition path: secure in production (via env vars) while remaining convenient in dev (via default).
 **Prevention:** Always use `os.environ.get()` for sensitive configuration from day one. Add a warning log when the default/insecure value is used.
+
+## 2024-05-27 - Hardcoded Port in Dockerfile
+**Vulnerability:** Hardcoding the port (e.g., `5000`) in `CMD` causes deployment failures on platforms like Render that enforce dynamic port binding via `PORT` environment variable.
+**Learning:** Container orchestration platforms often assign random ports. Hardcoding values in `Dockerfile` breaks compatibility.
+**Prevention:** Use shell form `CMD ["sh", "-c", "... ${PORT:-5000} ..."]` to allow environment variable expansion at runtime.
