@@ -13,22 +13,26 @@ cache = Cache()
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = os.environ.get('SECRET_KEY', 'dev_secret_key_upsc_saga')
+    app.secret_key = os.environ.get('SECRET_KEY') or 'dev_secret_key_upsc_saga'
     if not os.environ.get('SECRET_KEY'):
-        print("WARNING: Using default development secret key. Set SECRET_KEY in environment for production security.")
+        print("WARNING: Using default development secret key. Set SECRET_KEY in environment for production security.", flush=True)
     CORS(app, resources={r"/*": {"origins": "*"}})
     Compress(app) # Enable Gzip compression
 
     # --- LOGGING & AUTONOMOUS REPAIR SETUP ---
-    if not os.path.exists('logs'):
-        os.makedirs('logs', exist_ok=True)
+    try:
+        if not os.path.exists('logs'):
+            os.makedirs('logs', exist_ok=True)
 
-    file_handler = RotatingFileHandler('logs/app.log', maxBytes=1024*1024, backupCount=10)
-    file_handler.setFormatter(logging.Formatter(
-        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-    ))
-    file_handler.setLevel(logging.ERROR)
-    app.logger.addHandler(file_handler)
+        file_handler = RotatingFileHandler('logs/app.log', maxBytes=1024*1024, backupCount=10)
+        file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+        ))
+        file_handler.setLevel(logging.ERROR)
+        app.logger.addHandler(file_handler)
+    except OSError as e:
+        print(f"WARNING: File logging disabled due to error: {e}", flush=True)
+
     app.logger.setLevel(logging.INFO) # Ensure we capture info too if needed
 
     # Global Error Handler for Hephaestus
