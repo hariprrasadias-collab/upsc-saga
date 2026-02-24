@@ -13,27 +13,27 @@ const RevisionCurve: React.FC = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const fetchCurveData = async () => {
+            try {
+                const res = await fetch('http://localhost:5000/api/analytics/visualizations/revision-curve');
+                const data = await res.json();
+
+                if (Array.isArray(data)) {
+                    setCurveData(data);
+                } else {
+                    console.error('Revision curve data is not an array:', data);
+                    setCurveData([]);
+                }
+                setLoading(false);
+            } catch (err) {
+                console.error('Failed to fetch revision curve:', err);
+                setCurveData([]);
+                setLoading(false);
+            }
+        };
+
         fetchCurveData();
     }, []);
-
-    const fetchCurveData = async () => {
-        try {
-            const res = await fetch('http://localhost:5000/api/analytics/visualizations/revision-curve');
-            const data = await res.json();
-
-            if (Array.isArray(data)) {
-                setCurveData(data);
-            } else {
-                console.error('Revision curve data is not an array:', data);
-                setCurveData([]);
-            }
-            setLoading(false);
-        } catch (err) {
-            console.error('Failed to fetch revision curve:', err);
-            setCurveData([]);
-            setLoading(false);
-        }
-    };
 
     if (loading) return <div className="curve-loading">Loading revision curve...</div>;
 
@@ -77,7 +77,8 @@ const RevisionCurve: React.FC = () => {
                                 borderRadius: '6px',
                                 color: '#d4a574'
                             }}
-                            formatter={(value: any, name: string) => {
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            formatter={(value: any, name: any) => {
                                 if (name === 'retention') return [`${value}%`, 'Retention Rate'];
                                 if (name === 'reviews') return [value, 'Review Count'];
                                 return [value, name];
