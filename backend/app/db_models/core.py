@@ -36,6 +36,8 @@ def init_core_tables():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER,
             item_id TEXT NOT NULL, -- 'leviathan_axe', 'chaos_blades'
+            item_name TEXT,
+            equipped INTEGER DEFAULT 0,
             acquired_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users (id)
         )

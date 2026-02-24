@@ -23,22 +23,9 @@ class TestShopSecurity(unittest.TestCase):
 
         with self.app.app_context():
             conn = get_db()
-            # Drop the table potentially created by init_core_tables with wrong schema
-            conn.execute('DROP TABLE IF EXISTS inventory')
-
-            # Recreate with correct schema expected by shop.py
-            conn.execute('''
-                CREATE TABLE inventory (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    item_id TEXT NOT NULL,
-                    item_name TEXT NOT NULL,
-                    equipped INTEGER DEFAULT 0,
-                    FOREIGN KEY (user_id) REFERENCES users (id)
-                )
-            ''')
 
             # Initialize minimal schema needed for shop if create_app didn't
+            # Note: init_core_tables() in create_app() should now create the correct inventory table
             conn.execute('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, hacksilver INTEGER, current_xp INTEGER DEFAULT 0, is_admin BOOLEAN DEFAULT 0)')
 
             # Create user 1 with 1000 hacksilver
