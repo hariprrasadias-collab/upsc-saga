@@ -20,7 +20,15 @@ const XPBar: React.FC<XPBarProps> = ({ currentXP, maxXP }) => {
         <span>{currentXP} / {maxXP} XP</span>
       </div>
       {/* The container for the bar images */}
-      <div className="xp-bar-frame">
+      <div
+        className="xp-bar-frame"
+        role="progressbar"
+        aria-valuenow={currentXP}
+        aria-valuemin={0}
+        aria-valuemax={maxXP}
+        aria-label="Experience Progress"
+        title={`${currentXP} / ${maxXP} XP`}
+      >
         {/* The dynamic fill layer. Its width depends on the calculated percentage. */}
         <div
           className="xp-bar-fill"
