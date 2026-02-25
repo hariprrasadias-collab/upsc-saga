@@ -243,3 +243,92 @@
     padding: 10px 15px;
   }
 }
+/* Study Timer */
+.study-timer {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(212, 165, 116, 0.2);
+  border-radius: 4px;
+  padding: 15px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.study-timer h3 {
+  font-family: var(--font-headings, 'NorseBold', sans-serif);
+  font-size: 16px;
+  color: #d4a574;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.timer-display {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 32px;
+  color: #fff;
+  margin: 10px 0 15px;
+  text-shadow: 0 0 10px rgba(95, 179, 232, 0.5);
+  font-weight: bold;
+}
+
+.timer-controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.timer-btn {
+  font-family: var(--font-headings, 'NorseBold', sans-serif);
+  font-size: 12px;
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.timer-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.timer-btn.start, .timer-btn.resume {
+  background: linear-gradient(135deg, rgba(46, 204, 113, 0.6) 0%, rgba(39, 174, 96, 0.6) 100%);
+  border-color: rgba(46, 204, 113, 0.5);
+}
+
+.timer-btn.start:hover, .timer-btn.resume:hover {
+  background: linear-gradient(135deg, rgba(46, 204, 113, 0.8) 0%, rgba(39, 174, 96, 0.8) 100%);
+  box-shadow: 0 0 10px rgba(46, 204, 113, 0.4);
+}
+
+.timer-btn.pause {
+  background: linear-gradient(135deg, rgba(241, 196, 15, 0.6) 0%, rgba(243, 156, 18, 0.6) 100%);
+  border-color: rgba(241, 196, 15, 0.5);
+}
+
+.timer-btn.pause:hover {
+  background: linear-gradient(135deg, rgba(241, 196, 15, 0.8) 0%, rgba(243, 156, 18, 0.8) 100%);
+  box-shadow: 0 0 10px rgba(241, 196, 15, 0.4);
+}
+
+.timer-btn.stop {
+  background: linear-gradient(135deg, rgba(231, 76, 60, 0.6) 0%, rgba(192, 57, 43, 0.6) 100%);
+  border-color: rgba(231, 76, 60, 0.5);
+}
+
+.timer-btn.stop:hover {
+  background: linear-gradient(135deg, rgba(231, 76, 60, 0.8) 0%, rgba(192, 57, 43, 0.8) 100%);
+  box-shadow: 0 0 10px rgba(231, 76, 60, 0.4);
+}
+
+.timer-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
