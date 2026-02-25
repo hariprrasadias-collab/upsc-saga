@@ -103,7 +103,7 @@ def get_subject_performance(conn, user_id, subject):
             SELECT AVG(ae.overall_score) as avg_score
             FROM answer_evaluations ae
             JOIN user_answers ua ON ae.answer_id = ua.id
-            JOIN answer_questions aq ON ua.prompt_id = aq.id
+            JOIN answer_writing_prompts aq ON ua.prompt_id = aq.id
             WHERE ua.user_id = ? AND aq.subject = ?
         ''', (user_id, subject)).fetchone()
         if answer_avg and answer_avg['avg_score']:
