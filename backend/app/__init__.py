@@ -101,6 +101,12 @@ def create_app():
         init_study_plan_tables()
         init_autonomous_brain_tables()
         init_gamification_tables()
+
+        # Initialize Extra Modules (Flashcards, Answers, Syllabus, Revision)
+        init_flashcard_tables()
+        init_answer_writing_tables()
+        init_revision_tables()
+        init_syllabus_tables()
         
         # Initialize Automation Tables (Socratic, Triangulation, etc.)
         from app.db_models.automation_storage import init_automation_tables
