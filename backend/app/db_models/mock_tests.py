@@ -56,9 +56,20 @@ def init_mock_test_tables():
             score REAL DEFAULT 0,
             percentage REAL DEFAULT 0,
             status TEXT DEFAULT 'in_progress', -- 'in_progress', 'completed'
+            answers TEXT, -- JSON dump of selected answers
             FOREIGN KEY (test_id) REFERENCES mock_tests (id)
         )
     ''')
+
+    # Migration: Add 'answers' column if missing (for existing dbs)
+    try:
+        cursor = conn.execute("PRAGMA table_info(test_attempts)")
+        columns = [row['name'] for row in cursor.fetchall()]
+        if 'answers' not in columns:
+            print("Migrating: Adding 'answers' column to test_attempts...")
+            conn.execute("ALTER TABLE test_attempts ADD COLUMN answers TEXT")
+    except Exception as e:
+        print(f"Migration warning (test_attempts): {e}")
     
     # User Answers table
     conn.execute('''
