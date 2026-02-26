@@ -221,3 +221,30 @@ def create_app():
         init_neural_hash_tables()
 
     return app
+
+# ======================================================
+# GLOBAL INSTANCE EXPORT (Deployment Compatibility)
+# ======================================================
+# This allows 'gunicorn app:app' to work by exposing the
+# app instance at the package level, while resolving the
+# ambiguity between 'app' package and 'app' module.
+#
+# We only instantiate if NOT running in a test environment
+# to avoid side effects (DB connections) during testing.
+import sys
+
+def _should_create_global_app():
+    # Don't create if running pytest/unittest
+    if 'pytest' in sys.modules or 'unittest' in sys.modules:
+        return False
+    # Don't create if this file is main (handled by run_local.py or similar)
+    if __name__ == '__main__':
+        return False
+    return True
+
+if _should_create_global_app():
+    try:
+        app = create_app()
+    except Exception as e:
+        # Log but don't crash module import (allows diagnosing)
+        print(f"⚠️ Warning: Failed to create global app instance in backend/app/__init__.py: {e}")
