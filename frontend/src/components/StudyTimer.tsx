@@ -10,7 +10,15 @@ const StudyTimer: React.FC = () => {
     const [seconds, setSeconds] = useState(0);
     const [isActive, setIsActive] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const intervalRef = useRef<number | null>(null);
+
+    const formatTime = (totalSeconds: number) => {
+        const h = Math.floor(totalSeconds / 3600);
+        const m = Math.floor((totalSeconds % 3600) / 60);
+        const s = totalSeconds % 60;
+        return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    };
 
     useEffect(() => {
         if (isActive && !isPaused) {
@@ -24,6 +32,17 @@ const StudyTimer: React.FC = () => {
             if (intervalRef.current) clearInterval(intervalRef.current);
         };
     }, [isActive, isPaused]);
+
+    // Update document title with timer
+    useEffect(() => {
+        const originalTitle = document.title;
+        if (isActive && !isPaused) {
+            document.title = `${formatTime(seconds)} - Focus`;
+        }
+        return () => {
+            document.title = originalTitle;
+        };
+    }, [isActive, isPaused, seconds]);
 
     const handleStart = () => {
         setIsActive(true);
@@ -44,6 +63,7 @@ const StudyTimer: React.FC = () => {
             return;
         }
 
+        setIsSubmitting(true);
         const minutes = Math.floor(seconds / 60);
         try {
             const res = await fetch(`${API_BASE_URL}/api/tasks/log-study`, {
@@ -62,16 +82,10 @@ const StudyTimer: React.FC = () => {
         } catch (err) {
             console.error('Error logging study:', err);
             addToast("Error connecting to server.", "error");
+        } finally {
+            setIsSubmitting(false);
+            setSeconds(0);
         }
-
-        setSeconds(0);
-    };
-
-    const formatTime = (totalSeconds: number) => {
-        const h = Math.floor(totalSeconds / 3600);
-        const m = Math.floor((totalSeconds % 3600) / 60);
-        const s = totalSeconds % 60;
-        return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     };
 
     return (
@@ -80,7 +94,15 @@ const StudyTimer: React.FC = () => {
             <h3>⏱️ Focus Timer</h3>
             <div className="timer-display">{formatTime(seconds)}</div>
             <div className="timer-controls">
-                {!isActive ? (
+                {isSubmitting ? (
+                    <button
+                        className="timer-btn stop"
+                        disabled
+                        aria-label="Saving study session"
+                    >
+                        SAVING...
+                    </button>
+                ) : !isActive ? (
                     <button
                         className="timer-btn start"
                         onClick={handleStart}
