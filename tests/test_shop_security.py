@@ -3,6 +3,12 @@ import os
 import json
 import sqlite3
 import tempfile
+import sys
+
+# Add backend to path so we can import app modules
+# Assuming this file is in tests/ and backend/ is sibling
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../backend')))
+
 from app import create_app
 from app.db import get_db, init_app
 
