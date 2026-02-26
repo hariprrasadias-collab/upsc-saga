@@ -1,9 +1,6 @@
 // Daily Challenge Card Component
 import React, { useState, useEffect } from 'react';
 import './ChallengeCard.css';
-import { useGlobal } from '../../contexts/GlobalContext';
-import { useToast, ToastContainer } from '../../components/Toast';
-import { API_BASE_URL } from '../../config';
 
 interface Challenge {
     id: number;
@@ -17,12 +14,9 @@ interface Challenge {
 }
 
 const ChallengeCard: React.FC = () => {
-    const { refreshDashboard } = useGlobal();
-    const { toasts, addToast, removeToast } = useToast();
     const [challenge, setChallenge] = useState<Challenge | null>(null);
     const [loading, setLoading] = useState(true);
     const [streak, setStreak] = useState(0);
-    const [completing, setCompleting] = useState(false);
 
     useEffect(() => {
         fetchChallenge();
@@ -31,7 +25,7 @@ const ChallengeCard: React.FC = () => {
 
     const fetchChallenge = async () => {
         try {
-            const res = await fetch(`${API_BASE_URL}/api/challenges/daily`);
+            const res = await fetch('http://localhost:5000/api/challenges/daily');
             if (res.ok) {
                 const data = await res.json();
                 setChallenge(data);
@@ -45,7 +39,7 @@ const ChallengeCard: React.FC = () => {
 
     const fetchStreak = async () => {
         try {
-            const res = await fetch(`${API_BASE_URL}/api/challenges/streak`);
+            const res = await fetch('http://localhost:5000/api/challenges/streak');
             if (res.ok) {
                 const data = await res.json();
                 setStreak(data.current_streak || 0);
@@ -56,30 +50,24 @@ const ChallengeCard: React.FC = () => {
     };
 
     const handleComplete = async () => {
-        if (!challenge || challenge.completed || completing) return;
+        if (!challenge || challenge.completed) return;
 
-        setCompleting(true);
         try {
-            const res = await fetch(`${API_BASE_URL}/api/challenges/complete`, {
+            const res = await fetch('http://localhost:5000/api/challenges/complete', {
                 method: 'POST'
             });
 
             if (res.ok) {
                 const data = await res.json();
-                addToast(`Challenge completed! +${data.xp_awarded} XP`, 'success');
-                await Promise.all([
-                    fetchChallenge(),
-                    fetchStreak(),
-                    refreshDashboard()
-                ]);
-            } else {
-                addToast('Failed to complete challenge', 'error');
+                alert(`Challenge completed! +${data.xp_awarded} XP`);
+                fetchChallenge();
+                fetchStreak();
+
+                // Refresh page stats
+                window.location.reload();
             }
         } catch (err) {
             console.error('Error completing challenge:', err);
-            addToast('Error completing challenge', 'error');
-        } finally {
-            setCompleting(false);
         }
     };
 
@@ -103,7 +91,6 @@ const ChallengeCard: React.FC = () => {
 
     return (
         <div className={`challenge-card ${challenge.completed ? 'completed' : ''}`}>
-            <ToastContainer toasts={toasts} removeToast={removeToast} />
             <div className="challenge-header">
                 <h3>🎯 Daily Challenge</h3>
                 <div className="streak-badge">
@@ -116,14 +103,7 @@ const ChallengeCard: React.FC = () => {
                 <p>{challenge.description}</p>
 
                 <div className="challenge-progress">
-                    <div
-                        className="progress-bar"
-                        role="progressbar"
-                        aria-valuenow={challenge.completed ? 100 : Math.round((challenge.progress / challenge.target_value) * 100)}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                        aria-label={`Progress for ${challenge.title}`}
-                    >
+                    <div className="progress-bar">
                         <div
                             className="progress-fill"
                             style={{ width: `${progress}%` }}
@@ -142,9 +122,8 @@ const ChallengeCard: React.FC = () => {
                         <button
                             className="complete-btn"
                             onClick={handleComplete}
-                            disabled={completing}
                         >
-                            {completing ? 'Completing...' : 'Mark Complete'}
+                            Mark Complete
                         </button>
                     )}
                 </div>
