@@ -94,6 +94,7 @@ def create_app():
     from app.db_models.answer_writing import init_answer_writing_tables
     from app.db_models.revision import init_revision_tables
     from app.db_models.syllabus import init_syllabus_tables
+    from app.db_models.mock_tests import init_mock_test_tables
 
     with app.app_context():
         init_core_tables() # Core first (users)
@@ -106,6 +107,13 @@ def create_app():
         from app.db_models.automation_storage import init_automation_tables
         init_automation_tables()
         
+        # Initialize Feature Tables
+        init_syllabus_tables()
+        init_flashcard_tables()
+        init_answer_writing_tables()
+        init_revision_tables()
+        init_mock_test_tables()
+
         init_indexes() # Ensure performance indexes
 
     # Import blueprints
