@@ -1,0 +1,143 @@
+/* LoadingRune.css */
+
+.loading-rune {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-6, 1.5rem);
+    color: var(--color-amber, #e8a020);
+}
+
+/* Full variant */
+.loading-rune--full {
+    position: fixed;
+    inset: 0;
+    background: var(--color-obsidian, #080a0f);
+    z-index: 99999;
+}
+
+.loading-rune--full::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 50% 35% at 50% 50%,
+            rgba(232, 160, 32, 0.05) 0%,
+            transparent 70%);
+    pointer-events: none;
+}
+
+/* Inline variant */
+.loading-rune--inline {
+    min-height: 200px;
+    width: 100%;
+    flex: 1;
+}
+
+/* SVG circle */
+.loading-rune__circle {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.loading-rune--full .loading-rune__circle {
+    width: 100px;
+    height: 100px;
+}
+
+.loading-rune__svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    animation: spinCW 2s linear infinite;
+    will-change: transform;
+}
+
+/* Track */
+.loading-rune__track {
+    fill: none;
+    stroke: rgba(232, 160, 32, 0.1);
+    stroke-width: 3;
+}
+
+/* Animated arc */
+.loading-rune__arc {
+    fill: none;
+    stroke: var(--color-amber, #e8a020);
+    stroke-width: 3;
+    stroke-linecap: square;
+    stroke-dasharray: 60 215;
+    stroke-dashoffset: 40;
+    filter: drop-shadow(0 0 4px var(--color-amber, #e8a020));
+}
+
+/* Inner runic cross */
+.loading-rune__inner {
+    position: absolute;
+    inset: 25%;
+    width: 50%;
+    height: 50%;
+    color: rgba(232, 160, 32, 0.5);
+}
+
+/* Core amber square — pulses */
+.loading-rune__core {
+    animation: forgePulse 1.5s ease-in-out infinite;
+}
+
+/* Text block */
+.loading-rune__text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3, 0.75rem);
+}
+
+.loading-rune__label {
+    font-family: var(--font-headings, 'NorseBold', sans-serif);
+    font-size: var(--text-sm, 0.8125rem);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-amber, #e8a020);
+    animation: runeReveal 0.8s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) forwards;
+}
+
+/* Animated dots */
+.loading-rune__dots {
+    display: flex;
+    gap: 5px;
+}
+
+.loading-rune__dots span {
+    width: 5px;
+    height: 5px;
+    background: var(--color-amber, #e8a020);
+    border-radius: 50%;
+    animation: bounce 1.4s ease-in-out infinite;
+    opacity: 0.7;
+}
+
+.loading-rune__dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.loading-rune__dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .loading-rune__svg {
+        animation: none;
+    }
+
+    .loading-rune__core {
+        animation: none;
+    }
+
+    .loading-rune__dots span {
+        animation: none;
+    }
+}

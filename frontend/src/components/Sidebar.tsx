@@ -1,4 +1,4 @@
-// Sidebar with Expandable Groups
+// Sidebar with Expandable Groups — Runic Forge Edition
 import React, { useState, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Sidebar.css';

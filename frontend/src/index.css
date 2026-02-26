@@ -1,70 +1,174 @@
-/* /frontend/src/index.css */
+/* /frontend/src/index.css — RUNIC FORGE BRUTALISM Design System */
 
-/* Import Norse Fonts */
+/* === GOOGLE FONTS === */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+/* === LOCAL FONTS === */
 @font-face {
   font-family: 'Norse';
   src: url('/Norse.otf') format('opentype');
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'NorseBold';
   src: url('/Norsebold.otf') format('opentype');
   font-weight: bold;
+  font-display: swap;
 }
 
+/* === DESIGN TOKENS === */
 :root {
-  /* DEFAULT THEME (FROST/BLUE) */
-  --color-primary: #0a0e27;
-  --color-secondary: #1a2847;
-  --color-accent-blue: #5fb3e8;
-  --color-accent-blue-rgb: 95, 179, 232;
-  --color-accent-blue-hover: #4a9ecf;
-  --color-accent-orange: #d4a574;
-  --color-accent-orange-rgb: 212, 165, 116;
-  --color-accent-green: #2ecc71;
-  --color-accent-yellow: #f1c40f;
-  --color-text-primary: #c5c8d4;
-  --color-text-secondary: #8a8f9e;
-  --color-background-dark: #0f1a2e;
-  --color-background-dark-rgb: 15, 26, 46;
-  --color-background-dark-alt: #1a2847;
-  --color-background-dark-alt-rgb: 26, 40, 71;
-  --color-input-background: #0a0f1f;
-  --color-border-primary: #3d4f6b;
-  --color-border-secondary: #2a3a52;
-  --color-border-stone: #556b7f;
-  --color-error: #c54c3a;
+  /* === PALETTE: RUNIC FORGE === */
+  --color-obsidian:        #080a0f;
+  --color-obsidian-mid:    #0e1117;
+  --color-obsidian-light:  #161b26;
+  --color-forge:           #1c2333;
+  --color-forge-bright:    #253044;
 
-  --font-body: 'Roboto', sans-serif;
-  --font-headings: 'NorseBold', sans-serif;
+  /* Amber — Primary Accent (Forge Fire) */
+  --color-amber:           #e8a020;
+  --color-amber-dim:       #c4851a;
+  --color-amber-bright:    #f5c842;
+  --color-amber-glow:      rgba(232, 160, 32, 0.25);
+  --color-amber-rgb:       232, 160, 32;
+
+  /* Crimson — Secondary Accent (Blood/War) */
+  --color-crimson:         #c0392b;
+  --color-crimson-bright:  #e74c3c;
+  --color-crimson-dim:     #922b21;
+  --color-crimson-glow:    rgba(192, 57, 43, 0.25);
+  --color-crimson-rgb:     192, 57, 43;
+
+  /* Ice Blue — Tertiary Accent (Knowledge/Magic) */
+  --color-ice:             #5fb3e8;
+  --color-ice-dim:         #4a9ecf;
+  --color-ice-rgb:         95, 179, 232;
+  --color-ice-glow:        rgba(95, 179, 232, 0.2);
+
+  /* Status */
+  --color-success:         #27ae60;
+  --color-warning:         #f39c12;
+  --color-error:           #c0392b;
+
+  /* Text */
+  --color-text-primary:    #d4d8e2;
+  --color-text-secondary:  #7a8099;
+  --color-text-muted:      #4a5068;
+  --color-text-amber:      var(--color-amber);
+  --color-text-crimson:    var(--color-crimson);
+
+  /* Legacy Aliases (for backward compatibility) */
+  --color-primary:              var(--color-obsidian);
+  --color-secondary:            var(--color-forge);
+  --color-accent-blue:          var(--color-ice);
+  --color-accent-blue-rgb:      var(--color-ice-rgb);
+  --color-accent-blue-hover:    var(--color-ice-dim);
+  --color-accent-orange:        var(--color-amber);
+  --color-accent-orange-rgb:    var(--color-amber-rgb);
+  --color-accent-green:         var(--color-success);
+  --color-accent-yellow:        var(--color-amber-bright);
+  --color-background-dark:      var(--color-obsidian);
+  --color-background-dark-rgb:  8, 10, 15;
+  --color-background-dark-alt:  var(--color-forge);
+  --color-input-background:     var(--color-obsidian-mid);
+  --color-border-primary:       rgba(232, 160, 32, 0.2);
+  --color-border-secondary:     rgba(255, 255, 255, 0.06);
+  --color-border-stone:         #3a4055;
+
+  /* === TYPOGRAPHY === */
+  --font-body:        'Roboto', sans-serif;
+  --font-headings:    'NorseBold', 'Cinzel', sans-serif;
+  --font-display:     'Cinzel', 'NorseBold', sans-serif;
+  --font-mono:        'JetBrains Mono', 'Courier New', monospace;
+
+  /* Type Scale */
+  --text-xs:    0.6875rem;   /* 11px */
+  --text-sm:    0.8125rem;   /* 13px */
+  --text-base:  1rem;        /* 16px */
+  --text-md:    1.125rem;    /* 18px */
+  --text-lg:    1.375rem;    /* 22px */
+  --text-xl:    1.75rem;     /* 28px */
+  --text-2xl:   2.25rem;     /* 36px */
+  --text-3xl:   3rem;        /* 48px */
+  --text-4xl:   4rem;        /* 64px */
+
+  /* === SPACING (8px base grid) === */
+  --space-1:   0.25rem;    /* 4px  */
+  --space-2:   0.5rem;     /* 8px  */
+  --space-3:   0.75rem;    /* 12px */
+  --space-4:   1rem;       /* 16px */
+  --space-5:   1.25rem;    /* 20px */
+  --space-6:   1.5rem;     /* 24px */
+  --space-8:   2rem;       /* 32px */
+  --space-10:  2.5rem;     /* 40px */
+  --space-12:  3rem;       /* 48px */
+  --space-16:  4rem;       /* 64px */
+
+  /* === GEOMETRY === */
+  --radius-none:  0px;
+  --radius-sharp: 2px;
+  --radius-soft:  6px;
+  --radius-pill:  999px;
+
+  /* === BORDERS === */
+  --border-dim:    1px solid rgba(255,255,255,0.06);
+  --border-forge:  1px solid rgba(232, 160, 32, 0.25);
+  --border-amber:  2px solid var(--color-amber);
+  --border-crimson: 2px solid var(--color-crimson);
+  --border-ice:    1px solid rgba(95, 179, 232, 0.3);
+
+  /* === SHADOWS === */
+  --shadow-forge:   0 4px 24px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(232, 160, 32, 0.1);
+  --shadow-amber:   0 0 20px rgba(232, 160, 32, 0.35), 0 0 40px rgba(232, 160, 32, 0.15);
+  --shadow-crimson: 0 0 20px rgba(192, 57, 43, 0.35), 0 0 40px rgba(192, 57, 43, 0.15);
+  --shadow-ice:     0 0 20px rgba(95, 179, 232, 0.25);
+
+  /* === ANIMATION === */
+  --spring:       cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out:     cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out:  cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast:    150ms;
+  --duration-base:    250ms;
+  --duration-slow:    400ms;
+  --duration-spring:  500ms;
+
+  /* Layout */
+  --sidebar-w: 280px;
+  --rituals-w: 280px;
 }
 
-/* RAGE MODE OVERRIDES (Red Theme) */
+/* === RAGE MODE OVERRIDES === */
 body.rage-mode {
-  --color-primary: #1a0505;
-  --color-secondary: #2d0a0a;
-  --color-accent-blue: #ff4500;
-  /* Fire Orange replaces Ice Blue */
-  --color-accent-blue-rgb: 255, 69, 0;
-  --color-accent-blue-hover: #ff6347;
-  --color-background-dark: #1a0505;
-  --color-background-dark-alt: #2d0a0a;
-  --color-border-primary: #800000;
-  --color-text-primary: #ffdddd;
+  --color-obsidian:       #100505;
+  --color-forge:          #1e0808;
+  --color-amber:          #ff4500;
+  --color-amber-rgb:      255, 69, 0;
+  --color-amber-dim:      #cc3700;
+  --color-amber-bright:   #ff6347;
+  --color-amber-glow:     rgba(255, 69, 0, 0.3);
+  --color-text-primary:   #ffe8e8;
+  --color-border-primary: rgba(255, 69, 0, 0.3);
+
+  /* Legacy */
+  --color-primary:             var(--color-obsidian);
+  --color-secondary:           var(--color-forge);
+  --color-accent-blue:         #ff4500;
+  --color-accent-blue-rgb:     255, 69, 0;
+  --color-accent-blue-hover:   #ff6347;
+  --color-background-dark:     var(--color-obsidian);
+  --color-background-dark-alt: var(--color-forge);
+  --color-border-stone:        #5a1010;
 }
 
-/* Global Resets */
-*,
-*::before,
-*::after {
+/* === GLOBAL RESET === */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html,
-body,
-#root {
+html, body, #root {
   height: 100%;
   width: 100%;
 }
@@ -72,110 +176,221 @@ body,
 body {
   font-family: var(--font-body);
   color: var(--color-text-primary);
-  background-color: var(--color-primary);
+  background-color: var(--color-obsidian);
   line-height: 1.6;
-  transition: background-color 0.5s ease, color 0.5s ease;
+  transition: background-color 0.5s var(--ease-in-out), color 0.5s var(--ease-in-out);
   overflow: hidden;
-  /* Prevent double scrollbars */
+  font-size: var(--text-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* --- ANIMATIONS (REQUIRED FOR PARTICLES) --- */
+/* === CUSTOM SCROLLBAR — FORGE THEME === */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-obsidian); }
+::-webkit-scrollbar-thumb {
+  background: rgba(232, 160, 32, 0.3);
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-amber); }
+
+::selection {
+  background: rgba(232, 160, 32, 0.25);
+  color: white;
+}
+
+/* === PARTICLES (preserved) === */
 @keyframes fall {
-  0% {
-    opacity: 0;
-    transform: translateY(-10vh) translateX(-10px) rotate(0deg);
-  }
-
-  20% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-    transform: translateY(110vh) translateX(20px) rotate(360deg);
-  }
+  0%   { opacity: 0; transform: translateY(-10vh) translateX(-10px) rotate(0deg); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(110vh) translateX(20px) rotate(360deg); }
 }
 
 @keyframes ember-rise {
-  0% {
-    opacity: 0;
-    transform: translateY(110vh) scale(0.5);
-  }
-
-  50% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-    transform: translateY(-10vh) scale(1.5);
-  }
+  0%   { opacity: 0; transform: translateY(110vh) scale(0.5); }
+  50%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-10vh) scale(1.5); }
 }
 
-/* --- CUSTOM SCROLLBAR (GOD OF WAR THEME) --- */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+/* ==========================================
+   UTILITY CLASSES
+   ========================================== */
+
+/* Panel Styles */
+.forge-panel {
+  background: var(--color-obsidian-mid);
+  border: var(--border-forge);
+  box-shadow: var(--shadow-forge);
 }
 
-::-webkit-scrollbar-track {
-  background: var(--color-primary);
-  border-left: 1px solid var(--color-border-secondary);
+.forge-panel--crimson {
+  border-color: rgba(192, 57, 43, 0.35);
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--color-border-stone);
-  border-radius: 5px;
-  border: 2px solid var(--color-primary);
+.forge-panel--ice {
+  border-color: rgba(95, 179, 232, 0.2);
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-accent-blue);
-}
-
-::selection {
-  background: rgba(95, 179, 232, 0.3);
-  color: white;
-}
-
-/* --- GLOBAL UTILITIES --- */
+/* Legacy glass-panel — kept for remaining components, enhanced */
 .glass-panel {
-  background: rgba(13, 17, 23, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  background: rgba(14, 17, 23, 0.85);
+  border: var(--border-forge);
+  box-shadow: var(--shadow-forge);
+}
+
+/* Text Variants */
+.rune-text {
+  font-family: var(--font-headings);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.display-text {
+  font-family: var(--font-display);
+  font-weight: 900;
+}
+
+.data-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.command-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-text-secondary);
+}
+
+/* Neon text utilities */
+.neon-text-amber {
+  color: var(--color-amber);
+  text-shadow: 0 0 8px rgba(var(--color-amber-rgb), 0.6), 0 0 20px rgba(var(--color-amber-rgb), 0.3);
 }
 
 .neon-text-blue {
-  color: var(--color-accent-blue);
-  text-shadow: 0 0 5px rgba(var(--color-accent-blue-rgb), 0.7),
-    0 0 10px rgba(var(--color-accent-blue-rgb), 0.5);
+  color: var(--color-ice);
+  text-shadow: 0 0 8px rgba(var(--color-ice-rgb), 0.6), 0 0 20px rgba(var(--color-ice-rgb), 0.3);
 }
 
+.neon-text-crimson {
+  color: var(--color-crimson);
+  text-shadow: 0 0 8px rgba(var(--color-crimson-rgb), 0.6), 0 0 20px rgba(var(--color-crimson-rgb), 0.3);
+}
+
+/* Legacy aliases */
+.neon-text-orange { color: var(--color-amber); text-shadow: 0 0 8px var(--color-amber-glow); }
 .neon-border-blue {
-  border: 1px solid var(--color-accent-blue);
-  box-shadow: 0 0 5px rgba(var(--color-accent-blue-rgb), 0.5),
-    inset 0 0 5px rgba(var(--color-accent-blue-rgb), 0.2);
+  border: 1px solid var(--color-ice);
+  box-shadow: 0 0 8px var(--color-ice-glow), inset 0 0 5px rgba(var(--color-ice-rgb), 0.1);
 }
 
-.neon-text-orange {
-  color: var(--color-accent-orange);
-  text-shadow: 0 0 5px rgba(var(--color-accent-orange-rgb), 0.7),
-    0 0 10px rgba(var(--color-accent-orange-rgb), 0.5);
+/* Border utilities */
+.border-amber { border: var(--border-amber); }
+.border-crimson { border: var(--border-crimson); }
+.border-left-amber { border-left: 3px solid var(--color-amber); }
+.border-left-crimson { border-left: 3px solid var(--color-crimson); }
+
+/* Separator */
+.forge-separator {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(232, 160, 32, 0.4), transparent);
+  margin: var(--space-4) 0;
 }
 
+/* Buttons */
 .btn-primary {
-  background: linear-gradient(45deg, var(--color-accent-blue), #2980b9);
-  color: white;
+  background: var(--color-amber);
+  color: var(--color-obsidian);
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-sharp);
   cursor: pointer;
   font-family: var(--font-headings);
-  transition: all 0.3s ease;
+  font-size: var(--text-sm);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: transform var(--duration-base) var(--spring),
+              box-shadow var(--duration-base) var(--ease-out);
+  will-change: transform;
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 15px rgba(var(--color-accent-blue-rgb), 0.6);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--shadow-amber);
 }
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-amber);
+  border: var(--border-forge);
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-sharp);
+  cursor: pointer;
+  font-family: var(--font-headings);
+  font-size: var(--text-sm);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all var(--duration-base) var(--ease-out);
+}
+
+.btn-secondary:hover {
+  background: var(--color-amber-glow);
+  border-color: var(--color-amber);
+  box-shadow: var(--shadow-amber);
+}
+
+/* Spring hover utility */
+.spring-hover {
+  transition: transform var(--duration-spring) var(--spring),
+              box-shadow var(--duration-base) var(--ease-out);
+  will-change: transform;
+}
+
+.spring-hover:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.spring-hover:active {
+  transform: translateY(-1px) scale(0.99);
+  transition-duration: var(--duration-fast);
+}
+
+/* Focus styles */
+:focus-visible {
+  outline: 2px solid var(--color-amber);
+  outline-offset: 2px;
+}
+
+/* Badge / Tag */
+.forge-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-2);
+  background: var(--color-amber-glow);
+  border: 1px solid rgba(232, 160, 32, 0.4);
+  border-radius: var(--radius-sharp);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-amber);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Status indicators */
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot--active  { background: var(--color-success); box-shadow: 0 0 6px var(--color-success); }
+.status-dot--warning { background: var(--color-warning); box-shadow: 0 0 6px var(--color-warning); }
+.status-dot--error   { background: var(--color-error); box-shadow: 0 0 6px var(--color-error); }

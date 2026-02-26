@@ -1,116 +1,169 @@
-/* Main Application Container - Dynamic Grid Layout */
+/* /frontend/src/App.css — Runic Forge Application Shell */
+
+/* ==========================================
+   APPLICATION CONTAINER
+   ========================================== */
+
 .app-container {
   display: grid;
   grid-template-columns: 0px 1fr 0px;
-  /* Default: Full Screen (Sidebars Hidden) */
   height: 100vh;
   overflow: hidden;
-  background: linear-gradient(135deg, #0a0e27 0%, #1a2f4a 50%, #0a0e27 100%);
+  background-color: var(--color-obsidian);
   position: relative;
   gap: 0;
-  transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: grid-template-columns 0.35s var(--ease-in-out);
 }
 
-/* Sidebar Open States - Controlled by React State Classes on Body or Container? 
-   Actually, we can't easily change grid-template-columns based on child classes.
-   Wait, we can't style parent based on child class in CSS3.
-   
-   Alternative: We need to apply classes to .app-container itself.
-   Let's assume we update App.tsx to apply classes to app-container.
-*/
+/* Grain texture overlay — forge aesthetic depth */
+.app-container::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.6;
+}
 
-/* We need to update App.tsx to apply classes to .app-container based on state */
+/* Scanline effect — subtle CRT/HUD aesthetic */
+.app-container::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg,
+      transparent,
+      transparent 3px,
+      rgba(0, 0, 0, 0.03) 3px,
+      rgba(0, 0, 0, 0.03) 4px);
+  pointer-events: none;
+  z-index: 2;
+}
 
-/* Sidebar Toggle Button */
+/* ==========================================
+   SIDEBAR TOGGLE BUTTONS
+   ========================================== */
+
 .sidebar-toggle-btn {
   position: fixed;
-  top: 1rem;
-  left: 1rem;
+  top: var(--space-4);
+  left: var(--space-4);
   z-index: 20000;
-  /* High z-index to ensure clickability */
-  background: rgba(13, 17, 23, 0.8);
-  border: 1px solid var(--color-accent-orange);
-  color: var(--color-accent-orange);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  background: var(--color-obsidian-mid);
+  border: 1px solid rgba(232, 160, 32, 0.35);
+  color: var(--color-amber);
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sharp);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(5px);
+  font-size: 1.1rem;
+  transition:
+    transform var(--duration-spring) var(--spring),
+    background var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+  will-change: transform;
+}
+
+.sidebar-toggle-btn:hover {
+  background: var(--color-amber);
+  color: var(--color-obsidian);
+  transform: scale(1.08);
+  box-shadow: var(--shadow-amber);
+}
+
+.sidebar-toggle-btn:active {
+  transform: scale(0.95);
+  transition-duration: var(--duration-fast);
 }
 
 .sidebar-toggle-btn.right {
   left: auto;
-  right: 160px;
-  /* Moved left to avoid overlapping with Brain Interface (which is at right: 20px) */
-}
-
-.sidebar-toggle-btn:hover {
-  background: var(--color-accent-orange);
-  color: #fff;
-  box-shadow: 0 0 15px var(--color-accent-orange);
+  right: 165px;
 }
 
 .sidebar-toggle-btn.open {
-  left: 290px;
+  left: calc(var(--sidebar-w) + 8px);
 }
 
 .sidebar-toggle-btn.right.open {
   left: auto;
-  right: 440px;
-  /* 280px panel + 160px offset */
+  right: calc(var(--rituals-w) + 165px);
 }
 
-/* Sidebar - Left Column */
+/* Hamburger icon — icon content defined in JSX via text/emoji */
+
+/* ==========================================
+   SIDEBAR — LEFT COLUMN
+   ========================================== */
+
 .app-container>.sidebar {
   grid-column: 1;
   overflow-y: auto;
-  background: linear-gradient(180deg, rgba(26, 47, 74, 0.9) 0%, rgba(10, 14, 39, 0.8) 100%);
-  border-right: 2px solid rgba(212, 165, 116, 0.2);
-  box-shadow: inset -10px 0 20px rgba(0, 0, 0, 0.3);
-  width: 280px;
-  /* Fixed width content */
+  background: linear-gradient(180deg,
+      var(--color-obsidian-mid) 0%,
+      var(--color-obsidian) 100%);
+  border-right: 1px solid rgba(232, 160, 32, 0.2);
+  box-shadow: 4px 0 32px rgba(0, 0, 0, 0.6);
+  width: var(--sidebar-w);
   transform: translateX(-100%);
-  transition: transform 0.3s ease;
+  transition: transform 0.35s var(--ease-in-out);
+  position: relative;
+  z-index: 100;
 }
 
-/* Main Content Area - Center Column */
+/* ==========================================
+   MAIN CONTENT — CENTER COLUMN
+   ========================================== */
+
 .content {
   grid-column: 2;
   overflow-y: auto;
-  background: linear-gradient(135deg, #0a0e27 0%, #1a2f4a 50%, #0a0e27 100%);
+  background: transparent;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 10;
+  transition: all 0.35s var(--ease-in-out);
 }
 
-/* Rituals Panel - Right Column */
+/* ==========================================
+   RITUALS PANEL — RIGHT COLUMN
+   ========================================== */
+
 .rituals-panel-wrapper {
   grid-column: 3;
   overflow-y: auto;
-  background: linear-gradient(180deg, rgba(26, 47, 74, 0.9) 0%, rgba(10, 14, 39, 0.8) 100%);
-  border-left: 2px solid rgba(212, 165, 116, 0.2);
-  box-shadow: inset 10px 0 20px rgba(0, 0, 0, 0.3);
-  margin: 0;
-  width: 280px;
+  background: linear-gradient(180deg,
+      var(--color-obsidian-mid) 0%,
+      var(--color-obsidian) 100%);
+  border-left: 1px solid rgba(232, 160, 32, 0.2);
+  box-shadow: -4px 0 32px rgba(0, 0, 0, 0.6);
+  width: var(--rituals-w);
   transform: translateX(100%);
-  transition: transform 0.3s ease;
+  transition: transform 0.35s var(--ease-in-out);
+  position: relative;
+  z-index: 15;
 }
 
-/* OPEN STATES */
+/* ==========================================
+   OPEN STATES
+   ========================================== */
+
 .app-container.left-open {
-  grid-template-columns: 280px 1fr 0px;
+  grid-template-columns: var(--sidebar-w) 1fr 0px;
 }
 
 .app-container.right-open {
-  grid-template-columns: 0px 1fr 280px;
+  grid-template-columns: 0px 1fr var(--rituals-w);
 }
 
 .app-container.left-open.right-open {
-  grid-template-columns: 280px 1fr 280px;
+  grid-template-columns: var(--sidebar-w) 1fr var(--rituals-w);
 }
 
 .app-container.left-open>.sidebar {
@@ -121,53 +174,83 @@
   transform: translateX(0);
 }
 
-/* Loading and Error Screens */
+/* ==========================================
+   LOADING & ERROR SCREENS
+   ========================================== */
+
 .loading-screen,
 .error-screen {
   display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
   justify-content: center;
   align-items: center;
-  flex-grow: 1;
-  font-size: 2rem;
+  width: 100%;
+  height: 100vh;
   font-family: var(--font-headings);
-  color: var(--color-accent-orange);
-  text-shadow: 0 0 10px rgba(255, 127, 0, 0.5);
-  background-color: rgba(0, 0, 0, 0.8);
+  font-size: var(--text-lg);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: var(--color-obsidian);
+  color: var(--color-amber);
+  position: relative;
+  overflow: hidden;
+}
+
+.loading-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 40% at 50% 50%,
+      rgba(232, 160, 32, 0.04) 0%,
+      transparent 70%);
+  animation: forgePulse 3s ease-in-out infinite;
 }
 
 .error-screen {
-  color: var(--color-error);
-  text-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+  color: var(--color-crimson);
 }
 
-/* Placeholder Tab Styling */
+.error-screen::before {
+  background: radial-gradient(ellipse 60% 40% at 50% 50%,
+      rgba(192, 57, 43, 0.06) 0%,
+      transparent 70%);
+}
+
+/* Suspense fallback (inline, not full-screen) */
+.loading-inline {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-16);
+  flex: 1;
+}
+
+/* ==========================================
+   PLACEHOLDER TAB
+   ========================================== */
+
 .placeholder-tab {
   flex-grow: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 2.5rem;
+  font-size: var(--text-2xl);
   font-family: var(--font-headings);
-  color: var(--color-text-secondary);
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
-  padding: 2rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.1em;
+  padding: var(--space-8);
   text-align: center;
 }
 
-/* Responsive Adjustments */
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
 @media (max-width: 1400px) {
-
-  /* Adjust sidebar widths for smaller desktop screens, BUT keep 0px if closed */
-  .app-container.left-open {
-    grid-template-columns: 200px 1fr 0px;
-  }
-
-  .app-container.right-open {
-    grid-template-columns: 0px 1fr 250px;
-  }
-
-  .app-container.left-open.right-open {
-    grid-template-columns: 200px 1fr 250px;
+  :root {
+    --sidebar-w: 240px;
+    --rituals-w: 260px;
   }
 }
 
@@ -179,8 +262,8 @@
   .app-container>.sidebar {
     grid-column: 1;
     grid-row: 1;
-    max-width: 250px;
-    border-right: 2px solid rgba(212, 165, 116, 0.2);
+    max-width: 260px;
+    border-right: 1px solid rgba(232, 160, 32, 0.2);
     border-bottom: none;
   }
 
@@ -193,7 +276,7 @@
     grid-column: 1;
     grid-row: 3;
     border-left: none;
-    border-top: 2px solid rgba(212, 165, 116, 0.2);
+    border-top: 1px solid rgba(232, 160, 32, 0.2);
     max-height: 200px;
   }
 }
@@ -204,23 +287,16 @@
     height: auto;
   }
 
-  .app-container>.sidebar {
-    grid-row: 1;
-    min-height: 60px;
-    max-width: 100%;
-    border-right: none;
-    border-bottom: 2px solid rgba(212, 165, 116, 0.2);
+  .sidebar-toggle-btn {
+    top: var(--space-3);
+    left: var(--space-3);
+  }
+
+  .sidebar-toggle-btn.right {
+    right: var(--space-10);
   }
 
   .content {
-    grid-row: 2;
     min-height: calc(100vh - 200px);
-  }
-
-  .app-container>.rituals-panel {
-    grid-row: 3;
-    border-top: 2px solid rgba(212, 165, 116, 0.2);
-    max-height: 200px;
-    overflow-y: auto;
   }
 }

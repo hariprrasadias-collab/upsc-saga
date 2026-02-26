@@ -14,6 +14,7 @@ import { AnalyticsProvider } from './contexts/AnalyticsContext';
 import { PomodoroProvider } from './contexts/PomodoroContext';
 import CommandPalette from './components/CommandPalette/CommandPalette';
 import BrainInterface from './components/Brain/BrainInterface';
+import LoadingRune from './components/Shared/LoadingRune';
 
 // Lazy Load Heavy Components
 const WarMapContainer = lazy(() => import('./components/WarMap/WarMapContainer'));
@@ -81,8 +82,8 @@ function App() {
     await refreshDashboard();
   };
 
-  if (isLoading && !userStats) return <div className="loading-screen">Loading the Realms...</div>;
-  if (error) return <div className="error-screen">Error: {error}</div>;
+  if (isLoading && !userStats) return <LoadingRune variant="full" message="Summoning the Realm" />;
+  if (error) return <LoadingRune variant="full" message={`Error: ${error}`} />;
 
   return (
     <AnalyticsProvider>
@@ -133,7 +134,7 @@ function App() {
             position: 'relative',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
           }}>
-            <Suspense fallback={<div className="loading-screen">Summoning Realm...</div>}>
+            <Suspense fallback={<div className="loading-inline"><LoadingRune variant="inline" /></div>}>
               {/* Only render Tab Content if we are on the root path */}
               {location.pathname === '/' && (
                 <>

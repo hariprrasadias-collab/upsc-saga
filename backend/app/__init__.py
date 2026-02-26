@@ -13,7 +13,7 @@ cache = Cache()
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = 'dev_secret_key_upsc_saga'  # Required for session
+    app.secret_key = os.environ.get('SECRET_KEY', 'dev_secret_key_upsc_saga_change_in_prod')  # Load from env in production
     CORS(app, resources={r"/*": {"origins": "*"}})
     Compress(app) # Enable Gzip compression
 
@@ -62,8 +62,8 @@ def create_app():
     threading.Thread(target=run_startup_scan, daemon=True).start()
 
     # Configure Caching (Simple Local Memory Cache for speed)
-    app.config['CACHE_TYPE'] = 'NullCache' # Changed from SimpleCache to fix AttributeError
-    app.config['CACHE_DEFAULT_TIMEOUT'] = 300 # 5 minutes default
+    app.config['CACHE_TYPE'] = os.environ.get('CACHE_TYPE', 'SimpleCache')  # Activated: was NullCache
+    app.config['CACHE_DEFAULT_TIMEOUT'] = int(os.environ.get('CACHE_DEFAULT_TIMEOUT', 300))  # 5 min default
     cache.init_app(app)
 
     # Static Asset Caching (Cache-Control Headers)
@@ -115,10 +115,11 @@ def create_app():
         syllabus, flashcards, analytics, essay, csat, badges, challenges, 
         shop_new, weak_areas, admin, predictive, pomodoro, timebox, planner, 
         templates, revision, heatmap, model_answers, issue_mapping, scheduler,
-        mindmap, study_plan, golden_path, watchman
+        mindmap, study_plan, golden_path, watchman, health
     )
     
     # Register blueprints
+    app.register_blueprint(health.health_bp)
     app.register_blueprint(dashboard.bp)
     app.register_blueprint(golden_path.golden_path_bp, url_prefix='/api/golden-path')
     app.register_blueprint(tasks.bp)

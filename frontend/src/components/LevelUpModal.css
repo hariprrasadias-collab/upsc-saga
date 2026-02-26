@@ -1,101 +1,146 @@
-.levelup-overlay {
+/* /frontend/src/components/LevelUpModal.css — Forge Level Up */
+
+.level-up-overlay {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    z-index: 10000; /* Highest priority */
+    inset: 0;
+    background: rgba(8, 10, 15, 0.92);
+    z-index: 99998;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
-    animation: fadeIn 0.5s;
+    animation: fadeIn 0.2s ease;
 }
 
-.levelup-content {
+.level-up-modal {
+    background: var(--color-obsidian-mid, #0e1117);
+    border: 3px solid var(--color-amber, #e8a020);
+    border-radius: 0;
+    padding: 3rem 3.5rem;
     text-align: center;
     position: relative;
+    overflow: hidden;
+    box-shadow:
+        0 0 60px rgba(232, 160, 32, 0.3),
+        0 0 120px rgba(232, 160, 32, 0.1),
+        inset 0 0 40px rgba(232, 160, 32, 0.03);
+    animation: scaleInSpring 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    max-width: 480px;
+    width: 90vw;
 }
 
-.levelup-title {
-    font-family: var(--font-headings);
-    font-size: 8rem;
-    color: var(--color-accent-orange);
+/* Radiant amber corners */
+.level-up-modal::before,
+.level-up-modal::after {
+    content: '';
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-color: var(--color-crimson, #c0392b);
+    border-style: solid;
+}
+
+.level-up-modal::before {
+    top: -3px;
+    left: -3px;
+    border-width: 3px 0 0 3px;
+}
+
+.level-up-modal::after {
+    bottom: -3px;
+    right: -3px;
+    border-width: 0 3px 3px 0;
+}
+
+.level-up-title {
+    font-family: var(--font-headings, 'NorseBold', sans-serif);
+    font-size: var(--text-xs, 0.6875rem);
+    letter-spacing: 0.35em;
     text-transform: uppercase;
-    margin: 0;
-    /* The cinematic text glow */
-    text-shadow: 0 0 30px rgba(212, 165, 116, 0.8);
-    transform: scale(0.5);
-    animation: slamText 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    color: var(--color-text-muted, #4a5068);
+    margin-bottom: 0.5rem;
+    animation: slideInDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
 }
 
-.levelup-sub {
-    font-family: var(--font-headings);
-    font-size: 2rem;
-    color: white;
-    margin-top: 1rem;
-    opacity: 0;
-    animation: fadeIn 1s 0.8s forwards; /* Delay appearance */
+.level-up-number {
+    font-family: var(--font-display, 'Cinzel', sans-serif);
+    font-size: clamp(4rem, 12vw, 7rem);
+    font-weight: 900;
+    color: var(--color-amber, #e8a020);
+    line-height: 1;
+    text-shadow:
+        0 0 30px rgba(232, 160, 32, 0.7),
+        0 0 60px rgba(232, 160, 32, 0.3);
+    display: block;
+    animation: scaleInSpring 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
 }
 
-.levelup-lore {
-    margin: 2rem auto;
-    max-width: 600px;
-    background: rgba(0,0,0,0.6);
-    padding: 20px;
-    border-radius: 8px;
-    border-left: 3px solid #ffd700;
-    color: #f0f0f0;
-    font-style: italic;
-    font-family: 'Cinzel', serif;
-    font-size: 1.2rem;
-    line-height: 1.6;
-    opacity: 0;
-    animation: fadeIn 1s 1s forwards;
-    text-align: left;
+.level-up-subtitle {
+    font-family: var(--font-headings, 'NorseBold', sans-serif);
+    font-size: var(--text-lg, 1.375rem);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-text-primary, #d4d8e2);
+    margin-top: 0.5rem;
+    animation: slideInUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s both;
 }
 
-.levelup-rewards {
+.level-up-close {
     margin-top: 2rem;
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    opacity: 0;
-    animation: slideUp 0.5s 1.2s forwards;
-}
-
-.reward-badge {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid var(--color-accent-blue);
-    padding: 15px 30px;
-    border-radius: 8px;
-    color: var(--color-accent-blue);
-    font-weight: bold;
-    font-size: 1.2rem;
-}
-
-.continue-btn {
-    margin-top: 4rem;
-    padding: 1rem 3rem;
-    background: transparent;
-    border: 2px solid white;
-    color: white;
-    font-family: var(--font-headings);
-    font-size: 1.5rem;
-    cursor: pointer;
+    background: var(--color-amber, #e8a020);
+    color: var(--color-obsidian, #080a0f);
+    border: none;
+    padding: 0.6rem 2rem;
+    border-radius: 0;
+    font-family: var(--font-headings, 'NorseBold', sans-serif);
+    font-size: var(--text-sm, 0.8125rem);
+    letter-spacing: 0.15em;
     text-transform: uppercase;
-    opacity: 0;
-    animation: fadeIn 1s 2s forwards;
-    transition: 0.3s;
+    cursor: pointer;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+    animation: slideInUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.35s both;
 }
 
-.continue-btn:hover {
-    background: white;
-    color: black;
+.level-up-close:hover {
+    transform: translateY(-3px) scale(1.04);
+    box-shadow: 0 0 20px rgba(232, 160, 32, 0.5);
 }
 
-@keyframes slamText {
-    0% { transform: scale(3); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
+/* Particle burst dots */
+.level-up-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
 }
 
-@keyframes fadeIn { to { opacity: 1; } }
-@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.level-up-particles span {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-amber, #e8a020);
+    animation: particleBurst 0.8s ease-out forwards;
+}
+
+@keyframes particleBurst {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(var(--dx), var(--dy)) scale(0);
+        opacity: 0;
+    }
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+
+    .level-up-modal,
+    .level-up-number,
+    .level-up-title,
+    .level-up-subtitle,
+    .level-up-close {
+        animation: none !important;
+    }
+}
