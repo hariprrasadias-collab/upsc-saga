@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_cors import CORS
 from app.db import get_db
+from app.utils.security import get_real_ip, escape_like_term
 import json
 from datetime import datetime
 
@@ -66,8 +67,9 @@ def get_questions():
             except Exception as e:
                 # Fallback to LIKE if FTS fails or table doesn't exist
                 print(f"FTS Search failed, falling back to LIKE: {e}")
-                query += " AND (question_text LIKE ? OR explanation LIKE ?)"
-                search_term = f"%{search}%"
+                query += " AND (question_text LIKE ? ESCAPE '\\' OR explanation LIKE ? ESCAPE '\\')"
+                safe_search = escape_like_term(search)
+                search_term = f"%{safe_search}%"
                 params.append(search_term)
                 params.append(search_term)
 
@@ -224,7 +226,7 @@ def ask_strategos(question_id):
     try:
         # 1. Rate Limiting Check (Simple)
         import time
-        client_ip = request.remote_addr
+        client_ip = get_real_ip()
         last_req = _strategos_rate_limit.get(client_ip, 0)
         current_time = time.time()
 
@@ -320,8 +322,9 @@ def create_mock_from_filters():
             title_parts.append(filters['topic'])
             
         if filters.get('search'):
-            query += " AND (question_text LIKE ? OR explanation LIKE ?)"
-            search_term = f"%{filters['search']}%"
+            query += " AND (question_text LIKE ? ESCAPE '\\' OR explanation LIKE ? ESCAPE '\\')"
+            safe_search = escape_like_term(filters['search'])
+            search_term = f"%{safe_search}%"
             params.append(search_term)
             params.append(search_term)
             title_parts.append(f"Search: {filters['search']}")
