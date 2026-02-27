@@ -1688,16 +1688,21 @@
 }
 
 .milestone .label {
-    .month-analytics h4 {
-        align-self: flex-start;
-        margin: 0 0 1rem 0;
-        font-size: 0.75rem;
-        color: #7f8c8d;
-    }
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #bdc3c7;
+}
 
-    .legend {
-        display: flex;
-        flex-wrap: wrap;
+.month-analytics h4 {
+    align-self: flex-start;
+    margin: 0 0 1rem 0;
+    font-size: 0.75rem;
+    color: #7f8c8d;
+}
+
+.legend {
+    display: flex;
+    flex-wrap: wrap;
         gap: 0.5rem;
         justify-content: center;
         margin-top: 1rem;
@@ -2085,6 +2090,7 @@
 
 .milestone.active .label {
     color: #3498db;
+}
 }
 
 /* --- Redesign: Grand Strategy (Yearly) --- */
