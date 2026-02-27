@@ -213,20 +213,19 @@ def get_due_cards():
         
         conn = get_db()
         
-        # Get cards with their latest review session
+        # Bolt Optimization: Use Window Function + SQL Sort for O(1) latency
+        # Replaces fetching ALL cards and sorting in Python (O(N log N))
+
         query = '''
+            WITH LatestReviews AS (
+                SELECT *,
+                       ROW_NUMBER() OVER (PARTITION BY flashcard_id ORDER BY reviewed_at DESC) as rn
+                FROM review_sessions
+            )
             SELECT f.*,
                    rs.halflife, rs.alpha, rs.beta, rs.next_review, rs.reviewed_at
             FROM flashcards f
-            LEFT JOIN (
-                SELECT flashcard_id, halflife, alpha, beta, next_review, reviewed_at
-                FROM review_sessions
-                WHERE (flashcard_id, reviewed_at) IN (
-                    SELECT flashcard_id, MAX(reviewed_at)
-                    FROM review_sessions
-                    GROUP BY flashcard_id
-                )
-            ) rs ON f.id = rs.flashcard_id
+            LEFT JOIN LatestReviews rs ON f.id = rs.flashcard_id AND rs.rn = 1
             WHERE 1=1
         '''
         
@@ -234,22 +233,30 @@ def get_due_cards():
         if deck_id:
             query += ' AND f.deck_id = ?'
             params.append(deck_id)
+
+        # SQL Sort: New cards first (NULL reviewed_at), then by Due Date (next_review)
+        # This approximates "Urgency" without calculating complex math for every single card
+        query += '''
+            ORDER BY
+                CASE WHEN rs.reviewed_at IS NULL THEN 0 ELSE 1 END ASC,
+                rs.next_review ASC
+            LIMIT ?
+        '''
+        params.append(limit)
         
-        # Get all cards
-        all_cards = conn.execute(query, params).fetchall()
+        # Fetch only the top N cards
+        due_cards_rows = conn.execute(query, params).fetchall()
         
-        # Calculate urgency for each card
-        cards_with_urgency = []
-        for card in all_cards:
+        # Calculate precise urgency only for the returned set
+        due_cards = []
+        for card in due_cards_rows:
             card_dict = dict(card)
             
             if card['reviewed_at'] is None:
-                # New card - highest urgency
                 urgency = 10.0
                 card_dict['maturity'] = 'new'
             else:
-                # Calculate urgency based on Ebisu
-                last_review = datetime.fromisoformat(card['reviewed_at'])
+                last_review = datetime.fromisoformat(str(card['reviewed_at']))
                 urgency = get_urgency_score(
                     card['alpha'], card['beta'], card['halflife'], last_review
                 )
@@ -258,12 +265,8 @@ def get_due_cards():
                 )
             
             card_dict['urgency'] = urgency
-            cards_with_urgency.append(card_dict)
-        
-        # Sort by urgency (highest first) and limit
-        cards_with_urgency.sort(key=lambda x: x['urgency'], reverse=True)
-        due_cards = cards_with_urgency[:limit]
-        
+            due_cards.append(card_dict)
+
         return jsonify(due_cards)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
