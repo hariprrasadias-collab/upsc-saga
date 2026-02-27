@@ -244,14 +244,15 @@ def get_answer_writing_analytics():
                 SELECT ae.overall_score, DATE(ua.submitted_at) as date, aq.subject
                 FROM answer_evaluations ae
                 JOIN user_answers ua ON ae.answer_id = ua.id
-                JOIN answer_questions aq ON ua.prompt_id = aq.id
+                JOIN answer_writing_prompts aq ON ua.prompt_id = aq.id
                 WHERE ua.user_id = ?
                 ORDER BY ua.submitted_at ASC
             ''', (user_id,)).fetchall()
             score_data = [dict(s) for s in scores]
             # Improvement rate based on overall scores
             improvement = calculate_improvement_rate([s['overall_score'] for s in scores])
-        except:
+        except Exception as e:
+            print(f"Error getting answer writing analytics: {e}")
             score_data = []
             improvement = 0
             
@@ -261,7 +262,7 @@ def get_answer_writing_analytics():
                 SELECT aq.subject, AVG(ae.overall_score) as avg_score, COUNT(*) as count
                 FROM answer_evaluations ae
                 JOIN user_answers ua ON ae.answer_id = ua.id
-                JOIN answer_questions aq ON ua.prompt_id = aq.id
+                JOIN answer_writing_prompts aq ON ua.prompt_id = aq.id
                 WHERE ua.user_id = ?
                 GROUP BY aq.subject
             ''', (user_id,)).fetchall()
@@ -317,18 +318,22 @@ def get_progress_trend():
         
         if metric == 'syllabus':
             # Syllabus completion over time (cumulative)
+            # BOLT: Optimization - Hoist queries outside loop since they don't depend on date
+            # Reduces queries from 2 * (days + 1) to 2
+            completed = conn.execute('''
+                SELECT COUNT(*) FROM syllabus_topics
+                WHERE status = 'Completed'
+            ''').fetchone()[0]
+
+            total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
+
+            value = round((completed / total * 100) if total > 0 else 0, 1)
+
             for i in range(days + 1):
                 date = start_date + timedelta(days=i)
-                completed = conn.execute('''
-                    SELECT COUNT(*) FROM syllabus_topics
-                    WHERE status = 'Completed'
-                ''').fetchone()[0]
-                
-                total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
-                
                 trend_data.append({
                     'date': date.isoformat(),
-                    'value': round((completed / total * 100) if total > 0 else 0, 1)
+                    'value': value
                 })
         
         elif metric == 'mock_score':

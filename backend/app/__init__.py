@@ -94,6 +94,10 @@ def create_app():
     from app.db_models.answer_writing import init_answer_writing_tables
     from app.db_models.revision import init_revision_tables
     from app.db_models.syllabus import init_syllabus_tables
+    from app.db_models.mock_tests import init_mock_test_tables
+    from app.db_models.pomodoro import init_pomodoro_tables
+    from app.db_models.pyq import init_pyq_tables
+    from app.db_models.calendar import init_calendar_tables
 
     with app.app_context():
         init_core_tables() # Core first (users)
@@ -101,6 +105,16 @@ def create_app():
         init_study_plan_tables()
         init_autonomous_brain_tables()
         init_gamification_tables()
+
+        # Initialize Extra Modules (Flashcards, Answers, Syllabus, Revision, Mock Tests, Pomodoro, PYQ, Calendar)
+        init_flashcard_tables()
+        init_answer_writing_tables()
+        init_revision_tables()
+        init_syllabus_tables()
+        init_mock_test_tables()
+        init_pomodoro_tables()
+        init_pyq_tables()
+        init_calendar_tables()
         
         # Initialize Automation Tables (Socratic, Triangulation, etc.)
         from app.db_models.automation_storage import init_automation_tables
