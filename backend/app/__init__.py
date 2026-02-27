@@ -115,11 +115,10 @@ def create_app():
         syllabus, flashcards, analytics, essay, csat, badges, challenges, 
         shop_new, weak_areas, admin, predictive, pomodoro, timebox, planner, 
         templates, revision, heatmap, model_answers, issue_mapping, scheduler,
-        mindmap, study_plan, golden_path, watchman, health
+        mindmap, study_plan, golden_path, watchman
     )
     
     # Register blueprints
-    app.register_blueprint(health.health_bp)
     app.register_blueprint(dashboard.bp)
     app.register_blueprint(golden_path.golden_path_bp, url_prefix='/api/golden-path')
     app.register_blueprint(tasks.bp)
