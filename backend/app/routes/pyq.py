@@ -3,6 +3,7 @@ from flask_cors import CORS
 from app.db import get_db
 import json
 from datetime import datetime
+from app.utils.security import escape_like_term
 
 bp = Blueprint('pyq', __name__, url_prefix='/api/pyq')
 CORS(bp)
@@ -66,8 +67,9 @@ def get_questions():
             except Exception as e:
                 # Fallback to LIKE if FTS fails or table doesn't exist
                 print(f"FTS Search failed, falling back to LIKE: {e}")
-                query += " AND (question_text LIKE ? OR explanation LIKE ?)"
-                search_term = f"%{search}%"
+                query += " AND (question_text LIKE ? ESCAPE '\\' OR explanation LIKE ? ESCAPE '\\')"
+                search_escaped = escape_like_term(search)
+                search_term = f"%{search_escaped}%"
                 params.append(search_term)
                 params.append(search_term)
 
@@ -320,8 +322,9 @@ def create_mock_from_filters():
             title_parts.append(filters['topic'])
             
         if filters.get('search'):
-            query += " AND (question_text LIKE ? OR explanation LIKE ?)"
-            search_term = f"%{filters['search']}%"
+            query += " AND (question_text LIKE ? ESCAPE '\\' OR explanation LIKE ? ESCAPE '\\')"
+            search_escaped = escape_like_term(filters['search'])
+            search_term = f"%{search_escaped}%"
             params.append(search_term)
             params.append(search_term)
             title_parts.append(f"Search: {filters['search']}")
