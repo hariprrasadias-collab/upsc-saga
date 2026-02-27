@@ -5,6 +5,7 @@ from app.utils.session import get_current_user_id
 import json
 import time as import_time
 from app.utils.session import get_current_user_id
+from app.utils.security import escape_like_term
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -97,9 +98,10 @@ def get_questions():
             params.append(subject)
             
         if search:
-            query += ' AND (question_text LIKE ? OR topic LIKE ?)'
-            params.append(f'%{search}%')
-            params.append(f'%{search}%')
+            query += ' AND (question_text LIKE ? ESCAPE \'\\\' OR topic LIKE ? ESCAPE \'\\\')'
+            search_term = f'%{escape_like_term(search)}%'
+            params.append(search_term)
+            params.append(search_term)
             
         # Get total count for pagination
         count_query = query.replace('SELECT *', 'SELECT COUNT(*)')
@@ -229,10 +231,11 @@ def get_articles():
         params = []
         
         if search:
-            query += ' AND (title LIKE ? OR upsc_summary LIKE ? OR subjects LIKE ?)'
-            params.append(f'%{search}%')
-            params.append(f'%{search}%')
-            params.append(f'%{search}%')
+            query += ' AND (title LIKE ? ESCAPE \'\\\' OR upsc_summary LIKE ? ESCAPE \'\\\' OR subjects LIKE ? ESCAPE \'\\\')'
+            search_term = f'%{escape_like_term(search)}%'
+            params.append(search_term)
+            params.append(search_term)
+            params.append(search_term)
             
         # Get total count
         count_query = query.replace('SELECT *', 'SELECT COUNT(*)')
