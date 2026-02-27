@@ -1,0 +1,4 @@
+## 2024-05-24 - DoS via Unbounded In-Memory Rate Limiting
+**Vulnerability:** The rate limiter in `backend/app/routes/pyq.py` used a global dictionary `_strategos_rate_limit` to store IP addresses and timestamps. This dictionary was never cleaned, leading to memory growth proportional to the number of unique IP addresses visiting the endpoint (DoS via Memory Exhaustion).
+**Learning:** Avoid custom in-memory data structures for tracking request state (like rate limits) unless they have explicit cleanup/TTL mechanisms. Flask's `g` is for request scope, and libraries like `Flask-Caching` or `Redis` are for application scope with expiry.
+**Prevention:** Use `Flask-Caching` (which was already available in `app`) with a set timeout for rate limiting logic. This ensures entries are evicted automatically.
