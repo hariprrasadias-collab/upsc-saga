@@ -214,24 +214,26 @@ def get_analytics():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# In-memory rate limiter (Simple Dictionary)
-# Key: IP Address, Value: timestamp of last request
-_strategos_rate_limit = {}
+# Import cache from app package (initialized in __init__.py)
+from app import cache
 
 @bp.route('/strategos/<int:question_id>', methods=['POST'])
 def ask_strategos(question_id):
     """Ask AI for tactical breakdown of a question"""
     try:
-        # 1. Rate Limiting Check (Simple)
-        import time
+        # 1. Rate Limiting Check (Using Flask-Caching to prevent DoS)
         client_ip = request.remote_addr
-        last_req = _strategos_rate_limit.get(client_ip, 0)
-        current_time = time.time()
+        # Fallback if remote_addr is None (e.g. testing)
+        if not client_ip:
+            client_ip = 'unknown'
 
-        if current_time - last_req < 5: # 5 seconds cooldown
+        cache_key = f"strategos_limit_{client_ip}"
+
+        if cache.get(cache_key):
             return jsonify({'success': False, 'error': 'Strategos is thinking. Please wait 5 seconds.'}), 429
 
-        _strategos_rate_limit[client_ip] = current_time
+        # Set cache with 5 seconds timeout
+        cache.set(cache_key, True, timeout=5)
 
         conn = get_db()
         question = conn.execute("SELECT * FROM pyq_questions WHERE id = ?", (question_id,)).fetchone()
