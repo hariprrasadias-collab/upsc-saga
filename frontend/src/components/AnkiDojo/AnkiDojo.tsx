@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import './AnkiDojo.css';
 import { audioManager } from '../../util/AudioManager';
 import { ebisuScheduler } from './ebisuAlgorithm';
+import DOMPurify from 'dompurify';
 
 interface AnkiCard {
     id: number;
@@ -273,9 +274,10 @@ const AnkiDojo: React.FC = () => {
                             {/* Front */}
                             <div className="flip-card-front">
                                 <div className="card-label">Question</div>
+                                {/* 🛡️ Sentinel: Sanitize user input to prevent XSS vulnerabilities */}
                                 <div
                                     className="card-content"
-                                    dangerouslySetInnerHTML={{ __html: currentCard.question }}
+                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(currentCard.question) }}
                                 />
                                 {!isFlipped && <div className="tap-hint">👆 Tap to reveal answer</div>}
                             </div>
@@ -283,9 +285,10 @@ const AnkiDojo: React.FC = () => {
                             {/* Back */}
                             <div className="flip-card-back">
                                 <div className="card-label">Answer</div>
+                                {/* 🛡️ Sentinel: Sanitize user input to prevent XSS vulnerabilities */}
                                 <div
                                     className="card-content"
-                                    dangerouslySetInnerHTML={{ __html: currentCard.answer }}
+                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(currentCard.answer) }}
                                 />
                             </div>
                         </div>
