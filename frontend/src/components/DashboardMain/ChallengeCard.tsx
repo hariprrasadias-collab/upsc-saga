@@ -1,6 +1,9 @@
 // Daily Challenge Card Component
 import React, { useState, useEffect } from 'react';
 import './ChallengeCard.css';
+import { useGlobal } from '../../contexts/GlobalContext';
+import { API_BASE_URL } from '../../config';
+import { useToast, ToastContainer } from '../Toast';
 
 interface Challenge {
     id: number;
@@ -14,6 +17,8 @@ interface Challenge {
 }
 
 const ChallengeCard: React.FC = () => {
+    const { refreshDashboard } = useGlobal();
+    const { toasts, addToast, removeToast } = useToast();
     const [challenge, setChallenge] = useState<Challenge | null>(null);
     const [loading, setLoading] = useState(true);
     const [streak, setStreak] = useState(0);
@@ -25,7 +30,7 @@ const ChallengeCard: React.FC = () => {
 
     const fetchChallenge = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/challenges/daily');
+            const res = await fetch(`${API_BASE_URL}/api/challenges/daily`);
             if (res.ok) {
                 const data = await res.json();
                 setChallenge(data);
@@ -39,7 +44,7 @@ const ChallengeCard: React.FC = () => {
 
     const fetchStreak = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/challenges/streak');
+            const res = await fetch(`${API_BASE_URL}/api/challenges/streak`);
             if (res.ok) {
                 const data = await res.json();
                 setStreak(data.current_streak || 0);
@@ -53,21 +58,22 @@ const ChallengeCard: React.FC = () => {
         if (!challenge || challenge.completed) return;
 
         try {
-            const res = await fetch('http://localhost:5000/api/challenges/complete', {
+            const res = await fetch(`${API_BASE_URL}/api/challenges/complete`, {
                 method: 'POST'
             });
 
             if (res.ok) {
                 const data = await res.json();
-                alert(`Challenge completed! +${data.xp_awarded} XP`);
+                addToast(`Challenge completed! +${data.xp_awarded} XP`, 'success');
                 fetchChallenge();
                 fetchStreak();
 
                 // Refresh page stats
-                window.location.reload();
+                await refreshDashboard();
             }
         } catch (err) {
             console.error('Error completing challenge:', err);
+            addToast('Failed to complete challenge', 'error');
         }
     };
 
@@ -91,6 +97,7 @@ const ChallengeCard: React.FC = () => {
 
     return (
         <div className={`challenge-card ${challenge.completed ? 'completed' : ''}`}>
+            <ToastContainer toasts={toasts} removeToast={removeToast} />
             <div className="challenge-header">
                 <h3>🎯 Daily Challenge</h3>
                 <div className="streak-badge">
@@ -102,7 +109,14 @@ const ChallengeCard: React.FC = () => {
                 <h4>{challenge.title}</h4>
                 <p>{challenge.description}</p>
 
-                <div className="challenge-progress">
+                <div
+                    className="challenge-progress"
+                    role="progressbar"
+                    aria-valuenow={progress}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`Daily Challenge Progress: ${Math.round(progress)}%`}
+                >
                     <div className="progress-bar">
                         <div
                             className="progress-fill"
