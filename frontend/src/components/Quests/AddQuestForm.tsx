@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 // /frontend/src/components/Quests/AddQuestForm.tsx
 import React, { useState } from 'react';
 import './AddQuestForm.css';
@@ -38,7 +40,7 @@ const AddQuestForm: React.FC<AddQuestFormProps> = ({ onQuestCreated, onCancel })
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/quests', {
+      const response = await fetch(`${API_BASE_URL}/api/quests`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

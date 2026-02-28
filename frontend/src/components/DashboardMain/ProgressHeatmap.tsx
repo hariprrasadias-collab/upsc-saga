@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect } from 'react';
 import './ProgressHeatmap.css';
 
@@ -18,7 +20,7 @@ const ProgressHeatmap: React.FC = () => {
 
     const fetchHeatmapData = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/analytics/visualizations/heatmap?days=90');
+            const res = await fetch(`${API_BASE_URL}/api/analytics/visualizations/heatmap?days=90`);
             const data = await res.json();
 
             // Ensure data is an array

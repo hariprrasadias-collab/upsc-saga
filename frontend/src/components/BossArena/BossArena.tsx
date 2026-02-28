@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect, useCallback } from 'react';
 import './BossArena.css';
 import BattleInterface from './BattleInterface';
@@ -47,10 +49,11 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
 
     const fetchBattles = useCallback(async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/battles');
+            const res = await fetch(`${API_BASE_URL}/api/battles`);
             if (res.ok) {
-                const data = await res.json();
-                setBattles(data);
+                const raw = await res.json();
+                const data = raw.success === false ? [] : (raw.data || raw);
+                setBattles(Array.isArray(data) ? data : []);
             }
         } catch (err) {
             console.error("Failed to load battle history", err);
@@ -59,12 +62,13 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
 
     const fetchBosses = useCallback(async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/arena/bosses');
+            const res = await fetch(`${API_BASE_URL}/api/arena/bosses`);
             if (res.ok) {
-                const data = await res.json();
-                setYearBosses(data.year_bosses);
-                setSubjectBosses(data.subject_bosses);
-                setCustomBosses(data.custom_bosses || []);
+                const raw = await res.json();
+                const data = raw.data || raw;
+                setYearBosses(Array.isArray(data.year_bosses) ? data.year_bosses : []);
+                setSubjectBosses(Array.isArray(data.subject_bosses) ? data.subject_bosses : []);
+                setCustomBosses(Array.isArray(data.custom_bosses) ? data.custom_bosses : []);
             }
         } catch (err) {
             console.error("Failed to load bosses", err);
@@ -81,7 +85,7 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
     const handleFight = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://localhost:5000/api/battles/manual', {
+            const res = await fetch(`${API_BASE_URL}/api/battles/manual`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

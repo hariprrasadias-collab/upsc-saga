@@ -240,11 +240,14 @@ const StudyPlanDashboard: React.FC = () => {
             const today = new Date().toISOString().split('T')[0];
             const response = await fetch(`${API_BASE_URL}/api/planner/current?start_date=${today}&days=365`); // Fetch 1 year
             if (response.ok) {
-                const data = await response.json();
+                const responseData = await response.json();
+                const data = responseData.data || responseData;
                 if (data.success && Array.isArray(data.plan)) {
                     setPlan(data.plan);
+                } else if (Array.isArray(data)) {
+                    setPlan(data);
                 } else {
-                    console.error("Invalid API response format:", data);
+                    console.error("Invalid API response format:", responseData);
                     throw new Error("Invalid API response");
                 }
             } else {

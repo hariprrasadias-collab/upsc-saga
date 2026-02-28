@@ -27,14 +27,14 @@ class ModelManager:
 
     # --- GOOGLE GEMINI MODELS ---
     GEMINI_PRO_MODELS = [
-        'gemini-2.0-pro-exp-02-05',
-        'gemini-1.5-pro',
-        'gemini-pro'
+        'gemini-2.5-pro',
+        'gemini-3-pro-preview',
+        'gemini-2.5-flash'
     ]
     GEMINI_FAST_MODELS = [
+        'gemini-2.5-flash',
         'gemini-2.0-flash',
-        'gemini-2.0-flash-lite-preview-02-05',
-        'gemini-1.5-flash'
+        'gemini-2.5-flash-lite'
     ]
 
     # --- OPENROUTER MODELS (Tiered for Efficiency) ---
@@ -62,14 +62,13 @@ class ModelManager:
 
     # --- NVIDIA NIM MODELS ---
     NVIDIA_MODELS_PRO = [
-        'meta/llama-3.1-405b-instruct',
-        'nvidia/nemotron-4-340b-instruct'
+        'meta/llama-3.3-70b-instruct',
+        'qwen/qwq-32b'
     ]
 
     NVIDIA_MODELS_FAST = [
-        'meta/llama-3.1-70b-instruct',
-        'meta/llama-3.1-8b-instruct',
-        'mistralai/mixtral-8x22b-instruct-v0.1'
+        'mistralai/mixtral-8x22b-instruct-v0.1',
+        'deepseek-ai/deepseek-r1-distill-llama-8b'
     ]
 
     def __init__(self):
@@ -99,6 +98,22 @@ class ModelManager:
                 base_url="https://integrate.api.nvidia.com/v1",
                 api_key=nv_key
             )
+            
+        # 3. OpenClaw Local Gateway (Primary Local Fallback/Alternative)
+        openclaw_key = os.environ.get('OPENCLAW_API_KEY', 'd25c95eccbc569b1bc0d65699c5af9e39cea03ed39d728223f783dccf45616e0')
+        openclaw_base_url = os.environ.get('OPENCLAW_BASE_URL', 'http://localhost:18789/v1')
+        self.openclaw_model = os.environ.get('OPENCLAW_MODEL', 'ollama/qwen3:14b')
+        
+        try:
+            self.clients['openclaw'] = openai.OpenAI(
+                base_url=openclaw_base_url,
+                api_key=openclaw_key,
+                default_headers={
+                    "X-Title": "UPSC Second Brain Local"
+                }
+            )
+        except Exception as e:
+            print(f"⚠️ OpenClaw initialization soft-failed: {e}")
 
         # State Management
         self.response_cache = TTLCache(maxsize=200, ttl=3600)
@@ -192,6 +207,9 @@ class ModelManager:
         
         # B. Automatic Strategy based on Type
         elif model_type == 'pro':
+            # Priority 0: OpenClaw Local (User Priority)
+            add_candidate('openclaw', self.openclaw_model)
+            
             # Priority 1: Nvidia High-End (Complex Tasks)
             for m in self.NVIDIA_MODELS_PRO:
                 add_candidate('nvidia', m)
@@ -208,6 +226,9 @@ class ModelManager:
                     add_candidate('openrouter', m)
             
         else: # 'fast'
+            # Priority 0: OpenClaw Local (User Priority)
+            add_candidate('openclaw', self.openclaw_model)
+            
             # Priority 1: Nvidia Fast
             for m in self.NVIDIA_MODELS_FAST:
                 add_candidate('nvidia', m)

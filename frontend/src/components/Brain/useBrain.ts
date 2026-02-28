@@ -1,8 +1,10 @@
+import { API_BASE_URL } from '../../config';
+
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Message, Synapse, Insight, Action } from './types';
 
-const API_BASE_URL = 'http://localhost:5000/api/brain';
+const BRAIN_API_URL = `${API_BASE_URL}/api/brain`;
 
 export const useBrain = () => {
     const navigate = useNavigate();
@@ -40,7 +42,7 @@ export const useBrain = () => {
 
     const fetchSynapses = useCallback(async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/status`);
+            const response = await fetch(`${BRAIN_API_URL}/status`);
             if (!response.ok) throw new Error('Failed to fetch status');
             const data = await response.json();
 
@@ -65,7 +67,7 @@ export const useBrain = () => {
     const fetchProactiveInsights = useCallback(async () => {
         setIsLoadingInsights(true);
         try {
-            const response = await fetch(`${API_BASE_URL}/proactive`);
+            const response = await fetch(`${BRAIN_API_URL}/proactive`);
             if (!response.ok) throw new Error('Failed to fetch insights');
             const data = await response.json();
             setInsights(data.insights || []);
@@ -78,7 +80,7 @@ export const useBrain = () => {
 
     const executeAction = useCallback(async (action: Action) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/execute`, {
+            const response = await fetch(`${BRAIN_API_URL}/execute`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ type: action.type, payload: action.payload }),
@@ -128,7 +130,7 @@ export const useBrain = () => {
     const optimizeSystem = useCallback(async () => {
         setIsThinking(true);
         try {
-            const response = await fetch(`${API_BASE_URL}/optimize`, { method: 'POST' });
+            const response = await fetch(`${BRAIN_API_URL}/optimize`, { method: 'POST' });
             if (!response.ok) throw new Error('Optimization failed');
             const data = await response.json();
 
@@ -151,7 +153,7 @@ export const useBrain = () => {
         setIsThinking(true);
 
         try {
-            const response = await fetch(`${API_BASE_URL}/think`, {
+            const response = await fetch(`${BRAIN_API_URL}/think`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ input: text }),

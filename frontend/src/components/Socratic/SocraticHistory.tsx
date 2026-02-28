@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import './SocraticHistory.css';
 import MarkdownRenderer from '../Shared/MarkdownRenderer';
@@ -67,7 +69,7 @@ const SocraticHistory: React.FC = () => {
 
     const fetchHistory = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/socratic/history');
+            const response = await fetch(`${API_BASE_URL}/api/socratic/history`);
             const data = await response.json();
             if (data.success) {
                 setHistory(data.data);
@@ -111,7 +113,7 @@ const SocraticHistory: React.FC = () => {
 
         setIsContinuing(true);
         try {
-            const response = await fetch('http://localhost:5000/api/socratic/continue', {
+            const response = await fetch(`${API_BASE_URL}/api/socratic/continue`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
@@ -217,7 +219,7 @@ const SocraticHistory: React.FC = () => {
     const createFlashcard = async (front: string, back: string) => {
         if (!confirm("Create Flashcard from this insight?")) return;
         try {
-            await fetch('http://localhost:5000/api/flashcards', {
+            await fetch(`${API_BASE_URL}/api/flashcards`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({

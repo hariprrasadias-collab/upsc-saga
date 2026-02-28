@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect } from 'react';
 import './NeuralHash.css';
 import { FaBrain, FaHistory, FaBolt, FaLayerGroup, FaExclamationTriangle, FaDatabase, FaPlus } from 'react-icons/fa';
@@ -84,7 +86,7 @@ const NeuralHash: React.FC = () => {
 
     const fetchHistory = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/neural_hash/history');
+            const response = await fetch(`${API_BASE_URL}/api/neural_hash/history`);
             const data = await response.json();
             if (data.success) {
                 setHistory(data.history);
@@ -127,7 +129,7 @@ const NeuralHash: React.FC = () => {
 
     const handleCreateFlashcard = async (keyword: string) => {
         try {
-            const response = await fetch('http://localhost:5000/api/flashcards', {
+            const response = await fetch(`${API_BASE_URL}/api/flashcards`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -148,7 +150,7 @@ const NeuralHash: React.FC = () => {
 
     const handleCreateTask = async (question: string) => {
         try {
-            const response = await fetch('http://localhost:5000/api/tasks', {
+            const response = await fetch(`${API_BASE_URL}/api/tasks`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

@@ -22,6 +22,8 @@ def get_current_user_id():
     return 1
 
 
+from functools import wraps
+
 def require_auth(func):
     """
     Decorator to require authentication for a route.
@@ -31,11 +33,11 @@ def require_auth(func):
     - Return 401 if not authenticated
     - Pass user_id to the wrapped function
     """
+    @wraps(func)
     def wrapper(*args, **kwargs):
         user_id = get_current_user_id()
         if not user_id:
             from flask import jsonify
             return jsonify({'error': 'Authentication required'}), 401
         return func(*args, user_id=user_id, **kwargs)
-    wrapper.__name__ = func.__name__
     return wrapper

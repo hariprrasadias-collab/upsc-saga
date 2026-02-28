@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect } from 'react';
 import './Essay.css';
 import EssayEditor from './EssayEditor';
@@ -27,7 +29,7 @@ const EssayWorkshop: React.FC<EssayWorkshopProps> = ({ onTaskCompleted }) => {
 
     const fetchHistory = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/essay/history');
+            const response = await fetch(`${API_BASE_URL}/api/essay/history`);
             const data = await response.json();
             setHistory(data);
         } catch (error) {
@@ -37,7 +39,7 @@ const EssayWorkshop: React.FC<EssayWorkshopProps> = ({ onTaskCompleted }) => {
 
     const handleViewSubmission = async (id: number) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/essay/${id}`);
+            const response = await fetch(`${API_BASE_URL}/api/essay/${id}`);
             const data = await response.json();
             setSelectedSubmission(data);
             setActiveTab('write'); // Re-use the write tab area for viewing result

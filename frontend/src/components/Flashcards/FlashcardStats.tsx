@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 // FlashcardStats - Analytics dashboard for review performance
 import React, { useState, useEffect } from 'react';
 import './Flashcards.css';
@@ -24,7 +26,7 @@ const FlashcardStats: React.FC = () => {
 
     const fetchAnalytics = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/flashcards/analytics');
+            const res = await fetch(`${API_BASE_URL}/api/flashcards/analytics`);
             const data = await res.json();
             setAnalytics(data);
             setLoading(false);

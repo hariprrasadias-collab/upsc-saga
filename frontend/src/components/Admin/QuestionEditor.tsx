@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState } from 'react';
 import './ArticleEditor.css'; // Reuse styles
 import { useToast } from '../Toast';
@@ -25,7 +27,7 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ onClose, onSave }) => {
         setSaving(true);
 
         try {
-            const res = await fetch('http://localhost:5000/api/admin/questions', {
+            const res = await fetch(`${API_BASE_URL}/api/admin/questions`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

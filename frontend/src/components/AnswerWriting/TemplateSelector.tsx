@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect } from 'react';
 import './TemplateSelector.css';
 
@@ -28,7 +30,7 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onSelectTemplate })
     const fetchTemplates = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/api/templates/list');
+            const response = await fetch(`${API_BASE_URL}/api/templates/list`);
             const data = await response.json();
             if (data.success) {
                 setTemplates(data.templates);

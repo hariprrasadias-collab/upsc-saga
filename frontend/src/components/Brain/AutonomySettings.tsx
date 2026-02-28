@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect } from 'react';
 import './AutonomySettings.css';
 import { FaRobot, FaShieldAlt, FaHistory, FaChartLine, FaCheck } from 'react-icons/fa';
@@ -43,7 +45,7 @@ const AutonomySettings: React.FC = () => {
 
     const fetchSettings = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/autonomy/settings');
+            const response = await fetch(`${API_BASE_URL}/api/autonomy/settings`);
             const data = await response.json();
             setAutonomyLevel(data.autonomy_level);
             setStats(data.stats);
@@ -56,7 +58,7 @@ const AutonomySettings: React.FC = () => {
 
     const fetchActionLog = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/autonomy/action_log?limit=20');
+            const response = await fetch(`${API_BASE_URL}/api/autonomy/action_log?limit=20`);
             const data = await response.json();
             setActionLog(data.actions || []);
         } catch (error) {
@@ -66,7 +68,7 @@ const AutonomySettings: React.FC = () => {
 
     const fetchPatterns = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/autonomy/learned_patterns');
+            const response = await fetch(`${API_BASE_URL}/api/autonomy/learned_patterns`);
             const data = await response.json();
             setPatterns(data.patterns || []);
         } catch (error) {
@@ -76,7 +78,7 @@ const AutonomySettings: React.FC = () => {
 
     const handleLevelChange = async (newLevel: string) => {
         try {
-            const response = await fetch('http://localhost:5000/api/autonomy/settings', {
+            const response = await fetch(`${API_BASE_URL}/api/autonomy/settings`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

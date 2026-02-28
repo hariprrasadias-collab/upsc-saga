@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect } from 'react';
 
 interface Question {
@@ -26,9 +28,10 @@ const PracticeMode: React.FC = () => {
 
     const fetchTopics = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/csat/topics');
-            const data = await response.json();
-            setTopics(data);
+            const response = await fetch(`${API_BASE_URL}/api/csat/topics`);
+            const raw = await response.json();
+            const data = raw.data || raw;
+            setTopics(data || {});
         } catch (error) {
             console.error('Error fetching topics:', error);
         }
@@ -37,9 +40,10 @@ const PracticeMode: React.FC = () => {
     const fetchQuestions = async () => {
         if (!selectedCategory || !selectedTopic) return;
         try {
-            const response = await fetch(`http://localhost:5000/api/csat/questions?category=${selectedCategory}&topic=${selectedTopic}`);
-            const data = await response.json();
-            setQuestions(data);
+            const response = await fetch(`${API_BASE_URL}/api/csat/questions?category=${selectedCategory}&topic=${selectedTopic}`);
+            const raw = await response.json();
+            const data = raw.success === false ? [] : (raw.data || raw);
+            setQuestions(Array.isArray(data) ? data : []);
             setCurrentQuestionIndex(0);
             setShowExplanation(false);
             setSelectedOption(null);

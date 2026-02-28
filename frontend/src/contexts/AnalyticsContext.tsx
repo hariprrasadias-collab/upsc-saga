@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../config';
+
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
 interface AnalyticsData {
@@ -50,7 +52,7 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
 
         try {
             setLoading(true);
-            const res = await fetch('http://localhost:5000/api/analytics/overview?timeframe=all');
+            const res = await fetch(`${API_BASE_URL}/api/analytics/overview?timeframe=all`);
 
             if (res.ok) {
                 const data = await res.json();

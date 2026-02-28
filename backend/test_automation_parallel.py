@@ -64,8 +64,24 @@ def verify_parallel_automation():
         podcasts = conn.execute("SELECT count(*) FROM ai_generated_content WHERE topic = ? AND content_type='podcast'", ('Parallel Processing in Computing',)).fetchone()[0]
         print(f"Podcasts Created: {podcasts} (Expected > 0)")
         
-        if cards > 0 and tests > 0 and preds > 0 and debate > 0 and linkages > 0 and podcasts > 0:
-            print("\n✅ SUCCESS: All 6 automation artifacts generated!")
+        # Check Subject Book
+        subject_book = conn.execute("SELECT count(*) FROM ai_generated_content WHERE topic = ? AND content_type='subject_book'", ('Parallel Processing in Computing',)).fetchone()[0]
+        print(f"Subject Books Created: {subject_book} (Expected > 0)")
+
+        # Check Interview Simulator
+        interview_sim = conn.execute("SELECT count(*) FROM ai_generated_content WHERE topic = ? AND content_type='interview_sim'", ('Parallel Processing in Computing',)).fetchone()[0]
+        print(f"Interview Sims Created: {interview_sim} (Expected > 0)")
+
+        # Check Heatmap
+        heatmap = conn.execute("SELECT count(*) FROM ai_generated_content WHERE topic = ? AND content_type='heatmap'", ('Parallel Processing in Computing',)).fetchone()[0]
+        print(f"Heatmaps Created: {heatmap} (Expected > 0)")
+
+        # Check Self Review
+        self_review = conn.execute("SELECT count(*) FROM ai_generated_content WHERE topic = ? AND content_type='self_review'", ('Parallel Processing in Computing',)).fetchone()[0]
+        print(f"Self Reviews Created: {self_review} (Expected > 0)")
+        
+        if cards > 0 and tests > 0 and preds > 0 and debate > 0 and linkages > 0 and podcasts > 0 and subject_book > 0 and interview_sim > 0 and heatmap > 0 and self_review > 0:
+            print("\n✅ SUCCESS: All automation artifacts generated!")
         else:
             print("\n❌ FAILURE: Missing artifacts.")
 

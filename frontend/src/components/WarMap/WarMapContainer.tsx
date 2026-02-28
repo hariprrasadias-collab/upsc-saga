@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 // frontend/src/components/WarMap/WarMapContainer.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import Calendar from 'react-calendar';
@@ -135,13 +137,20 @@ const WarMapContainer: React.FC<WarMapContainerProps> = ({ onTaskCompleted }) =>
   const fetchTasksForDate = useCallback(async () => {
     setIsLoadingTasks(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/tasks?date=${dateStr}`);
+      const response = await fetch(`${API_BASE_URL}/api/tasks?date=${dateStr}`);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to fetch tasks for date');
       }
 
-      const rawTasks: RawTaskFromAPI[] = await response.json();
+      const jsonResponse = await response.json();
+      let rawTasks: RawTaskFromAPI[] = jsonResponse.success === false ? [] : (jsonResponse.data || jsonResponse);
+
+      if (!Array.isArray(rawTasks)) {
+        console.error("Expected array but got:", jsonResponse);
+        rawTasks = [];
+      }
+
       const tasksForDay: Task[] = rawTasks.map(task => ({
         id: task.id,
         title: task.title,
@@ -172,7 +181,7 @@ const WarMapContainer: React.FC<WarMapContainerProps> = ({ onTaskCompleted }) =>
 
   const handleTaskComplete = async (taskId: number) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/tasks/${taskId}/complete`, {
+      const response = await fetch(`${API_BASE_URL}/api/tasks/${taskId}/complete`, {
         method: 'POST',
       });
 

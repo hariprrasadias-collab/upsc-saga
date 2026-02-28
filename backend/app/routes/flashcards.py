@@ -21,7 +21,10 @@ def get_user_id():
     """Helper to get user ID from session or default to 1"""
     return session.get('user_id', 1)
 
+from app import cache
+
 @flashcards.route('/api/flashcards/decks', methods=['GET'])
+@cache.cached(timeout=120)
 def get_decks():
     """Get all decks with card counts"""
     try:
@@ -45,8 +48,8 @@ def get_decks():
 
 @flashcards.route('/api/flashcards/decks',methods=['POST'])
 def create_deck():
-   """Create a new deck"""
-   try:
+    """Create a new deck"""
+    try:
         user_id = get_user_id()
         data = request.get_json()
         
@@ -61,7 +64,7 @@ def create_deck():
         conn.commit()
         
         return jsonify({'id': deck_id, 'message': 'Deck created'}), 201
-   except Exception as e:
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 

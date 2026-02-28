@@ -97,7 +97,8 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
         try {
             const response = await fetch(`${API_BASE_URL}/api/dashboard-data`);
             if (!response.ok) throw new Error('Failed to fetch dashboard data');
-            const data = await response.json();
+            const responseData = await response.json();
+            const data = responseData.data || responseData;
 
             if (data.stats) {
                 setUserStats((prev) => {
@@ -121,7 +122,7 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
                 }));
                 setTodayTasks(tasksWithBooleanCompletion);
             } else {
-                 setTodayTasks([]);
+                setTodayTasks([]);
             }
         } catch (err) {
             console.error("Error refreshing dashboard:", err);

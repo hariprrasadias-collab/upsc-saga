@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 // FlashcardReview - Interactive review interface with flip animation
 import React, { useState, useEffect } from 'react';
 import './Flashcards.css';
@@ -36,8 +38,8 @@ const FlashcardReview: React.FC<FlashcardReviewProps> = ({ deckId, onFinish }) =
     const fetchDueCards = async () => {
         try {
             const url = deckId
-                ? `http://localhost:5000/api/flashcards/due?deck_id=${deckId}&limit=20`
-                : 'http://localhost:5000/api/flashcards/due?limit=20';
+                ? `${API_BASE_URL}/api/flashcards/due?deck_id=${deckId}&limit=20`
+                : `${API_BASE_URL}/api/flashcards/due?limit=20`;
 
             const res = await fetch(url);
             const data = await res.json();
@@ -56,7 +58,7 @@ const FlashcardReview: React.FC<FlashcardReviewProps> = ({ deckId, onFinish }) =
         const timeSpent = Math.floor((Date.now() - sessionStart) / 1000);
 
         try {
-            await fetch(`http://localhost:5000/api/flashcards/${card.id}/review`, {
+            await fetch(`${API_BASE_URL}/api/flashcards/${card.id}/review`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ rating, time_taken: timeSpent })
@@ -83,7 +85,7 @@ const FlashcardReview: React.FC<FlashcardReviewProps> = ({ deckId, onFinish }) =
     const finishSession = async () => {
         // Award XP
         if (cardsReviewed > 0) {
-            await fetch('http://localhost:5000/api/flashcards/award-xp', {
+            await fetch(`${API_BASE_URL}/api/flashcards/award-xp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ cards_reviewed: cardsReviewed + 1 })

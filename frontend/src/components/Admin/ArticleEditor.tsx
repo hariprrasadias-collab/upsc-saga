@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState } from 'react';
 import './ArticleEditor.css';
 import { useToast } from '../Toast';
@@ -20,7 +22,7 @@ const ArticleEditor: React.FC<ArticleEditorProps> = ({ onClose, onSave }) => {
         setSaving(true);
 
         try {
-            const res = await fetch('http://localhost:5000/api/admin/articles', {
+            const res = await fetch(`${API_BASE_URL}/api/admin/articles`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

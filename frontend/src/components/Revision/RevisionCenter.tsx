@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect } from 'react';
 import './RevisionCenter.css';
 import { audioManager } from '../../util/AudioManager';
@@ -24,7 +26,7 @@ const RevisionCenter: React.FC = () => {
     const fetchDueItems = async () => {
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:5000/api/scheduler/due');
+            const res = await fetch(`${API_BASE_URL}/api/scheduler/due`);
             if (res.ok) {
                 const data = await res.json();
                 setDueItems(data);
@@ -43,7 +45,7 @@ const RevisionCenter: React.FC = () => {
         if (!currentItem) return;
 
         try {
-            const res = await fetch('http://localhost:5000/api/scheduler/review', {
+            const res = await fetch(`${API_BASE_URL}/api/scheduler/review`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

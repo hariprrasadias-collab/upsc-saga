@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
@@ -43,7 +45,7 @@ const TimeBoxing: React.FC = () => {
 
     const fetchTimeBoxes = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/timebox/get');
+            const res = await fetch(`${API_BASE_URL}/api/timebox/get`);
             const data = await res.json();
             setTimeBoxes(data);
         } catch (err) {
@@ -53,7 +55,7 @@ const TimeBoxing: React.FC = () => {
 
     const fetchSuggestions = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/timebox/suggestions');
+            const res = await fetch(`${API_BASE_URL}/api/timebox/suggestions`);
             const data = await res.json();
             setSuggestions(data);
         } catch (err) {
@@ -71,7 +73,7 @@ const TimeBoxing: React.FC = () => {
         }
 
         try {
-            await fetch('http://localhost:5000/api/timebox/add', {
+            await fetch(`${API_BASE_URL}/api/timebox/add`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -89,7 +91,7 @@ const TimeBoxing: React.FC = () => {
 
     const handleDelete = async (subject: string) => {
         try {
-            await fetch(`http://localhost:5000/api/timebox/delete/${encodeURIComponent(subject)}`, {
+            await fetch(`${API_BASE_URL}/api/timebox/delete/${encodeURIComponent(subject)}`, {
                 method: 'DELETE'
             });
             await fetchTimeBoxes();

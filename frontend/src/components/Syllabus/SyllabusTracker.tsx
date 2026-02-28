@@ -40,8 +40,9 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
     const fetchData = useCallback(async () => {
         try {
             const res = await fetch(`${API_BASE_URL}/api/syllabus/`);
-            const data = await res.json();
-            setTopics(data);
+            const jsonResponse = await res.json();
+            const data = jsonResponse.data || jsonResponse;
+            setTopics(Array.isArray(data) ? data : []);
         } catch (err) {
             console.error("Failed to load syllabus", err);
         } finally {

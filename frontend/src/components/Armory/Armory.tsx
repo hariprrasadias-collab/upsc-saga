@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 // Enhanced Armory with Badges, Shop, and Inventory tabs
 import React, { useState, useEffect } from 'react';
 import './Armory.css';
@@ -44,7 +46,7 @@ const Armory: React.FC = () => {
     const fetchData = async () => {
         try {
             // Fetch shop inventory
-            const shopRes = await fetch('http://localhost:5000/api/shop/inventory');
+            const shopRes = await fetch(`${API_BASE_URL}/api/shop/inventory`);
             if (shopRes.ok) {
                 const shopData = await shopRes.json();
                 setHacksilver(shopData.hacksilver);
@@ -53,7 +55,7 @@ const Armory: React.FC = () => {
             }
 
             // Fetch badges
-            const badgesRes = await fetch('http://localhost:5000/api/badges/all');
+            const badgesRes = await fetch(`${API_BASE_URL}/api/badges/all`);
             if (badgesRes.ok) {
                 const badgesData = await badgesRes.json();
                 setBadges(badgesData);
@@ -70,7 +72,7 @@ const Armory: React.FC = () => {
         if (!confirm(`Purchase ${item.name} for ${item.cost} Hacksilver?`)) return;
 
         try {
-            const res = await fetch('http://localhost:5000/api/shop/buy', {
+            const res = await fetch(`${API_BASE_URL}/api/shop/buy`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ item_id: item.id, item_name: item.name, cost: item.cost })

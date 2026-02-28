@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 // Answer Writing Practice - Main Component
 import React, { useState, useEffect } from 'react';
 import './AnswerWriting.css';
@@ -76,10 +78,10 @@ const AnswerWriting: React.FC<AnswerWritingProps> = ({ onTaskCompleted }) => {
 
     const fetchDailyPrompt = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/answer-writing/daily-prompt');
+            const res = await fetch(`${API_BASE_URL}/api/answer-writing/daily-prompt`);
             if (res.ok) {
-                const data = await res.json();
-                setCurrentPrompt(data);
+                const raw = await res.json();
+                setCurrentPrompt(raw.data || raw);
             }
         } catch (err) {
             console.error('Error fetching prompt:', err);
@@ -89,10 +91,11 @@ const AnswerWriting: React.FC<AnswerWritingProps> = ({ onTaskCompleted }) => {
     const fetchHistory = async () => {
         setLoadingHistory(true);
         try {
-            const res = await fetch('http://localhost:5000/api/answer-writing/my-answers');
+            const res = await fetch(`${API_BASE_URL}/api/answer-writing/my-answers`);
             if (res.ok) {
-                const data = await res.json();
-                setHistory(data);
+                const raw = await res.json();
+                const data = raw.success === false ? [] : (raw.data || raw);
+                setHistory(Array.isArray(data) ? data : []);
             }
         } catch (err) {
             console.error('Error fetching history:', err);
@@ -138,7 +141,7 @@ const AnswerWriting: React.FC<AnswerWritingProps> = ({ onTaskCompleted }) => {
         audioManager.play('click');
 
         try {
-            const res = await fetch('http://localhost:5000/api/answer-writing/submit', {
+            const res = await fetch(`${API_BASE_URL}/api/answer-writing/submit`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -149,7 +152,8 @@ const AnswerWriting: React.FC<AnswerWritingProps> = ({ onTaskCompleted }) => {
             });
 
             if (res.ok) {
-                const data = await res.json();
+                const raw = await res.json();
+                const data = raw.data || raw;
                 setEvaluation(data.evaluation);
                 setShowEvaluation(true);
                 audioManager.play('success');

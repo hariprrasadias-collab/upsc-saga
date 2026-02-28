@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect } from 'react';
 
 interface FormulaSection {
@@ -15,7 +17,7 @@ const FormulaSheet: React.FC = () => {
 
     const fetchFormulas = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/csat/formulas');
+            const response = await fetch(`${API_BASE_URL}/api/csat/formulas`);
             const data = await response.json();
             setFormulas(data);
         } catch (error) {

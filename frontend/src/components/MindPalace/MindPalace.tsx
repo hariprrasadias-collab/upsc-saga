@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect } from 'react';
 import './MindPalace.css';
 import { FaPlus, FaArrowLeft } from 'react-icons/fa';
@@ -52,9 +54,10 @@ const MindPalace: React.FC = () => {
 
     const fetchLocations = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/mind_palace/locations');
-            const data = await res.json();
-            setLocations(data);
+            const res = await fetch(`${API_BASE_URL}/api/mind_palace/locations`);
+            const raw = await res.json();
+            const data = raw.success === false ? [] : (raw.data || raw);
+            setLocations(Array.isArray(data) ? data : []);
         } catch (err) {
             console.error(err);
         }
@@ -62,9 +65,10 @@ const MindPalace: React.FC = () => {
 
     const fetchArtifacts = async (locationId: number) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/mind_palace/locations/${locationId}/artifacts`);
-            const data = await res.json();
-            setArtifacts(data);
+            const res = await fetch(`${API_BASE_URL}/api/mind_palace/locations/${locationId}/artifacts`);
+            const raw = await res.json();
+            const data = raw.success === false ? [] : (raw.data || raw);
+            setArtifacts(Array.isArray(data) ? data : []);
         } catch (err) {
             console.error(err);
         }
@@ -72,7 +76,7 @@ const MindPalace: React.FC = () => {
 
     const handleCreateLocation = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/mind_palace/locations', {
+            const res = await fetch(`${API_BASE_URL}/api/mind_palace/locations`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: newName, description: newDesc })
@@ -122,7 +126,7 @@ const MindPalace: React.FC = () => {
         const y = 50;
 
         try {
-            const res = await fetch('http://localhost:5000/api/mind_palace/artifacts', {
+            const res = await fetch(`${API_BASE_URL}/api/mind_palace/artifacts`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -148,7 +152,7 @@ const MindPalace: React.FC = () => {
 
     const handleUpdateArtifactPosition = async (id: number, x: number, y: number) => {
         try {
-            await fetch(`http://localhost:5000/api/mind_palace/artifacts/${id}`, {
+            await fetch(`${API_BASE_URL}/api/mind_palace/artifacts/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ x_position: x, y_position: y })
@@ -306,13 +310,13 @@ const MindPalace: React.FC = () => {
                             {editingArtifact ? (
                                 <>
                                     <button className="delete-btn" onClick={async () => {
-                                        await fetch(`http://localhost:5000/api/mind_palace/artifacts/${editingArtifact.id}`, { method: 'DELETE' });
+                                        await fetch(`${API_BASE_URL}/api/mind_palace/artifacts/${editingArtifact.id}`, { method: 'DELETE' });
                                         fetchArtifacts(currentLocation!.id);
                                         setShowArtifactModal(false);
                                         setEditingArtifact(null);
                                     }}>Forget</button>
                                     <button className="save-btn" onClick={async () => {
-                                        await fetch(`http://localhost:5000/api/mind_palace/artifacts/${editingArtifact.id}`, {
+                                        await fetch(`${API_BASE_URL}/api/mind_palace/artifacts/${editingArtifact.id}`, {
                                             method: 'PUT',
                                             headers: { 'Content-Type': 'application/json' },
                                             body: JSON.stringify({ title: editingArtifact.title, content: editingArtifact.content })

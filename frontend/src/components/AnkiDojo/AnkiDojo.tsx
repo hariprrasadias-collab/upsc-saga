@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 // /frontend/src/components/AnkiDojo/AnkiDojo.tsx
 import React, { useState, useEffect } from 'react';
 import './AnkiDojo.css';
@@ -43,9 +45,12 @@ const AnkiDojo: React.FC = () => {
     useEffect(() => {
         const fetchQueue = async () => {
             try {
-                const res = await fetch('http://localhost:5000/api/anki/queue');
+                const res = await fetch(`${API_BASE_URL}/api/anki/queue`);
                 if (!res.ok) throw new Error("Anki Connection Failed");
-                const ids = await res.json();
+                const raw = await res.json();
+                const ids = raw.success === false ? [] : (raw.data || raw);
+
+                if (!Array.isArray(ids)) throw new Error("Invalid Anki Queue");
 
                 // In Smart Learn mode, sort by Ebisu priority
                 if (studyMode === 'smart') {
@@ -73,12 +78,13 @@ const AnkiDojo: React.FC = () => {
                 setLoading(true);
                 const nextId = queue[0];
                 try {
-                    const res = await fetch('http://localhost:5000/api/anki/card', {
+                    const res = await fetch(`${API_BASE_URL}/api/anki/card`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ card_id: nextId })
                     });
-                    const cardData = await res.json();
+                    const raw = await res.json();
+                    const cardData = raw.data || raw;
                     setCurrentCard(cardData);
                     setIsFlipped(false); // Reset flip
                 } catch {
@@ -121,7 +127,7 @@ const AnkiDojo: React.FC = () => {
         }
 
         try {
-            await fetch('http://localhost:5000/api/anki/answer', {
+            await fetch(`${API_BASE_URL}/api/anki/answer`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ card_id: currentCard.id, ease })

@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import './TriangulationDashboard.css';
@@ -31,7 +33,7 @@ const TriangulationDashboard: React.FC<Props> = ({ text, onClose }) => {
     React.useEffect(() => {
         const analyze = async () => {
             try {
-                const res = await fetch('http://localhost:5000/api/triangulation/analyze', {
+                const res = await fetch(`${API_BASE_URL}/api/triangulation/analyze`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ text })
@@ -87,7 +89,7 @@ ${Object.entries(result.gs_linkages).map(([k, v]) => `- **${k.toUpperCase()}**: 
 ${result.predicted_question}
             `;
 
-            const res = await fetch('http://localhost:5000/api/lore', {
+            const res = await fetch(`${API_BASE_URL}/api/lore`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './RevisionCurve.css';
@@ -18,7 +20,7 @@ const RevisionCurve: React.FC = () => {
 
     const fetchCurveData = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/analytics/visualizations/revision-curve');
+            const res = await fetch(`${API_BASE_URL}/api/analytics/visualizations/revision-curve`);
             const data = await res.json();
 
             if (Array.isArray(data)) {

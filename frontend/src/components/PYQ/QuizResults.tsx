@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 // QuizResults.tsx - Display quiz results with review
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
@@ -24,7 +26,7 @@ const QuizResults: React.FC = () => {
         if (!results) {
             const fetchResults = async () => {
                 try {
-                    const res = await fetch(`http://localhost:5000/api/pyq/quiz/${sessionId}`);
+                    const res = await fetch(`${API_BASE_URL}/api/pyq/quiz/${sessionId}`);
                     const data = await res.json();
                     setResults({
                         score: data.session.score,

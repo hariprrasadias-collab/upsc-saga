@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect } from 'react';
 import './BossArena.css';
 import { audioManager } from '../../util/AudioManager';
@@ -44,7 +46,7 @@ const BattleInterface: React.FC<BattleInterfaceProps> = ({ boss, onBattleEnd }) 
 
     const startBattle = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/arena/fight/start', {
+            const res = await fetch(`${API_BASE_URL}/api/arena/fight/start`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -66,12 +68,12 @@ const BattleInterface: React.FC<BattleInterfaceProps> = ({ boss, onBattleEnd }) 
 
     const updateChallengeProgress = async (type: string, increment: number = 1) => {
         try {
-            const res = await fetch('http://localhost:5000/api/challenges/daily');
+            const res = await fetch(`${API_BASE_URL}/api/challenges/daily`);
             if (res.ok) {
                 const challenge = await res.json();
                 if (challenge && challenge.type === type && !challenge.completed) {
                     const newProgress = Math.min(challenge.progress + increment, challenge.target_value);
-                    await fetch('http://localhost:5000/api/challenges/progress', {
+                    await fetch(`${API_BASE_URL}/api/challenges/progress`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ progress: newProgress })
@@ -132,7 +134,7 @@ const BattleInterface: React.FC<BattleInterfaceProps> = ({ boss, onBattleEnd }) 
         setBattleState(outcome.toLowerCase() as any);
 
         try {
-            const res = await fetch('http://localhost:5000/api/arena/fight/end', {
+            const res = await fetch(`${API_BASE_URL}/api/arena/fight/end`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

@@ -2,8 +2,8 @@
 import threading
 from flask import Blueprint, request, jsonify, current_app
 import feedparser
-import threading
 import time
+from app.validators import parse_pagination
 from app.db_models.current_affairs import (
     init_current_affairs_table, 
     save_article, 
@@ -345,8 +345,19 @@ def get_saved():
     if request.args.get('search'):
         filters['search'] = request.args.get('search')
     
+    page, per_page = parse_pagination(request.args)
+    filters['limit'] = per_page
+    filters['offset'] = (page - 1) * per_page
+    
     articles = get_saved_articles(filters)
-    return jsonify(articles)
+    
+    # Ideally return total count as well, but for now returning the paginated array
+    # works with the existing frontend format. The envelope will wrap it in 'data'.
+    return jsonify({
+        "data": articles,
+        "page": page,
+        "per_page": per_page
+    })
 
 @bp.route('/<int:article_id>/tags', methods=['PUT'])
 def update_tags(article_id):

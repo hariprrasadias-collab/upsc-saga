@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect } from 'react';
 import './Ravens.css';
 import { audioManager } from '../../util/AudioManager';
@@ -62,10 +64,11 @@ const Ravens: React.FC = () => {
             if (showBookmarked) params.append('bookmarked', 'true');
             if (searchQuery) params.append('search', searchQuery);
 
-            const res = await fetch(`http://localhost:5000/api/ravens/saved?${params}`);
+            const res = await fetch(`${API_BASE_URL}/api/ravens/saved?${params}`);
             if (res.ok) {
-                const data = await res.json();
-                setArticles(data);
+                const raw = await res.json();
+                const data = raw.success === false ? [] : (raw.data || raw);
+                setArticles(Array.isArray(data) ? data : []);
             }
         } catch (err) {
             console.error("Error fetching articles:", err);
@@ -83,12 +86,12 @@ const Ravens: React.FC = () => {
 
     const updateChallengeProgress = async (type: string, increment: number = 1) => {
         try {
-            const res = await fetch('http://localhost:5000/api/challenges/daily');
+            const res = await fetch(`${API_BASE_URL}/api/challenges/daily`);
             if (res.ok) {
                 const challenge = await res.json();
                 if (challenge && challenge.type === type && !challenge.completed) {
                     const newProgress = Math.min(challenge.progress + increment, challenge.target_value);
-                    await fetch('http://localhost:5000/api/challenges/progress', {
+                    await fetch(`${API_BASE_URL}/api/challenges/progress`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ progress: newProgress })
@@ -111,12 +114,16 @@ const Ravens: React.FC = () => {
         audioManager.play('click');
 
         try {
-            const muninRes = await fetch('http://localhost:5000/api/ravens?type=munin');
-            const huginRes = await fetch('http://localhost:5000/api/ravens?type=hugin');
+            const muninRes = await fetch(`${API_BASE_URL}/api/ravens?type=munin`);
+            const huginRes = await fetch(`${API_BASE_URL}/api/ravens?type=hugin`);
 
-            const muninNews = await muninRes.json();
-            const huginNews = await huginRes.json();
-            const allNews = [...muninNews, ...huginNews];
+            const rawMunin = await muninRes.json();
+            const rawHugin = await huginRes.json();
+
+            const muninNews = rawMunin.success === false ? [] : (rawMunin.data || rawMunin);
+            const huginNews = rawHugin.success === false ? [] : (rawHugin.data || rawHugin);
+
+            const allNews = [...(Array.isArray(muninNews) ? muninNews : []), ...(Array.isArray(huginNews) ? huginNews : [])];
 
             setProcessingStatus(`Found ${allNews.length} articles. Processing...`);
 
@@ -124,7 +131,7 @@ const Ravens: React.FC = () => {
                 const article = allNews[i];
                 setProcessingStatus(`Processing ${i + 1}/${allNews.length}: ${article.title.substring(0, 30)}...`);
 
-                await fetch('http://localhost:5000/api/ravens/process', {
+                await fetch(`${API_BASE_URL}/api/ravens/process`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(article)
@@ -151,7 +158,7 @@ const Ravens: React.FC = () => {
         try {
             const content = `Source: ${article.source}\nPublished: ${article.published}\nLink: ${article.link}\n\nSummary:\n${article.upscSummary}\n\nKey Points:\n${article.keyPoints?.map(p => `- ${p}`).join('\n')}`;
 
-            const res = await fetch('http://localhost:5000/api/lore', {
+            const res = await fetch(`${API_BASE_URL}/api/lore`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -175,7 +182,7 @@ const Ravens: React.FC = () => {
 
     const handleAnki = async (id: number) => {
         try {
-            await fetch(`http://localhost:5000/api/ravens/${id}/to-anki`, { method: 'POST' });
+            await fetch(`${API_BASE_URL}/api/ravens/${id}/to-anki`, { method: 'POST' });
             audioManager.play('success');
             addToast('Added to Anki', 'success');
             fetchArticles();
@@ -187,7 +194,7 @@ const Ravens: React.FC = () => {
 
     const handleImportance = async (id: number, importance: number) => {
         try {
-            await fetch(`http://localhost:5000/api/ravens/${id}/importance`, {
+            await fetch(`${API_BASE_URL}/api/ravens/${id}/importance`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ importance })
@@ -201,7 +208,7 @@ const Ravens: React.FC = () => {
 
     const handleBookmark = async (id: number) => {
         try {
-            await fetch(`http://localhost:5000/api/ravens/${id}/bookmark`, { method: 'POST' });
+            await fetch(`${API_BASE_URL}/api/ravens/${id}/bookmark`, { method: 'POST' });
             audioManager.play('click');
             fetchArticles();
         } catch (err) {
@@ -211,7 +218,7 @@ const Ravens: React.FC = () => {
 
     const handleNotesSave = async (id: number, notes: string) => {
         try {
-            await fetch(`http://localhost:5000/api/ravens/${id}/notes`, {
+            await fetch(`${API_BASE_URL}/api/ravens/${id}/notes`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ notes })
@@ -556,7 +563,7 @@ const Ravens: React.FC = () => {
 
                                     addToast('Refetching content...', 'info');
                                     try {
-                                        const res = await fetch('http://localhost:5000/api/ravens/process', {
+                                        const res = await fetch(`${API_BASE_URL}/api/ravens/process`, {
                                             method: 'POST',
                                             headers: { 'Content-Type': 'application/json' },
                                             body: JSON.stringify({ ...selectedArticle, force: true })

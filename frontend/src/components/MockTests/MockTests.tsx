@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 // Mock Tests - Main Container
 import React, { useState, useEffect } from 'react';
 import './MockTests.css';
@@ -60,11 +62,12 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
 
     // Fetch available tests
     const fetchTests = () => {
-        fetch('http://localhost:5000/api/mock-tests')
+        fetch(`${API_BASE_URL}/api/mock-tests`)
             .then(r => r.json())
-            .then(data => {
+            .then(raw => {
+                const data = raw.success === false ? [] : (raw.data || raw);
                 console.log('Fetched tests:', data);
-                setTests(data);
+                setTests(Array.isArray(data) ? data : []);
             })
             .catch(err => console.error(err));
     };
@@ -94,7 +97,7 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
     const startTest = async (test: Test) => {
         console.log('Starting test:', test);
         try {
-            const res = await fetch(`http://localhost:5000/api/mock-tests/${test.id}/start`, {
+            const res = await fetch(`${API_BASE_URL}/api/mock-tests/${test.id}/start`, {
                 method: 'POST'
             });
 
@@ -102,7 +105,8 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
                 throw new Error(`HTTP error! status: ${res.status}`);
             }
 
-            const data = await res.json();
+            const raw = await res.json();
+            const data = raw.data || raw;
             console.log('Test data received:', data);
 
             if (!data.questions || data.questions.length === 0) {
@@ -132,7 +136,7 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
 
         if (attemptId) {
             try {
-                await fetch(`http://localhost:5000/api/mock-tests/attempt/${attemptId}/answer`, {
+                await fetch(`${API_BASE_URL}/api/mock-tests/attempt/${attemptId}/answer`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -157,14 +161,16 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
         setIsSubmitting(true);
 
         try {
-            const res = await fetch(`http://localhost:5000/api/mock-tests/attempt/${attemptId}/submit`, {
+            const res = await fetch(`${API_BASE_URL}/api/mock-tests/attempt/${attemptId}/submit`, {
                 method: 'POST'
             });
-            const data = await res.json();
+            const raw = await res.json();
+            const data = raw.data || raw;
 
             // Fetch detailed results
-            const resultRes = await fetch(`http://localhost:5000/api/mock-tests/attempt/${attemptId}/results`);
-            const resultData = await resultRes.json();
+            const resultRes = await fetch(`${API_BASE_URL}/api/mock-tests/attempt/${attemptId}/results`);
+            const rawResult = await resultRes.json();
+            const resultData = rawResult.data || rawResult;
 
             setResults({ ...data, ...resultData });
             setView('results');
@@ -197,7 +203,7 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
                 return;
             }
 
-            const res = await fetch('http://localhost:5000/api/mock-tests', {
+            const res = await fetch(`${API_BASE_URL}/api/mock-tests`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -249,7 +255,7 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
         }
 
         try {
-            const res = await fetch(`http://localhost:5000/api/mock-tests/${testId}`, {
+            const res = await fetch(`${API_BASE_URL}/api/mock-tests/${testId}`, {
                 method: 'DELETE'
             });
 

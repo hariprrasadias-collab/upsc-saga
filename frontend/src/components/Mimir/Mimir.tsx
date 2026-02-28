@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 // /frontend/src/components/Mimir/Mimir.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import './Mimir.css';
@@ -45,14 +47,16 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
     // Fetch History on Load
     useEffect(() => {
         if (isOpen) {
-            fetch('http://localhost:5000/api/mimir/history')
+            fetch(`${API_BASE_URL}/api/mimir/history`)
                 .then(res => {
                     if (!res.ok) throw new Error('Failed to fetch history');
                     return res.json();
                 })
-                .then((data: any[]) => {
+                .then(raw => {
+                    const data = raw.success === false ? [] : (raw.data || raw);
+                    const safeData = Array.isArray(data) ? data : [];
                     // Map backend format (role, content) to frontend format (sender, message)
-                    const mappedMessages: ChatMessage[] = data.map((msg, index) => ({
+                    const mappedMessages: ChatMessage[] = safeData.map((msg: any, index: number) => ({
                         id: index, // Use index as ID for history
                         sender: msg.role === 'model' ? 'mimir' : 'user',
                         message: msg.content
@@ -79,7 +83,7 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
         setMessages(prev => [...prev, { id: tempId, sender: 'user', message: userMsg }]);
 
         try {
-            const res = await fetch('http://localhost:5000/api/mimir/chat', {
+            const res = await fetch(`${API_BASE_URL}/api/mimir/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: userMsg })
@@ -87,7 +91,8 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
 
             if (!res.ok) throw new Error(`Server error: ${res.status}`);
 
-            const data = await res.json();
+            const raw = await res.json();
+            const data = raw.data || raw;
 
             setMessages(prev => [
                 ...prev,
@@ -107,7 +112,7 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
     const handleClear = async () => {
         if (!confirm("Clear Mimir's memory?")) return;
         try {
-            await fetch('http://localhost:5000/api/mimir/clear', { method: 'POST' });
+            await fetch(`${API_BASE_URL}/api/mimir/clear`, { method: 'POST' });
             setMessages([]);
         } catch (error) {
             console.error("Clear error:", error);

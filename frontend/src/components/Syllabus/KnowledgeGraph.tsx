@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import './KnowledgeGraph.css';
@@ -40,7 +42,7 @@ const KnowledgeGraph: React.FC = () => {
 
     const fetchGraphData = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/analytics/visualizations/knowledge-graph');
+            const res = await fetch(`${API_BASE_URL}/api/analytics/visualizations/knowledge-graph`);
             const data = await res.json();
             setGraphData(data);
             setLoading(false);

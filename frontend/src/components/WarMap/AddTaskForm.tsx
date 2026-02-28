@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 // /frontend/src/components/WarMap/AddTaskForm.tsx
 import React, { useState } from 'react';
 import './AddTaskForm.css';
@@ -39,7 +41,7 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ selectedDateStr, onTaskCreate
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/tasks', {
+      const response = await fetch(`${API_BASE_URL}/api/tasks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

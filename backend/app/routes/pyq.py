@@ -1,11 +1,10 @@
 from flask import Blueprint, request, jsonify
-from flask_cors import CORS
 from app.db import get_db
 import json
 from datetime import datetime
+from app.validators import parse_pagination
 
 bp = Blueprint('pyq', __name__, url_prefix='/api/pyq')
-CORS(bp)
 
 @bp.route('/questions', methods=['GET'])
 def get_questions():
@@ -73,8 +72,26 @@ def get_questions():
 
         query += " ORDER BY year DESC, id ASC"
         
+        # Pagination
+        page, per_page = parse_pagination(request.args, default_per_page=50)
+        
+        # Extract count query
+        count_query = query.replace("SELECT *", "SELECT COUNT(*)", 1).split(" ORDER BY")[0]
+        try:
+            total = conn.execute(count_query, params).fetchone()[0]
+        except Exception:
+            total = 0
+            
+        query += " LIMIT ? OFFSET ?"
+        params.extend([per_page, (page - 1) * per_page])
+        
         questions = conn.execute(query, params).fetchall()
-        return jsonify([dict(q) for q in questions])
+        return jsonify({
+            "data": [dict(q) for q in questions],
+            "total": total,
+            "page": page,
+            "per_page": per_page
+        })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -214,24 +231,21 @@ def get_analytics():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# In-memory rate limiter (Simple Dictionary)
-# Key: IP Address, Value: timestamp of last request
-_strategos_rate_limit = {}
+from app import cache
 
 @bp.route('/strategos/<int:question_id>', methods=['POST'])
 def ask_strategos(question_id):
     """Ask AI for tactical breakdown of a question"""
     try:
-        # 1. Rate Limiting Check (Simple)
-        import time
+        # 1. Rate Limiting Check using Global Cache
         client_ip = request.remote_addr
-        last_req = _strategos_rate_limit.get(client_ip, 0)
-        current_time = time.time()
-
-        if current_time - last_req < 5: # 5 seconds cooldown
+        cache_key = f"strategos_rl_{client_ip}"
+        
+        if cache.get(cache_key):
             return jsonify({'success': False, 'error': 'Strategos is thinking. Please wait 5 seconds.'}), 429
-
-        _strategos_rate_limit[client_ip] = current_time
+            
+        # Set cooldown for 5 seconds
+        cache.set(cache_key, True, timeout=5)
 
         conn = get_db()
         question = conn.execute("SELECT * FROM pyq_questions WHERE id = ?", (question_id,)).fetchone()

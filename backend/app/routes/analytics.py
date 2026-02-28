@@ -12,6 +12,13 @@ from app.services.analytics_service import (
 
 analytics = Blueprint('analytics', __name__)
 
+@analytics.after_request
+def add_no_cache_headers(response):
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
 # ==================== OVERVIEW ====================
 
 @analytics.route('/api/analytics/overview', methods=['GET'])
@@ -46,22 +53,22 @@ def get_overview():
         # Activities completed - handle missing tables gracefully
         try:
             mock_count = conn.execute('SELECT COUNT(*) FROM test_attempts WHERE user_id = ? AND submitted_at >= ?', (user_id, start_date)).fetchone()[0]
-        except:
+        except Exception:
             mock_count = 0
             
         try:
             answer_count = conn.execute('SELECT COUNT(*) FROM user_answers WHERE user_id = ? AND submitted_at >= ?', (user_id, start_date)).fetchone()[0]
-        except:
+        except Exception:
             answer_count = 0
             
         try:
             review_count = conn.execute('SELECT COUNT(DISTINCT flashcard_id) FROM review_sessions WHERE user_id = ? AND reviewed_at >= ?', (user_id, start_date)).fetchone()[0]
-        except:
+        except Exception:
             review_count = 0
         
         try:
             task_count = conn.execute('SELECT COUNT(*) FROM tasks WHERE user_id = ? AND isCompleted = 1', (user_id,)).fetchone()[0]
-        except:
+        except Exception:
             task_count = 0
         
         total_activities = mock_count + answer_count + review_count + task_count
@@ -108,7 +115,7 @@ def get_subject_wise():
             try:
                 perf = get_subject_performance(conn, user_id, subject)
                 results.append(perf)
-            except:
+            except Exception:
                 # Return empty data for missing tables
                 results.append({
                     'subject': subject,
@@ -197,7 +204,7 @@ def get_mock_test_analytics():
             trend_data = [dict(t) for t in trends]
             scores = [t['score'] for t in trends]
             improvement = calculate_improvement_rate(scores)
-        except:
+        except Exception:
             trend_data = []
             improvement = 0
         
@@ -214,7 +221,7 @@ def get_mock_test_analytics():
                 GROUP BY mt.subject
             ''', (user_id,)).fetchall()
             subject_stats_data = [dict(s) for s in subject_stats]
-        except:
+        except Exception:
             subject_stats_data = []
         
         return jsonify({
@@ -251,7 +258,7 @@ def get_answer_writing_analytics():
             score_data = [dict(s) for s in scores]
             # Improvement rate based on overall scores
             improvement = calculate_improvement_rate([s['overall_score'] for s in scores])
-        except:
+        except Exception:
             score_data = []
             improvement = 0
             
@@ -266,7 +273,7 @@ def get_answer_writing_analytics():
                 GROUP BY aq.subject
             ''', (user_id,)).fetchall()
             subject_avg_data = [dict(s) for s in subject_avg]
-        except:
+        except Exception:
             subject_avg_data = []
             
         return jsonify({

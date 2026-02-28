@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect } from 'react';
 import './WeakAreasDashboard.css';
 
@@ -30,10 +32,11 @@ const WeakAreasDashboard: React.FC = () => {
     const fetchDashboard = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/api/weak-areas/dashboard');
-            const data = await response.json();
+            const response = await fetch(`${API_BASE_URL}/api/weak-areas/dashboard`);
+            const rawData = await response.json();
+            const data = rawData.data || rawData;
 
-            if (data.success) {
+            if (data.success || data.stats) {
                 setStats(data.stats);
                 setWeakAreas(data.weak_areas);
             }
@@ -52,15 +55,16 @@ const WeakAreasDashboard: React.FC = () => {
 
         setGenerating(true);
         try {
-            const response = await fetch('http://localhost:5000/api/weak-areas/practice', {
+            const response = await fetch(`${API_BASE_URL}/api/weak-areas/practice`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ count: 10 })
             });
 
-            const data = await response.json();
+            const rawData = await response.json();
+            const data = rawData.data || rawData;
 
-            if (data.success) {
+            if (data.success || data.session_id) {
                 // Navigate to the quiz session
                 if (data.session_id) {
                     window.location.href = `/pyq-quiz/${data.session_id}`;

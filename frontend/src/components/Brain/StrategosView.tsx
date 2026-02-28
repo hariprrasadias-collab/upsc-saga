@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useEffect, useState } from 'react';
 import { FaChessKing, FaHeartbeat, FaExclamationTriangle, FaRocket } from 'react-icons/fa';
 import type { Action } from './types';
@@ -25,7 +27,7 @@ const StrategosView: React.FC<StrategosViewProps> = ({ onExecuteAction: _onExecu
 
     const fetchStatus = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/brain/status');
+            const res = await fetch(`${API_BASE_URL}/api/brain/status`);
             const data = await res.json();
             setStatus(data);
         } catch (err) {

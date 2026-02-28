@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 // /frontend/src/components/LoreTablets/LoreTablets.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import './LoreTablets.css';
@@ -21,7 +23,7 @@ const LoreTablets: React.FC = () => {
 
     const fetchNotes = useCallback(async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/lore');
+            const res = await fetch(`${API_BASE_URL}/api/lore`);
             if (res.ok) {
                 const data = await res.json();
                 setNotes(data);
@@ -54,8 +56,8 @@ const LoreTablets: React.FC = () => {
     // Save Note (Create or Update)
     const handleSave = async () => {
         const endpoint = selectedNote 
-            ? `http://localhost:5000/api/lore/${selectedNote.id}`
-            : `http://localhost:5000/api/lore`;
+            ? `${API_BASE_URL}/api/lore/${selectedNote.id}`
+            : `${API_BASE_URL}/api/lore`;
         
         const method = selectedNote ? 'PUT' : 'POST';
 
@@ -84,7 +86,7 @@ const LoreTablets: React.FC = () => {
         if (!confirm("Are you sure you want to destroy this tablet?")) return;
 
         try {
-            const res = await fetch(`http://localhost:5000/api/lore/${selectedNote.id}`, {
+            const res = await fetch(`${API_BASE_URL}/api/lore/${selectedNote.id}`, {
                 method: 'DELETE'
             });
             if (res.ok) {

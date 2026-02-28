@@ -108,6 +108,10 @@ def create_app():
         
         init_indexes() # Ensure performance indexes
 
+    # Register Global Middleware
+    from app.middleware import register_middleware
+    register_middleware(app)
+
     # Import blueprints
     from .routes import (
         dashboard, tasks, quests, battles, shop, codex, lore, mimir, 
@@ -166,6 +170,9 @@ def create_app():
     
     from app.routes import compilation
     app.register_blueprint(compilation.bp)
+
+    from app.routes.automation import bp as automation_bp
+    app.register_blueprint(automation_bp)
 
     from app.routes.scribe import scribe_bp
     app.register_blueprint(scribe_bp, url_prefix='/api/scribe')

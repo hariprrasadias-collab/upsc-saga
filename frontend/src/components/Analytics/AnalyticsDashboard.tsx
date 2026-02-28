@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 // Analytics Dashboard - Phase 2 Feature #2
 import React, { useState, useEffect } from 'react';
 import './Analytics.css';
@@ -41,24 +43,30 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ onNavigate }) =
 
             // Fetch remaining analytics data in parallel
             const [subjectRes, mockRes, weakRes, predictiveRes, perfRes] = await Promise.all([
-                fetch('http://localhost:5000/api/analytics/subject-wise'),
-                fetch('http://localhost:5000/api/analytics/mock-tests'),
-                fetch('http://localhost:5000/api/analytics/weak-areas?limit=5'),
-                fetch('http://localhost:5000/api/analytics/predictive/all'),
-                fetch('http://localhost:5000/api/analytics/performance-scatter')
+                fetch(`${API_BASE_URL}/api/analytics/subject-wise`),
+                fetch(`${API_BASE_URL}/api/analytics/mock-tests`),
+                fetch(`${API_BASE_URL}/api/analytics/weak-areas?limit=5`),
+                fetch(`${API_BASE_URL}/api/analytics/predictive/all`),
+                fetch(`${API_BASE_URL}/api/analytics/performance-scatter`)
             ]);
 
-            const subjectData = await subjectRes.json();
-            const mockData = await mockRes.json();
-            const weakData = await weakRes.json();
-            const predictiveAnalytics = await predictiveRes.json();
-            const perfData = await perfRes.json();
+            const _subjectData = await subjectRes.json();
+            const _mockData = await mockRes.json();
+            const _weakData = await weakRes.json();
+            const _predictiveAnalytics = await predictiveRes.json();
+            const _perfData = await perfRes.json();
 
-            setSubjectData(subjectData);
+            const subjectData = _subjectData.success === false ? [] : _subjectData.data || _subjectData;
+            const mockData = _mockData.success === false ? null : _mockData.data || _mockData;
+            const weakData = _weakData.success === false ? [] : _weakData.data || _weakData;
+            const predictiveAnalytics = _predictiveAnalytics.success === false ? null : _predictiveAnalytics.data || _predictiveAnalytics;
+            const perfData = _perfData.success === false ? [] : _perfData.data || _perfData;
+
+            setSubjectData(Array.isArray(subjectData) ? subjectData : []);
             setMockTrends(mockData);
-            setWeakAreas(weakData);
+            setWeakAreas(weakData?.weak_areas || (Array.isArray(weakData) ? weakData : []));
             setPredictiveData(predictiveAnalytics);
-            setPerformanceData(perfData);
+            setPerformanceData(Array.isArray(perfData) ? perfData : []);
 
             // Show burnout alert if high risk
             if (predictiveAnalytics?.burnout_detection?.burnout_risk === 'high') {

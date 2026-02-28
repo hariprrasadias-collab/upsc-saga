@@ -9,7 +9,7 @@ def get_today_date_str():
     return datetime.date.today().isoformat()
 
 @bp.route('/dashboard-data')
-# @cache.cached(timeout=60, query_string=True) # Cache for 1 minute
+@cache.cached(timeout=60, query_string=True) # Cache for 1 minute
 def get_dashboard_data():
     try:
         user_id = 1
@@ -51,7 +51,7 @@ def get_dashboard_data():
             # from anki_client import fetch_due_cards
             # anki = fetch_due_cards()
             pass
-        except:
+        except Exception as anki_err: # Replaced bare except
             pass
 
         return jsonify({

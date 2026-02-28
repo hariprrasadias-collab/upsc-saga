@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect } from 'react';
 import './ExplainabilityDashboard.css';
 import { FaLightbulb, FaFlask, FaCheck, FaTimes, FaInfoCircle } from 'react-icons/fa';
@@ -24,7 +26,7 @@ const ExplainabilityDashboard: React.FC = () => {
     const fetchOpportunities = async () => {
         setLoading(true);
     try {
-        const response = await fetch('http://localhost:5000/api/autonomy/optimizations');
+        const response = await fetch(`${API_BASE_URL}/api/autonomy/optimizations`);
         const data = await response.json();
         setOpportunities(data.opportunities || []);
     } catch (error) {
@@ -36,7 +38,7 @@ const ExplainabilityDashboard: React.FC = () => {
 
 const handleAccept = async (id: number) => {
     try {
-        const response = await fetch(`http://localhost:5000/api/autonomy/optimizations/${id}/accept`, {
+        const response = await fetch(`${API_BASE_URL}/api/autonomy/optimizations/${id}/accept`, {
             method: 'POST'
         });
         const result = await response.json();

@@ -795,7 +795,25 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 ("PREDICT_QUESTIONS", {"topic": topic, "subject": subject, "timeframe_days": 30}),
                 ("GENERATE_TOPIC_LINKAGES", {"topic": topic, "subject": subject}),
                 ("GENERATE_PODCAST_SCRIPT", {"topic": topic, "style": "humorous"}),
-                ("GENERATE_SOCRATIC_DIALOGUE", {"topic": topic, "subject": subject})
+                ("GENERATE_SOCRATIC_DIALOGUE", {"topic": topic, "subject": subject}),
+                ("GENERATE_SUBJECT_BOOK", {"topic": topic, "subject": subject}),
+                ("GENERATE_INTERVIEW_SIM", {"topic": topic}),
+                ("GENERATE_HEATMAP", {"topic": topic, "subject": subject}),
+                ("GENERATE_HEATMAP", {"topic": topic, "subject": subject}),
+                ("GENERATE_SELF_REVIEW", {"topic": topic}),
+                # --- NEW GLOBAL AUTOMATION ENGINE MAPPINGS ---
+                ("GENERATE_MNEMONICS", {"topic": topic, "type": "facts"}),
+                ("TRIANGULATE_TOPIC", {"topic": topic}),
+                ("CONSTRUCT_PALACE", {"topic": topic}),
+                ("GENERATE_ESSAY_PROMPT", {"topic": topic, "subject": subject}),
+                ("GENERATE_MAP_WORK", {"topic": topic}),
+                ("GENERATE_CHEAT_SHEET", {"topic": topic}),
+                ("GENERATE_QUOTE_BANK", {"topic": topic}),
+                ("GENERATE_TIMELINE", {"topic": topic}),
+                ("GENERATE_ETHICS_DILEMMA", {"topic": topic}),
+                ("GENERATE_ELI5", {"topic": topic}),
+                ("GENERATE_ROLEPLAY_SCENARIO", {"topic": topic}),
+                ("GENERATE_VISUAL_PROMPT", {"topic": topic})
             ]
 
             print(f"Brain: 🚀 Launching {len(actions)} parallel automation tasks for {topic}")
@@ -810,6 +828,30 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                         print(f"Brain: ⚡ Parallel Start -> {action}")
                         result = self.execute_action(action, payload)
                         
+                        if not result or not result.get('success'):
+                            print(f"Brain: ❌ Action failed or returned false success for {action}")
+                            return
+
+                        # Check if any part of the result payload contains the error strings
+                        is_valid = True
+                        for k, v in result.items():
+                            if isinstance(v, str) and ("Oracle is silent" in v or "Error code:" in v or "Quota Exceeded" in v):
+                                is_valid = False
+                                break
+                            if isinstance(v, dict):
+                                if v.get("error") == "Quota Exceeded" or v.get("is_fallback"):
+                                    is_valid = False
+                                    break
+                                # Stringify the dict just in case the error is nested deeper
+                                stringified = str(v)
+                                if "Oracle is silent" in stringified or "Error code:" in stringified:
+                                    is_valid = False
+                                    break
+                        
+                        if not is_valid:
+                            print(f"Brain: ⚠️ Skipping DB save for {action} due to AI Exhaustion/Error.")
+                            return
+
                         # PERSISTENCE LOGIC
                         if result and result.get('success'):
                             if action == "PREDICT_QUESTIONS":
@@ -857,6 +899,109 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                                     conn.execute('INSERT INTO ai_generated_content (content_type, topic, content, metadata) VALUES (?, ?, ?, ?)',
                                                 ('podcast', topic, script, json.dumps({'style': payload.get('style')})))
                                     conn.commit()
+
+                            elif action == "GENERATE_SUBJECT_BOOK":
+                                book_data = result.get('book')
+                                if book_data:
+                                    print(f"Brain: Saving Subject Book...")
+                                    conn.execute('INSERT INTO ai_generated_content (content_type, topic, content, metadata) VALUES (?, ?, ?, ?)',
+                                                ('subject_book', topic, json.dumps(book_data), json.dumps({'subject': payload.get('subject')})))
+                                    conn.commit()
+
+                            elif action == "GENERATE_INTERVIEW_SIM":
+                                interview_data = result.get('interview')
+                                if interview_data:
+                                    print(f"Brain: Saving Interview Simulator...")
+                                    conn.execute('INSERT INTO ai_generated_content (content_type, topic, content, metadata) VALUES (?, ?, ?, ?)',
+                                                ('interview_sim', topic, json.dumps(interview_data), json.dumps({})))
+                                    conn.commit()
+                                    
+                            elif action == "GENERATE_HEATMAP":
+                                heatmap_data = result.get('heatmap')
+                                if heatmap_data:
+                                    print(f"Brain: Saving Heatmap...")
+                                    conn.execute('INSERT INTO ai_generated_content (content_type, topic, content, metadata) VALUES (?, ?, ?, ?)',
+                                                ('heatmap', topic, json.dumps(heatmap_data), json.dumps({'subject': payload.get('subject')})))
+                                    conn.commit()
+
+                            elif action == "GENERATE_SELF_REVIEW":
+                                review_data = result.get('review')
+                                if review_data:
+                                    print(f"Brain: Saving Self Review...")
+                                    conn.execute('INSERT INTO ai_generated_content (content_type, topic, content, metadata) VALUES (?, ?, ?, ?)',
+                                                ('self_review', topic, json.dumps(review_data), json.dumps({})))
+                                    conn.commit()
+
+                            elif action == "GENERATE_MNEMONICS":
+                                mnemonic_text = result.get('mnemonic')
+                                if mnemonic_text:
+                                    print(f"Brain: Saving Mnemonics...")
+                                    self._save_mnemonic(topic, mnemonic_text, payload.get('type', 'facts'))
+                            
+                            elif action == "TRIANGULATE_TOPIC":
+                                data = result.get('data', {})
+                                synthesis = data.get('synthesis', '')
+                                if synthesis:
+                                    print(f"Brain: Saving Triangulation...")
+                                    save_triangulation(topic, synthesis, data)
+                            
+                            elif action == "GENERATE_ESSAY_PROMPT":
+                                prompt = result.get('prompt')
+                                if prompt:
+                                    print(f"Brain: Saving Essay Prompt...")
+                                    self._save_essay_prompt(topic, subject, prompt)
+                                    save_ai_content('essay', topic, prompt, {'subject': subject})
+
+                            elif action == "GENERATE_MAP_WORK":
+                                locations = result.get('locations')
+                                if locations:
+                                    print(f"Brain: Saving Map Work...")
+                                    save_ai_content('map_work', topic, json.dumps(locations), {'locations': locations})
+                            
+                            elif action == "GENERATE_CHEAT_SHEET":
+                                content = result.get('content')
+                                if content:
+                                    print(f"Brain: Saving Cheat Sheet...")
+                                    save_ai_content('cheat_sheet', topic, content)
+
+                            elif action == "GENERATE_QUOTE_BANK":
+                                quotes = result.get('quotes')
+                                data_pts = result.get('data')
+                                if quotes or data_pts:
+                                    print(f"Brain: Saving Quote Bank...")
+                                    content = f"Quotes:\n{quotes}\n\nData:\n{data_pts}"
+                                    save_ai_content('quote_bank', topic, content)
+
+                            elif action == "GENERATE_TIMELINE":
+                                timeline = result.get('timeline')
+                                if timeline:
+                                    print(f"Brain: Saving Timeline...")
+                                    save_ai_content('timeline', topic, timeline)
+
+                            elif action == "GENERATE_ETHICS_DILEMMA":
+                                dilemma = result.get('dilemma')
+                                if dilemma:
+                                    print(f"Brain: Saving Ethics Dilemma...")
+                                    save_ai_content('ethics_dilemma', topic, dilemma)
+
+                            elif action == "GENERATE_ELI5":
+                                eli5_data = result.get('data')
+                                if eli5_data:
+                                    print(f"Brain: Saving ELI5...")
+                                    save_ai_content('eli5', topic, json.dumps(eli5_data))
+
+                            elif action == "GENERATE_ROLEPLAY_SCENARIO":
+                                scenario = result.get('scenario')
+                                if scenario:
+                                    print(f"Brain: Saving Roleplay Scenario...")
+                                    save_ai_content('roleplay', topic, scenario)
+
+                            elif action == "GENERATE_VISUAL_PROMPT":
+                                visual_prompt = result.get('prompt')
+                                if visual_prompt:
+                                    print(f"Brain: Saving Visual Prompt...")
+                                    self._save_mnemonic(topic, visual_prompt, 'visual')
+                                    save_ai_content('visual_prompt', topic, visual_prompt)
 
                         print(f"Brain: ✅ Parallel Done & Saved -> {action}")
                 except Exception as e:
@@ -995,6 +1140,51 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 return {"success": True, "dilemma": "Mock Dilemma"}
             elif action_type == "GENERATE_ELI5":
                 return {"success": True, "explanation": "Mock ELI5"}
+            elif action_type == "GENERATE_SUBJECT_BOOK":
+                return {
+                    "success": True,
+                    "book": {
+                        "title": "Mock Book",
+                        "subject": "Mock Subject",
+                        "chapters": [
+                            {"title": "Ch 1", "content": "Mock Content", "key_concepts": ["A", "B"]}
+                        ],
+                        "generated_at": "2023-01-01T00:00:00Z"
+                    }
+                }
+            elif action_type == "GENERATE_INTERVIEW_SIM":
+                return {
+                    "success": True,
+                    "interview": [
+                        {
+                            "sender": "board",
+                            "text": "Mock Question",
+                            "timestamp": "2023-01-01T00:00:00Z",
+                            "mood": "neutral"
+                        }
+                    ]
+                }
+            elif action_type == "GENERATE_HEATMAP":
+                return {
+                    "success": True,
+                    "heatmap": [
+                        {
+                            "name": "Root",
+                            "size": 100,
+                            "intensity": 50,
+                            "children": []
+                        }
+                    ]
+                }
+            elif action_type == "GENERATE_SELF_REVIEW":
+                return {
+                    "success": True,
+                    "review": {
+                        "week": "Mock Week",
+                        "stats": {"total": 1, "success_rate": 100, "avg_impact": 5.0},
+                        "improvement_plan": {"plan": ["Mock Improvement"]}
+                    }
+                }
             # Fallback for others
             return {"success": True, "message": "Mock Action Executed"}
 
@@ -1973,6 +2163,148 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     result = {"success": True, "message": "Neural Hash Decoded.", "data": data}
                 except Exception as e:
                     result = {"success": False, "message": f"Neural Hash Decode Failed: {str(e)}"}
+
+            elif action_type == "GENERATE_SUBJECT_BOOK":
+                try:
+                    topic = payload.get('topic', '')
+                    subject = payload.get('subject', 'General')
+                    prompt = f"""
+                    # MISSION: GENERATE SUBJECT BOOK CHAPTER
+                    **Topic:** {topic}
+                    **Subject:** {subject}
+                    
+                    **TASK:** Generate a highly structured, book-like deep dive for this topic, meant to read like a premier textbook.
+                    
+                    **OUTPUT SCHEMA (JSON):**
+                    {{
+                        "title": "{topic} Comprehensive Guide",
+                        "subject": "{subject}",
+                        "chapters": [
+                            {{
+                                "title": "Introduction & Core Concepts",
+                                "content": "Detailed markdown formatted text explaining the definitions and fundamentals.",
+                                "key_concepts": ["Concept 1", "Concept 2"]
+                            }},
+                            {{
+                                "title": "Advanced Application & Nuance",
+                                "content": "Detailed markdown formatted text covering exceptions, case studies, or complex workings.",
+                                "key_concepts": ["Nuance 1", "Nuance 2"]
+                            }}
+                        ],
+                        "generated_at": "{datetime.now().isoformat()}"
+                    }}
+                    """
+                    response = model_manager.generate_content(prompt, model_type='pro')
+                    data = self._parse_response(response.text)
+                    result = {"success": True, "message": "Subject Book Generated.", "book": data}
+                except Exception as e:
+                    result = {"success": False, "message": f"Subject Book Gen Failed: {str(e)}"}
+
+            elif action_type == "GENERATE_INTERVIEW_SIM":
+                try:
+                    topic = payload.get('topic', '')
+                    prompt = f"""
+                    # MISSION: UPSC INTERVIEW SIMULATOR
+                    **Topic:** {topic}
+                    
+                    **TASK:** Generate an initial interview board question to start a mock interview simulation for '{topic}'. Also provide a model answer trajectory.
+                    
+                    **OUTPUT SCHEMA (JSON Array of Messages):**
+                    [
+                        {{
+                            "sender": "board",
+                            "text": "The candidate's detailed analysis on {topic} is intriguing. Tell me, what is the most critical challenge in this area, and how would you resolve it as an administrator?",
+                            "timestamp": "{datetime.now().isoformat()}",
+                            "mood": "skeptical"
+                        }}
+                    ]
+                    """
+                    response = model_manager.generate_content(prompt, model_type='pro')
+                    data = self._parse_response(response.text)
+                    result = {"success": True, "message": "Interview Sim Generated.", "interview": data}
+                except Exception as e:
+                    result = {"success": False, "message": f"Interview Sim Gen Failed: {str(e)}"}
+
+            elif action_type == "GENERATE_HEATMAP":
+                try:
+                    topic = payload.get('topic', '')
+                    prompt = f"""
+                    # MISSION: SYLLABUS HEATMAP
+                    **Topic:** {topic}
+                    
+                    **TASK:** Break down '{topic}' into sub-topics and assign an intensity score based on how frequently/deeply UPSC tests them (0-100). Higher intensity means critical for exams. Needs to be a nested structure.
+                    
+                    **OUTPUT SCHEMA (JSON Array representing the root nodes):**
+                    [
+                        {{
+                            "name": "{topic}",
+                            "size": 1000,
+                            "intensity": 50,
+                            "children": [
+                                {{
+                                    "name": "Sub-topic 1",
+                                    "size": 500,
+                                    "intensity": 90
+                                }},
+                                {{
+                                    "name": "Sub-topic 2",
+                                    "size": 500,
+                                    "intensity": 20
+                                }}
+                            ]
+                        }}
+                    ]
+                    """
+                    response = model_manager.generate_content(prompt, model_type='pro')
+                    data = self._parse_response(response.text)
+                    result = {"success": True, "message": "Heatmap Generated.", "heatmap": data}
+                except Exception as e:
+                    result = {"success": False, "message": f"Heatmap Gen Failed: {str(e)}"}
+
+            elif action_type == "GENERATE_SELF_REVIEW":
+                try:
+                    topic = payload.get('topic', '')
+                    prompt = f"""
+                    # MISSION: SYSTEM SELF REVIEW
+                    **Topic Context:** {topic} (Recent study focus)
+                    
+                    **TASK:** Generate a simulated autonomous self-reflection review for the system's performance and strategy on this topic.
+                    
+                    **OUTPUT SCHEMA (JSON):**
+                    {{
+                        "week": "Current Phase",
+                        "stats": {{
+                            "total": 15,
+                            "success_rate": 86.5,
+                            "avg_impact": 4.2
+                        }},
+                        "improvement_plan": {{
+                            "plan": [
+                                "Identify knowledge gaps deeper in {topic}.",
+                                "Ensure closer alignment with recent PYQs."
+                            ]
+                        }}
+                    }}
+                    """
+                    response = model_manager.generate_content(prompt, model_type='pro')
+                    data = self._parse_response(response.text)
+                    result = {"success": True, "message": "Self Review Generated.", "review": data}
+                except Exception as e:
+                    result = {"success": False, "message": f"Self Review Gen Failed: {str(e)}"}
+
+            elif action_type == "GENERATE_MNEMONICS":
+                try:
+                    from app.services.upsc_summarizer import generate_mnemonic
+                    topic = payload.get('topic', '')
+                    m_type = payload.get('type', 'facts')
+                    mnemonic_text = generate_mnemonic(topic, m_type)
+                    result = {
+                        "success": True,
+                        "message": "Mnemonics Generated.",
+                        "mnemonic": mnemonic_text
+                    }
+                except Exception as e:
+                    result = {"success": False, "message": f"Mnemonics Gen Failed: {str(e)}"}
 
             return result
 

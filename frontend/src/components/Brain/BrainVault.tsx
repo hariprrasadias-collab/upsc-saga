@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './BrainVault.css';
+import { API_BASE_URL } from '../../config';
 import MarkdownRenderer from '../Shared/MarkdownRenderer';
 import TimelineRenderer from './Renderers/TimelineRenderer';
 import PodcastPlayer from './Renderers/PodcastPlayer';
@@ -45,7 +46,7 @@ const BrainVault: React.FC = () => {
     const fetchContent = async () => {
         setLoading(true);
         try {
-            let url = 'http://localhost:5000/api/automation/content';
+            let url = `${API_BASE_URL}/api/automation/content`;
             if (filterType !== 'all') {
                 url += `?type=${filterType}`;
             }
@@ -71,7 +72,7 @@ const BrainVault: React.FC = () => {
         if (!window.confirm("Delete this artifact from the Neural Storage?")) return;
 
         try {
-            await fetch(`http://localhost:5000/api/automation/content/${id}`, { method: 'DELETE' });
+            await fetch(`${API_BASE_URL}/api/automation/content/${id}`, { method: 'DELETE' });
             setContentList(prev => prev.filter(item => item.id !== id));
             if (selectedContent?.id === id) setSelectedContent(null);
         } catch (error) {

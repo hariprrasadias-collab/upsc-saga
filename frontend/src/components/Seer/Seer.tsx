@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useEffect, useState } from 'react';
 import './Seer.css';
 import {
@@ -33,18 +35,22 @@ const Seer: React.FC = () => {
         const fetchData = async () => {
             try {
                 const [seerRes, weightRes, trendRes] = await Promise.all([
-                    fetch('http://localhost:5000/api/seer'),
-                    fetch('http://localhost:5000/api/seer/weightage'),
-                    fetch('http://localhost:5000/api/seer/trends')
+                    fetch(`${API_BASE_URL}/api/seer`),
+                    fetch(`${API_BASE_URL}/api/seer/weightage`),
+                    fetch(`${API_BASE_URL}/api/seer/trends`)
                 ]);
 
-                const seerData = await seerRes.json();
-                const weightData = await weightRes.json();
-                const trendData = await trendRes.json();
+                const rawSeer = await seerRes.json();
+                const rawWeight = await weightRes.json();
+                const rawTrend = await trendRes.json();
+
+                const seerData = rawSeer.data || rawSeer;
+                const weightData = rawWeight.success === false ? [] : (rawWeight.data || rawWeight);
+                const trendData = rawTrend.success === false ? [] : (rawTrend.data || rawTrend);
 
                 setData(seerData);
-                setWeightage(weightData);
-                setTrends(trendData);
+                setWeightage(Array.isArray(weightData) ? weightData : []);
+                setTrends(Array.isArray(trendData) ? trendData : []);
                 setLoading(false);
             } catch (err) {
                 console.error("The pool is clouded...", err);

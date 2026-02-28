@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import './MnemonicGenerator.css';
@@ -35,7 +37,7 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
     const fetchHistory = async () => {
         setLoadingHistory(true);
         try {
-            const response = await fetch('http://localhost:5000/api/revision/mnemonic/history');
+            const response = await fetch(`${API_BASE_URL}/api/revision/mnemonic/history`);
             const data = await response.json();
             if (data.success) {
                 setHistory(data.history);
@@ -55,7 +57,7 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
 
         setGenerating(true);
         try {
-            const response = await fetch('http://localhost:5000/api/revision/mnemonic', {
+            const response = await fetch(`${API_BASE_URL}/api/revision/mnemonic`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -106,7 +108,7 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
     const handleDelete = async (id: number, e: React.MouseEvent) => {
         e.stopPropagation();
         try {
-            const response = await fetch(`http://localhost:5000/api/revision/mnemonic/history/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/api/revision/mnemonic/history/${id}`, {
                 method: 'DELETE'
             });
             const data = await response.json();

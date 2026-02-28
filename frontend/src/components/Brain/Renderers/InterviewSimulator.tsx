@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../../config';
+
 import React, { useState, useRef, useEffect } from 'react';
 import './InterviewSimulator.css';
 import MarkdownRenderer from '../../Shared/MarkdownRenderer';
@@ -64,7 +66,7 @@ const InterviewSimulator: React.FC<InterviewSimulatorProps> = ({ content, topic 
 
         try {
             // Call Backend for Board Response
-            const response = await fetch('http://localhost:5000/api/interview/respond', {
+            const response = await fetch(`${API_BASE_URL}/api/interview/respond`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

@@ -15,8 +15,8 @@ test('BrainVault Displays New Futuristic Features', async ({ page }) => {
             topic: 'Economy of India',
             created_at: new Date().toISOString(),
             content: JSON.stringify({
-                title: "Economy of India",
-                chapters: [{ title: "Banking", content: "# Banking System\nRBI is...", key_concepts: ["RBI"] }]
+              title: "Economy of India",
+              chapters: [{ title: "Banking", content: "# Banking System\nRBI is...", key_concepts: ["RBI"] }]
             })
           },
           {
@@ -25,27 +25,27 @@ test('BrainVault Displays New Futuristic Features', async ({ page }) => {
             topic: 'Study Weaknesses',
             created_at: new Date().toISOString(),
             content: JSON.stringify([
-                { name: "History", size: 100, intensity: 80 },
-                { name: "Polity", size: 50, intensity: 20 }
+              { name: "History", size: 100, intensity: 80 },
+              { name: "Polity", size: 50, intensity: 20 }
             ])
           },
           {
-              id: 3,
-              content_type: 'interview_sim',
-              topic: 'Civil Service Interview',
-              created_at: new Date().toISOString(),
-              content: JSON.stringify([{ sender: 'board', text: 'Welcome', timestamp: new Date() }])
+            id: 3,
+            content_type: 'interview_sim',
+            topic: 'Civil Service Interview',
+            created_at: new Date().toISOString(),
+            content: JSON.stringify([{ sender: 'board', text: 'Welcome', timestamp: new Date() }])
           },
           {
-              id: 4,
-              content_type: 'self_review',
-              topic: 'Weekly Review',
-              created_at: new Date().toISOString(),
-              content: JSON.stringify({
-                  week: '2025-W10',
-                  stats: { total: 10, success_rate: 90, avg_impact: 0.8 },
-                  improvement_plan: { plan: ["Study more"] }
-              })
+            id: 4,
+            content_type: 'self_review',
+            topic: 'Weekly Review',
+            created_at: new Date().toISOString(),
+            content: JSON.stringify({
+              week: '2025-W10',
+              stats: { total: 10, success_rate: 90, avg_impact: 0.8 },
+              improvement_plan: { plan: ["Study more"] }
+            })
           }
         ]
       })
@@ -53,7 +53,7 @@ test('BrainVault Displays New Futuristic Features', async ({ page }) => {
   });
 
   // Navigate to Brain Vault (assuming route, but we might need to click nav)
-  await page.goto('http://localhost:5173/brain'); // Adjust if route differs
+  await page.goto('http://localhost:5174/brain-vault'); // Adjusted route
 
   // Check if items list loaded
   await expect(page.getByText('Economy of India')).toBeVisible();

@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect } from 'react';
 import './Foresight.css';
 
@@ -32,8 +34,9 @@ const Foresight: React.FC = () => {
 
     const fetchSubjects = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/foresight/subjects');
-            const data = await response.json();
+            const response = await fetch(`${API_BASE_URL}/api/foresight/subjects`);
+            const raw = await response.json();
+            const data = raw.data || raw;
             setSubjects(data.subjects || []);
         } catch (error) {
             console.error('Failed to fetch subjects:', error);
@@ -43,8 +46,9 @@ const Foresight: React.FC = () => {
     const fetchSavedPredictions = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/api/foresight/saved');
-            const data = await response.json();
+            const response = await fetch(`${API_BASE_URL}/api/foresight/saved`);
+            const raw = await response.json();
+            const data = raw.data || raw;
             setPredictions(data.predictions || []);
         } catch (error) {
             console.error('Failed to fetch saved predictions:', error);
@@ -56,7 +60,7 @@ const Foresight: React.FC = () => {
     const triggerPrediction = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/api/foresight/predict', {
+            const response = await fetch(`${API_BASE_URL}/api/foresight/predict`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -65,7 +69,8 @@ const Foresight: React.FC = () => {
                 })
             });
 
-            const data = await response.json();
+            const raw = await response.json();
+            const data = raw.data || raw;
             setPredictions(data.predictions || []);
             setActiveTab('new');
         } catch (error) {
@@ -79,7 +84,7 @@ const Foresight: React.FC = () => {
         if (activeTab === 'saved') {
             // Unsave
             try {
-                await fetch(`http://localhost:5000/api/foresight/unsave/${pred.id}`, { method: 'DELETE' });
+                await fetch(`${API_BASE_URL}/api/foresight/unsave/${pred.id}`, { method: 'DELETE' });
                 setPredictions(prev => prev.filter(p => p.id !== pred.id));
             } catch (error) {
                 console.error('Failed to unsave:', error);
@@ -87,7 +92,7 @@ const Foresight: React.FC = () => {
         } else {
             // Save
             try {
-                await fetch('http://localhost:5000/api/foresight/save', {
+                await fetch(`${API_BASE_URL}/api/foresight/save`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(pred)

@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 // /frontend/src/components/Quests/QuestsPage.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import './QuestsPage.css';
@@ -21,13 +23,18 @@ const QuestsPage: React.FC<QuestsPageProps> = ({ onTaskCompleted }) => {
     setError(null);
     try {
       // CRITICAL FIX: Use '/api/quests', NOT '/api/tasks'
-      const response = await fetch('http://localhost:5000/api/quests');
+      const response = await fetch(`${API_BASE_URL}/api/quests`);
 
       if (!response.ok) {
         throw new Error('Failed to fetch quests');
       }
 
-      const rawTasks: RawTaskFromAPI[] = await response.json();
+      const jsonResponse = await response.json();
+      const rawTasks: RawTaskFromAPI[] = jsonResponse.success === false ? [] : (jsonResponse.data || jsonResponse);
+
+      if (!Array.isArray(rawTasks)) {
+        throw new Error('API returned invalid format for quests');
+      }
 
       // Map API data to frontend Task interface
       const allQuests: Task[] = rawTasks.map(task => ({
@@ -59,7 +66,7 @@ const QuestsPage: React.FC<QuestsPageProps> = ({ onTaskCompleted }) => {
 
   const handleQuestComplete = async (questId: number) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/quests/${questId}/complete`, {
+      const response = await fetch(`${API_BASE_URL}/api/quests/${questId}/complete`, {
         method: 'POST',
       });
 

@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect } from 'react';
 import './IssueMappingViewer.css';
 import VisualLinker from './VisualLinker';
@@ -31,7 +33,7 @@ const IssueMappingViewer: React.FC<Props> = ({ articleId, articleTitle }) => {
     const fetchMappings = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`http://localhost:5000/api/issue-mapping/article/${articleId}`);
+            const response = await fetch(`${API_BASE_URL}/api/issue-mapping/article/${articleId}`);
             const data = await response.json();
 
             if (data.success) {
@@ -48,7 +50,7 @@ const IssueMappingViewer: React.FC<Props> = ({ articleId, articleTitle }) => {
     const analyzeArticle = async () => {
         setAnalyzing(true);
         try {
-            const response = await fetch('http://localhost:5000/api/issue-mapping/analyze', {
+            const response = await fetch(`${API_BASE_URL}/api/issue-mapping/analyze`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ article_id: articleId })
@@ -71,7 +73,7 @@ const IssueMappingViewer: React.FC<Props> = ({ articleId, articleTitle }) => {
         const updatedTags = [...tags, newTag.trim()];
 
         try {
-            const res = await fetch('http://localhost:5000/api/issue-mapping/tags', {
+            const res = await fetch(`${API_BASE_URL}/api/issue-mapping/tags`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ article_id: articleId, tags: updatedTags })
@@ -88,7 +90,7 @@ const IssueMappingViewer: React.FC<Props> = ({ articleId, articleTitle }) => {
     const handleRemoveTag = async (tagToRemove: string) => {
         const updatedTags = tags.filter(t => t !== tagToRemove);
         try {
-            const res = await fetch('http://localhost:5000/api/issue-mapping/tags', {
+            const res = await fetch(`${API_BASE_URL}/api/issue-mapping/tags`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ article_id: articleId, tags: updatedTags })

@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../config';
+
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import './MorningBriefing.css';
@@ -46,7 +48,7 @@ const MorningBriefing: React.FC = () => {
     const fetchLatestBriefing = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/night-watchman/latest');
+            const response = await fetch(`${API_BASE_URL}/night-watchman/latest`);
             const data = await response.json();
             if (data.success && data.briefing) {
                 // Parse quiz data if available
@@ -71,7 +73,7 @@ const MorningBriefing: React.FC = () => {
 
     const fetchHistory = async () => {
         try {
-            const response = await fetch('http://localhost:5000/night-watchman/history');
+            const response = await fetch(`${API_BASE_URL}/night-watchman/history`);
             const data = await response.json();
             if (data.success) {
                 setHistory(data.history);
@@ -84,7 +86,7 @@ const MorningBriefing: React.FC = () => {
     const fetchBriefingById = async (id: number) => {
         setLoading(true);
         try {
-            const response = await fetch(`http://localhost:5000/night-watchman/briefing/${id}`);
+            const response = await fetch(`${API_BASE_URL}/night-watchman/briefing/${id}`);
             const data = await response.json();
             if (data.success && data.briefing) {
                 let parsedQuiz = [];
@@ -108,7 +110,7 @@ const MorningBriefing: React.FC = () => {
     const triggerWatchman = async () => {
         setTriggering(true);
         try {
-            const response = await fetch('http://localhost:5000/night-watchman/trigger', {
+            const response = await fetch(`${API_BASE_URL}/night-watchman/trigger`, {
                 method: 'POST'
             });
             const data = await response.json();
@@ -129,7 +131,7 @@ const MorningBriefing: React.FC = () => {
     const markAsRead = async () => {
         if (!briefing) return;
         try {
-            await fetch(`http://localhost:5000/night-watchman/mark-read/${briefing.id}`, {
+            await fetch(`${API_BASE_URL}/night-watchman/mark-read/${briefing.id}`, {
                 method: 'POST'
             });
             setBriefing({ ...briefing, is_read: true });
