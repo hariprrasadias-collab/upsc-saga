@@ -872,9 +872,6 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                                     print(f"Brain: Saving Socratic Dialogue...")
                                     cursor = conn.execute('INSERT INTO socratic_conversations (topic, user_id, dialogue, insight) VALUES (?, ?, ?, ?)',
                                                 (topic, 1, dialogue, json.dumps(verdict)))
-                                    # Create notification
-                                    conn.execute('INSERT INTO notifications (user_id, title, message, type) VALUES (?, ?, ?, ?)',
-                                                (1, "New Socratic Debate", f"A debate on {topic} is ready.", "debate"))
                                     conn.commit()
 
                             elif action == "GENERATE_TOPIC_LINKAGES":
