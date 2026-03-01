@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app.services.mock_test_service import MockTestService
 from app.db import get_db
+import json
 
 mock_tests_bp = Blueprint('mock_tests', __name__)
 
@@ -82,7 +83,7 @@ def submit_test(test_id):
         conn.execute('''
             INSERT INTO test_attempts (user_id, test_id, score, percentage, answers, status)
             VALUES (?, ?, ?, ?, ?, 'completed')
-        ''', (1, test_id, score, percentage, import_json().dumps(answers)))
+        ''', (1, test_id, score, percentage, json.dumps(answers)))
         
         conn.commit()
         
@@ -95,7 +96,3 @@ def submit_test(test_id):
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-def import_json():
-    import json
-    return json

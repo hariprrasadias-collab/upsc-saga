@@ -34,21 +34,24 @@ def test_mock_test_service():
 
 def test_database_schema():
     print("\n🔍 Testing Database Schema...")
-    db_path = os.path.join(os.getcwd(), 'upsc_saga.db')
+    # Use the same logic as app.db to find the database
+    base_dir = os.path.join(os.getcwd(), 'backend') if os.path.exists(os.path.join(os.getcwd(), 'backend')) else os.getcwd()
+    db_path = os.environ.get('DATABASE_PATH', os.path.join(base_dir, 'upsc_saga.db'))
+
     if not os.path.exists(db_path):
-        print(f"❌ FAILED: Database not found at {db_path}")
+        print(f"⚠️ WARNING: Database not found at {db_path}. Skipping schema check (this is expected in CI/fresh builds).")
         return
 
     try:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
-        # Check syllabus_tracker
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='syllabus_tracker'")
+        # Check syllabus_topics (renamed from syllabus_tracker)
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='syllabus_topics'")
         if cursor.fetchone():
-            print("✅ Table 'syllabus_tracker' exists.")
+            print("✅ Table 'syllabus_topics' exists.")
         else:
-            print("❌ FAILED: Table 'syllabus_tracker' MISSING.")
+            print("❌ FAILED: Table 'syllabus_topics' MISSING.")
 
         # Check custom_bosses column
         cursor.execute("PRAGMA table_info(custom_bosses)")
