@@ -324,19 +324,47 @@ def get_progress_trend():
         
         if metric == 'syllabus':
             # Syllabus completion over time (cumulative)
-            for i in range(days + 1):
-                date = start_date + timedelta(days=i)
-                completed = conn.execute('''
-                    SELECT COUNT(*) FROM syllabus_topics
+            # Fetch total topics once
+            total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
+
+            if total > 0:
+                # Get completion history (grouped by date) to avoid N+1 queries
+                completed_dates = conn.execute('''
+                    SELECT DATE(last_updated) as date, COUNT(*) as count
+                    FROM syllabus_topics
                     WHERE status = 'Completed'
-                ''').fetchone()[0]
+                    GROUP BY DATE(last_updated)
+                ''').fetchall()
                 
-                total = conn.execute('SELECT COUNT(*) FROM syllabus_topics').fetchone()[0]
+                daily_completions = {row['date']: row['count'] for row in completed_dates}
                 
-                trend_data.append({
-                    'date': date.isoformat(),
-                    'value': round((completed / total * 100) if total > 0 else 0, 1)
-                })
+                # Count completions before the start of the window
+                initial_completed = conn.execute('''
+                    SELECT COUNT(*) FROM syllabus_topics
+                    WHERE status = 'Completed' AND DATE(last_updated) < ?
+                ''', (start_date.isoformat(),)).fetchone()[0]
+
+                running_completed = initial_completed
+
+                for i in range(days + 1):
+                    date = start_date + timedelta(days=i)
+                    date_str = date.isoformat()
+
+                    if date_str in daily_completions:
+                        running_completed += daily_completions[date_str]
+
+                    trend_data.append({
+                        'date': date_str,
+                        'value': round((running_completed / total * 100), 1)
+                    })
+            else:
+                # Handle empty syllabus case
+                for i in range(days + 1):
+                    date = start_date + timedelta(days=i)
+                    trend_data.append({
+                        'date': date.isoformat(),
+                        'value': 0
+                    })
         
         elif metric == 'mock_score':
             # Mock test scores over time
