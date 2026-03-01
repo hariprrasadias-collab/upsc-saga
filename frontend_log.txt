@@ -3,10 +3,8 @@
 > vite
 
 (!) the `splitVendorChunk` plugin doesn't have any effect when using the object form of `build.rollupOptions.output.manualChunks`. Consider using the function form instead.
-Port 5173 is in use, trying another one...
-Port 5174 is in use, trying another one...
 
-  VITE v6.4.1  ready in 93 ms
+  VITE v6.4.1  ready in 256 ms
 
-  ➜  Local:   http://localhost:5175/
+  ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
