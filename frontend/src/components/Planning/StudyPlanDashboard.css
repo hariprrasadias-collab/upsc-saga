@@ -2875,42 +2875,43 @@
     color: #9b59b6;
     padding: 0.5rem 1rem;
     border-radius: 6px;
+}
 
-    .strategos-content p {
-        margin: 0;
-        font-size: 0.95rem;
-        color: #ecf0f1;
+.strategos-content p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #ecf0f1;
+}
+
+.strategos-action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.strategos-action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
     }
 
-    .strategos-action-btn {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 0.85rem;
-        transition: all 0.2s;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
+}
 
-    .strategos-action-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateY(-1px);
-    }
-
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    /* Market Watch Ticker */
+/* Market Watch Ticker */
     .market-ticker {
         display: flex;
         gap: 1rem;
