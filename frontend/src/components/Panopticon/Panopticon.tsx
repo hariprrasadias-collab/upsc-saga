@@ -103,7 +103,7 @@ const Panopticon: React.FC = () => {
                 >
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <h3 className="neon-text-blue">🧬 Optimization Protocol</h3>
-                        <button onClick={() => setBiohack(null)} style={{ background: 'none', border: 'none', color: 'var(--color-text-primary)', cursor: 'pointer' }}>✕</button>
+                        <button aria-label="Close Optimization Protocol" onClick={() => setBiohack(null)} style={{ background: 'none', border: 'none', color: 'var(--color-text-primary)', cursor: 'pointer' }}>✕</button>
                     </div>
                     <MarkdownRenderer content={biohack} />
                 </motion.div>
