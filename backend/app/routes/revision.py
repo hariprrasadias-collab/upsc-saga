@@ -91,20 +91,34 @@ def auto_forge_weakness_cards():
         
         # 3. Save the new cards to the DB
         saved_cards = []
-        for card in cards_data:
-            cursor.execute('''
+        if cards_data:
+            values = []
+            for card in cards_data:
+                values.extend([
+                    'auto-forged',
+                    card['title'],
+                    card['one_liner'],
+                    "Auto-forged from weakness scan"
+                ])
+
+            placeholders = ', '.join(['(?, ?, ?, ?, datetime(\'now\'))'] * len(cards_data))
+
+            cursor.execute(f'''
                 INSERT INTO revision_cards (topic_id, title, one_liner, full_content, created_at)
-                VALUES (?, ?, ?, ?, datetime('now'))
-            ''', ('auto-forged', card['title'], card['one_liner'], "Auto-forged from weakness scan"))
+                VALUES {placeholders}
+                RETURNING id
+            ''', values)
             
-            card_id = cursor.lastrowid
-            saved_cards.append({
-                'id': card_id,
-                'topic_id': 'auto-forged',
-                'title': card['title'],
-                'one_liner': card['one_liner'],
-                'created_at': "Just now" # Frontend will fix the date
-            })
+            returned_ids = [row['id'] if hasattr(row, 'keys') else row[0] for row in cursor.fetchall()]
+
+            for i, card in enumerate(cards_data):
+                saved_cards.append({
+                    'id': returned_ids[i],
+                    'topic_id': 'auto-forged',
+                    'title': card['title'],
+                    'one_liner': card['one_liner'],
+                    'created_at': "Just now" # Frontend will fix the date
+                })
             
         conn.commit()
         conn.close()
