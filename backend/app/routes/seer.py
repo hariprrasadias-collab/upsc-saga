@@ -34,18 +34,24 @@ def consult_the_seer():
     # 2. XP HISTORY (Last 7 Days)
     # We look at tasks completed in the last 7 days
     today = datetime.date.today()
-    xp_history = []
+    start_date = today - datetime.timedelta(days=6)
+
+    # Do a single query grouped by due_date
+    xp_rows = conn.execute('''
+        SELECT due_date, SUM(xp_reward) as total_xp
+        FROM tasks
+        WHERE user_id = ? AND due_date >= ? AND due_date <= ? AND isCompleted = 1
+        GROUP BY due_date
+    ''', (user_id, start_date.isoformat(), today.isoformat())).fetchall()
     
+    xp_map = {row['due_date']: row['total_xp'] for row in xp_rows}
+
+    xp_history = []
     for i in range(6, -1, -1):
         date_val = today - datetime.timedelta(days=i)
         date_str = date_val.isoformat()
         
-        # Sum XP of tasks completed on this due_date (Approximation)
-        # Note: ideally we track 'completed_at' timestamp, but using due_date for now is a safe fallback
-        xp_sum = conn.execute('''
-            SELECT SUM(xp_reward) FROM tasks 
-            WHERE user_id = ? AND due_date = ? AND isCompleted = 1
-        ''', (user_id, date_str)).fetchone()[0]
+        xp_sum = xp_map.get(date_str, 0)
         
         xp_history.append({
             "date": date_val.strftime('%d %b'), # e.g. "22 Nov"
