@@ -227,4 +227,8 @@ def create_app():
         init_foresight_tables()
         init_neural_hash_tables()
 
+    # Start Telegram Bot Daemon
+    from app.telegram_bot_daemon import start_telegram_daemon
+    start_telegram_daemon(app)
+
     return app
