@@ -36,11 +36,10 @@ def predict_recall(alpha, beta_val, halflife, elapsed_hours):
     Returns:
         float: Probability of recall (0-1)
     """
+    import ebisu
+    # Ebisu expects elapsed time to match the unit of halflife (days if halflife is days)
     elapsed_days = elapsed_hours / 24.0
-    dt = elapsed_days / halflife
-    
-    # Ebisu equation
-    return beta_dist.cdf(0.5, alpha, beta_val * (2 ** dt))
+    return ebisu.predictRecall((alpha, beta_val, halflife), elapsed_days, exact=True)
 
 
 def update_recall(prior_alpha, prior_beta, prior_halflife, result, elapsed_hours):
