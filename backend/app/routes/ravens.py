@@ -5,7 +5,6 @@ import feedparser
 import time
 from app.validators import parse_pagination
 from app.db_models.current_affairs import (
-    init_current_affairs_table, 
     save_article, 
     get_saved_articles,
     update_article_tags,
