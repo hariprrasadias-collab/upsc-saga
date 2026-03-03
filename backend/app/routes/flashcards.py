@@ -1,5 +1,5 @@
 # Flashcards API Routes
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify
 from app.db import get_db
 from datetime import datetime, timedelta
 from app.services.ebisu_srs import (
