@@ -85,6 +85,9 @@ def test_rate_limiter(client):
     with open(temp_rl_path, 'w') as f:
         json.dump({}, f)
         
+    import app.middleware
+    app.middleware._rate_limits = {}
+
     # The default max is 60. We will hit it exactly 60 times.
     for _ in range(60):
         res = client.get('/api/test/success')

@@ -1,4 +1,11 @@
 {
+  "name": "upsc-saga",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install": "cd frontend && npm install",
+    "build": "cd frontend && npm run build && cd .. && rm -rf dist && cp -r frontend/dist ."
+  },
   "devDependencies": {
     "terser": "^5.44.1"
   }
