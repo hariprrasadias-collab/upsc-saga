@@ -84,6 +84,11 @@ def test_rate_limiter(client):
     # Reset limit file so we get exactly 60 clean requests
     with open(temp_rl_path, 'w') as f:
         json.dump({}, f)
+
+    # Also clear in-memory rate limits
+    import app.middleware as mw
+    if hasattr(mw, '_rate_limits'):
+        mw._rate_limits.clear()
         
     # The default max is 60. We will hit it exactly 60 times.
     for _ in range(60):
