@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "UPSC Second Brain",
   "scripts": {
-    "postinstall": "cd frontend && npm install",
-    "build": "cd frontend && npm run build"
+    "build": "cd frontend && npm install --include=dev && npm run build && cd .. && rm -rf dist && cp -r frontend/dist dist"
   },
   "devDependencies": {
     "terser": "^5.44.1"
