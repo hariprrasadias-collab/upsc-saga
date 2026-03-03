@@ -2,7 +2,6 @@
 The Neural Hash - Pattern Decoding Service
 """
 import os
-import os
 import json
 import re
 from functools import lru_cache
@@ -18,13 +17,9 @@ class NeuralHashService:
         """
         Decodes the input text to find hidden patterns, keywords, and themes relevant to UPSC.
         """
-        # No strict check needed as manager handles it
-        # if not self.model: ...
-        
         # Check Cache
         cache_key = f"{context_type}:{hash(text)}"
         if cache_key in self._cache:
-            # print("⚡ Neural Hash: Cache Hit") # Reduced logs
             return {"success": True, "data": self._cache[cache_key]}
 
         prompt = self._construct_prompt(text, context_type)
@@ -147,11 +142,7 @@ class NeuralHashService:
                     return list(set([query] + expanded))
             return [query]
         except Exception as e:
-            # print(f"Neural Hash Expansion Failed: {e}")
             return [query]
-
-    # Duplicate init removed
-
 
     def find_quantum_connections(self, topic: str):
         """
@@ -161,7 +152,6 @@ class NeuralHashService:
         
         # Check Cache
         if topic in self._cache:
-            # print(f"⚡ Neural Hash: Returning cached connections for '{topic}'")
             return self._cache[topic]
         
         try:
