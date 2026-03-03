@@ -161,15 +161,27 @@ def identify_weak_areas(conn, user_id, limit=10):
             LIMIT ?
         ''', (user_id, limit)).fetchall()
         
-        for subj in low_scores:
-            # Calculate trend for this subject
-            subject_scores = conn.execute('''
-                SELECT mta.score
+        if low_scores:
+            subjects = [subj['subject'] for subj in low_scores]
+            placeholders = ','.join('?' for _ in subjects)
+
+            all_scores = conn.execute(f'''
+                SELECT mt.subject, mta.score, mta.submitted_at
                 FROM test_attempts mta
                 JOIN mock_tests mt ON mta.test_id = mt.id
-                WHERE mta.user_id = ? AND mt.subject = ?
+                WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
                 ORDER BY mta.submitted_at ASC
-            ''', (user_id, subj['subject'])).fetchall()
+            ''', (user_id, *subjects)).fetchall()
+
+            scores_by_subject = defaultdict(list)
+            for row in all_scores:
+                scores_by_subject[row['subject']].append({
+                    'score': row['score'],
+                    'submitted_at': row['submitted_at']
+                })
+
+        for subj in low_scores:
+            subject_scores = scores_by_subject.get(subj['subject'], [])
 
             scores_list = [s['score'] for s in subject_scores]
             trend_val = calculate_improvement_rate(scores_list)
