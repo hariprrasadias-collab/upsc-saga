@@ -1,0 +1,12 @@
+{
+  "name": "upsc-saga-root",
+  "version": "1.0.0",
+  "description": "Root package.json to satisfy Render build",
+  "private": true,
+  "scripts": {
+    "build": "echo 'No root build step required. Render should be configured to use frontend/ or backend/ as Root Directory, or update the Build Command to build those directories specifically.'"
+  },
+  "devDependencies": {
+    "terser": "^5.44.1"
+  }
+}
