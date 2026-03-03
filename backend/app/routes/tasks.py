@@ -1,3 +1,4 @@
+from app.utils.session import get_current_user_id
 from flask import Blueprint, request, jsonify
 from app.db import get_db
 from app.services.game_engine import calculate_and_apply_rewards
@@ -6,7 +7,7 @@ bp = Blueprint('tasks', __name__, url_prefix='/api/tasks')
 
 @bp.route('', methods=['GET', 'POST'])
 def handle_tasks():
-    user_id = 1
+    user_id = get_current_user_id()
     conn = get_db()
 
     try:
@@ -58,7 +59,7 @@ def handle_tasks():
 
 @bp.route('/<int:task_id>/complete', methods=['POST'])
 def complete_task(task_id):
-    user_id = 1
+    user_id = get_current_user_id()
     conn = get_db()
     
     try:
@@ -85,7 +86,7 @@ def log_study_session():
     """Log study hours and award XP"""
     try:
         data = request.get_json()
-        user_id = 1
+        user_id = get_current_user_id()
         minutes = data.get('minutes', 0)
         
         if minutes <= 0:

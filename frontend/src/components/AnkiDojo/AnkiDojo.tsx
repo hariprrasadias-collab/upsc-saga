@@ -25,6 +25,7 @@ const AnkiDojo: React.FC = () => {
     const [sessionCards, setSessionCards] = useState<number[]>([]);
     const [totalStudied, setTotalStudied] = useState(0);
     const [correctCount, setCorrectCount] = useState(0);
+    const [streak, setStreak] = useState(0);
     const [refetchTrigger, setRefetchTrigger] = useState(0); // NEW: Trigger for refetch
 
     // Load Ebisu state from localStorage on mount
@@ -106,8 +107,10 @@ const AnkiDojo: React.FC = () => {
 
         if (isCorrect) {
             setCorrectCount(prev => prev + 1);
+            setStreak(prev => prev + 1);
             audioManager.play('success');
         } else {
+            setStreak(0);
             audioManager.play('click');
         }
 
@@ -265,8 +268,13 @@ const AnkiDojo: React.FC = () => {
             {/* Flashcard */}
             {currentCard && (
                 <div className="card-wrapper">
+                    {streak >= 3 && (
+                        <div className={`streak-badge ki-charge-${Math.min(streak, 10)}`}>
+                            🔥 {streak}x Streak!
+                        </div>
+                    )}
                     <div
-                        className={`flip-card ${isFlipped ? 'flipped' : ''}`}
+                        className={`flip-card ${isFlipped ? 'flipped' : ''} ${streak >= 3 ? `ki-charge-${Math.min(streak, 10)}` : ''}`}
                         onClick={handleCardClick}
                     >
                         <div className="flip-card-inner">

@@ -150,6 +150,23 @@ const GoldenPath: React.FC = () => {
                 setTooltip(null);
             });
 
+        // Add SVG defs for plasma and stars
+        const defs = svg.append("defs");
+
+        // Star glow filter
+        const filter = defs.append("filter")
+            .attr("id", "star-glow")
+            .attr("x", "-50%")
+            .attr("y", "-50%")
+            .attr("width", "200%")
+            .attr("height", "200%");
+        filter.append("feGaussianBlur")
+            .attr("stdDeviation", "6")
+            .attr("result", "coloredBlur");
+        const feMerge = filter.append("feMerge");
+        feMerge.append("feMergeNode").attr("in", "coloredBlur");
+        feMerge.append("feMergeNode").attr("in", "SourceGraphic");
+
         // Node Circles
         const colorScale = d3.scaleLinear<string>()
             .domain([5, 30]) // Effort range approx
@@ -159,11 +176,10 @@ const GoldenPath: React.FC = () => {
             .attr("r", (d: any) => 10 + (d.yield / 1.5)) // Slightly larger base size
             .attr("fill", (d: any) => {
                 const baseColor = colorScale(d.effort);
-                // If Revision mode, desaturate/darken fresh items, highlight old ones?
-                // Or just use border for status.
                 return baseColor;
             })
-            .attr("fill-opacity", 0.8)
+            .attr("fill-opacity", 0.9)
+            .attr("filter", "url(#star-glow)")
             .attr("stroke", (d: any) => {
                 if (d.is_trending) return '#ff5722'; // Orange/Red for Trending
                 if (d.musk_category === 'DELETE') return '#e74c3c';
@@ -178,14 +194,14 @@ const GoldenPath: React.FC = () => {
         const icons = node.append("g").attr("transform", "translate(-8, -8)");
 
         // Trending Icon
-        icons.filter((d:any) => d.is_trending).append("text")
+        icons.filter((d: any) => d.is_trending).append("text")
             .text("🔥")
             .attr("x", -10)
             .attr("y", -5)
             .style("font-size", "12px");
 
         // Mnemonic Icon
-        icons.filter((d:any) => d.has_mnemonic).append("text")
+        icons.filter((d: any) => d.has_mnemonic).append("text")
             .text("🧠")
             .attr("x", 10)
             .attr("y", -5)
@@ -230,24 +246,23 @@ const GoldenPath: React.FC = () => {
         }
 
         // Highlight Path Effect
-        if (optimalPath.length) {
-            const pathIds = new Set(optimalPath.map(n => n.id));
+        const pathIds = new Set(optimalPath.map(n => n.id));
 
-            // Highlight Nodes
-            svg.selectAll(".node circle")
-                .transition().duration(500)
-                .style("stroke", (d: any) => pathIds.has(d.id) ? "#ffd700" : null)
-                .style("stroke-width", (d: any) => pathIds.has(d.id) ? 5 : null)
-                .style("filter", (d: any) => pathIds.has(d.id) ? "drop-shadow(0 0 10px #ffd700)" : null)
-                .attr("r", (d: any) => pathIds.has(d.id) ? (10 + (d.yield / 1.5)) * 1.2 : (10 + (d.yield / 1.5)));
+        // Let the CSS classes handle the visual updates (plasma beam, animations)
+        svg.selectAll(".node")
+            .classed("highlighted", (d: any) => pathIds.has(d.id));
 
-            // Highlight Edges
-            svg.selectAll(".link")
-                .transition().duration(500)
-                .style("stroke", (d: any) => pathIds.has(d.source.id) && pathIds.has(d.target.id) ? "#ffd700" : "#555")
-                .style("stroke-width", (d: any) => pathIds.has(d.source.id) && pathIds.has(d.target.id) ? 3 : 1)
-                .style("stroke-opacity", (d: any) => pathIds.has(d.source.id) && pathIds.has(d.target.id) ? 1 : 0.1);
-        }
+        svg.selectAll(".node circle")
+            .transition().duration(500)
+            .attr("r", (d: any) => pathIds.has(d.id) ? (10 + (d.yield / 1.5)) * 1.5 : (10 + (d.yield / 1.5)));
+
+        svg.selectAll(".link")
+            .classed("highlighted", (d: any) => pathIds.has(d.source.id) && pathIds.has(d.target.id))
+            .style("stroke", null) // reset inline styles to let computed CSS take priority
+            .style("stroke-width", null)
+            .style("stroke-opacity", null)
+            .style("filter", null)
+            .style("stroke-dasharray", null);
 
         return () => {
             simulation.stop();
@@ -482,14 +497,14 @@ const GoldenPath: React.FC = () => {
                             <span className="tooltip-val">{tooltip.data.roi?.toFixed(2)}</span>
                         </div>
                         {tooltip.data.is_trending && (
-                             <div className="tooltip-row" style={{ color: '#ff5722' }}>
+                            <div className="tooltip-row" style={{ color: '#ff5722' }}>
                                 <span>🔥 Trending Topic</span>
-                             </div>
+                            </div>
                         )}
                         {tooltip.data.has_mnemonic && (
-                             <div className="tooltip-row" style={{ color: '#9b59b6' }}>
+                            <div className="tooltip-row" style={{ color: '#9b59b6' }}>
                                 <span>🧠 Mnemonic Available</span>
-                             </div>
+                            </div>
                         )}
                         {tooltip.data.days_since_revision !== undefined && tooltip.data.days_since_revision < 900 && (
                             <div className="tooltip-row">

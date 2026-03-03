@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify
 from app.db import get_db
 from app import cache
+from app.utils.session import get_current_user_id
 import datetime
 
 bp = Blueprint('dashboard', __name__, url_prefix='/api')
@@ -12,7 +13,7 @@ def get_today_date_str():
 @cache.cached(timeout=60, query_string=True) # Cache for 1 minute
 def get_dashboard_data():
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         conn = get_db()
 
         # Optimized User Query: Select only stats needed for UI

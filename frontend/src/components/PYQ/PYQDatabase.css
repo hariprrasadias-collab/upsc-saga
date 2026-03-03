@@ -171,6 +171,15 @@
     color: var(--color-accent-blue);
     border-color: rgba(52, 152, 219, 0.3);
     background: rgba(52, 152, 219, 0.1);
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.tag.year:hover,
+.tag.year.active {
+    background: rgba(52, 152, 219, 0.25);
+    border-color: var(--color-accent-blue);
+    box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
 }
 
 .tag.subject {
@@ -270,19 +279,23 @@
     background: rgba(243, 156, 18, 0.1);
     border-left: 3px solid var(--color-accent-orange);
     border-radius: 0 8px 8px 0;
-    animation: fadeIn 0.3s ease-out;
+    animation: reveal-shimmer 0.5s ease-out;
+    position: relative;
+    overflow: hidden;
 }
 
-.explanation h4 {
-    color: var(--color-accent-orange);
-    margin: 0 0 10px 0;
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-family: 'Cinzel', serif;
+.explanation::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(243, 156, 18, 0.08), transparent);
+    animation: shimmer-sweep 1s ease-out;
 }
 
-@keyframes fadeIn {
+@keyframes reveal-shimmer {
     from {
         opacity: 0;
         transform: translateY(-10px);
@@ -291,6 +304,16 @@
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@keyframes shimmer-sweep {
+    from {
+        transform: translateX(-50%);
+    }
+
+    to {
+        transform: translateX(50%);
     }
 }
 

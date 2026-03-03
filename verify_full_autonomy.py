@@ -66,11 +66,12 @@ def verify_optimization():
     try:
         # Trigger scan
         resp = requests.get(f"{BASE_URL}/autonomy/optimizations")
-        data = resp.json()
+        raw_data = resp.json()
+        data = raw_data.get('data', raw_data)
         print(f"Opportunities Found: {data.get('count')}")
         print(json.dumps(data, indent=2))
         
-        if data.get('count') > 0:
+        if data.get('count', 0) > 0:
             opp_id = data['opportunities'][0]['id']
             # Accept it
             resp = requests.post(f"{BASE_URL}/autonomy/optimizations/{opp_id}/accept")

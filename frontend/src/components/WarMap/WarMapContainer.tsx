@@ -2,16 +2,13 @@ import { API_BASE_URL } from '../../config';
 
 // frontend/src/components/WarMap/WarMapContainer.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import './WarMap.css';
 import WarMapHeader from './WarMapHeader';
+import TacticalBriefing from './TacticalBriefing';
+import TerritoryNodeMap from './TerritoryNodeMap';
 import type { Task, RawTaskFromAPI } from '../../contexts/GlobalContext';
 import { generateCSVTaskId } from '../../util/taskUtils';
-import { brainService } from '../../services/BrainService';
-
-type ValuePiece = Date | null;
-type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 interface Slot {
   id: string;
@@ -33,22 +30,17 @@ interface WarMapContainerProps {
 }
 
 const WarMapContainer: React.FC<WarMapContainerProps> = ({ onTaskCompleted }) => {
-  const [date, setDate] = useState<Value>(new Date());
   const [dayTasks, setDayTasks] = useState<Task[]>([]);
   const [csvTasks, setCsvTasks] = useState<Slot[]>([]);
   const [isLoadingTasks, setIsLoadingTasks] = useState(false);
-  const [showAddForm, setShowAddForm] = useState(false);
-
-  // Briefing State
-  const [briefing, setBriefing] = useState<string | null>(null);
-  const [isBriefingLoading, setIsBriefingLoading] = useState(false);
+  const [briefingRefresh, setBriefingRefresh] = useState(0);
 
   const getSelectedDateString = useCallback((): string => {
-    const selectedDate = date instanceof Date ? date : new Date();
+    const selectedDate = new Date();
     const offset = selectedDate.getTimezoneOffset();
     const localDate = new Date(selectedDate.getTime() - (offset * 60 * 1000));
     return localDate.toISOString().split('T')[0];
-  }, [date]);
+  }, []);
 
   const dateStr = getSelectedDateString();
 
@@ -173,12 +165,6 @@ const WarMapContainer: React.FC<WarMapContainerProps> = ({ onTaskCompleted }) =>
     fetchCSVTasks();
   }, [fetchTasksForDate, fetchCSVTasks]);
 
-  const handleTaskAddedOrCancelled = async () => {
-    await fetchTasksForDate();
-    await onTaskCompleted();
-    setShowAddForm(false);
-  };
-
   const handleTaskComplete = async (taskId: number) => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/tasks/${taskId}/complete`, {
@@ -192,134 +178,84 @@ const WarMapContainer: React.FC<WarMapContainerProps> = ({ onTaskCompleted }) =>
 
       await fetchTasksForDate();
       await onTaskCompleted();
+      // Inform briefing to recount pending tasks 
+      setBriefingRefresh(prev => prev + 1);
     } catch (err) {
       console.error('Error completing task:', err);
       alert('Failed to complete task. See console for details.');
     }
   };
 
-  const handleRequestBriefing = async () => {
-    setIsBriefingLoading(true);
-    try {
-      // Construct context from current tasks
-      const tasksContext = [...csvTasks, ...dayTasks].map(t =>
-        'subject' in t ? `${t.subject}: ${t.activity} (${t.status})` : `${t.title} (${t.isCompleted ? 'Done' : 'Pending'})`
-      ).join('\n');
-
-      const response = await brainService.think(
-        `Give me a strategic briefing for ${dateStr}. Here is my schedule:\n${tasksContext}`,
-        { date: dateStr }
-      );
-      setBriefing(response.response_text);
-    } catch (error) {
-      setBriefing("The Oracles are silent. Connection failed.");
-    } finally {
-      setIsBriefingLoading(false);
-    }
-  };
-
   return (
     <div className="war-map-container">
       <WarMapHeader
-        showAddForm={showAddForm}
-        onToggleAddForm={() => setShowAddForm(prev => !prev)}
         selectedDateStr={dateStr}
-        onTaskActionComplete={handleTaskAddedOrCancelled}
-        onRequestBriefing={handleRequestBriefing}
+        showAddForm={false}
+        onToggleAddForm={() => { }}
+        onTaskActionComplete={() => { }}
       />
 
-      {!showAddForm && (
-        <div className="map-content-grid">
-          <div className="calendar-section">
-            <Calendar
-              onChange={setDate}
-              value={date}
-              className="react-calendar-themed"
-            />
-          </div>
+      <div className="command-center-layout">
+        <div className="command-left-panel">
+          <TacticalBriefing refreshTrigger={briefingRefresh} dayTasks={dayTasks} csvTasks={csvTasks} />
 
-          <div className="day-tasks-section">
-            <h2>Rituals for {dateStr}</h2>
-            <div className="tasks-list-container">
-              {isLoadingTasks ? (
-                <div className="loading-message">Consulting the oracles...</div>
-              ) : (dayTasks.length > 0 || csvTasks.length > 0) ? (
-                <ul className="war-map-task-list">
-                  {/* CSV Study Plan Tasks */}
-                  {csvTasks.map((task) => (
-                    <li key={`csv-${task.id}`} className={`war-map-task-item csv-task ${task.status === 'completed' ? 'completed' : ''}`}>
-                      <div className="wm-task-checkbox-wrapper">
-                        <input
-                          type="checkbox"
-                          id={`csv-task-${task.id}`}
-                          checked={task.status === 'completed'}
-                          onChange={() => toggleCSVTaskStatus(task)}
-                          className="google-calendar-checkbox"
-                        />
-                        <div className="google-event-content">
-                          <label htmlFor={`csv-task-${task.id}`} className="wm-task-title-label google-link">
-                            {task.subject} - {task.activity}
-                            <span className="event-time"> ({task.time})</span>
-                          </label>
-                          {task.resource_link && (
-                            <div className="google-event-description">
-                              <a href={task.resource_link} target="_blank" rel="noreferrer" className="description-line">
-                                🔗 Resources
-                              </a>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-
-                  {/* Local Tasks */}
-                  {dayTasks.map((task) => (
-                    <li key={task.id} className={`war-map-task-item ${task.isCompleted ? 'completed' : ''}`}>
-                      <div className="wm-task-checkbox-wrapper">
-                        <input
-                          type="checkbox"
-                          id={`wm-task-${task.id}`}
-                          checked={task.isCompleted}
-                          onChange={() => handleTaskComplete(task.id)}
-                          disabled={task.isCompleted}
-                        />
-                        <label htmlFor={`wm-task-${task.id}`} className="wm-task-title-label">
-                          {task.title}
-                        </label>
-                      </div>
-                      <span className="wm-task-xp">+{task.xp_reward} XP</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div className="empty-tasks-message">
-                  No rituals planned for this day.
-                </div>
-              )}
+          <div className="daily-targets-panel panel-glass">
+            <div className="panel-header">
+              <h3>⚡ ACTIVE TARGETS ({dayTasks.length + csvTasks.length})</h3>
             </div>
+
+            {isLoadingTasks ? (
+              <div className="loading-state">Synchronizing Database...</div>
+            ) : (
+              <div className="tasks-scroll-list custom-scrollbar">
+                {/* Database Tasks */}
+                {dayTasks.map(task => (
+                  <div key={`db-${task.id}`} className={`target-item ${task.isCompleted ? 'completed' : ''}`}>
+                    <div className="target-info">
+                      <strong>{task.title}</strong>
+                      <span className="reward-badge">+{task.xp_reward} {task.associated_stat?.toUpperCase()}</span>
+                    </div>
+                    <button
+                      className={`status-btn ${task.isCompleted ? 'done' : 'engage'}`}
+                      onClick={() => !task.isCompleted && handleTaskComplete(task.id!)}
+                    >
+                      {task.isCompleted ? 'SECURED' : 'ENGAGE'}
+                    </button>
+                  </div>
+                ))}
+
+                {/* CSV Study Tasks */}
+                {csvTasks.map(slot => {
+                  const isCompleted = slot.status === 'completed';
+                  return (
+                    <div key={slot.id} className={`target-item csv-task ${isCompleted ? 'completed' : ''}`}>
+                      <div className="target-info">
+                        <div className="time-badge">{slot.time}</div>
+                        <strong>{slot.subject}</strong>
+                        <div className="topic-text">{slot.activity}</div>
+                      </div>
+                      <button
+                        className={`status-btn ${isCompleted ? 'done' : 'engage'}`}
+                        onClick={() => toggleCSVTaskStatus(slot)}
+                      >
+                        {isCompleted ? 'SECURED' : 'ENGAGE'}
+                      </button>
+                    </div>
+                  );
+                })}
+
+                {dayTasks.length === 0 && csvTasks.length === 0 && (
+                  <div className="empty-state">No active targets assigned.</div>
+                )}
+              </div>
+            )}
           </div>
         </div>
-      )}
 
-      {/* Briefing Modal */}
-      {(briefing || isBriefingLoading) && (
-        <div className="modal-overlay" onClick={() => !isBriefingLoading && setBriefing(null)}>
-          <div className="briefing-modal" onClick={e => e.stopPropagation()}>
-            <div className="briefing-header">
-              <h2>🔮 Oracle's Briefing</h2>
-              {!isBriefingLoading && <button onClick={() => setBriefing(null)}>×</button>}
-            </div>
-            <div className="briefing-content">
-              {isBriefingLoading ? (
-                <div className="loading-spinner">Communing with the Cortex...</div>
-              ) : (
-                <p>{briefing}</p>
-              )}
-            </div>
-          </div>
+        <div className="command-right-panel">
+          <TerritoryNodeMap />
         </div>
-      )}
+      </div>
     </div>
   );
 };

@@ -1,3 +1,4 @@
+from app.utils.session import get_current_user_id
 # Answer Writing API Routes
 from flask import Blueprint, request, jsonify
 from app.db import get_db
@@ -66,7 +67,7 @@ def submit_answer():
     """Submit an answer and get AI evaluation"""
     try:
         data = request.get_json()
-        user_id = 1  # Get from session in production
+        user_id = get_current_user_id()
         prompt_id = data.get('prompt_id')
         answer_text = data.get('answer_text', '').strip()
         time_taken = data.get('time_taken', 0)
@@ -151,7 +152,7 @@ def submit_answer():
 def get_my_answers():
     """Get user's submission history"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         limit = request.args.get('limit', 10, type=int)
         
         conn = get_db()
@@ -177,7 +178,7 @@ def get_my_answers():
 def get_answer_detail(answer_id):
     """Get specific answer with full evaluation"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         conn = get_db()
         
         answer = conn.execute('''
@@ -201,7 +202,7 @@ def get_answer_detail(answer_id):
             if result.get(field):
                 try:
                     result[field] = json.loads(result[field])
-                except:
+                except Exception:
                     result[field] = []
         
         return jsonify(result)
@@ -212,7 +213,7 @@ def get_answer_detail(answer_id):
 def get_analytics():
     """Get performance analytics"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         conn = get_db()
         
         # Overall stats

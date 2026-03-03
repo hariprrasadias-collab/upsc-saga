@@ -87,6 +87,45 @@ class MindMapService:
             }
 
     @staticmethod
+    def deep_dive(topic, node_name):
+        """
+        Generates child nodes for a specific sub-topic in the mind map.
+        """
+        prompt = f"""
+        # MISSION: SUB-NODE DEEP DIVE (MIND MAP EXPANSION)
+        **Context Topic:** "{topic}"
+        **Target Node to Expand:** "{node_name}"
+
+        **DIRECTIVE:**
+        The user has clicked "Deep Dive" on this node. Provide 3-5 high-yield specific child concepts, facts, or data points for this specific sub-topic.
+
+        **OUTPUT SCHEMA (JSON ONLY):**
+        [
+            {{ "name": "Deep point 1" }},
+            {{ "name": "Data: 45% growth", "children": [ {{ "name": "Source: World Bank" }} ] }}
+        ]
+        """
+        try:
+            response = model_manager.generate_content(prompt, model_type='fast')
+            text = response.text.strip()
+            if text.startswith("```"):
+                text = text.replace('```json', '').replace('```', '').strip()
+                
+            start = text.find('[')
+            end = text.rfind(']')
+            
+            if start != -1 and end != -1:
+                text = text[start:end+1]
+                
+            if not text:
+                raise Exception("Empty response from AI")
+                
+            return json.loads(text)
+        except Exception as e:
+            print(f"Error generating deep dive: {e}")
+            return [{"name": f"Error: {str(e)}"}]
+
+    @staticmethod
     def save_mindmap(title, root_node):
         try:
             conn = db.get_db()

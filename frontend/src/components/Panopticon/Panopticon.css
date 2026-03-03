@@ -28,6 +28,26 @@
     padding: 1.5rem;
     margin-bottom: 1rem;
     backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.correlation-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #2dd4bf, #3b82f6);
+    opacity: 0.6;
+}
+
+.correlation-card:hover {
+    border-color: rgba(45, 212, 191, 0.4);
+    box-shadow: 0 5px 20px rgba(45, 212, 191, 0.15);
+    transform: translateX(4px);
 }
 
 .corr-header {
@@ -45,6 +65,7 @@
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
+    text-shadow: 0 0 10px currentColor;
 }
 
 .insight-text {
@@ -158,4 +179,57 @@
     border-radius: 6px;
     font-weight: 600;
     cursor: pointer;
+    transition: all 0.3s;
+}
+
+.save-btn:hover {
+    box-shadow: 0 0 15px rgba(45, 212, 191, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Neural Readout - Biohack Results */
+.biohack-result {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(45, 212, 191, 0.3);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-top: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    animation: neural-fadeIn 0.5s ease-out;
+}
+
+.biohack-result::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #2dd4bf, #3b82f6, #2dd4bf);
+    background-size: 200% 100%;
+    animation: neural-scan 3s infinite linear;
+}
+
+@keyframes neural-scan {
+    from {
+        background-position: -200% 0;
+    }
+
+    to {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes neural-fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

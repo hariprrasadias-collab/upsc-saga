@@ -456,12 +456,8 @@ SUMMARY:"""
         traceback.print_exc()
         return f"⚠️ AI generation failed: {str(e)[:100]}"
 
-def generate_mnemonic(text: str, mnemonic_type: str = "facts") -> str:
-    """Generate memory aids (mnemonics) for facts, dates, lists, concepts."""
-    
-    # Check if Gemini API key is configured
-    if not GEMINI_API_KEY:
-        return "⚠️ Gemini API Key not configured. Please add GEMINI_API_KEY to your environment variables to use AI-powered mnemonic generation."
+def generate_mnemonic(text: str, mnemonic_type: str = "facts") -> dict:
+    """Generate memory aids (mnemonics) and visualization prompts for facts, dates, lists, concepts."""
     
     type_instructions = {
         "facts": "Create a memorable acronym or phrase to remember key facts",
@@ -474,29 +470,29 @@ def generate_mnemonic(text: str, mnemonic_type: str = "facts") -> str:
     
     prompt = f"""You are a creative UPSC memory coach. {instruction}.
 
-Content: {text[:300]}
+Content: {text[:500]}
 
 Requirements:
-- Make it MEMORABLE and FUN
-- Use vivid imagery or clever wordplay
-- Keep it short (2-3 lines max)
-- Make it easy to recall under exam pressure
-- Be creative but appropriate
-
-MNEMONIC:"""
+1. Make the mnemonic MEMORABLE and FUN (2-3 lines max).
+2. Create a vivid "Visualization Prompt" (1 sentence) that paints a highly weird, memorable, or funny mental image of this mnemonic in action.
+3. RETURN EXCLUSIVELY VALID JSON IN THIS FORMAT:
+{{
+  "mnemonic": "Your generated mnemonic text here",
+  "visualization_prompt": "A vivid mental image to help remember it"
+}}
+"""
 
     try:
-        model = None # genai.GenerativeModel('gemini-2.0-flash-001')
-        # response = model.generate_content(prompt)
         response = model_manager.generate_content(prompt, model_type='fast')
-        mnemonic = get_gemini_text(response)
-        if not mnemonic:
-            return "Mnemonic unavailable (Safety Block)"
-            
-        return mnemonic
+        text_resp = response.text.replace("```json", "").replace("```", "").strip()
+        data = json.loads(text_resp)
+        return data
     except Exception as e:
         print(f"Error generating mnemonic: {e}")
-        return f"⚠️ Error generating mnemonic: {str(e)}. Please check your Gemini API configuration."
+        return {
+            "mnemonic": f"⚠️ Error generating mnemonic: {str(e)}",
+            "visualization_prompt": "N/A"
+        }
 
 
 

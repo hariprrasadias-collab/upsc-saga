@@ -1,3 +1,4 @@
+from app.utils.session import get_current_user_id
 from flask import Blueprint, request, jsonify
 from app.db import get_db
 from app.services.mimir_service import mimir_service
@@ -9,7 +10,7 @@ scribe_bp = Blueprint('scribe', __name__)
 def evaluate_answer():
     try:
         data = request.json
-        user_id = 1  # TODO: Get from session
+        user_id = get_current_user_id()
         question_text = data.get('question')
         answer_text = data.get('answer')
         
@@ -49,7 +50,7 @@ def evaluate_answer():
 @scribe_bp.route('/history', methods=['GET'])
 def get_history():
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         conn = get_db()
         rows = conn.execute('''
             SELECT id, question_text, answer_text, score, feedback_json, created_at 
@@ -64,7 +65,7 @@ def get_history():
             if item.get('feedback_json'):
                 try:
                     item['feedback_json'] = json.loads(item['feedback_json'])
-                except:
+                except Exception:
                     item['feedback_json'] = {}
             history.append(item)
         return jsonify(history)

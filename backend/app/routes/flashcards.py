@@ -11,17 +11,15 @@ from app.services.ebisu_srs import (
     get_card_maturity
 )
 from app.services.xp_service import award_xp
+from app.utils.session import get_current_user_id as get_user_id
+from app.validators import require_json_fields
 import json
 
 flashcards = Blueprint('flashcards', __name__)
 
-# ==================== DECK MANAGEMENT ====================
-
-def get_user_id():
-    """Helper to get user ID from session or default to 1"""
-    return session.get('user_id', 1)
-
 from app import cache
+
+# ==================== DECK MANAGEMENT ====================
 
 @flashcards.route('/api/flashcards/decks', methods=['GET'])
 @cache.cached(timeout=120)
@@ -62,6 +60,7 @@ def create_deck():
         
         deck_id = cursor.lastrowid
         conn.commit()
+        cache.clear()
         
         return jsonify({'id': deck_id, 'message': 'Deck created'}), 201
     except Exception as e:
@@ -123,6 +122,7 @@ def delete_deck(deck_id):
         # CASCADE will delete flashcards and review_sessions
         conn.execute('DELETE FROM decks WHERE id = ?', (deck_id,))
         conn.commit()
+        cache.clear()
         
         return jsonify({'message': 'Deck deleted'})
     except Exception as e:
@@ -138,8 +138,9 @@ def create_flashcard():
         user_id = get_user_id()
         data = request.get_json()
         
-        if 'deck_id' not in data:
-            return jsonify({'error': 'deck_id is required'}), 400
+        valid, err = require_json_fields(data, ['deck_id', 'front', 'back'])
+        if not valid:
+            return jsonify({'error': err}), 400
             
         conn = get_db()
         
@@ -175,8 +176,19 @@ def create_flashcard():
 def update_flashcard(card_id):
     """Update a flashcard"""
     try:
+        user_id = get_user_id()
         data = request.get_json()
         conn = get_db()
+        
+        # Verify ownership via deck
+        card = conn.execute('''
+            SELECT f.id FROM flashcards f
+            JOIN decks d ON f.deck_id = d.id
+            WHERE f.id = ? AND d.user_id = ?
+        ''', (card_id, user_id)).fetchone()
+        
+        if not card:
+            return jsonify({'error': 'Card not found'}), 404
         
         conn.execute('''
             UPDATE flashcards
@@ -195,7 +207,19 @@ def update_flashcard(card_id):
 def delete_flashcard(card_id):
     """Delete a flashcard"""
     try:
+        user_id = get_user_id()
         conn = get_db()
+        
+        # Verify ownership via deck
+        card = conn.execute('''
+            SELECT f.id FROM flashcards f
+            JOIN decks d ON f.deck_id = d.id
+            WHERE f.id = ? AND d.user_id = ?
+        ''', (card_id, user_id)).fetchone()
+        
+        if not card:
+            return jsonify({'error': 'Card not found'}), 404
+        
         conn.execute('DELETE FROM flashcards WHERE id = ?', (card_id,))
         conn.commit()
         

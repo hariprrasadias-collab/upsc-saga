@@ -266,7 +266,7 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
             </div>
 
             <div className="pomodoro-timer-display">
-                <svg className="progress-ring" width="320" height="320">
+                <svg className={`progress-ring ${isRunning && timeLeft <= 60 ? 'urgent' : ''}`} width="320" height="320">
                     <defs>
                         <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                             <stop offset="0%" stopColor="#d4a574" />
@@ -324,7 +324,7 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
                             </div>
                         ) : (
                             <>
-                                <div className={`timer-text ${isRunning ? 'active' : ''}`}>{formatTime(timeLeft)}</div>
+                                <div className={`timer-text ${isRunning ? 'active' : ''} ${isRunning && timeLeft <= 60 ? 'urgent' : ''}`}>{formatTime(timeLeft)}</div>
                                 {!isRunning && (
                                     <button className="edit-time-btn" onClick={() => {
                                         setEditMinutes(Math.floor(timeLeft / 60).toString());

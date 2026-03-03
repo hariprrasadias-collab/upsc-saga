@@ -18,6 +18,8 @@ const RevisionCenter: React.FC = () => {
     const [currentItem, setCurrentItem] = useState<RevisionItem | null>(null);
     const [loading, setLoading] = useState(true);
     const [showAnswer, setShowAnswer] = useState(false);
+    const [hint, setHint] = useState<string | null>(null);
+    const [loadingHint, setLoadingHint] = useState(false);
 
     useEffect(() => {
         fetchDueItems();
@@ -63,6 +65,7 @@ const RevisionCenter: React.FC = () => {
                 setDueItems(remaining);
                 setCurrentItem(remaining.length > 0 ? remaining[0] : null);
                 setShowAnswer(false);
+                setHint(null);
             }
         } catch (err) {
             console.error("Failed to submit review:", err);
@@ -83,6 +86,24 @@ const RevisionCenter: React.FC = () => {
         );
     }
 
+    const getHint = async () => {
+        if (!currentItem) return;
+        setLoadingHint(true);
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/revision/hint`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ item_type: currentItem.item_type, item_id: currentItem.item_id })
+            });
+            const data = await res.json();
+            if (data.success && data.hint) setHint(data.hint);
+        } catch (e) {
+            console.error("Hint failed:", e);
+        } finally {
+            setLoadingHint(false);
+        }
+    };
+
     return (
         <div className="revision-center">
             <div className="revision-header">
@@ -91,20 +112,28 @@ const RevisionCenter: React.FC = () => {
             </div>
 
             <div className="card-container">
-                <div className="revision-card">
-                    <div className="card-type">{currentItem.item_type.toUpperCase()}</div>
+                <div className={`revision-card ${showAnswer ? 'is-flipped' : ''}`}>
+                    <div className="card-inner">
+                        <div className="card-front">
+                            <div className="card-type">{currentItem.item_type.toUpperCase()}</div>
+                            <button className="hint-btn" onClick={getHint} disabled={loadingHint || !!hint}>
+                                {loadingHint ? 'Whispering...' : '🧠 AI Whisper'}
+                            </button>
 
-                    <div className="card-front">
-                        <h3>Item ID: {currentItem.item_id}</h3>
-                        <p>Content placeholder for {currentItem.item_type} #{currentItem.item_id}</p>
-                        {/* In a real app, we would fetch and display the actual content here */}
-                    </div>
+                            <h3>Item ID: {currentItem.item_id}</h3>
+                            <p>Content placeholder for {currentItem.item_type} #{currentItem.item_id}</p>
 
-                    {showAnswer && (
-                        <div className="card-back">
-                            <p>Answer/Details would appear here...</p>
+                            {hint && (
+                                <div className="ai-hint-box">
+                                    <i>" {hint} "</i>
+                                </div>
+                            )}
                         </div>
-                    )}
+
+                        <div className="card-back">
+                            <p>Answer / Details would appear here...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 

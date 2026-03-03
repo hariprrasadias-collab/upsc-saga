@@ -1,9 +1,10 @@
 .issue-mapping-viewer {
-    background: #ffffff;
+    background: rgba(15, 23, 42, 0.6);
     border-radius: 12px;
     padding: 24px;
     margin-top: 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
 }
 
 .mapping-header {
@@ -12,13 +13,13 @@
     align-items: center;
     margin-bottom: 20px;
     padding-bottom: 16px;
-    border-bottom: 2px solid #f0f0f0;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .mapping-header h3 {
     margin: 0;
     font-size: 20px;
-    color: #1f2937;
+    color: #f1f5f9;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -63,11 +64,11 @@
 }
 
 .mapping-card {
-    background: linear-gradient(135deg, #f8f9fd 0%, #ffffff 100%);
-    border: 1px solid #e5e7eb;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(102, 126, 234, 0.15);
     border-radius: 12px;
     padding: 20px;
-    transition: all 0.3s ease;
+    transition: all 0.4s ease;
     position: relative;
     overflow: hidden;
 }
@@ -80,12 +81,13 @@
     right: 0;
     height: 4px;
     background: linear-gradient(90deg, #667eea, #764ba2);
+    opacity: 0.7;
 }
 
 .mapping-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    border-color: #667eea;
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+    border-color: rgba(102, 126, 234, 0.4);
 }
 
 .mapping-card-header {
@@ -121,8 +123,8 @@
 .paper-tag {
     display: inline-block;
     padding: 4px 10px;
-    background: #f3f4f6;
-    color: #6b7280;
+    background: rgba(255, 255, 255, 0.08);
+    color: #94a3b8;
     border-radius: 6px;
     font-size: 12px;
     font-weight: 600;
@@ -132,7 +134,7 @@
 .topic-section h4 {
     margin: 8px 0 0 0;
     font-size: 16px;
-    color: #111827;
+    color: #f1f5f9;
     font-weight: 700;
     line-height: 1.4;
 }
@@ -149,7 +151,7 @@
     display: block;
     font-size: 12px;
     font-weight: 600;
-    color: #6b7280;
+    color: #94a3b8;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 8px;
@@ -159,7 +161,7 @@
 .utility-section p {
     margin: 0;
     font-size: 14px;
-    color: #374151;
+    color: #cbd5e1;
     line-height: 1.6;
 }
 
@@ -167,7 +169,7 @@
 .empty-state {
     text-align: center;
     padding: 60px 20px;
-    color: #6b7280;
+    color: #94a3b8;
     font-size: 15px;
 }
 
@@ -203,9 +205,9 @@
     gap: 16px;
     margin-bottom: 24px;
     padding: 16px;
-    background: #f8f9fd;
+    background: rgba(255, 255, 255, 0.03);
     border-radius: 8px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .tags-list {
@@ -218,8 +220,8 @@
     display: inline-flex;
     align-items: center;
     padding: 4px 10px;
-    background: #e0e7ff;
-    color: #4338ca;
+    background: rgba(99, 102, 241, 0.15);
+    color: #818cf8;
     border-radius: 16px;
     font-size: 13px;
     font-weight: 500;
@@ -228,7 +230,7 @@
 .remove-tag-btn {
     background: none;
     border: none;
-    color: #6366f1;
+    color: #818cf8;
     margin-left: 6px;
     cursor: pointer;
     font-size: 16px;
@@ -237,7 +239,7 @@
 }
 
 .remove-tag-btn:hover {
-    color: #dc2626;
+    color: #ef4444;
 }
 
 .add-tag-form {
@@ -247,27 +249,30 @@
 
 .add-tag-form input {
     padding: 6px 12px;
-    border: 1px solid #d1d5db;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 6px;
     font-size: 13px;
     outline: none;
+    background: rgba(0, 0, 0, 0.2);
+    color: #e2e8f0;
 }
 
 .add-tag-form input:focus {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    border-color: #818cf8;
+    box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.2);
 }
 
 .add-tag-form button {
     padding: 6px 12px;
-    background: #6366f1;
-    color: white;
-    border: none;
+    background: rgba(99, 102, 241, 0.2);
+    color: #818cf8;
+    border: 1px solid rgba(99, 102, 241, 0.3);
     border-radius: 6px;
     cursor: pointer;
     font-weight: 600;
+    transition: all 0.2s;
 }
 
 .add-tag-form button:hover {
-    background: #4f46e5;
+    background: rgba(99, 102, 241, 0.3);
 }

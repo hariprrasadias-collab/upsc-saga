@@ -123,26 +123,93 @@
 }
 
 .option-btn.correct {
-    background: #065f46;
-    border-color: #059669;
+    background: rgba(6, 95, 70, 0.6);
+    border-color: #10b981;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+    animation: correct-pulse 0.6s ease-out;
 }
 
 .option-btn.wrong {
-    background: #7f1d1d;
-    border-color: #dc2626;
+    background: rgba(127, 29, 29, 0.6);
+    border-color: #ef4444;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+    animation: wrong-shake 0.5s ease-out;
+}
+
+@keyframes correct-pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+    }
+
+    50% {
+        transform: scale(1.03);
+        box-shadow: 0 0 25px rgba(16, 185, 129, 0.6);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+    }
+}
+
+@keyframes wrong-shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-6px);
+    }
+
+    40% {
+        transform: translateX(6px);
+    }
+
+    60% {
+        transform: translateX(-4px);
+    }
+
+    80% {
+        transform: translateX(4px);
+    }
 }
 
 .explanation-box {
-    background: #0f172a;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(15px);
     padding: 1.5rem;
-    border-radius: 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(245, 158, 11, 0.3);
     border-left: 4px solid #f59e0b;
-    animation: slideDown 0.3s ease;
+    animation: slide-up-spring 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 .explanation-box h3 {
     color: #f59e0b;
     margin: 0 0 0.5rem 0;
+    font-family: 'Cinzel', serif;
+    text-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+}
+
+@keyframes slide-up-spring {
+    0% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+
+    60% {
+        opacity: 1;
+        transform: translateY(-5px) scale(1.01);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .next-btn {
@@ -153,6 +220,12 @@
     border-radius: 6px;
     cursor: pointer;
     margin-top: 1rem;
+    transition: all 0.3s;
+}
+
+.next-btn:hover {
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+    transform: translateY(-2px);
 }
 
 /* Formula Sheet Styles */
@@ -211,14 +284,12 @@
     color: #cbd5e1;
 }
 
-@keyframes slideDown {
+@keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(-10px);
     }
 
     to {
         opacity: 1;
-        transform: translateY(0);
     }
 }

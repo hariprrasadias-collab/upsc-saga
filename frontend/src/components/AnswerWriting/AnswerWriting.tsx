@@ -348,6 +348,17 @@ const AnswerWriting: React.FC<AnswerWritingProps> = ({ onTaskCompleted }) => {
                         </div>
                     </div>
 
+                    {/* Ink Meter Progress Bar */}
+                    <div className="ink-meter">
+                        <div
+                            className="ink-meter-fill"
+                            style={{
+                                width: `${Math.min((wordCount / currentPrompt.word_limit) * 100, 100)}%`,
+                                background: getWordCountColor()
+                            }}
+                        />
+                    </div>
+
                     {/* Template Selector */}
                     <TemplateSelector onSelectTemplate={handleTemplateSelect} />
 

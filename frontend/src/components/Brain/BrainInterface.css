@@ -346,6 +346,8 @@
 .synapse-item:hover {
     border-color: var(--kratos-gold-dim);
     background: rgba(197, 160, 89, 0.05);
+    box-shadow: 0 0 10px rgba(197, 160, 89, 0.1);
+    transform: translateX(3px);
 }
 
 .synapse-dot {
@@ -417,4 +419,6 @@
     background: rgba(255, 255, 255, 0.2);
     color: #fff;
     border-color: #fff;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
 }

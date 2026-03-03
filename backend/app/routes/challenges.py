@@ -1,3 +1,4 @@
+from app.utils.session import get_current_user_id
 from flask import Blueprint, jsonify, request, session
 from app.services.challenge_service import challenge_service
 
@@ -11,7 +12,7 @@ def get_current_user_id():
     user_id = session.get('user_id')
     if not user_id:
         # Defaults to 1 for single-user mode
-        user_id = 1
+        user_id = get_current_user_id()
     return user_id
 
 @challenges_bp.route('/api/challenges/daily', methods=['GET'])

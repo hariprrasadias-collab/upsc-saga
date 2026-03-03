@@ -25,6 +25,40 @@
     padding: 1.5rem;
     position: relative;
     overflow: hidden;
+    transition: all 0.3s;
+}
+
+.predictive-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #d4a574, #f1c40f, transparent);
+    background-size: 200% 100%;
+    animation: prophecy-sweep 3s infinite linear;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.predictive-card:hover::before {
+    opacity: 1;
+}
+
+.predictive-card:hover {
+    border-color: rgba(212, 165, 116, 0.4);
+    box-shadow: 0 5px 20px rgba(212, 165, 116, 0.15);
+}
+
+@keyframes prophecy-sweep {
+    from {
+        background-position: -200% 0;
+    }
+
+    to {
+        background-position: 200% 0;
+    }
 }
 
 .predictive-card h3 {
@@ -91,7 +125,18 @@
     color: #d4a574;
     font-family: 'Cinzel', serif;
     margin-bottom: 1rem;
-    text-shadow: 0 0 20px rgba(212, 165, 116, 0.2);
+    text-shadow: 0 0 20px rgba(212, 165, 116, 0.4);
+    animation: prob-breathe 3s infinite alternate;
+}
+
+@keyframes prob-breathe {
+    from {
+        text-shadow: 0 0 10px rgba(212, 165, 116, 0.2);
+    }
+
+    to {
+        text-shadow: 0 0 25px rgba(212, 165, 116, 0.5);
+    }
 }
 
 .probability-bar {

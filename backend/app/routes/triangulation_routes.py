@@ -58,7 +58,7 @@ def get_history():
                     d['full_report'] = {} # Indicate no full report
                     d['way_forward'] = parsed_json
 
-            except:
+            except Exception:
                 d['full_report'] = {}
                 d['way_forward'] = {}
 
@@ -66,3 +66,47 @@ def get_history():
         return jsonify({'success': True, 'data': data})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@triangulation_bp.route('/extract-actionables', methods=['POST'])
+def extract_actionables():
+    try:
+        data = request.json
+        topic = data.get('topic')
+        way_forward = data.get('way_forward', {})
+        
+        if not topic or not way_forward:
+             return jsonify({'success': False, 'error': 'Topic and way_forward are required'}), 400
+             
+        from app.db import get_db
+        from datetime import datetime, timedelta
+        conn = get_db()
+        
+        # Calculate due date: tomorrow
+        tomorrow = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+        
+        actions = []
+        if isinstance(way_forward, dict):
+            for timeframe, action in way_forward.items():
+                if action and isinstance(action, str):
+                    actions.append(f"[{timeframe.upper()}] {action}")
+        elif isinstance(way_forward, list):
+            actions = [str(a) for a in way_forward]
+        elif isinstance(way_forward, str):
+            actions = [way_forward]
+            
+        inserted = 0
+        for action in actions:
+            action_str = str(action)
+            title = f"Tactical Payload ({topic}): {action_str[:80]}..."
+            conn.execute('''
+                INSERT INTO tasks (user_id, title, xp_reward, associated_stat, due_date, isCompleted, is_quest)
+                VALUES (?, ?, ?, ?, ?, 0, 0)
+            ''', (1, title, 30, 'intelligence', tomorrow))
+            inserted += 1
+            
+        conn.commit()
+        return jsonify({'success': True, 'inserted': inserted})
+        
+    except Exception as e:
+        print(f"Extraction Error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500

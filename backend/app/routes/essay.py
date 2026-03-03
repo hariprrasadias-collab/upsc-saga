@@ -1,3 +1,4 @@
+from app.utils.session import get_current_user_id
 from flask import Blueprint, request, jsonify
 from app.db import get_db
 from app.services.essay_evaluator import EssayEvaluator
@@ -11,7 +12,7 @@ def submit_essay():
     """Submit an essay for AI evaluation"""
     try:
         data = request.json
-        user_id = 1  # TODO: Get from session
+        user_id = get_current_user_id()
         topic = data.get('topic')
         content = data.get('content')
         
@@ -44,7 +45,7 @@ def submit_essay():
 def get_essay_history():
     """Get past essay submissions"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         conn = get_db()
         submissions = conn.execute('''
             SELECT id, topic, submitted_at, score
@@ -61,7 +62,7 @@ def get_essay_history():
 def get_essay_detail(id):
     """Get details of a specific submission"""
     try:
-        user_id = 1
+        user_id = get_current_user_id()
         conn = get_db()
         submission = conn.execute('''
             SELECT * FROM essay_submissions

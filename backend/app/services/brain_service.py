@@ -1364,7 +1364,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     topic = payload.get('topic', 'General Knowledge')
                     
                     cursor = conn.execute('INSERT INTO mind_palace_locations (name, description, layout_type) VALUES (?, ?, ?)', 
-                                        (f"The Hall of {topic}", f"A dedicated space for remembering {topic}", "hall"))
+                                        (f"The Hall of {topic}", f"A dedicated isometric 3D space for {topic}", "hall"))
                     location_id = cursor.lastrowid
                     
                     brainstorm_prompt = f"""
@@ -1372,14 +1372,14 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     **Topic:** {topic}
 
                     **TASK:**
-                    Create 5 vivid, bizarre, and memorable memory pegs (artifacts) for this topic.
+                    Create 5-7 highly vivid, bizarre, and memorable memory pegs (artifacts) for this topic.
                     Use the 'Loci Method' principles: Exaggeration, Absurdity, and Spatial Memory.
 
                     **OUTPUT SCHEMA (JSON Array):**
                     [
                         {{
                             "title": "Concept Name",
-                            "content": "The vivid visual story. (e.g., 'A giant elephant eating the Constitution to represent Article 1...')",
+                            "content": "The vivid visual story. (e.g., 'A giant neon elephant eating the Constitution to represent Article 1...')",
                             "icon": "🐘"
                         }}
                     ]
@@ -1389,14 +1389,18 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     
                     if isinstance(artifacts_data, list):
                         import random
+                        neon_colors = ['#3498db', '#9b59b6', '#2ecc71', '#e74c3c', '#f1c40f', '#00f3ff', '#ff00ff']
+                        
                         for art in artifacts_data:
-                            x = random.randint(10, 90)
-                            y = random.randint(10, 90)
+                            x = random.randint(10, 80)
+                            y = random.randint(10, 80)
+                            color = random.choice(neon_colors)
+                            
                             conn.execute('INSERT INTO mind_palace_artifacts (location_id, title, content, type, x_position, y_position, icon, color) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', 
-                                       (location_id, art.get('title'), art.get('content'), 'concept', x, y, art.get('icon', '📦'), '#9b59b6'))
+                                       (location_id, art.get('title', 'Unknown'), art.get('content', ''), 'concept', x, y, art.get('icon', '📦'), color))
                             
                     conn.commit()
-                    result = {"success": True, "message": f"Constructed 'The Hall of {topic}' with {len(artifacts_data)} memories."}
+                    result = {"success": True, "message": f"Constructed 'The Hall of {topic}' with {len(artifacts_data) if isinstance(artifacts_data, list) else 0} memories."}
                 except Exception as e:
                     result = {"success": False, "message": f"Construction Failed: {str(e)}"}
 
@@ -2335,6 +2339,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 "status": "ONLINE",
                 "panopticon": "Active",
                 "neural_hash": "Ready",
+                "active_modules": ["Panopticon", "Neural Hash Cortex", "Strategy Engine", "Memory Retrieval", "Gamification Engine", "Watchman"],
                 "timestamp": datetime.now().isoformat()
             }
         except Exception as e:

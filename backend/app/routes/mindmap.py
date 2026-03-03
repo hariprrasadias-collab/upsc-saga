@@ -18,6 +18,22 @@ def generate_mindmap():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@bp.route('/deepdive', methods=['POST'])
+def deepdive_mindmap():
+    """Generate deeper child nodes for a specific node in a mind map"""
+    data = request.get_json()
+    topic = data.get('topic')
+    node_name = data.get('node_name')
+    
+    if not topic or not node_name:
+        return jsonify({'error': 'Topic and node_name are required'}), 400
+
+    try:
+        children_data = MindMapService.deep_dive(topic, node_name)
+        return jsonify({'success': True, 'children': children_data})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @bp.route('/save', methods=['POST'])
 def save_mindmap():
     """Save a mind map"""

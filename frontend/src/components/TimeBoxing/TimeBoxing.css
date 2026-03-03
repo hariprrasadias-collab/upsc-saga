@@ -108,8 +108,65 @@
 }
 
 .timebox-card.overtime {
-    border-color: rgba(231, 76, 60, 0.4);
-    background: linear-gradient(90deg, rgba(231, 76, 60, 0.05), rgba(0, 0, 0, 0.4));
+    border-color: rgba(231, 76, 60, 0.8);
+    background: linear-gradient(90deg, rgba(231, 76, 60, 0.1), rgba(0, 0, 0, 0.6));
+    box-shadow: 0 0 15px rgba(231, 76, 60, 0.5);
+    animation: glitch-border 2s infinite linear;
+}
+
+.timebox-card.overtime::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(0deg,
+            rgba(231, 76, 60, 0.05),
+            rgba(231, 76, 60, 0.05) 1px,
+            transparent 1px,
+            transparent 4px);
+    pointer-events: none;
+    border-radius: 12px;
+    z-index: 10;
+    animation: scanlines 5s infinite linear;
+}
+
+@keyframes glitch-border {
+    0% {
+        border-color: rgba(231, 76, 60, 0.8);
+        box-shadow: 0 0 15px rgba(231, 76, 60, 0.5);
+    }
+
+    10% {
+        border-color: rgba(255, 0, 0, 1);
+        box-shadow: 0 0 25px rgba(255, 0, 0, 0.8);
+        transform: translateX(2px);
+    }
+
+    20% {
+        border-color: rgba(231, 76, 60, 0.8);
+        box-shadow: 0 0 15px rgba(231, 76, 60, 0.5);
+        transform: translateX(-2px);
+    }
+
+    30% {
+        transform: translateX(0);
+    }
+
+    100% {
+        border-color: rgba(231, 76, 60, 0.8);
+    }
+}
+
+@keyframes scanlines {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: 0 100px;
+    }
 }
 
 .timebox-info {
@@ -159,6 +216,20 @@
     border-radius: 4px;
     box-shadow: 0 0 10px rgba(212, 165, 116, 0.4);
     position: relative;
+    animation: pulse-neon 2s infinite;
+}
+
+@keyframes pulse-neon {
+
+    0%,
+    100% {
+        box-shadow: 0 0 10px rgba(212, 165, 116, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(212, 165, 116, 0.8);
+        filter: brightness(1.2);
+    }
 }
 
 .progress-bar::after {
@@ -175,6 +246,33 @@
 .progress-bar.overtime {
     background: linear-gradient(90deg, #c0392b, #e74c3c);
     box-shadow: 0 0 10px rgba(231, 76, 60, 0.4);
+    animation: pulse-neon-overtime 1s infinite alternate;
+}
+
+@keyframes pulse-neon-overtime {
+    0% {
+        box-shadow: 0 0 10px rgba(231, 76, 60, 0.4);
+        filter: brightness(1);
+    }
+
+    100% {
+        box-shadow: 0 0 20px rgba(255, 0, 0, 1);
+        filter: brightness(1.5);
+    }
+}
+
+.progress-segments {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(90deg,
+            transparent,
+            transparent calc(20% - 2px),
+            rgba(0, 0, 0, 0.8) calc(20% - 2px),
+            rgba(0, 0, 0, 0.8) 20%);
 }
 
 /* Delete Button */

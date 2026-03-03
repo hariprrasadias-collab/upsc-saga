@@ -10,9 +10,31 @@
 .admin-sidebar {
     width: 250px;
     background: #1a1510;
-    border-right: 1px solid #333;
+    border-right: 1px solid rgba(245, 158, 11, 0.2);
     display: flex;
     flex-direction: column;
+    position: relative;
+}
+
+.admin-sidebar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -1px;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(180deg, transparent, rgba(245, 158, 11, 0.4), transparent);
+    animation: sidebar-glow 3s infinite alternate;
+}
+
+@keyframes sidebar-glow {
+    from {
+        opacity: 0.3;
+    }
+
+    to {
+        opacity: 0.8;
+    }
 }
 
 .admin-logo {
@@ -51,6 +73,8 @@
     background: rgba(245, 158, 11, 0.1);
     color: #f59e0b;
     font-weight: bold;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.15);
+    border-left: 3px solid #f59e0b;
 }
 
 .admin-content {
@@ -68,10 +92,18 @@
 }
 
 .stat-card {
-    background: #1a1a2e;
+    background: rgba(26, 26, 46, 0.7);
     padding: 1.5rem;
     border-radius: 8px;
-    border: 1px solid #333;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(8px);
+    transition: all 0.3s;
+}
+
+.stat-card:hover {
+    border-color: rgba(245, 158, 11, 0.3);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    transform: translateY(-3px);
 }
 
 .stat-card h3 {
@@ -84,6 +116,7 @@
     font-size: 2rem;
     font-weight: bold;
     color: #fff;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
 }
 
 /* Questions Table */

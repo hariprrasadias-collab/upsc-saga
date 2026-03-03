@@ -104,7 +104,7 @@ def get_available_bosses():
     for row in custom:
         try:
             custom_bosses.append(get_boss_stats('CUSTOM', row['id']))
-        except:
+        except Exception:
             continue
     
     return jsonify({

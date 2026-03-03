@@ -43,6 +43,28 @@
   overflow: visible;
 }
 
+.dashboard-header::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #d4a574, #5fb3e8, transparent);
+  background-size: 200% 100%;
+  animation: header-shimmer 4s infinite linear;
+}
+
+@keyframes header-shimmer {
+  from {
+    background-position: -200% 0;
+  }
+
+  to {
+    background-position: 200% 0;
+  }
+}
+
 .dashboard-header::before {
   content: '';
   position: absolute;
@@ -147,6 +169,7 @@
   background: rgba(95, 179, 232, 0.1);
   border-color: rgba(212, 165, 116, 0.3);
   transform: translateX(3px);
+  box-shadow: 0 0 12px rgba(95, 179, 232, 0.15);
 }
 
 .stat-icon {

@@ -1,3 +1,4 @@
+from app.utils.session import get_current_user_id
 from flask import Blueprint, request, jsonify, redirect, session, url_for
 import os
 import datetime
@@ -201,7 +202,7 @@ def complete_google_event(event_id):
         
         # Get XP metadata and award XP
         conn = get_db()
-        user_id = 1  # Get from session in production
+        user_id = get_current_user_id()
         
         metadata = conn.execute('''
             SELECT xp_reward FROM calendar_event_metadata 
@@ -254,7 +255,7 @@ def uncomplete_google_event(event_id):
         
         # Update local DB
         conn = get_db()
-        user_id = 1
+        user_id = get_current_user_id()
         conn.execute('''
             INSERT OR REPLACE INTO calendar_event_metadata 
             (event_id, user_id, is_completed)
@@ -329,7 +330,7 @@ def delete_google_event(event_id):
 def event_metadata(event_id):
     """Get or update XP metadata for a Google Calendar event"""
     conn = get_db()
-    user_id = 1  # Get from session in production
+    user_id = get_current_user_id()
     
     if request.method == 'GET':
         metadata = conn.execute('''

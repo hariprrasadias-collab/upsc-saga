@@ -79,7 +79,7 @@ def get_proactive_insights():
             if isinstance(payload, str):
                 try:
                     payload = json.loads(payload)
-                except:
+                except Exception:
                     payload = {}
                 
             insights.append({
@@ -122,7 +122,7 @@ def trigger_optimization():
                 if isinstance(payload, str):
                     try:
                         payload = json.loads(payload)
-                    except:
+                    except Exception:
                         payload = {}
                 
                 actions_taken.append({

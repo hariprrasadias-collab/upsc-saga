@@ -13,11 +13,56 @@ interface RevisionCard {
     created_at: string;
 }
 
+const RevisionCardItem: React.FC<{ card: RevisionCard, onDelete: (id: number) => void }> = ({ card, onDelete }) => {
+    const [isFlipped, setIsFlipped] = useState(false);
+
+    return (
+        <div
+            className={`revision-card-container ${isFlipped ? 'flipped' : ''}`}
+            onClick={() => setIsFlipped(!isFlipped)}
+        >
+            <div className="revision-card-inner">
+                {/* FRONT FACE */}
+                <div className="card-face front">
+                    <div className="front-icon">⚡</div>
+                    <h3 className="front-title">{card.title}</h3>
+                </div>
+
+                {/* BACK FACE */}
+                <div className="card-face back">
+                    <div className="card-header">
+                        <h3>{card.title}</h3>
+                        <div className="card-header-actions">
+                            <span className="card-date">
+                                {new Date(card.created_at).toLocaleDateString()}
+                            </span>
+                            <button
+                                className="delete-card-btn"
+                                onClick={(e) => {
+                                    e.stopPropagation(); // prevent flip
+                                    onDelete(card.id);
+                                }}
+                                title="Delete card"
+                            >
+                                ×
+                            </button>
+                        </div>
+                    </div>
+                    <div className="card-content markdown-body">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{card.one_liner}</ReactMarkdown>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const RevisionCards: React.FC = () => {
     const [cards, setCards] = useState<RevisionCard[]>([]);
     const [loading, setLoading] = useState(false);
     const [newCard, setNewCard] = useState({ title: '', content: '' });
     const [generating, setGenerating] = useState(false);
+    const [autoGenerating, setAutoGenerating] = useState(false);
 
     useEffect(() => {
         fetchCards();
@@ -112,6 +157,27 @@ const RevisionCards: React.FC = () => {
         }
     };
 
+    const handleAutoGenerateWeakness = async () => {
+        setAutoGenerating(true);
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/revision/auto-forge`, {
+                method: 'POST'
+            });
+            const data = await response.json();
+            if (data.success && data.cards) {
+                setCards([...data.cards, ...cards]);
+                alert(`✅ Automatically forged ${data.cards.length} shards from your weak areas!`);
+            } else {
+                alert('Auto-forge returned empty. The Oracle found no critical vulnerabilities right now.');
+            }
+        } catch (error) {
+            console.error('Error auto-forging:', error);
+            alert('Failed to auto-forge. See console.');
+        } finally {
+            setAutoGenerating(false);
+        }
+    };
+
     return (
         <div className="revision-cards-container">
             <div className="revision-header">
@@ -141,9 +207,16 @@ const RevisionCards: React.FC = () => {
                     <button
                         className="generate-btn"
                         onClick={handleGenerateCard}
-                        disabled={generating}
+                        disabled={generating || autoGenerating}
                     >
                         {generating ? '✨ Forging Knowledge...' : '🚀 Generate Smart Summary'}
+                    </button>
+                    <button
+                        className="auto-gen-weakness-btn"
+                        onClick={handleAutoGenerateWeakness}
+                        disabled={generating || autoGenerating}
+                    >
+                        {autoGenerating ? '👁️ SCANNING VULNERABILITIES...' : '🔮 AUTO-FORGE FROM WEAKNESSES'}
                     </button>
                 </div>
             </div>
@@ -162,29 +235,7 @@ const RevisionCards: React.FC = () => {
                 ) : (
                     <div className="cards-grid">
                         {cards.map((card) => (
-                            <div key={card.id} className="revision-card">
-                                <div className="card-header">
-                                    <h3>{card.title}</h3>
-                                    <div className="card-header-actions">
-                                        <span className="card-date">
-                                            {new Date(card.created_at).toLocaleDateString()}
-                                        </span>
-                                        <button
-                                            className="delete-card-btn"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDeleteCard(card.id);
-                                            }}
-                                            title="Delete card"
-                                        >
-                                            ×
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="card-content markdown-body">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{card.one_liner}</ReactMarkdown>
-                                </div>
-                            </div>
+                            <RevisionCardItem key={card.id} card={card} onDelete={handleDeleteCard} />
                         ))}
                     </div>
                 )}

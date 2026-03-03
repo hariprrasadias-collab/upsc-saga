@@ -198,7 +198,7 @@
     justify-content: center;
     border-right: 1px solid rgba(255, 255, 255, 0.03);
     font-size: 13px;
-    transition: all 0.2s ease;
+    transition: all 0.25s ease;
     flex-shrink: 0;
 }
 
@@ -261,11 +261,12 @@
 }
 
 .data-cell:hover {
-    transform: scale(1.1);
+    transform: scale(1.15);
     z-index: 5;
-    box-shadow: 0 0 15px rgba(212, 165, 116, 0.6);
+    box-shadow: 0 0 20px rgba(212, 165, 116, 0.7);
     border: 1px solid #d4a574;
     background-color: rgba(212, 165, 116, 0.2) !important;
+    border-radius: 4px;
 }
 
 /* Modal - Stone Tablet Style */

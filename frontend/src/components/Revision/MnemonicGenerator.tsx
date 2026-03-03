@@ -2,6 +2,7 @@ import { API_BASE_URL } from '../../config';
 
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { motion, AnimatePresence } from 'framer-motion';
 import './MnemonicGenerator.css';
 
 interface MnemonicGeneratorProps {
@@ -13,6 +14,7 @@ interface MnemonicHistoryItem {
     mnemonic_text: string;
     original_text: string;
     mnemonic_type: string;
+    visualization_prompt?: string;
     created_at: string;
 }
 
@@ -21,6 +23,7 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
     const [text, setText] = useState('');
     const [mnemonicType, setMnemonicType] = useState('facts');
     const [mnemonic, setMnemonic] = useState('');
+    const [visualizationPrompt, setVisualizationPrompt] = useState('');
     const [generating, setGenerating] = useState(false);
     const [history, setHistory] = useState<MnemonicHistoryItem[]>([]);
     const [loadingHistory, setLoadingHistory] = useState(false);
@@ -69,6 +72,7 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
             const data = await response.json();
             if (data.success) {
                 setMnemonic(data.mnemonic);
+                setVisualizationPrompt(data.visualization_prompt || '');
                 if (onMnemonicGenerated) {
                     onMnemonicGenerated(data.mnemonic);
                 }
@@ -93,6 +97,7 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
     const handleClear = () => {
         setText('');
         setMnemonic('');
+        setVisualizationPrompt('');
     };
 
     const confirmDelete = (id: number, e: React.MouseEvent) => {
@@ -148,6 +153,12 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
                         <div className="mnemonic-hero preview">
                             <div className="hero-label">MEMORY HOOK</div>
                             <h1 className="hero-text">{mnemonicPhrase.replace(/\*\*/g, '')}</h1>
+                            {visualizationPrompt && (
+                                <div className="visualization-prompt">
+                                    <span className="vis-icon">👁️</span>
+                                    <i>{visualizationPrompt}</i>
+                                </div>
+                            )}
                             <div className="click-hint">Click to view full details ↗</div>
                         </div>
                     ) : (
@@ -165,6 +176,12 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
                     <div className="mnemonic-hero full">
                         <div className="hero-label">MEMORY HOOK</div>
                         <h1 className="hero-text">{mnemonicPhrase.replace(/\*\*/g, '')}</h1>
+                        {visualizationPrompt && (
+                            <div className="visualization-prompt" style={{ marginTop: '1rem', color: 'var(--color-accent-orange)', fontSize: '1.2rem' }}>
+                                <span className="vis-icon">👁️  Visualize this: </span>
+                                <i>{visualizationPrompt}</i>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -279,16 +296,24 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
                         </button>
                     </div>
 
-                    {mnemonic && (
-                        <div className="mnemonic-result">
-                            <div className="result-header">
-                                <h3>Revealed Truth</h3>
-                            </div>
-                            <div className="mnemonic-box">
-                                {renderMnemonicContent(mnemonic, 'preview')}
-                            </div>
-                        </div>
-                    )}
+                    <AnimatePresence>
+                        {mnemonic && (
+                            <motion.div
+                                className="mnemonic-result"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20, transition: { duration: 0.2 } }}
+                                transition={{ duration: 0.5, ease: "easeOut" }}
+                            >
+                                <div className="result-header">
+                                    <h3>Revealed Truth</h3>
+                                </div>
+                                <div className="mnemonic-box">
+                                    {renderMnemonicContent(mnemonic, 'preview')}
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </>
             ) : (
                 <div className="mnemonic-history">
@@ -346,6 +371,14 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
                                     </div>
 
                                     <div className="history-content">
+                                        {item.visualization_prompt && (
+                                            <div className="history-section vis-section" style={{ marginBottom: '1rem' }}>
+                                                <span className="section-label">👁️ Visualization</span>
+                                                <p className="section-text" style={{ color: 'var(--color-accent-orange)', fontStyle: 'italic' }}>
+                                                    {item.visualization_prompt}
+                                                </p>
+                                            </div>
+                                        )}
                                         <div className="history-section input-section">
                                             <span className="section-label">Source Data</span>
                                             <p className="section-text">

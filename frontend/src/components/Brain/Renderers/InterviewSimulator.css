@@ -15,7 +15,7 @@
 .interview-header {
     padding: 15px 20px;
     background: #fff;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -23,7 +23,7 @@
 
 .dark-mode .interview-header {
     background: #1a1d21;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .interview-header h3 {
@@ -50,6 +50,19 @@
     background: #28a745;
     border-radius: 50%;
     box-shadow: 0 0 5px #28a745;
+    animation: status-blink 2s infinite;
+}
+
+@keyframes status-blink {
+
+    0%,
+    100% {
+        box-shadow: 0 0 5px #28a745;
+    }
+
+    50% {
+        box-shadow: 0 0 12px #28a745;
+    }
 }
 
 .interview-chat-area {
@@ -94,7 +107,7 @@
     background: #fff;
     padding: 12px 16px;
     border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     position: relative;
     border-top-left-radius: 0;
 }
@@ -107,8 +120,15 @@
 }
 
 .dark-mode .message-bubble {
-    background: #2a2e33;
+    background: rgba(42, 46, 51, 0.8);
     color: #e0e0e0;
+    backdrop-filter: blur(5px);
+    transition: all 0.3s;
+}
+
+.dark-mode .message-bubble:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
 }
 
 /* Mood Styles for Board */
@@ -141,14 +161,14 @@
 .interview-input-area {
     padding: 15px;
     background: #fff;
-    border-top: 1px solid rgba(0,0,0,0.1);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
     display: flex;
     gap: 10px;
 }
 
 .dark-mode .interview-input-area {
     background: #1a1d21;
-    border-top: 1px solid rgba(255,255,255,0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .interview-input-area textarea {
@@ -194,10 +214,22 @@
     font-size: 1.5rem;
 }
 
-.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
 
 @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
 }

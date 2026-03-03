@@ -1,3 +1,4 @@
+from app.utils.session import get_current_user_id
 from flask import Blueprint, request, jsonify
 from app.db import get_db
 from app.services.game_engine import calculate_and_apply_rewards
@@ -8,7 +9,7 @@ bp = Blueprint('battles', __name__, url_prefix='/api/battles')
 @bp.route('', methods=['GET'])
 def get_battles():
     """Get all battles (Mock Tests + Answer Writing)"""
-    user_id = 1
+    user_id = get_current_user_id()
     conn = get_db()
     
     battles = []
@@ -85,7 +86,7 @@ def get_battles():
 @bp.route('/manual', methods=['POST'])
 def manual_battle():
     """Handle manual external test entry"""
-    user_id = 1
+    user_id = get_current_user_id()
     conn = get_db()
     data = request.get_json()
     

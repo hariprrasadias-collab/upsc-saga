@@ -37,11 +37,18 @@
 }
 
 .metric-card {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
     padding: 20px;
     border-radius: 10px;
     text-align: center;
     border: 1px solid var(--glass-border);
+    transition: all 0.3s;
+}
+
+.metric-card:hover {
+    border-color: rgba(0, 132, 255, 0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transform: translateY(-3px);
 }
 
 .metric-val {
@@ -51,8 +58,13 @@
     margin-bottom: 5px;
 }
 
-.metric-val.good { color: #28a745; }
-.metric-val.bad { color: #dc3545; }
+.metric-val.good {
+    color: #28a745;
+}
+
+.metric-val.bad {
+    color: #dc3545;
+}
 
 .metric-label {
     font-size: 0.85rem;
@@ -62,7 +74,7 @@
 }
 
 .improvement-section {
-    background: rgba(0,0,0,0.2);
+    background: rgba(0, 0, 0, 0.2);
     padding: 25px;
     border-radius: 12px;
     border-left: 4px solid #0084ff;
@@ -84,7 +96,7 @@
     align-items: flex-start;
     margin-bottom: 15px;
     padding: 10px;
-    background: rgba(255,255,255,0.03);
+    background: rgba(255, 255, 255, 0.03);
     border-radius: 8px;
 }
 

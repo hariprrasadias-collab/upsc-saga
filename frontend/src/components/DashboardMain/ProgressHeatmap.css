@@ -46,6 +46,7 @@
 .heatmap-day:hover {
     transform: scale(1.5);
     z-index: 10;
+    box-shadow: 0 0 6px rgba(212, 165, 116, 0.5);
 }
 
 .heatmap-legend {

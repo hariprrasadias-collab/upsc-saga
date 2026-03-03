@@ -97,6 +97,33 @@
     border-color: rgba(0, 242, 255, 0.3);
 }
 
+.input-section.decoding {
+    position: relative;
+}
+
+.input-section.decoding::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 242, 255, 0.06), transparent);
+    animation: decode-shimmer 1.5s infinite linear;
+    pointer-events: none;
+    border-radius: 24px;
+}
+
+@keyframes decode-shimmer {
+    from {
+        transform: translateX(-50%);
+    }
+
+    to {
+        transform: translateX(50%);
+    }
+}
+
 .context-selector {
     display: flex;
     gap: 1rem;
@@ -380,20 +407,22 @@
 }
 
 .keyword-tag {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 242, 255, 0.05);
     padding: 0.4rem 0.8rem;
     border-radius: 6px;
     font-size: 0.85rem;
     color: #cbd5e1;
     cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid transparent;
+    transition: all 0.3s;
+    border: 1px solid rgba(0, 242, 255, 0.15);
 }
 
 .keyword-tag:hover {
-    background: rgba(0, 242, 255, 0.1);
-    border-color: rgba(0, 242, 255, 0.3);
+    background: rgba(0, 242, 255, 0.15);
+    border-color: rgba(0, 242, 255, 0.5);
     color: #00f2ff;
+    box-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
+    transform: translateY(-2px);
 }
 
 /* New Sections: Traps & Cross-Linkages */

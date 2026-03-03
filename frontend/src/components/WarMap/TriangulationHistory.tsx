@@ -55,6 +55,16 @@ const TriangulationHistory: React.FC = () => {
     const [selectedReport, setSelectedReport] = useState<TriangulationReport | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState<'overview' | 'analysis' | 'evidence' | 'strategy'>('overview');
+    const [isDecrypting, setIsDecrypting] = useState(false);
+    const [extracting, setExtracting] = useState(false);
+
+    useEffect(() => {
+        if (selectedReport) {
+            setIsDecrypting(true);
+            const timer = setTimeout(() => setIsDecrypting(false), 1200);
+            return () => clearTimeout(timer);
+        }
+    }, [selectedReport]);
 
     useEffect(() => {
         fetchHistory();
@@ -75,6 +85,32 @@ const TriangulationHistory: React.FC = () => {
             console.error("Failed to fetch Triangulation history", error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleExtractActionables = async () => {
+        if (!selectedReport?.full_report?.way_forward) return;
+        setExtracting(true);
+        try {
+            const response = await fetch('http://127.0.0.1:5000/api/triangulation/extract-actionables', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    topic: selectedReport.topic,
+                    way_forward: selectedReport.full_report.way_forward
+                })
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert('Actionables successfully injected into the Task Queue!');
+            } else {
+                alert('Extraction failed: ' + data.error);
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Oracle Connection Error.');
+        } finally {
+            setExtracting(false);
         }
     };
 
@@ -357,17 +393,36 @@ const TriangulationHistory: React.FC = () => {
 
                 <div className="report-view glass-panel">
                     {selectedReport ? (
-                        <>
-                            <div className="report-header">
-                                <h2>{selectedReport.topic}</h2>
-                                <span className="report-date">{new Date(selectedReport.created_at).toLocaleString()}</span>
+                        isDecrypting ? (
+                            <div className="decrypting-overlay">
+                                <div className="spinner-core"></div>
+                                <h2 className="glitch" data-text="DECRYPTING DOSSIER...">DECRYPTING DOSSIER...</h2>
+                                <div className="scan-line"></div>
                             </div>
-                            {renderContent()}
-                        </>
+                        ) : (
+                            <>
+                                <div className="report-header">
+                                    <div className="header-title-block">
+                                        <h2>{selectedReport.topic}</h2>
+                                        <span className="report-date">CLASSIFIED: {new Date(selectedReport.created_at).toLocaleString()}</span>
+                                    </div>
+                                    {selectedReport.full_report?.way_forward && (
+                                        <button
+                                            className="actionable-btn"
+                                            onClick={handleExtractActionables}
+                                            disabled={extracting}
+                                        >
+                                            {extracting ? 'INJECTING...' : '⚡ EXTRACT ACTIONABLES'}
+                                        </button>
+                                    )}
+                                </div>
+                                {renderContent()}
+                            </>
+                        )
                     ) : (
                         <div className="empty-state">
                             <div className="icon">📂</div>
-                            <p>Select a strategic report to review.</p>
+                            <p>Awaiting dossier selection.</p>
                         </div>
                     )}
                 </div>

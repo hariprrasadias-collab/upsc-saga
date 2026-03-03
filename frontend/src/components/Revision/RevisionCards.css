@@ -103,23 +103,55 @@
 .cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
+    gap: 2rem;
+    perspective: 1000px;
+    /* Essential for 3D flip */
 }
 
-.revision-card {
-    background: linear-gradient(145deg, rgba(30, 30, 30, 0.9), rgba(20, 20, 20, 0.95));
-    border: 1px solid rgba(212, 165, 116, 0.15);
-    border-radius: 10px;
-    padding: 1.5rem;
-    transition: all 0.3s ease;
+/* 3D Card Container */
+.revision-card-container {
+    width: 100%;
+    height: 350px;
+    /* Fixed height for consistent flipping */
+    perspective: 1000px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.revision-card-inner {
     position: relative;
-    /* overflow: hidden; Removed to allow tooltip/popups if any, but mainly fixed via card-content scrolling */
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
+}
+
+.revision-card-container.flipped .revision-card-inner {
+    transform: rotateY(180deg);
+}
+
+.card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 12px;
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    max-height: 400px; /* Prevent cards from becoming too massive */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(212, 165, 116, 0.3);
 }
 
-.revision-card::before {
+/* Front Face */
+.card-face.front {
+    background: linear-gradient(145deg, rgba(30, 30, 30, 0.95), rgba(15, 15, 15, 0.95));
+    align-items: center;
+    justify-content: center;
+}
+
+.card-face.front::before {
     content: '';
     position: absolute;
     top: 0;
@@ -127,13 +159,28 @@
     width: 100%;
     height: 4px;
     background: linear-gradient(90deg, transparent, #d4a574, transparent);
-    opacity: 0.5;
+    opacity: 0.8;
 }
 
-.revision-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-    border-color: rgba(212, 165, 116, 0.4);
+.front-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 10px rgba(212, 165, 116, 0.6));
+}
+
+.front-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    color: #d4a574;
+    text-shadow: 0 0 10px rgba(212, 165, 116, 0.3);
+    margin: 0;
+}
+
+/* Back Face */
+.card-face.back {
+    background: linear-gradient(145deg, rgba(20, 20, 20, 0.95), rgba(10, 10, 10, 0.95));
+    transform: rotateY(180deg);
+    overflow-y: auto;
 }
 
 .card-header {
@@ -152,6 +199,7 @@
     line-height: 1.4;
     flex: 1;
     padding-right: 1rem;
+    text-align: left;
 }
 
 .card-header-actions {
@@ -183,8 +231,10 @@
     color: #e0e0e0;
     font-size: 0.95rem;
     line-height: 1.6;
-    overflow-y: auto; /* Enable scrolling for long content */
-    padding-right: 0.5rem; /* Space for scrollbar */
+    overflow-y: auto;
+    /* Enable scrolling for long content */
+    padding-right: 0.5rem;
+    /* Space for scrollbar */
 }
 
 /* Custom Scrollbar for card content */
@@ -215,7 +265,8 @@
     font-weight: 600;
 }
 
-.markdown-body ul, .markdown-body ol {
+.markdown-body ul,
+.markdown-body ol {
     margin-left: 1.2rem;
     margin-bottom: 0.8rem;
 }
@@ -224,7 +275,9 @@
     margin-bottom: 0.3rem;
 }
 
-.markdown-body h1, .markdown-body h2, .markdown-body h3 {
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3 {
     color: #d4a574;
     font-size: 1.1em;
     margin-top: 1rem;
@@ -251,4 +304,36 @@
 .empty-subtitle {
     font-size: 0.9rem !important;
     color: #555 !important;
+}
+
+/* Auto Generate Weaknesses Button */
+.auto-gen-weakness-btn {
+    background: rgba(212, 165, 116, 0.1);
+    color: #d4a574;
+    border: 1px solid #d4a574;
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Cinzel', serif;
+    margin-top: 1rem;
+    display: block;
+    width: 100%;
+}
+
+.auto-gen-weakness-btn:hover:not(:disabled) {
+    background: #d4a574;
+    color: #000;
+    box-shadow: 0 0 15px rgba(212, 165, 116, 0.6);
+}
+
+.auto-gen-weakness-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: #666;
+    color: #666;
 }

@@ -92,8 +92,9 @@
 
 .node-content:hover {
     transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 15px rgba(52, 152, 219, 0.2);
     background: rgba(13, 17, 23, 1);
+    border-color: rgba(52, 152, 219, 0.3);
 }
 
 .node-title {
@@ -195,6 +196,17 @@
     background: linear-gradient(145deg, rgba(241, 196, 15, 0.2), rgba(176, 141, 85, 0.1));
     box-shadow: 0 0 40px rgba(241, 196, 15, 0.5);
     transform: scale(1.05);
+    animation: runic-pulse 2s infinite alternate;
+}
+
+@keyframes runic-pulse {
+    from {
+        box-shadow: 0 0 30px rgba(241, 196, 15, 0.3);
+    }
+
+    to {
+        box-shadow: 0 0 50px rgba(241, 196, 15, 0.6);
+    }
 }
 
 .status-5 .node-title {

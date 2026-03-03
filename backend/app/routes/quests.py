@@ -1,3 +1,4 @@
+from app.utils.session import get_current_user_id
 from flask import Blueprint, request, jsonify
 from app.db import get_db
 from app.services.game_engine import calculate_and_apply_rewards
@@ -6,7 +7,7 @@ bp = Blueprint('quests', __name__, url_prefix='/api/quests')
 
 @bp.route('', methods=['GET', 'POST'])
 def handle_quests():
-    user_id = 1
+    user_id = get_current_user_id()
     conn = get_db()
     if request.method == 'GET':
         quests = conn.execute('SELECT * FROM tasks WHERE user_id=? AND is_quest=1 ORDER BY isCompleted ASC', (user_id,)).fetchall()
@@ -35,7 +36,7 @@ def handle_quests():
 
 @bp.route('/<int:quest_id>/complete', methods=['POST'])
 def complete_quest(quest_id):
-    user_id = 1
+    user_id = get_current_user_id()
     conn = get_db()
     quest = conn.execute('SELECT * FROM tasks WHERE id = ?', (quest_id,)).fetchone()
     

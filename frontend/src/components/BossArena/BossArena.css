@@ -385,8 +385,33 @@
 
 .health-bar-fill {
     height: 100%;
-    transition: width 0.3s ease;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 0 20px currentColor;
+    position: relative;
+}
+
+.health-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 10px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.6);
+    filter: blur(3px);
+    animation: hp-shimmer 1.5s infinite;
+}
+
+@keyframes hp-shimmer {
+
+    0%,
+    100% {
+        opacity: 0.3;
+    }
+
+    50% {
+        opacity: 0.8;
+    }
 }
 
 .health-bar-fill.player {
@@ -397,6 +422,54 @@
 .health-bar-fill.boss {
     background: linear-gradient(90deg, #f44336 0%, #ff5722 100%);
     box-shadow: 0 0 20px #f44336;
+}
+
+/* Boss Critical State - CRT Scanlines */
+.battle-interface.boss-critical::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(0deg,
+            rgba(244, 67, 54, 0.03),
+            rgba(244, 67, 54, 0.03) 1px,
+            transparent 1px,
+            transparent 3px);
+    pointer-events: none;
+    z-index: 999;
+    animation: scanline-scroll 4s infinite linear;
+}
+
+.battle-interface.boss-critical {
+    animation: screen-shake 0.3s infinite;
+}
+
+@keyframes scanline-scroll {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: 0 100px;
+    }
+}
+
+@keyframes screen-shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-2px);
+    }
+
+    75% {
+        transform: translateX(2px);
+    }
 }
 
 .health-label {

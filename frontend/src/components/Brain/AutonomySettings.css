@@ -85,7 +85,8 @@
 
 .level-option:hover {
     background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(0, 188, 212, 0.2);
+    transform: translateX(3px);
 }
 
 .level-option.selected {
@@ -139,6 +140,12 @@
     border-radius: 8px;
     text-align: center;
     border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s;
+}
+
+.stat-card:hover {
+    border-color: rgba(0, 188, 212, 0.2);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 }
 
 .stat-value {
@@ -166,6 +173,12 @@
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 8px;
     padding: 12px;
+    transition: all 0.2s;
+}
+
+.log-item:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .log-header {

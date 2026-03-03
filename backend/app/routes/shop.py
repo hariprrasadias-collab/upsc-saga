@@ -1,3 +1,4 @@
+from app.utils.session import get_current_user_id
 from flask import Blueprint, request, jsonify
 from app.db import get_db
 
@@ -5,7 +6,7 @@ bp = Blueprint('shop', __name__, url_prefix='/api/shop')
 
 @bp.route('/inventory', methods=['GET'])
 def get_inventory():
-    user_id = 1
+    user_id = get_current_user_id()
     conn = get_db()
     items = conn.execute('SELECT item_id, equipped FROM inventory WHERE user_id = ?', (user_id,)).fetchall()
     user = conn.execute('SELECT hacksilver FROM users WHERE id = ?', (user_id,)).fetchone()
@@ -16,7 +17,7 @@ def get_inventory():
 
 @bp.route('/buy', methods=['POST'])
 def buy_item():
-    user_id = 1
+    user_id = get_current_user_id()
     data = request.get_json()
     cost = data.get('cost')
     

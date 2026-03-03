@@ -719,5 +719,5 @@ def get_similar_questions(question_id):
              conn = get_db()
              fallback = conn.execute("SELECT * FROM pyq_questions WHERE subject = ? AND id != ? ORDER BY RANDOM() LIMIT 5", (question['subject'], question_id)).fetchall()
              return jsonify([dict(q) for q in fallback])
-        except:
+        except Exception:
              return jsonify([])

@@ -237,6 +237,7 @@ const TimeBoxing: React.FC = () => {
                                                 animate={{ width: `${Math.min(percentage, 100)}%` }}
                                                 transition={{ duration: 1, ease: "easeOut" }}
                                             />
+                                            <div className="progress-segments"></div>
                                         </div>
 
                                         <div className="card-actions">

@@ -47,4 +47,5 @@ def delete_automation_content(id):
         conn.commit()
         return jsonify({'success': True})
     except Exception as e:
+        print(f"Error deleting automation content {id}: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500

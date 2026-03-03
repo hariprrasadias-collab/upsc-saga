@@ -34,12 +34,31 @@
     border-radius: 10px;
     padding: 15px;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.opportunity-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, #00bcd4, #673ab7);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.opportunity-card:hover::before {
+    opacity: 1;
 }
 
 .opportunity-card:hover {
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(0, 188, 212, 0.3);
     transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .opp-header {
@@ -115,6 +134,12 @@
     border: 1px solid rgba(103, 58, 183, 0.3);
     border-radius: 10px;
     padding: 15px;
+    transition: all 0.3s;
+}
+
+.experiment-card:hover {
+    border-color: rgba(103, 58, 183, 0.5);
+    box-shadow: 0 0 15px rgba(103, 58, 183, 0.15);
 }
 
 .exp-header {

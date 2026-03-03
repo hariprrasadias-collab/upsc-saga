@@ -1,3 +1,4 @@
+from app.utils.session import get_current_user_id
 from flask import Blueprint, request, jsonify
 from app.db import get_db
 import anki_client
@@ -39,7 +40,7 @@ def answer_anki_card():
     result = anki_client.answer_card(card_id, ease)
     
     # Give XP for studying!
-    user_id = 1
+    user_id = get_current_user_id()
     xp_gain = 10 # Small consistent XP
     
     from app.services.game_engine import calculate_and_apply_rewards

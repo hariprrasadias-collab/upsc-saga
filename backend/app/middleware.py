@@ -15,19 +15,31 @@ RATE_LIMIT_FILE = os.environ.get(
     os.path.join(BASE_DIR, 'rate_limits.json')
 )
 
+# In-memory rate limit store (avoids file I/O on every request)
+_rate_limits: dict = {}
+_last_sync = 0.0
+_SYNC_INTERVAL = 30  # seconds between file syncs
+
 def _load_rate_limits():
+    global _rate_limits
     if os.path.exists(RATE_LIMIT_FILE):
         try:
             with open(RATE_LIMIT_FILE, 'r') as f:
-                return json.load(f)
-        except:
-            return {}
-    return {}
+                _rate_limits = json.load(f)
+        except (json.JSONDecodeError, IOError):
+            _rate_limits = {}
+    return _rate_limits
 
 def _save_rate_limits(limits):
+    global _last_sync
+    now = time.time()
+    
+    # Only write to disk periodically
+    if now - _last_sync < _SYNC_INTERVAL:
+        return
+    _last_sync = now
+    
     try:
-        # Clean up stale entries while saving
-        now = time.time()
         cleaned_limits = {}
         for ip, data in limits.items():
             valid_times = [t for t in data if now - t < RATE_LIMIT_WINDOW]
@@ -57,8 +69,11 @@ def register_middleware(app):
         client_ip = request.remote_addr
         now = time.time()
         
-        limits = _load_rate_limits()
-        request_times = limits.get(client_ip, [])
+        # Use in-memory store, load from file only on first request
+        global _rate_limits
+        if not _rate_limits:
+            _load_rate_limits()
+        request_times = _rate_limits.get(client_ip, [])
         
         # Filter strictly within window
         request_times = [t for t in request_times if now - t < RATE_LIMIT_WINDOW]
@@ -70,11 +85,10 @@ def register_middleware(app):
             }), 429
             
         request_times.append(now)
-        limits[client_ip] = request_times
+        _rate_limits[client_ip] = request_times
         
-        # In a real high-throughput scenario, don't write to file on every request,
-        # but for this scale and to ensure persistence over dicts, it's acceptable.
-        _save_rate_limits(limits)
+        # Periodic file sync for persistence
+        _save_rate_limits(_rate_limits)
 
     @app.before_request
     def assign_request_id():
@@ -102,7 +116,7 @@ def register_middleware(app):
                     data['request_id'] = g.request_id
                     response.set_data(json.dumps(data))
                 return response
-        except:
+        except Exception:
             pass
             
         # Parse the original JSON

@@ -41,7 +41,7 @@ def main():
     app = create_app()
     with app.app_context():
         print("🚀 Starting Quota Compliance Verification...")
-        print(f"   Current Model Manager Config: Fast={model_manager.FAST_MODELS}, Pro={model_manager.PRO_MODELS}")
+        print(f"   Current Model Manager Config: Fast={model_manager.GEMINI_FAST_MODELS}, Pro={model_manager.GEMINI_PRO_MODELS}")
         
         success_count = 0
         total_tests = 0

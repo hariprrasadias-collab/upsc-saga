@@ -2,6 +2,7 @@ import { API_BASE_URL } from '../../config';
 
 // /frontend/src/components/Quests/QuestsPage.tsx
 import React, { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import './QuestsPage.css';
 import type { Task, RawTaskFromAPI } from '../../contexts/GlobalContext';
 import AddQuestForm from './AddQuestForm';
@@ -143,26 +144,40 @@ const QuestsPage: React.FC<QuestsPageProps> = ({ onTaskCompleted }) => {
           ) : error ? (
             <div className="error-message">Error: {error}</div>
           ) : quests.length > 0 ? (
-            <ul className="quest-list">
-              {quests.map((quest) => (
-                <li key={quest.id} className={`quest-item ${quest.isCompleted ? 'completed' : ''}`}>
-                  <div className="quest-checkbox-wrapper">
-                    <input
-                      type="checkbox"
-                      id={`quest-${quest.id}`}
-                      checked={quest.isCompleted}
-                      onChange={() => handleQuestComplete(quest.id)}
-                      disabled={quest.isCompleted}
-                    />
-                    <label htmlFor={`quest-${quest.id}`} className="quest-title-label">
-                      {quest.title}
-                      {quest.due_date && <span className="quest-due-date"> (Due: {quest.due_date})</span>}
-                    </label>
-                  </div>
-                  <span className="quest-xp">+{quest.xp_reward} XP</span>
-                </li>
-              ))}
-            </ul>
+            <motion.div layout className="quest-grid">
+              <AnimatePresence>
+                {quests.map((quest) => (
+                  <motion.div
+                    key={quest.id}
+                    className={`quest-card ${quest.isCompleted ? 'completed' : ''}`}
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.5, filter: 'blur(10px)', transition: { duration: 0.5 } }}
+                    layout
+                  >
+                    <div className="quest-card-header">
+                      <h3 className="quest-title">{quest.title}</h3>
+                      <span className="quest-xp">+{quest.xp_reward} XP</span>
+                    </div>
+
+                    <div className="quest-card-body">
+                      {quest.due_date && <span className="quest-due-date">Due: {quest.due_date}</span>}
+                      {quest.associated_stat && <span className="quest-stat-badge">{quest.associated_stat.toUpperCase()}</span>}
+                    </div>
+
+                    <div className="quest-card-footer">
+                      <button
+                        className={`quest-action-btn ${quest.isCompleted ? 'btn-completed' : ''}`}
+                        onClick={() => handleQuestComplete(quest.id)}
+                        disabled={quest.isCompleted}
+                      >
+                        {quest.isCompleted ? 'CLAIMED' : 'COMPLETE MISSION'}
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
           ) : (
             <div className="empty-quests-message">
               No active campaigns. Time to forge a new destiny!

@@ -44,7 +44,8 @@ export const useBrain = () => {
         try {
             const response = await fetch(`${BRAIN_API_URL}/status`);
             if (!response.ok) throw new Error('Failed to fetch status');
-            const data = await response.json();
+            const rawData = await response.json();
+            const data = rawData.data || rawData;
 
             const flatSynapses: Synapse[] = [];
             if (data.active_modules) {
@@ -69,7 +70,8 @@ export const useBrain = () => {
         try {
             const response = await fetch(`${BRAIN_API_URL}/proactive`);
             if (!response.ok) throw new Error('Failed to fetch insights');
-            const data = await response.json();
+            const rawData = await response.json();
+            const data = rawData.data || rawData;
             setInsights(data.insights || []);
         } catch (err) {
             handleError('Failed to load insights', err);
@@ -85,7 +87,8 @@ export const useBrain = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ type: action.type, payload: action.payload }),
             });
-            const result = await response.json();
+            const rawResult = await response.json();
+            const result = rawResult.data || rawResult;
 
             addMessage({
                 text: `Action Executed: ${result.message || result.error || 'Completed'}`,
@@ -93,7 +96,7 @@ export const useBrain = () => {
             });
 
             // Auto-Navigation Logic
-            if (result.success) {
+            if (rawResult.success || result.success) {
                 switch (action.type) {
                     case 'CREATE_FLASHCARDS':
                         navigate('/flashcards');
@@ -132,7 +135,8 @@ export const useBrain = () => {
         try {
             const response = await fetch(`${BRAIN_API_URL}/optimize`, { method: 'POST' });
             if (!response.ok) throw new Error('Optimization failed');
-            const data = await response.json();
+            const rawData = await response.json();
+            const data = rawData.data || rawData;
 
             addMessage({
                 text: `**Optimization Complete**\n\n${data.analysis}`,
@@ -160,7 +164,8 @@ export const useBrain = () => {
             });
 
             if (!response.ok) throw new Error('Brain unreachable');
-            const data = await response.json();
+            const rawData = await response.json();
+            const data = rawData.data || rawData;
 
             addMessage({
                 text: data.response_text || "I'm having trouble thinking right now.",

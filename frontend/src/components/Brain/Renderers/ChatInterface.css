@@ -16,7 +16,8 @@
     flex: 1;
     overflow-y: auto;
     padding: 20px;
-    padding-bottom: 80px; /* Space for controls */
+    padding-bottom: 80px;
+    /* Space for controls */
 }
 
 .chat-message-row {
@@ -42,7 +43,7 @@
     justify-content: center;
     font-size: 1.5rem;
     flex-shrink: 0;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .chat-bubble-container {
@@ -79,6 +80,13 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #e0e0e0;
     border-top-left-radius: 2px;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s;
+}
+
+.agent-bubble:hover {
+    border-color: rgba(88, 166, 255, 0.25);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
 }
 
 .user-bubble {
@@ -137,9 +145,10 @@
 
 .typing-indicator {
     font-size: 0.8rem;
-    color: #8b949e;
+    color: #58a6ff;
     font-style: italic;
     animation: pulse 1.5s infinite;
+    text-shadow: 0 0 6px rgba(88, 166, 255, 0.3);
 }
 
 .input-group {
@@ -162,7 +171,8 @@
     outline: none;
 }
 
-.send-btn, .auto-btn {
+.send-btn,
+.auto-btn {
     padding: 0 20px;
     border: none;
     border-radius: 6px;
@@ -181,11 +191,13 @@
     color: white;
 }
 
-.send-btn:active, .auto-btn:active {
+.send-btn:active,
+.auto-btn:active {
     transform: scale(0.95);
 }
 
-.send-btn:disabled, .auto-btn:disabled {
+.send-btn:disabled,
+.auto-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
@@ -197,7 +209,15 @@
 }
 
 @keyframes pulse {
-    0% { opacity: 0.5; }
-    50% { opacity: 1; }
-    100% { opacity: 0.5; }
+    0% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.5;
+    }
 }

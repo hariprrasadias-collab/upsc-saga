@@ -1,3 +1,4 @@
+from app.utils.session import get_current_user_id
 from flask import Blueprint, request, jsonify
 from flask_cors import CORS
 from app.db import get_db
@@ -28,7 +29,7 @@ def update_status(id):
     try:
         data = request.json
         status = data.get('status')
-        user_id = 1 # Hardcoded for now
+        user_id = get_current_user_id()
         
         if status not in ['Not Started', 'Reading', 'Notes Done', 'Revision 1', 'Revision 2', 'Completed']:
             return jsonify({'error': 'Invalid status'}), 400

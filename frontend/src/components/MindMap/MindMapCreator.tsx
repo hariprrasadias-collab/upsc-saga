@@ -11,6 +11,15 @@ const MindMapCreator: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [savedMaps, setSavedMaps] = useState<any[]>([]);
     const [showSaved, setShowSaved] = useState(false);
+    const [contextMenu, setContextMenu] = useState<{ x: number, y: number, node: any } | null>(null);
+    const [divingId, setDivingId] = useState<string | null>(null);
+
+    // Close context menu on external clicks
+    React.useEffect(() => {
+        const handleClick = () => setContextMenu(null);
+        window.addEventListener('click', handleClick);
+        return () => window.removeEventListener('click', handleClick);
+    }, []);
 
     React.useEffect(() => {
         fetchSavedMaps();
@@ -120,6 +129,55 @@ const MindMapCreator: React.FC = () => {
         }
     };
 
+    const handleNodeRightClick = (nodeData: any, x: number, y: number) => {
+        setContextMenu({ x, y, node: nodeData });
+    };
+
+    const handleDeepDive = async () => {
+        if (!contextMenu || !mindMapData) return;
+
+        const targetNode = contextMenu.node;
+        setContextMenu(null);
+        setDivingId(targetNode.name);
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/mindmap/deepdive`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ topic, node_name: targetNode.name })
+            });
+
+            if (!res.ok) throw new Error("Failed to deep dive");
+
+            const data = await res.json();
+            if (data.success && data.children) {
+                // We need to find the node within our mindMapData tree and attach children
+                const newData = JSON.parse(JSON.stringify(mindMapData)); // Deep clone
+
+                const appendChildren = (currentNode: any, targetName: string, newChildren: any[]) => {
+                    if (currentNode.name === targetName) {
+                        currentNode.children = currentNode.children || [];
+                        currentNode.children = [...currentNode.children, ...newChildren];
+                        return true;
+                    }
+                    if (currentNode.children) {
+                        for (let child of currentNode.children) {
+                            if (appendChildren(child, targetName, newChildren)) return true;
+                        }
+                    }
+                    return false;
+                };
+
+                appendChildren(newData, targetNode.name, data.children);
+                setMindMapData(newData);
+            }
+        } catch (err: any) {
+            alert(err.message);
+        } finally {
+            setDivingId(null);
+        }
+    };
+
     return (
         <div className="mindmap-container">
             <div className="mindmap-header">
@@ -188,7 +246,12 @@ const MindMapCreator: React.FC = () => {
                                 <div className="canvas-actions">
                                     <button className="save-btn" onClick={handleSave}>💾 Save Map</button>
                                 </div>
-                                <D3Tree data={mindMapData} />
+                                <D3Tree data={mindMapData} onNodeRightClick={handleNodeRightClick} />
+                                {divingId && (
+                                    <div className="diving-indicator">
+                                        ⚡ Neural Link Extrapolating "{divingId}"...
+                                    </div>
+                                )}
                             </>
                         ) : (
                             !loading && (
@@ -206,6 +269,19 @@ const MindMapCreator: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {contextMenu && (
+                <div
+                    className="cyber-context-menu"
+                    style={{ left: contextMenu.x, top: contextMenu.y }}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="menu-header">Node: {contextMenu.node.name.length > 20 ? contextMenu.node.name.substring(0, 20) + '...' : contextMenu.node.name}</div>
+                    <button className="menu-btn" onClick={handleDeepDive}>
+                        ⚡ AI Deep Dive Expansion
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

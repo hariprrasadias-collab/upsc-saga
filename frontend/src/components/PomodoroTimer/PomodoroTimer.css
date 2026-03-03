@@ -216,6 +216,29 @@ body {
 
 .progress-ring {
     transform: rotate(-90deg);
+    filter: drop-shadow(0 0 6px rgba(132, 169, 255, 0.4));
+}
+
+.progress-ring circle.ring-progress {
+    transition: stroke-dashoffset 1s linear;
+}
+
+/* Neon ring pulse - intensifies in last 60s */
+.pomodoro-timer-display.urgent .progress-ring {
+    filter: drop-shadow(0 0 12px rgba(255, 107, 107, 0.6));
+    animation: ring-urgent-pulse 1s infinite;
+}
+
+@keyframes ring-urgent-pulse {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 0 8px rgba(255, 107, 107, 0.4));
+    }
+
+    50% {
+        filter: drop-shadow(0 0 20px rgba(255, 107, 107, 0.8));
+    }
 }
 
 .timer-text {

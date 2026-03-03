@@ -43,7 +43,7 @@ def get_content():
         if item.get('metadata'):
             try:
                 item['metadata'] = json.loads(item['metadata'])
-            except:
+            except Exception:
                 item['metadata'] = {}
         results.append(item)
         
@@ -65,7 +65,7 @@ def get_content_by_id(id):
     if item.get('metadata'):
         try:
             item['metadata'] = json.loads(item['metadata'])
-        except:
+        except Exception:
             item['metadata'] = {}
             
     return jsonify({"success": True, "data": item})

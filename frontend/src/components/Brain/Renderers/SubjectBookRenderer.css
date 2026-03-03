@@ -5,7 +5,8 @@
     border: 1px solid var(--glass-border);
     border-radius: 12px;
     overflow: hidden;
-    font-family: 'Crimson Text', serif; /* Book-like font */
+    font-family: 'Crimson Text', serif;
+    /* Book-like font */
 }
 
 .book-spine {
@@ -56,6 +57,7 @@
     background: rgba(255, 215, 0, 0.1);
     color: var(--gold);
     border-left: 3px solid var(--gold);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.1);
 }
 
 .chapter-num {
@@ -75,8 +77,10 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    background: #fdfbf7; /* Paper color */
-    color: #2c3e50; /* Ink color */
+    background: #fdfbf7;
+    /* Paper color */
+    color: #2c3e50;
+    /* Ink color */
     padding: 40px;
 }
 
@@ -86,13 +90,13 @@
 }
 
 .page-header {
-    border-bottom: 2px solid rgba(0,0,0,0.1);
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
     padding-bottom: 15px;
     margin-bottom: 20px;
 }
 
 .dark-mode .page-header {
-    border-bottom: 2px solid rgba(255,255,255,0.1);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .page-header h3 {
@@ -107,14 +111,14 @@
 
 .concept-tag {
     font-size: 0.75rem;
-    background: rgba(0,0,0,0.05);
+    background: rgba(0, 0, 0, 0.05);
     padding: 2px 8px;
     border-radius: 12px;
     color: #666;
 }
 
 .dark-mode .concept-tag {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
     color: #aaa;
 }
 
@@ -132,16 +136,16 @@
     align-items: center;
     margin-top: 20px;
     padding-top: 15px;
-    border-top: 1px solid rgba(0,0,0,0.1);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .dark-mode .page-footer {
-    border-top: 1px solid rgba(255,255,255,0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .page-footer button {
     background: none;
-    border: 1px solid rgba(0,0,0,0.2);
+    border: 1px solid rgba(0, 0, 0, 0.2);
     padding: 5px 15px;
     border-radius: 4px;
     cursor: pointer;
@@ -149,7 +153,7 @@
 }
 
 .dark-mode .page-footer button {
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .page-footer button:disabled {

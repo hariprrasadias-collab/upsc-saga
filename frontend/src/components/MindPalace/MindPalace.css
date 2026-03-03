@@ -214,3 +214,54 @@
     border-radius: 6px;
     cursor: pointer;
 }
+
+/* 3D Isometric Room View */
+.isometric-room {
+    transform: perspective(1200px) rotateX(60deg) rotateZ(-45deg);
+    transform-style: preserve-3d;
+    box-shadow: 0 0 50px rgba(52, 152, 219, 0.2);
+    border-radius: 20px;
+    background: radial-gradient(circle at center, rgba(52, 152, 219, 0.1) 0%, transparent 70%);
+    border: 1px solid rgba(52, 152, 219, 0.3);
+    transition: transform 0.5s ease;
+    margin: 40px auto;
+    width: 80% !important;
+    height: 80% !important;
+}
+
+.isometric-room::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(52, 152, 219, 0.2) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(52, 152, 219, 0.2) 1px, transparent 1px);
+    background-size: 50px 50px;
+    transform: translateZ(-1px);
+    pointer-events: none;
+}
+
+.isometric-node {
+    transform: rotateZ(45deg) rotateX(-60deg) translateY(-30px);
+    transform-style: preserve-3d;
+    box-shadow: 0 30px 20px rgba(0, 0, 0, 0.6), 0 0 20px rgba(52, 152, 219, 0.6);
+    border-color: #3498db;
+    background: rgba(13, 17, 23, 0.9);
+}
+
+.isometric-node::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 30px;
+    background: linear-gradient(to bottom, #3498db, transparent);
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: -1;
+}
+
+.isometric-node:hover {
+    transform: rotateZ(45deg) rotateX(-60deg) translateY(-40px) scale(1.1);
+    box-shadow: 0 40px 25px rgba(0, 0, 0, 0.5), 0 0 30px rgba(52, 152, 219, 0.8);
+}

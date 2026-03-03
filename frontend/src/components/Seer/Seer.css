@@ -50,21 +50,58 @@
 
 .seer-card {
     background: rgba(13, 17, 23, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(52, 152, 219, 0.15);
     border-radius: 16px;
     padding: 2rem;
     backdrop-filter: blur(10px);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.seer-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--color-accent-blue), var(--color-accent-orange), transparent);
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.seer-card:hover::before {
+    opacity: 1;
+    animation: border-shimmer 2s infinite linear;
+}
+
+@keyframes border-shimmer {
+    from {
+        background-position: -200% 0;
+    }
+
+    to {
+        background-position: 200% 0;
+    }
+}
+
+.seer-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(52, 152, 219, 0.05), transparent 70%);
+    pointer-events: none;
 }
 
 .seer-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
-    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5), 0 0 20px rgba(52, 152, 219, 0.15);
+    border-color: rgba(52, 152, 219, 0.3);
 }
 
 .seer-card.wide {

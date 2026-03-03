@@ -599,3 +599,68 @@
     cursor: pointer;
     font-weight: bold;
 }
+
+/* Ink Meter - Word Count Progress Bar */
+.ink-meter {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.ink-meter-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.4s ease, background 0.4s ease;
+    box-shadow: 0 0 8px currentColor;
+}
+
+/* AI Analysis Glassmorphic Overlay */
+.analysis-result {
+    margin-top: 1.5rem !important;
+    padding: 1.5rem !important;
+    background: rgba(142, 68, 173, 0.08) !important;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(142, 68, 173, 0.3) !important;
+    border-left: 4px solid #8e44ad !important;
+    border-radius: 12px !important;
+    animation: slideUp 0.5s ease-out;
+}
+
+.analysis-result h3 {
+    color: #9b59b6;
+    font-family: 'Cinzel', serif;
+    margin-top: 0;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Analyze Button */
+.analyze-btn {
+    background: linear-gradient(135deg, rgba(142, 68, 173, 0.3), rgba(155, 89, 182, 0.3)) !important;
+    border: 1px solid rgba(155, 89, 182, 0.5) !important;
+    color: #d2b4de !important;
+    padding: 0.6rem 1.2rem !important;
+    border-radius: 8px !important;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+}
+
+.analyze-btn:hover:not(:disabled) {
+    box-shadow: 0 0 15px rgba(155, 89, 182, 0.5);
+    background: rgba(155, 89, 182, 0.4) !important;
+}

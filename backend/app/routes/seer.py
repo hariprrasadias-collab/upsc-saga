@@ -1,3 +1,4 @@
+from app.utils.session import get_current_user_id
 from flask import Blueprint, jsonify
 from app.db import get_db
 import datetime
@@ -6,7 +7,7 @@ bp = Blueprint('seer', __name__, url_prefix='/api/seer')
 
 @bp.route('', methods=['GET'])
 def consult_the_seer():
-    user_id = 1
+    user_id = get_current_user_id()
     conn = get_db()
     
     # 1. STAT RADAR (Which subject is your strongest?)

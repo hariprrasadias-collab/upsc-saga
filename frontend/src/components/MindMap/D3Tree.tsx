@@ -14,9 +14,10 @@ interface CustomHierarchyNode extends d3.HierarchyNode<TreeNode> {
 
 interface D3TreeProps {
     data: TreeNode;
+    onNodeRightClick?: (nodeData: TreeNode, x: number, y: number) => void;
 }
 
-const D3Tree: React.FC<D3TreeProps> = ({ data }) => {
+const D3Tree: React.FC<D3TreeProps> = ({ data, onNodeRightClick }) => {
     const svgRef = useRef<SVGSVGElement>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -49,9 +50,8 @@ const D3Tree: React.FC<D3TreeProps> = ({ data }) => {
 
         const gLink = svg.append("g")
             .attr("fill", "none")
-            .attr("stroke", "#555")
-            .attr("stroke-opacity", 0.4)
-            .attr("stroke-width", 1.5);
+            .attr("stroke", "rgba(52, 152, 219, 0.4)") // Cyberpunk Blue Base
+            .attr("stroke-width", 2);
 
         const gNode = svg.append("g")
             .attr("cursor", "pointer")
@@ -104,24 +104,34 @@ const D3Tree: React.FC<D3TreeProps> = ({ data }) => {
                 .on("click", (_event, d) => {
                     d.children = d.children ? undefined : d._children;
                     update(d);
+                })
+                .on("contextmenu", (event, d) => {
+                    event.preventDefault();
+                    if (onNodeRightClick) {
+                        onNodeRightClick(d.data, event.pageX, event.pageY);
+                    }
                 });
 
             nodeEnter.append("circle")
+                .attr("class", "neon-node-circle")
                 .attr("r", 6)
-                .attr("fill", (d) => d._children ? "#555" : "#999")
-                .attr("stroke-width", 10);
+                .attr("fill", (d) => d._children ? "#3498db" : "#9b59b6")
+                .attr("stroke", (d) => d._children ? "rgba(52, 152, 219, 0.5)" : "rgba(155, 89, 182, 0.5)")
+                .attr("stroke-width", 4)
+                .style("filter", "drop-shadow(0 0 8px rgba(52, 152, 219, 0.8))");
 
             nodeEnter.append("text")
                 .attr("dy", "0.31em")
-                .attr("x", (d) => d._children ? -8 : 8)
+                .attr("x", (d) => d._children ? -12 : 12)
                 .attr("text-anchor", (d) => d._children ? "end" : "start")
                 .text((d) => d.data.name)
-                .attr("fill", "white") // High contrast text
-                .style("text-shadow", "0 1px 2px rgba(0,0,0,0.8)") // Shadow for readability
+                .attr("fill", "#ecf0f1")
+                .style("text-shadow", "0 0 8px rgba(52, 152, 219, 0.6)")
+                .style("font-weight", "500")
                 .clone(true).lower()
                 .attr("stroke-linejoin", "round")
-                .attr("stroke-width", 3)
-                .attr("stroke", "#1a1a1a"); // Dark halo
+                .attr("stroke-width", 4)
+                .attr("stroke", "rgba(13, 17, 23, 0.9)"); // Dark background halo
 
             // Transition nodes to their new position.
             const nodeUpdate = node.merge(nodeEnter).transition(transition as any)
@@ -144,10 +154,12 @@ const D3Tree: React.FC<D3TreeProps> = ({ data }) => {
 
             // Enter any new links at the parent's previous position.
             const linkEnter = link.enter().append("path")
+                .attr("class", "neon-link")
                 .attr("d", (_d: any) => {
                     const o = { x: source.x0 ?? 0, y: source.y0 ?? 0 };
                     return diagonal({ source: o, target: o });
-                });
+                })
+                .style("filter", "drop-shadow(0 0 3px rgba(52, 152, 219, 0.4))");
 
             // Transition links to their new position.
             link.merge(linkEnter).transition(transition as any)

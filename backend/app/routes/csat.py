@@ -57,7 +57,7 @@ def get_questions():
             # Parse options JSON
             try:
                 q_dict['options'] = json.loads(q_dict['options'])
-            except:
+            except Exception:
                 q_dict['options'] = []
             result.append(q_dict)
             

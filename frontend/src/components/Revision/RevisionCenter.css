@@ -57,25 +57,51 @@
 }
 
 .revision-card {
-    background: rgba(13, 17, 23, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: transparent;
+    perspective: 1500px;
+    height: 400px;
+    width: 100%;
+}
+
+.card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    border-radius: 16px;
+}
+
+.revision-card.is-flipped .card-inner {
+    transform: rotateY(180deg);
+}
+
+.card-front,
+.card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    background: linear-gradient(145deg, rgba(20, 25, 35, 0.9), rgba(10, 12, 18, 0.9));
+    border: 1px solid rgba(80, 90, 110, 0.3);
     border-radius: 16px;
     padding: 3rem;
-    min-height: 400px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    text-align: center;
-    position: relative;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(10px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.02);
 }
 
-.revision-card:hover {
-    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.6);
-    border-color: rgba(255, 255, 255, 0.1);
+.card-front {
+    /* Front specifics */
+}
+
+.card-back {
+    transform: rotateY(180deg);
+    /* Back specifics */
 }
 
 .card-type {
@@ -91,6 +117,7 @@
     border: 1px solid rgba(243, 156, 18, 0.3);
     padding: 0.3rem 0.8rem;
     border-radius: 4px;
+    z-index: 10;
 }
 
 .card-front h3 {
@@ -106,20 +133,14 @@
     color: var(--color-text-primary);
     line-height: 1.6;
     font-family: 'Georgia', serif;
-}
-
-.card-back {
-    margin-top: 2.5rem;
-    padding-top: 2.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    width: 100%;
-    animation: fadeIn 0.5s ease-out;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .card-back p {
     font-size: 1.4rem;
     color: var(--color-accent-blue);
     line-height: 1.6;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .controls {
@@ -259,4 +280,45 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Hint Button and Box */
+.hint-btn {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: rgba(155, 89, 182, 0.1);
+    border: 1px solid rgba(155, 89, 182, 0.4);
+    color: #9b59b6;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.hint-btn:hover {
+    background: rgba(155, 89, 182, 0.3);
+    box-shadow: 0 0 15px rgba(155, 89, 182, 0.5);
+    color: #fff;
+}
+
+.hint-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.ai-hint-box {
+    margin-top: 2rem;
+    background: rgba(142, 68, 173, 0.15);
+    border-left: 3px solid #9b59b6;
+    padding: 1rem;
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: #d2b4de;
+    max-width: 80%;
+    animation: fadeIn 0.4s ease-out;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }

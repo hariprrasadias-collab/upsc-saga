@@ -342,3 +342,77 @@
     border-radius: 8px;
     text-align: center;
 }
+
+/* Cyber Context Menu */
+.cyber-context-menu {
+    position: absolute;
+    /* Changed to absolute for inner container positioning */
+    background: rgba(13, 17, 23, 0.95);
+    border: 1px solid rgba(52, 152, 219, 0.5);
+    box-shadow: 0 0 15px rgba(52, 152, 219, 0.4);
+    border-radius: 8px;
+    padding: 8px;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    min-width: 200px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.cyber-context-menu .menu-header {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.cyber-context-menu .menu-btn {
+    width: 100%;
+    text-align: left;
+    background: rgba(52, 152, 219, 0.1);
+    border: 1px solid transparent;
+    color: #ecf0f1;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.cyber-context-menu .menu-btn:hover {
+    background: rgba(52, 152, 219, 0.3);
+    border-color: rgba(52, 152, 219, 0.8);
+    box-shadow: 0 0 10px rgba(52, 152, 219, 0.4);
+    text-shadow: 0 0 5px rgba(52, 152, 219, 0.8);
+}
+
+/* Diving Indicator */
+.diving-indicator {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(155, 89, 182, 0.9);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    box-shadow: 0 0 15px rgba(155, 89, 182, 0.6);
+    animation: pulse 1.5s infinite;
+    z-index: 100;
+    border: 1px solid #8e44ad;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

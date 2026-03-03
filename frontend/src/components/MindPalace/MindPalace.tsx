@@ -225,14 +225,14 @@ const MindPalace: React.FC = () => {
                     </div>
                 ) : (
                     <div
-                        className="room-view"
-                        style={{ width: '100%', height: '100%', position: 'relative' }}
+                        className="room-view isometric-room"
+                        style={{ position: 'relative' }}
                         onDragOver={(e) => e.preventDefault()}
                     >
                         {artifacts.map(art => (
                             <div
                                 key={art.id}
-                                className="artifact-node"
+                                className="artifact-node isometric-node"
                                 style={{
                                     left: `${art.x_position}%`,
                                     top: `${art.y_position}%`,

@@ -422,3 +422,37 @@ def get_todays_tasks_summary():
         summary.append(f"- {status_str} [{t['start_time']}-{t['end_time']}] {t['subject']}: {t['topic']}")
         
     return "\n".join(summary)
+
+def inject_tactical_revision(topic, subject, plan_id):
+    """
+    Surgical autonomous AI override: Injects an emergency 'Tactical Revision' for the 
+    specified weak area into the very next available 'study' or 'buffer' slot tomorrow.
+    """
+    conn = get_db()
+    
+    # 1. Find the first available slot starting tomorrow
+    tomorrow = (datetime.date.today() + timedelta(days=1)).isoformat()
+    
+    # Grab the next non-completed slot
+    next_slot = conn.execute('''
+        SELECT st.* 
+        FROM study_tasks st
+        WHERE st.plan_id = ? AND st.date >= ? AND st.status != 'completed'
+        ORDER BY st.date ASC, st.start_time ASC
+        LIMIT 1
+    ''', (plan_id, tomorrow)).fetchone()
+    
+    if not next_slot:
+        return False
+        
+    # 2. Convert it into a Tactical AI Revision Block
+    override_topic = f"🔥 TACTICAL REVISION: {topic}"
+    conn.execute('''
+        UPDATE study_tasks 
+        SET subject = ?, topic = ?, status = 'pending', resource_link = ''
+        WHERE id = ?
+    ''', ("AI Override: " + subject, override_topic, next_slot['id']))
+    
+    conn.commit()
+    print(f"Brain: ⚠️ Injected emergency tactical revision for {topic} on {next_slot['date']}")
+    return True

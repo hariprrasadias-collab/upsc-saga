@@ -3,11 +3,13 @@
     flex-direction: column;
     gap: 1rem;
     height: 100%;
-    background: transparent; /* Default */
+    background: transparent;
+    /* Default */
 }
 
 .cheat-sheet-container.fullscreen-mode {
-    background: #0f0f13; /* Dark background for fullscreen */
+    background: #0f0f13;
+    /* Dark background for fullscreen */
     padding: 2rem;
     overflow: auto;
 }
@@ -55,7 +57,8 @@
     background: rgba(255, 255, 255, 0.1);
     border: none;
     color: var(--text-secondary);
-    width: 36px; /* Slightly larger for touch targets */
+    width: 36px;
+    /* Slightly larger for touch targets */
     height: 36px;
     border-radius: 50%;
     cursor: pointer;
@@ -152,14 +155,29 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 .cheat-sheet-legacy {
@@ -207,6 +225,9 @@
 
 .quiz-card:hover {
     background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-primary);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
 }
 
 .quiz-q {

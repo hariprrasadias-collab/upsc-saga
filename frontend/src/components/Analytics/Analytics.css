@@ -105,6 +105,7 @@
     font-weight: bold;
     color: #fff;
     font-family: 'Cinzel', serif;
+    text-shadow: 0 0 10px rgba(212, 165, 116, 0.4);
 }
 
 .stat-label {
@@ -210,6 +211,42 @@
     border-radius: 12px;
     padding: 1.5rem;
     backdrop-filter: blur(5px);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+
+.chart-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #d4a574, #f59e0b, transparent);
+    background-size: 200% 100%;
+    animation: holo-sweep 3s infinite linear;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.chart-container:hover::before {
+    opacity: 1;
+}
+
+.chart-container:hover {
+    border-color: rgba(212, 165, 116, 0.25);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes holo-sweep {
+    from {
+        background-position: -200% 0;
+    }
+
+    to {
+        background-position: 200% 0;
+    }
 }
 
 .chart-container h3 {

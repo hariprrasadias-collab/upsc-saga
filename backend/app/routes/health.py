@@ -43,12 +43,12 @@ def metrics():
         total_questions = conn.execute('SELECT COUNT(*) FROM pyq_questions').fetchone()[0]
         try:
             total_flashcards = conn.execute('SELECT COUNT(*) FROM flashcards').fetchone()[0]
-        except:
+        except Exception:
             total_flashcards = 0
             
         try:
             total_users = conn.execute('SELECT COUNT(*) FROM users').fetchone()[0]
-        except:
+        except Exception:
             total_users = 0
 
         uptime = time.time() - START_TIME

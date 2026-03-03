@@ -73,6 +73,34 @@
     border-color: var(--color-accent-blue);
     color: var(--color-accent-blue);
     box-shadow: 0 0 15px rgba(52, 152, 219, 0.3);
+    position: relative;
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 20%;
+    width: 60%;
+    height: 3px;
+    background: var(--color-accent-blue);
+    border-radius: 2px;
+    box-shadow: 0 0 8px rgba(52, 152, 219, 0.6);
+    animation: tab-glow 2s infinite alternate;
+}
+
+@keyframes tab-glow {
+    from {
+        box-shadow: 0 0 5px rgba(52, 152, 219, 0.4);
+        width: 50%;
+        left: 25%;
+    }
+
+    to {
+        box-shadow: 0 0 12px rgba(52, 152, 219, 0.8);
+        width: 70%;
+        left: 15%;
+    }
 }
 
 /* Editor Styles */
@@ -437,21 +465,33 @@
 }
 
 .history-card {
-    background: rgba(13, 17, 23, 0.6);
+    background: rgba(13, 17, 23, 0.5);
     padding: 2rem;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
+    backdrop-filter: blur(12px);
+}
+
+.history-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--color-accent-green), transparent);
+    opacity: 0.5;
 }
 
 .history-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--color-accent-blue);
-    background: rgba(13, 17, 23, 0.8);
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    transform: translateY(-5px) scale(1.01);
+    border-color: rgba(46, 204, 113, 0.4);
+    background: rgba(13, 17, 23, 0.7);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(46, 204, 113, 0.15);
 }
 
 .history-card-header {
@@ -467,6 +507,7 @@
 .history-score {
     font-weight: bold;
     color: var(--color-accent-green);
+    text-shadow: 0 0 8px rgba(46, 204, 113, 0.4);
 }
 
 .history-card h3 {

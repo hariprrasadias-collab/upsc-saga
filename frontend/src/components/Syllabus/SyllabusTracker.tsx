@@ -226,29 +226,40 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         setExpandedSubjects(prev => ({ ...prev, [subjectKey]: !prev[subjectKey] }));
     };
 
-    if (loading) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading Syllabus...</div>;
+    const renderSyncMeter = (percent: number) => {
+        const segments = 10;
+        const filledSegments = Math.round((percent / 100) * segments);
+        return (
+            <div className="sync-meter">
+                {Array.from({ length: segments }).map((_, i) => (
+                    <div key={i} className={`sync-segment ${i < filledSegments ? 'filled' : ''}`}></div>
+                ))}
+            </div>
+        );
+    };
+
+    if (loading) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading Syllabus Matrix...</div>;
 
     return (
         <div className="syllabus-container">
             <div className="syllabus-header">
                 <div>
-                    <h1>Syllabus Tracker</h1>
-                    <p>Track your conquest of the UPSC syllabus, topic by topic.</p>
+                    <h1>Syllabus Matrix</h1>
+                    <p>Track your conquest of the UPSC battlegrounds. Increase your Sync Levels.</p>
                 </div>
                 <button
-                    className="brain-audit-btn"
+                    className="brain-audit-btn priority-btn"
                     onClick={handlePrioritize}
                     disabled={isPrioritizing}
-                    style={{ marginRight: '10px', background: '#e74c3c' }}
                 >
-                    {isPrioritizing ? 'Scanning...' : '🔥 Prioritize'}
+                    {isPrioritizing ? 'SCANNING WEAKNESSES...' : '🔥 VULNERABILITY SCAN'}
                 </button>
                 <button
                     className="brain-audit-btn"
                     onClick={handleBrainAudit}
                     disabled={isBrainLoading}
                 >
-                    {isBrainLoading ? 'Analyzing...' : '🧠 Strategos Audit'}
+                    {isBrainLoading ? 'ANALYZING...' : '🧠 STRATEGOS AUDIT'}
                 </button>
             </div>
 
@@ -257,50 +268,51 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                 {['Prelims', 'GS1', 'GS2', 'GS3', 'GS4', 'Optional'].map(paper => (
                     <div key={paper} className="paper-card">
                         <div className="paper-title">{paper}</div>
-                        <div className="progress-container">
-                            <div
-                                className="progress-bar"
-                                style={{ width: `${getProgress(paper)}%` }}
-                            ></div>
+                        {renderSyncMeter(getProgress(paper))}
+                        <div className="progress-text">
+                            {getProgress(paper)}% SYNCHRONIZED
                         </div>
-                        <div className="progress-text">{getProgress(paper)}% Completed</div>
                     </div>
                 ))}
             </div>
 
-            {/* TREE VIEW */}
-            <div className="syllabus-tree">
+            {/* SECTOR MAP */}
+            <div className="sector-map-container">
                 {Object.entries(groupedData).sort().map(([paper, subjects]) => (
-                    <div key={paper} className="paper-section">
-                        <div className="paper-header" onClick={() => togglePaper(paper)}>
-                            <h2>{paper}</h2>
-                            <span>{expandedPapers[paper] ? '▼' : '▶'}</span>
+                    <div key={paper} className="paper-sector">
+                        <div className="sector-header" onClick={() => togglePaper(paper)}>
+                            <h2 className="paper-glitch" data-text={paper}>{paper}</h2>
+                            <div className="sync-overall">
+                                {getProgress(paper)}% SYNCED
+                            </div>
                         </div>
 
                         {expandedPapers[paper] && (
-                            <div className="subject-list">
-                                {Object.entries(subjects).sort().map(([subject, subjectTopics]) => {
-                                    const subjectKey = `${paper}-${subject}`;
+                            <div className="sector-grid">
+                                {Object.entries(subjects).sort().map(([subject, subTopics]) => {
+                                    const total = subTopics.length;
+                                    const completed = subTopics.filter(t => t.status === 'Completed').length;
+                                    const isPriority = subTopics.some(t => priorityIds.includes(t.id));
+
                                     return (
-                                        <div key={subjectKey} className="subject-item">
-                                            <div className="subject-header" onClick={() => toggleSubject(subjectKey)}>
-                                                <span>{subject}</span>
-                                                <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>
-                                                    {subjectTopics.filter(t => t.status === 'Completed').length}/{subjectTopics.length} Done
-                                                </span>
+                                        <div key={subject} className={`subject-node ${isPriority ? 'priority-node' : ''}`}>
+                                            <div className="subject-node-header" onClick={() => toggleSubject(`${paper}-${subject}`)}>
+                                                <h3>{subject}</h3>
+                                                <div className="node-stats">{completed}/{total}</div>
                                             </div>
 
-                                            {expandedSubjects[subjectKey] && (
-                                                <div className="topic-list">
-                                                    {subjectTopics.map(topic => (
-                                                        <TopicItem
-                                                            key={topic.id}
-                                                            topic={topic}
-                                                            isPriority={priorityIds.includes(topic.id)}
-                                                            onStatusChange={handleStatusChange}
-                                                            onMarkRevised={handleMarkRevised}
-                                                            onOpenNotes={openNotes}
-                                                        />
+                                            {expandedSubjects[`${paper}-${subject}`] && (
+                                                <div className="topic-list-container custom-scrollbar">
+                                                    {subTopics.map(topic => (
+                                                        <div key={topic.id} className={priorityIds.includes(topic.id) ? 'highlight-topic' : ''}>
+                                                            <TopicItem
+                                                                topic={topic}
+                                                                isPriority={priorityIds.includes(topic.id)}
+                                                                onStatusChange={handleStatusChange}
+                                                                onMarkRevised={handleMarkRevised}
+                                                                onOpenNotes={openNotes}
+                                                            />
+                                                        </div>
                                                     ))}
                                                 </div>
                                             )}
