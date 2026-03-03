@@ -1,7 +1,7 @@
 {
   "scripts": {
     "install": "npm --prefix frontend install",
-    "build": "npm --prefix frontend run build"
+    "build": "npm --prefix frontend run build && rm -rf dist && cp -r frontend/dist dist"
   },
   "devDependencies": {
     "terser": "^5.44.1"
