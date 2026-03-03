@@ -81,6 +81,10 @@ def test_response_enveloping_error(client):
     assert 'data' not in data
 
 def test_rate_limiter(client):
+    # Clear the in-memory global variable as well so the file reset is picked up
+    import app.middleware
+    app.middleware._rate_limits = {}
+
     # Reset limit file so we get exactly 60 clean requests
     with open(temp_rl_path, 'w') as f:
         json.dump({}, f)
