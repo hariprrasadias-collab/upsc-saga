@@ -3,8 +3,10 @@ import os
 import sqlite3
 import json
 
-# Add current directory to path so we can import app modules
-sys.path.append(os.getcwd())
+# Add backend directory to path so we can import app modules regardless of where we run from
+backend_dir = os.path.dirname(os.path.abspath(__file__))
+if backend_dir not in sys.path:
+    sys.path.append(backend_dir)
 
 def test_quest_service():
     print("\n🔍 Testing Quest Service...")
@@ -34,7 +36,7 @@ def test_mock_test_service():
 
 def test_database_schema():
     print("\n🔍 Testing Database Schema...")
-    db_path = os.path.join(os.getcwd(), 'upsc_saga.db')
+    db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'upsc_saga.db')
     if not os.path.exists(db_path):
         print(f"❌ FAILED: Database not found at {db_path}")
         return
@@ -74,10 +76,19 @@ def test_brain_service_status():
     except Exception as e:
         print(f"❌ Brain Service check failed: {e}")
 
+def test_study_planner_slots():
+    print("\n🔍 Testing Study Planner Slots...")
+    try:
+        import test_study_planner
+        test_study_planner.test_get_smart_slots()
+    except Exception as e:
+        print(f"❌ FAILED: Study Planner Slots error. {e}")
+
 if __name__ == "__main__":
     print(">> Starting System Verification...")
     test_quest_service()
     test_mock_test_service()
     test_database_schema()
     test_brain_service_status()
+    test_study_planner_slots()
     print("\n>> Verification Complete.")
