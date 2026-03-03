@@ -9,6 +9,7 @@ import json
 import re
 import time
 from dotenv import load_dotenv
+from google.api_core import exceptions as google_exceptions
 from app.services.model_manager import model_manager
 
 # Load environment variables
