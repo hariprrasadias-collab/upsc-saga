@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "build": "cd frontend && npm install --include=dev && npm run build && rm -rf ../dist && cp -r dist ../dist"
+  },
   "devDependencies": {
     "terser": "^5.44.1"
   }
