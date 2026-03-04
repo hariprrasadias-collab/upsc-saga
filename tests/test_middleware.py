@@ -14,7 +14,7 @@ os.environ['DATABASE_PATH'] = temp_db_path
 from app import create_app
 from app.db import get_db
 import app.db
-import app.middleware
+import app.middleware as app_middleware
 
 app.db.DATABASE = temp_db_path
 app.middleware.RATE_LIMIT_FILE = temp_rl_path
@@ -81,6 +81,9 @@ def test_response_enveloping_error(client):
     assert 'data' not in data
 
 def test_rate_limiter(client):
+    # Clear the in-memory global state before the test
+    app_middleware._rate_limits = {}
+
     # Reset limit file so we get exactly 60 clean requests
     with open(temp_rl_path, 'w') as f:
         json.dump({}, f)
