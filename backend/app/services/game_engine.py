@@ -40,7 +40,7 @@ def calculate_and_apply_rewards(user_id, base_xp, base_hs, tags=[]):
         cursor.execute('''
             INSERT INTO users (id, username, current_xp, level, max_xp, hacksilver, strength_stat, runic_stat, vitality_stat, luck_stat)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (user_id, 'Hero', 0, 1, 100, 50, 5, 5, 5, 5))
+        ''', (user_id, f'Hero_{user_id}', 0, 1, 100, 50, 5, 5, 5, 5))
         conn.commit()
         user = cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
 
