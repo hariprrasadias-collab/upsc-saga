@@ -1,6 +1,6 @@
 flask
 gunicorn
-google-generativeai
+google-generativeai==0.8.6
 python-dotenv
 networkx
 cachetools
@@ -15,3 +15,4 @@ google-auth-oauthlib
 openai
 thefuzz
 google-api-python-client
+beautifulsoup4
