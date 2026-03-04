@@ -362,6 +362,62 @@ def get_plan_for_range(start_date_str, days=30):
         
     return result
 
+def smart_reschedule_task(task_id):
+    """
+    Finds a buffer slot today or on the weekend to reschedule a single task.
+    """
+    conn = get_db()
+    task = conn.execute('SELECT * FROM study_tasks WHERE id = ?', (task_id,)).fetchone()
+    if not task:
+        return False
+
+    today = datetime.date.today()
+    tomorrow = (today + timedelta(days=1)).isoformat()
+    buffer_slots = get_future_buffer_slots(today.isoformat())
+
+    if not buffer_slots:
+        buffer_slots = get_future_buffer_slots(tomorrow)
+
+    if buffer_slots:
+        target_slot = buffer_slots[0]
+        reschedule_task(task['id'], target_slot['date'], target_slot['start_time'], target_slot['end_time'])
+        delete_task(target_slot['id'])
+        return True
+    return False
+
+def check_telegram_tasks(app):
+    """
+    Checks for tasks starting now or ending now to interact via Telegram.
+    """
+    from app.services.telegram_service import telegram_service
+    if not telegram_service.is_configured():
+        return
+
+    with app.app_context():
+        conn = get_db()
+        now = datetime.datetime.now()
+        current_date_iso = now.date().isoformat()
+        current_time_str = now.strftime("%H:%M")
+
+        # Check for reminders (tasks starting soon/now)
+        # Assuming we remind if task starts within the current minute
+        starting_tasks = conn.execute('''
+            SELECT * FROM study_tasks
+            WHERE date = ? AND start_time = ? AND status = 'pending'
+        ''', (current_date_iso, current_time_str)).fetchall()
+
+        for task in starting_tasks:
+            telegram_service.send_task_reminder(dict(task))
+
+        # Check for completion (tasks ending now)
+        ending_tasks = conn.execute('''
+            SELECT * FROM study_tasks
+            WHERE date = ? AND end_time = ? AND status = 'pending'
+        ''', (current_date_iso, current_time_str)).fetchall()
+
+        for task in ending_tasks:
+            telegram_service.ask_task_completion(dict(task))
+
 def check_and_reschedule_pending():
     """
     Auto-Rescheduler:
