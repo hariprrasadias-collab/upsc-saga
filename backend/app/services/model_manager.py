@@ -100,18 +100,22 @@ class ModelManager:
             )
             
         # 3. OpenClaw Local Gateway (Primary Local Fallback/Alternative)
-        openclaw_key = os.environ.get('OPENCLAW_API_KEY', 'd25c95eccbc569b1bc0d65699c5af9e39cea03ed39d728223f783dccf45616e0')
+        # 🛡️ Sentinel: Removed hardcoded API key fallback to prevent secret exposure
+        openclaw_key = os.environ.get('OPENCLAW_API_KEY')
         openclaw_base_url = os.environ.get('OPENCLAW_BASE_URL', 'http://localhost:18789/v1')
         self.openclaw_model = os.environ.get('OPENCLAW_MODEL', 'ollama/qwen3:14b')
         
         try:
-            self.clients['openclaw'] = openai.OpenAI(
-                base_url=openclaw_base_url,
-                api_key=openclaw_key,
-                default_headers={
-                    "X-Title": "UPSC Second Brain Local"
-                }
-            )
+            if openclaw_key:
+                self.clients['openclaw'] = openai.OpenAI(
+                    base_url=openclaw_base_url,
+                    api_key=openclaw_key,
+                    default_headers={
+                        "X-Title": "UPSC Second Brain Local"
+                    }
+                )
+            else:
+                print("⚠️ OpenClaw API key missing, local fallback not initialized.")
         except Exception as e:
             print(f"⚠️ OpenClaw initialization soft-failed: {e}")
 

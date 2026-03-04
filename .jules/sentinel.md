@@ -1,0 +1,4 @@
+## 2025-02-28 - [Hardcoded API Key Removed]
+**Vulnerability:** A hardcoded OpenClaw API Key was found in `backend/app/services/model_manager.py` as a fallback environment variable default (`d25c95eccbc569b1bc0d65699c5af9e39cea03ed39d728223f783dccf45616e0`).
+**Learning:** Hardcoded credentials even as "fallback defaults" in environment variable lookups represent a critical security risk and potential secret leakage. Even if it's meant for a local instance, it can easily lead to credential stuffing or exposure of local services if port forwarded or accidentally exposed.
+**Prevention:** Avoid default fallback values for API keys. Instead, implement graceful degradation by checking if the environment variable exists, and only initializing the service if the key is provided, logging a clear warning if it is not.
