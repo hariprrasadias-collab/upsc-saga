@@ -1,4 +1,11 @@
 {
+  "name": "upsc-saga-root",
+  "version": "1.0.0",
+  "description": "Root package.json to satisfy Render build",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && npm install --include=dev && npm run build && cd .. && rm -rf dist && cp -a frontend/dist ."
+  },
   "devDependencies": {
     "terser": "^5.44.1"
   }
