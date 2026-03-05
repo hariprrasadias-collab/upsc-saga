@@ -2,9 +2,21 @@
 > frontend@0.0.0 dev
 > vite
 
+▲ [WARNING] Duplicate key "scripts" in object literal [duplicate-object-key]
+
+    ../package.json:8:2:
+      8 │   "scripts": {
+        ╵   ~~~~~~~~~
+
+  The original key "scripts" is here:
+
+    ../package.json:2:2:
+      2 │   "scripts": {
+        ╵   ~~~~~~~~~
+
 (!) the `splitVendorChunk` plugin doesn't have any effect when using the object form of `build.rollupOptions.output.manualChunks`. Consider using the function form instead.
 
-  VITE v6.4.1  ready in 147 ms
+  VITE v6.4.1  ready in 263 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
