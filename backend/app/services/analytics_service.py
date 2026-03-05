@@ -160,37 +160,53 @@ def identify_weak_areas(conn, user_id, limit=10):
             ORDER BY avg_score ASC
             LIMIT ?
         ''', (user_id, limit)).fetchall()
-        
-        for subj in low_scores:
-            # Calculate trend for this subject
-            subject_scores = conn.execute('''
-                SELECT mta.score
+
+        if low_scores:
+            subjects = [subj['subject'] for subj in low_scores]
+            placeholders = ','.join('?' * len(subjects))
+
+            # Fetch all scores for these subjects in one go to prevent N+1 query problem
+            all_scores_query = f'''
+                SELECT mt.subject, mta.score, mta.submitted_at
                 FROM test_attempts mta
                 JOIN mock_tests mt ON mta.test_id = mt.id
-                WHERE mta.user_id = ? AND mt.subject = ?
+                WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
                 ORDER BY mta.submitted_at ASC
-            ''', (user_id, subj['subject'])).fetchall()
+            '''
+            params = [user_id] + subjects
+            all_scores_rows = conn.execute(all_scores_query, params).fetchall()
 
-            scores_list = [s['score'] for s in subject_scores]
-            trend_val = calculate_improvement_rate(scores_list)
-            trend_direction = 'improving' if trend_val > 0 else 'declining' if trend_val < 0 else 'stable'
+            # Group scores by subject
+            grouped_scores = defaultdict(list)
+            grouped_dates = defaultdict(list)
+            for row in all_scores_rows:
+                grouped_scores[row['subject']].append(row['score'])
+                grouped_dates[row['subject']].append(row['submitted_at'])
 
-            # Get last 5 scores for sparkline
-            recent_scores = scores_list[-5:] if scores_list else []
-            last_attempt = subject_scores[-1]['submitted_at'] if subject_scores else None
+            for subj in low_scores:
+                subject_name = subj['subject']
+                scores_list = grouped_scores.get(subject_name, [])
+                dates_list = grouped_dates.get(subject_name, [])
 
-            weak_areas.append({
-                'subject': subj['subject'],
-                'topic': f"{subj['subject']} (Mock Tests)",
-                'weakness_score': max(0, 100 - (subj['avg_score'] or 0)),
-                'source': 'Mock Tests',
-                'action': f"Practice {subj['subject']} questions",
-                'trend': trend_direction,
-                'trend_value': abs(trend_val),
-                'impact': 'High' if (subj['avg_score'] or 0) < 40 else 'Medium',
-                'recent_scores': recent_scores,
-                'last_attempt': last_attempt
-            })
+                trend_val = calculate_improvement_rate(scores_list)
+                trend_direction = 'improving' if trend_val > 0 else 'declining' if trend_val < 0 else 'stable'
+
+                # Get last 5 scores for sparkline
+                recent_scores = scores_list[-5:] if scores_list else []
+                last_attempt = dates_list[-1] if dates_list else None
+
+                weak_areas.append({
+                    'subject': subject_name,
+                    'topic': f"{subject_name} (Mock Tests)",
+                    'weakness_score': max(0, 100 - (subj['avg_score'] or 0)),
+                    'source': 'Mock Tests',
+                    'action': f"Practice {subject_name} questions",
+                    'trend': trend_direction,
+                    'trend_value': abs(trend_val),
+                    'impact': 'High' if (subj['avg_score'] or 0) < 40 else 'Medium',
+                    'recent_scores': recent_scores,
+                    'last_attempt': last_attempt
+                })
     except Exception as e:
         print(f"Error identifying weak areas: {e}")
     
