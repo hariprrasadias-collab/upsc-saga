@@ -111,7 +111,7 @@ class MockTestService:
         
         try:
             # Use ModelManager for rate limiting and load balancing
-            response = model_manager.generate_content(prompt, model_type='pro')
+            response = model_manager.generate_content(prompt, model_type='pro', max_output_tokens=4096)
             
             if hasattr(response, 'text'):
                 text = response.text.strip()
@@ -137,7 +137,9 @@ class MockTestService:
 
             try:
                 data = json.loads(text)
-            except json.JSONDecodeError:
+            except json.JSONDecodeError as e:
+                print(f"❌ Mock Test JSON Error: {e}")
+                print(f"Raw text was: {text[:500]} ...")
                 return {"success": False, "error": "Failed to parse AI response (Invalid JSON)"}
             
             conn = get_db()

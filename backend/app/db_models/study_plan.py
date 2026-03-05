@@ -123,6 +123,21 @@ def get_pending_tasks_before_date(date_str):
     
     return [dict(t) for t in tasks]
 
+def get_pending_past_tasks_today(date_str, current_time_str):
+    """Get all pending tasks for a specific date that have ended before current_time."""
+    conn = get_db()
+    plan = get_active_plan()
+    if not plan:
+        return []
+        
+    tasks = conn.execute('''
+        SELECT * FROM study_tasks 
+        WHERE plan_id = ? AND date = ? AND end_time < ? AND status = 'pending'
+        ORDER BY start_time ASC
+    ''', (plan['id'], date_str, current_time_str)).fetchall()
+    
+    return [dict(t) for t in tasks]
+
 def update_task_status(task_id, status, google_event_id=None):
     """Update task status"""
     conn = get_db()

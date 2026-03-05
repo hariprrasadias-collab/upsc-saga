@@ -80,7 +80,22 @@ const HeatmapRenderer: React.FC<HeatmapRendererProps> = ({ content, title }) => 
     let data: HeatmapData[] = [];
 
     try {
-        data = typeof content === 'string' ? JSON.parse(content) : content;
+        let parsed = typeof content === 'string' ? JSON.parse(content) : content;
+
+        // Handle error objects
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && parsed.error) {
+            return <div className="error-message" style={{ textAlign: 'center', padding: '30px' }}>⚠️ {parsed.error}: Heatmap data not available. Try regenerating.</div>;
+        }
+
+        // Unwrap debug envelope
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && parsed.response_text) {
+            let inner = parsed.response_text;
+            const jsonMatch = inner.match(/```json\s*\n?([\s\S]*?)\n?```/);
+            if (jsonMatch) inner = jsonMatch[1].trim();
+            try { parsed = JSON.parse(inner); } catch { }
+        }
+
+        data = parsed;
         // Ensure it's an array for Recharts Treemap root
         if (!Array.isArray(data)) {
             data = [data]; // Wrap single root if needed

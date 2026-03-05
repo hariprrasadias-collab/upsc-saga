@@ -171,9 +171,6 @@ def create_app():
     from app.routes import compilation
     app.register_blueprint(compilation.bp)
 
-    from app.routes.automation import bp as automation_bp
-    app.register_blueprint(automation_bp)
-
     from app.routes.scribe import scribe_bp
     app.register_blueprint(scribe_bp, url_prefix='/api/scribe')
 
@@ -211,6 +208,9 @@ def create_app():
 
     from app.routes.interview import interview_bp
     app.register_blueprint(interview_bp, url_prefix='/api/interview')
+
+    from app.routes.image_gen import image_gen_bp
+    app.register_blueprint(image_gen_bp)
 
     # Initialize Tables
     from app.db_models.mind_palace import init_mind_palace_tables

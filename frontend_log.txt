@@ -4,7 +4,28 @@
 
 (!) the `splitVendorChunk` plugin doesn't have any effect when using the object form of `build.rollupOptions.output.manualChunks`. Consider using the function form instead.
 
-  VITE v6.4.1  ready in 147 ms
+  VITE v6.4.1  ready in 221 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
+10:34:15 pm [vite] (client) hmr update /src/components/Brain/BrainVault.tsx
+10:43:09 pm [vite] (client) hmr update /src/components/Brain/Renderers/VisualPromptRenderer.tsx
+10:43:46 pm [vite] (client) hmr update /src/components/Brain/Renderers/VisualPromptRenderer.tsx
+10:50:08 pm [vite] (client) hmr update /src/components/Brain/Renderers/TimelineRenderer.tsx
+10:50:50 pm [vite] (client) hmr update /src/components/Brain/Renderers/CheatSheetRenderer.tsx
+10:51:13 pm [vite] (client) hmr update /src/components/Brain/Renderers/SubjectBookRenderer.tsx
+10:52:12 pm [vite] (client) hmr update /src/components/Brain/Renderers/SubjectBookRenderer.tsx
+10:59:19 pm [vite] (client) hmr update /src/components/Brain/Renderers/CheatSheetRenderer.tsx
+10:59:58 pm [vite] (client) hmr update /src/components/Brain/Renderers/CheatSheetRenderer.tsx
+11:00:23 pm [vite] (client) hmr update /src/components/Brain/Renderers/SubjectBookRenderer.tsx
+11:01:50 pm [vite] (client) hmr update /src/components/Brain/Renderers/VisualPromptRenderer.tsx
+6:08:18 pm [vite] (client) hmr update /src/components/Brain/Renderers/VisualPromptRenderer.tsx
+6:09:24 pm [vite] (client) hmr update /src/components/Brain/Renderers/VisualPromptRenderer.tsx
+6:10:29 pm [vite] (client) hmr update /src/components/Brain/Renderers/ELI5Renderer.tsx
+6:11:07 pm [vite] (client) hmr update /src/components/Brain/Renderers/HeatmapRenderer.tsx
+6:11:09 pm [vite] (client) hmr update /src/components/Brain/Renderers/SelfReviewRenderer.tsx
+6:12:11 pm [vite] (client) hmr update /src/components/Brain/BrainVault.tsx
+11:42:02 pm [vite] (client) hmr update /src/components/Ravens/Ravens.tsx
+12:34:04 am [vite] (client) hmr update /src/components/Flashcards/RevisionCurve.tsx
+12:34:04 am [vite] (client) hmr update /src/components/Panopticon/Panopticon.tsx
+12:34:04 am [vite] (client) hmr update /src/components/Seer/Seer.tsx

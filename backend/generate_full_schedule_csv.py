@@ -4,9 +4,9 @@ from datetime import timedelta
 import os
 
 # --- CONFIGURATION ---
-START_DATE = datetime.date(2025, 11, 27)
+START_DATE = datetime.date(2026, 3, 4)
 DURATION_DAYS = 730
-OUTPUT_FILE = "mimir_schedule.csv"
+OUTPUT_FILE = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'public', 'UPSC_Scheduler.csv')
 
 # --- RESOURCES ---
 # Phase 1: Foundation (NCERTs) - STRICT ORDER

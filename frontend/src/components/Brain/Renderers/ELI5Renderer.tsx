@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import './Renderers.css';
 import MarkdownRenderer from '../../Shared/MarkdownRenderer';
+import { API_BASE_URL } from '../../../config';
 
 interface QuizItem {
     question: string;
@@ -23,24 +24,39 @@ interface ELI5Props {
 }
 
 const ELI5Renderer: React.FC<ELI5Props> = ({ content }) => {
-    // 1. Parse content
+    // 1. Parse content (handle debug envelope + error objects)
     const data: ELI5Data = useMemo(() => {
+        const fallback: ELI5Data = {
+            eli5: content,
+            eli15: "",
+            eli_expert: "",
+            analogy: "",
+            real_world_example: "",
+            visual_analogy_prompt: "",
+            quiz: []
+        };
         try {
-            const parsed = JSON.parse(content);
+            let parsed = JSON.parse(content);
+
+            // Handle error objects
+            if (parsed.error) {
+                return { ...fallback, eli5: `⚠️ ${parsed.error}: Content generation was limited. Try regenerating.` };
+            }
+
+            // Unwrap debug envelope
+            if (parsed.response_text && !parsed.eli5) {
+                let inner = parsed.response_text;
+                const jsonMatch = inner.match(/```json\s*\n?([\s\S]*?)\n?```/);
+                if (jsonMatch) inner = jsonMatch[1].trim();
+                try { parsed = JSON.parse(inner); } catch { return { ...fallback, eli5: inner }; }
+            }
+
             if (typeof parsed === 'object' && parsed !== null && parsed.eli5) {
                 return parsed as ELI5Data;
             }
-            throw new Error("Not structured data");
+            return fallback;
         } catch (e) {
-            return {
-                eli5: content,
-                eli15: "",
-                eli_expert: "",
-                analogy: "",
-                real_world_example: "",
-                visual_analogy_prompt: "",
-                quiz: []
-            };
+            return fallback;
         }
     }, [content]);
 
@@ -66,21 +82,24 @@ const ELI5Renderer: React.FC<ELI5Props> = ({ content }) => {
         window.speechSynthesis.speak(utterance);
     };
 
-    const generateImage = () => {
+    const generateImage = async () => {
         if (!data.visual_analogy_prompt) return;
         setIsGeneratingImg(true);
-        const encodedPrompt = encodeURIComponent(data.visual_analogy_prompt);
-        const seed = Math.floor(Math.random() * 9999);
-        const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?nologo=true&seed=${seed}&width=600&height=400&model=flux`;
-
-        // Simple preload
-        const img = new Image();
-        img.src = url;
-        img.onload = () => {
-            setGeneratedImage(url);
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/generate-image`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: data.visual_analogy_prompt })
+            });
+            const result = await response.json();
+            if (result.success && result.image_url) {
+                setGeneratedImage(result.image_url);
+            }
+        } catch (e) {
+            console.error('ELI5 image gen failed:', e);
+        } finally {
             setIsGeneratingImg(false);
-        };
-        img.onerror = () => setIsGeneratingImg(false);
+        }
     };
 
     const handleQuizOption = (qIndex: number, option: string) => {

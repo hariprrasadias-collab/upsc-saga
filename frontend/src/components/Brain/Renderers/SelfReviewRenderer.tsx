@@ -22,7 +22,22 @@ const SelfReviewRenderer: React.FC<SelfReviewRendererProps> = ({ content }) => {
     let data: SelfReviewData;
 
     try {
-        data = typeof content === 'string' ? JSON.parse(content) : content;
+        let parsed = typeof content === 'string' ? JSON.parse(content) : content;
+
+        // Handle error objects
+        if (parsed && parsed.error) {
+            return <div className="error-message" style={{ textAlign: 'center', padding: '30px' }}>⚠️ {parsed.error}: Review data not available. Try regenerating.</div>;
+        }
+
+        // Unwrap debug envelope
+        if (parsed && parsed.response_text && !parsed.week) {
+            let inner = parsed.response_text;
+            const jsonMatch = inner.match(/```json\s*\n?([\s\S]*?)\n?```/);
+            if (jsonMatch) inner = jsonMatch[1].trim();
+            try { parsed = JSON.parse(inner); } catch { }
+        }
+
+        data = parsed;
     } catch (e) {
         console.error("SelfReview Data Error", e);
         return <div className="error-message">📋 Review Data Corrupted</div>;

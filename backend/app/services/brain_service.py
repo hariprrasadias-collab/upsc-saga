@@ -791,7 +791,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
             # Define all actions to run
             actions = [
                 ("CREATE_FLASHCARDS", {"topic": topic, "count": 5, "reasoning": "Task Completion Automation"}),
-                ("CREATE_MOCK_TEST", {"topic": topic, "count": 10, "reasoning": "Task Completion Automation"}),
+                ("CREATE_MOCK_TEST", {"topic": topic, "count": 5, "reasoning": "Task Completion Automation"}),
                 ("PREDICT_QUESTIONS", {"topic": topic, "subject": subject, "timeframe_days": 30}),
                 ("GENERATE_TOPIC_LINKAGES", {"topic": topic, "subject": subject}),
                 ("GENERATE_PODCAST_SCRIPT", {"topic": topic, "style": "humorous"}),
@@ -829,7 +829,8 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                         result = self.execute_action(action, payload)
                         
                         if not result or not result.get('success'):
-                            print(f"Brain: ❌ Action failed or returned false success for {action}")
+                            err_msg = result.get('error') or result.get('message') or 'Unknown'
+                            print(f"Brain: ❌ Action failed or returned false success for {action}. Reason: {err_msg}")
                             return
 
                         # Check if any part of the result payload contains the error strings
@@ -872,9 +873,6 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                                     print(f"Brain: Saving Socratic Dialogue...")
                                     cursor = conn.execute('INSERT INTO socratic_conversations (topic, user_id, dialogue, insight) VALUES (?, ?, ?, ?)',
                                                 (topic, 1, dialogue, json.dumps(verdict)))
-                                    # Create notification
-                                    conn.execute('INSERT INTO notifications (user_id, title, message, type) VALUES (?, ?, ?, ?)',
-                                                (1, "New Socratic Debate", f"A debate on {topic} is ready.", "debate"))
                                     conn.commit()
 
                             elif action == "GENERATE_TOPIC_LINKAGES":

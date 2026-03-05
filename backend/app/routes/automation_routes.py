@@ -15,7 +15,7 @@ def get_content():
     """
     type_filter = request.args.get('type')
     topic_filter = request.args.get('topic')
-    limit = request.args.get('limit', 20)
+    limit = request.args.get('limit', 200)
     
     conn = get_db()
     
@@ -35,16 +35,20 @@ def get_content():
     
     cursor = conn.execute(query, params)
     rows = cursor.fetchall()
-    
     results = []
     for row in rows:
         item = dict(row)
         # Parse metadata JSON if it exists
-        if item.get('metadata'):
+        if item.get('metadata') and isinstance(item['metadata'], str):
             try:
                 item['metadata'] = json.loads(item['metadata'])
             except Exception:
                 item['metadata'] = {}
+        
+        # Add content_type if missing (ensure it matches frontend expecting)
+        if 'content_type' not in item:
+            item['content_type'] = item.get('type', 'unknown')
+            
         results.append(item)
         
     return jsonify({

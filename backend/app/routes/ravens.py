@@ -30,116 +30,126 @@ bp = Blueprint('ravens', __name__, url_prefix='/api/ravens')
 
 def run_background_fetch(app):
     """Background task to fetch and process news"""
-    with app.app_context():
-        print("🦅 Raven: Starting background fetch mission...")
-        
-        feeds = [
-            'https://www.thehindu.com/news/national/feeder/default.rss',
-            'https://pib.gov.in/RSS/RssFeed.aspx?ModId=2',
-            'https://indianexpress.com/section/india/feed/',
-            'https://www.thehindu.com/opinion/editorial/feeder/default.rss',
-            'https://indianexpress.com/section/opinion/editorials/feed/'
-        ]
-        
-        processed_count = 0
-        
-        for url in feeds:
-            try:
-                print(f"🦅 Raven: Scouting {url}...")
-                feed = feedparser.parse(url)
-                
-                # Process only the latest 5 entries from each feed to avoid overload
-                for entry in feed.entries[:5]:
-                    link = entry.link
+    import sys
+    
+    def log(msg):
+        print(msg, flush=True)
+    
+    try:
+        with app.app_context():
+            log("🦅 Raven: Starting background fetch mission...")
+            
+            feeds = [
+                'https://www.thehindu.com/news/national/feeder/default.rss',
+                'https://pib.gov.in/RSS/RssFeed.aspx?ModId=2',
+                'https://indianexpress.com/section/india/feed/',
+                'https://www.thehindu.com/opinion/editorial/feeder/default.rss',
+                'https://indianexpress.com/section/opinion/editorials/feed/'
+            ]
+            
+            processed_count = 0
+            
+            for url in feeds:
+                try:
+                    log(f"🦅 Raven: Scouting {url}...")
+                    feed = feedparser.parse(url)
                     
-                    # Skip if already exists
-                    if article_exists(link):
-                        continue
+                    # Process only the latest 5 entries from each feed to avoid overload
+                    for entry in feed.entries[:5]:
+                        link = entry.link
                         
-                    print(f"🦅 Raven: Found new artifact - {entry.title}")
+                        # Skip if already exists
+                        if article_exists(link):
+                            continue
+                            
+                        log(f"🦅 Raven: Found new artifact - {entry.title}")
+                        
+                        try:
+                            # 1. Fetch Content
+                            full_content = fetch_article_content(link)
+                            if not full_content or len(full_content) < 100:
+                                full_content = entry.get('summary', '')
+                            
+                            # 2. AI Summarization
+                            ai_result = summarize_for_upsc(entry.title, full_content, link)
+                            
+                            # 3. Extract Image
+                            image_url = extract_image_from_article(link)
+                            
+                            # 4. Find PYQs
+                            related_pyqs = find_related_pyqs(
+                                ai_result['subjects'],
+                                ai_result['papers']
+                            )
+                            
+                            # 5. Save to DB
+                            article_data = {
+                                'title': entry.title,
+                                'link': link,
+                                'source': feed.feed.get('title', 'Unknown Source'),
+                                'published': entry.get('published', 'Today'),
+                                'original_summary': entry.get('summary', ''),
+                                'upsc_summary': ai_result['upsc_summary'],
+                                'key_points': ai_result['key_points'],
+                                'papers': ai_result['papers'],
+                                'subjects': ai_result['subjects'],
+                                'importance': ai_result['importance'],
+                                'image_url': image_url,
+                                'related_pyqs': related_pyqs,
+                                # Enhanced Metadata
+                                'prelims_pointers': ai_result.get('prelims_pointers', []),
+                                'mains_dimensions': ai_result.get('mains_dimensions', []),
+                                'steeple_analysis': ai_result.get('steeple_analysis', {}),
+                                'inter_linkages': ai_result.get('inter_linkages', []),
+                                # God Mode Metadata
+                                'mind_map': ai_result.get('mind_map', ''),
+                                'quiz': ai_result.get('quiz', []),
+                                'answer_framework': ai_result.get('answer_framework', {}),
+                                'essay_fodder': ai_result.get('essay_fodder', {}),
+                                # Universe Mode Metadata
+                                'timeline': ai_result.get('timeline', []),
+                                'data_visualization': ai_result.get('data_visualization', {}),
+                                'podcast_script': ai_result.get('podcast_script', ''),
+                                'interview_questions': ai_result.get('interview_questions', []),
+                                'simulation_scenario': ai_result.get('simulation_scenario', {}),
+                                # Omniverse Mode Metadata
+                                'future_scenarios': ai_result.get('future_scenarios', {}),
+                                'historical_analogies': ai_result.get('historical_analogies', []),
+                                'locations': ai_result.get('locations', []),
+                                'socratic_clash': ai_result.get('socratic_clash', []),
+                                'mnemonics': ai_result.get('mnemonics', []),
+                                # Singularity Mode Metadata
+                                'systemic_bias': ai_result.get('systemic_bias', {}),
+                                'butterfly_effect': ai_result.get('butterfly_effect', []),
+                                'polymath_angle': ai_result.get('polymath_angle', {}),
+                                'quote_injection': ai_result.get('quote_injection', {}),
+                                'roleplay_persona': ai_result.get('roleplay_persona', {}),
+                                # Akaashic Mode Metadata
+                                'systems_loops': ai_result.get('systems_loops', []),
+                                'counter_factuals': ai_result.get('counter_factuals', []),
+                                'civilizational_parallels': ai_result.get('civilizational_parallels', []),
+                                'fermi_estimates': ai_result.get('fermi_estimates', {}),
+                                'global_context': ai_result.get('global_context', [])
+                            }
+                            
+                            save_article(article_data)
+                            processed_count += 1
+                            log(f"🦅 Raven: Successfully archived - {entry.title}")
+                            
+                            # Be gentle with the API (rate limit awareness, 3s is safe)
+                            time.sleep(3)
+                            
+                        except Exception as inner_e:
+                            log(f"🦅 Raven: Failed to process {entry.title}: {inner_e}")
+                            
+                except Exception as e:
+                    log(f"🦅 Raven: Failed to fly to {url}: {e}")
                     
-                    try:
-                        # 1. Fetch Content
-                        full_content = fetch_article_content(link)
-                        if not full_content or len(full_content) < 100:
-                            full_content = entry.get('summary', '')
-                        
-                        # 2. AI Summarization
-                        ai_result = summarize_for_upsc(entry.title, full_content, link)
-                        
-                        # 3. Extract Image
-                        image_url = extract_image_from_article(link)
-                        
-                        # 4. Find PYQs
-                        related_pyqs = find_related_pyqs(
-                            ai_result['subjects'],
-                            ai_result['papers']
-                        )
-                        
-                        # 5. Save to DB
-                        article_data = {
-                            'title': entry.title,
-                            'link': link,
-                            'source': feed.feed.get('title', 'Unknown Source'),
-                            'published': entry.get('published', 'Today'),
-                            'original_summary': entry.get('summary', ''),
-                            'upsc_summary': ai_result['upsc_summary'],
-                            'key_points': ai_result['key_points'],
-                            'papers': ai_result['papers'],
-                            'subjects': ai_result['subjects'],
-                            'importance': ai_result['importance'],
-                            'image_url': image_url,
-                            'related_pyqs': related_pyqs,
-                            # Enhanced Metadata
-                            'prelims_pointers': ai_result.get('prelims_pointers', []),
-                            'mains_dimensions': ai_result.get('mains_dimensions', []),
-                            'steeple_analysis': ai_result.get('steeple_analysis', {}),
-                            'inter_linkages': ai_result.get('inter_linkages', []),
-                            # God Mode Metadata
-                            'mind_map': ai_result.get('mind_map', ''),
-                            'quiz': ai_result.get('quiz', []),
-                            'answer_framework': ai_result.get('answer_framework', {}),
-                            'essay_fodder': ai_result.get('essay_fodder', {}),
-                            # Universe Mode Metadata
-                            'timeline': ai_result.get('timeline', []),
-                            'data_visualization': ai_result.get('data_visualization', {}),
-                            'podcast_script': ai_result.get('podcast_script', ''),
-                            'interview_questions': ai_result.get('interview_questions', []),
-                            'simulation_scenario': ai_result.get('simulation_scenario', {}),
-                            # Omniverse Mode Metadata
-                            'future_scenarios': ai_result.get('future_scenarios', {}),
-                            'historical_analogies': ai_result.get('historical_analogies', []),
-                            'locations': ai_result.get('locations', []),
-                            'socratic_clash': ai_result.get('socratic_clash', []),
-                            'mnemonics': ai_result.get('mnemonics', []),
-                            # Singularity Mode Metadata
-                            'systemic_bias': ai_result.get('systemic_bias', {}),
-                            'butterfly_effect': ai_result.get('butterfly_effect', []),
-                            'polymath_angle': ai_result.get('polymath_angle', {}),
-                            'quote_injection': ai_result.get('quote_injection', {}),
-                            'roleplay_persona': ai_result.get('roleplay_persona', {}),
-                            # Akaashic Mode Metadata
-                            'systems_loops': ai_result.get('systems_loops', []),
-                            'counter_factuals': ai_result.get('counter_factuals', []),
-                            'civilizational_parallels': ai_result.get('civilizational_parallels', []),
-                            'fermi_estimates': ai_result.get('fermi_estimates', {}),
-                            'global_context': ai_result.get('global_context', [])
-                        }
-                        
-                        save_article(article_data)
-                        processed_count += 1
-                        print(f"🦅 Raven: Successfully archived - {entry.title}")
-                        
-                        # Be gentle with the API (10 RPM limit = 6s delay minimum, using 10s to be safe)
-                        time.sleep(10)
-                        
-                    except Exception as inner_e:
-                        print(f"🦅 Raven: Failed to process {entry.title}: {inner_e}")
-                        
-            except Exception as e:
-                print(f"🦅 Raven: Failed to fly to {url}: {e}")
-                
-        print(f"🦅 Raven: Mission complete. Archived {processed_count} new artifacts.")
+            log(f"🦅 Raven: Mission complete. Archived {processed_count} new artifacts.")
+    except Exception as fatal:
+        print(f"🦅 Raven: FATAL ERROR in background thread: {fatal}", flush=True)
+        import traceback
+        traceback.print_exc()
 
 @bp.route('/background-fetch', methods=['POST'])
 def trigger_background_fetch():
@@ -344,6 +354,9 @@ def get_saved():
     
     if request.args.get('search'):
         filters['search'] = request.args.get('search')
+    
+    if request.args.get('source'):
+        filters['source'] = request.args.get('source')
     
     page, per_page = parse_pagination(request.args)
     filters['limit'] = per_page

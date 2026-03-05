@@ -4,7 +4,7 @@ import heapq
 import json
 import os
 from app.db import get_db
-from app.db_models.study_plan import create_new_plan, add_tasks_bulk, get_active_plan, get_tasks_for_date, get_pending_tasks_before_date, reschedule_task, init_study_plan_tables, get_future_buffer_slots, delete_task
+from app.db_models.study_plan import create_new_plan, add_tasks_bulk, get_active_plan, get_tasks_for_date, get_pending_tasks_before_date, reschedule_task, init_study_plan_tables, get_future_buffer_slots, delete_task, get_task_by_id
 
 def load_books_data():
     """Load books data from JSON file."""
@@ -361,6 +361,126 @@ def get_plan_for_range(start_date_str, days=30):
         result.append(day_plan)
         
     return result
+
+def smart_reschedule_task(task_id):
+    """
+    Intelligently reschedule a single task.
+    1. Try today's remaining buffers.
+    2. Try upcoming weekend buffers.
+    3. Append as an extra slot at the end of today.
+    """
+    task = get_task_by_id(task_id)
+    if not task:
+        return {"success": False, "error": "Task not found"}
+
+    today = datetime.date.today()
+    today_iso = today.isoformat()
+    current_time_str = datetime.datetime.now().strftime("%H:%M")
+    
+    # 1. Look for today's future buffer slots
+    buffer_slots = get_future_buffer_slots(today_iso)
+    today_buffers = [s for s in buffer_slots if s['date'] == today_iso and s['start_time'] >= current_time_str]
+    
+    if today_buffers:
+        target_slot = today_buffers[0]
+        reschedule_task(task['id'], target_slot['date'], target_slot['start_time'], target_slot['end_time'])
+        delete_task(target_slot['id'])
+        return {"success": True, "rescheduled_to": target_slot['date'], "time": f"{target_slot['start_time']}-{target_slot['end_time']}", "type": "today_buffer"}
+        
+    # 2. Look for weekend buffers (Saturday=5, Sunday=6)
+    weekend_buffers = [s for s in buffer_slots if datetime.datetime.strptime(s['date'], "%Y-%m-%d").date().weekday() in [5, 6]]
+    
+    if weekend_buffers:
+        target_slot = weekend_buffers[0]
+        reschedule_task(task['id'], target_slot['date'], target_slot['start_time'], target_slot['end_time'])
+        delete_task(target_slot['id'])
+        return {"success": True, "rescheduled_to": target_slot['date'], "time": f"{target_slot['start_time']}-{target_slot['end_time']}", "type": "weekend_buffer"}
+        
+    # 3. Append as an extra slot today
+    todays_tasks = get_tasks_for_date(today_iso)
+    if todays_tasks:
+        last_task = max(todays_tasks, key=lambda x: x['end_time'])
+        new_start = last_task['end_time']
+        try:
+            h, m = map(int, new_start.split(':'))
+            end_minutes = h * 60 + m + 50
+            new_end = f"{end_minutes // 60:02d}:{end_minutes % 60:02d}"
+        except:
+            new_start = "22:00"
+            new_end = "22:50"
+    else:
+        new_start = "20:00"
+        new_end = "20:50"
+        
+    # Check for rollover
+    if int(new_start.split(':')[0]) >= 24:
+        tomorrow = today + timedelta(days=1)
+        new_start = "04:00"
+        new_end = "04:50"
+        today_iso = tomorrow.isoformat()
+        
+    reschedule_task(task['id'], today_iso, new_start, new_end)
+    return {"success": True, "rescheduled_to": today_iso, "time": f"{new_start}-{new_end}", "type": "extra_slot"}
+
+def delay_task_by_one_hour(task_id):
+    """
+    Delays a given task by exactly 1 hour. 
+    If it crosses midnight, moves it to the next day's buffer or extra slot.
+    """
+    task = get_task_by_id(task_id)
+    if not task:
+        return {"success": False, "error": "Task not found"}
+
+    try:
+        h_start, m_start = map(int, task['start_time'].split(':'))
+        h_end, m_end = map(int, task['end_time'].split(':'))
+        
+        new_start_h = h_start + 1
+        new_end_h = h_end + 1
+        
+        target_date = task['date']
+        
+        # If it rolls over midnight
+        if new_start_h >= 24:
+            new_start_h -= 24
+            new_end_h -= 24
+            current_date_obj = datetime.datetime.strptime(target_date, "%Y-%m-%d").date()
+            target_date = (current_date_obj + timedelta(days=1)).isoformat()
+
+        new_start_str = f"{new_start_h:02d}:{m_start:02d}"
+        new_end_str = f"{new_end_h:02d}:{m_end:02d}"
+        
+        reschedule_task(task_id, target_date, new_start_str, new_end_str)
+        return {"success": True, "rescheduled_to": target_date, "time": f"{new_start_str}-{new_end_str}", "type": "delayed"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+def reschedule_all_pending_today():
+    """
+    Finds all pending tasks for today and pushes them through the smart_reschedule logic.
+    """
+    today_iso = datetime.date.today().isoformat()
+    # Normally we get tasks before current time, but this sweeping action applies to everything pending today.
+    conn = get_db()
+    plan = get_active_plan()
+    if not plan:
+        return {"success": False, "error": "No active plan found"}
+
+    pending_today = conn.execute('''
+        SELECT id FROM study_tasks 
+        WHERE plan_id = ? AND date = ? AND status = 'pending'
+    ''', (plan['id'], today_iso)).fetchall()
+
+    if not pending_today:
+        return {"success": True, "message": "No pending tasks found for today."}
+
+    moved_count = 0
+    for row in pending_today:
+        res = smart_reschedule_task(row['id'])
+        if res.get("success"):
+            moved_count += 1
+
+    return {"success": True, "tasks_rescheduled": moved_count}
 
 def check_and_reschedule_pending():
     """

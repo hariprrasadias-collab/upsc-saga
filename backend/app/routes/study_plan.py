@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify, current_app
 import threading
-from app.services.study_planner import generate_study_plan, get_plan_for_range, check_and_reschedule_pending
-from app.db_models.study_plan import update_task_status, get_task_by_id
+import datetime
+from app.services.study_planner import generate_study_plan, get_plan_for_range, check_and_reschedule_pending, smart_reschedule_task, delay_task_by_one_hour, reschedule_all_pending_today
+from app.db_models.study_plan import update_task_status, get_task_by_id, get_pending_past_tasks_today
 from app.services.brain_service import brain_service
 
 study_plan_bp = Blueprint('study_plan', __name__)
@@ -25,10 +26,10 @@ def generate():
 def get_current_plan():
     try:
         start_date = request.args.get('start_date')
-        days = int(request.args.get('days', 30))
-        
         if not start_date:
-            return jsonify({"error": "Start date required"}), 400
+            start_date = datetime.date.today().isoformat()
+            
+        days = int(request.args.get('days', 30))
 
         plan = get_plan_for_range(start_date, days)
         return jsonify({"success": True, "plan": plan})
@@ -40,6 +41,47 @@ def reschedule_check():
     try:
         result = check_and_reschedule_pending()
         return jsonify(result)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@study_plan_bp.route('/api/planner/tasks/recently-ended', methods=['GET'])
+def get_recently_ended():
+    try:
+        today_iso = datetime.date.today().isoformat()
+        current_time_str = datetime.datetime.now().strftime("%H:%M")
+        
+        tasks = get_pending_past_tasks_today(today_iso, current_time_str)
+        return jsonify({"success": True, "tasks": tasks})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@study_plan_bp.route('/api/planner/task/<int:task_id>/reschedule-smart', methods=['POST'])
+def reschedule_task_smart(task_id):
+    try:
+        result = smart_reschedule_task(task_id)
+        if result.get("success"):
+            return jsonify(result)
+        return jsonify(result), 400
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@study_plan_bp.route('/api/planner/task/<int:task_id>/delay', methods=['POST'])
+def delay_task(task_id):
+    try:
+        result = delay_task_by_one_hour(task_id)
+        if result.get("success"):
+            return jsonify(result)
+        return jsonify(result), 400
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@study_plan_bp.route('/api/planner/reschedule-all-pending', methods=['POST'])
+def reschedule_all_pending_route():
+    try:
+        result = reschedule_all_pending_today()
+        if result.get("success"):
+            return jsonify(result)
+        return jsonify(result), 400
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 

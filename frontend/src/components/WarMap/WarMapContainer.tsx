@@ -8,10 +8,9 @@ import WarMapHeader from './WarMapHeader';
 import TacticalBriefing from './TacticalBriefing';
 import TerritoryNodeMap from './TerritoryNodeMap';
 import type { Task, RawTaskFromAPI } from '../../contexts/GlobalContext';
-import { generateCSVTaskId } from '../../util/taskUtils';
 
 interface Slot {
-  id: string;
+  id: string | number;
   time: string;
   subject: string;
   activity: string;
@@ -44,85 +43,43 @@ const WarMapContainer: React.FC<WarMapContainerProps> = ({ onTaskCompleted }) =>
 
   const dateStr = getSelectedDateString();
 
-  // --- CSV Fetching Logic ---
-  const parseCSV = (csvText: string): DayPlan[] => {
-    const lines = csvText.split('\n').filter(line => line.trim() !== '');
-    const dataRows = lines.slice(1); // Skip headers
-
-    const dayMap: { [key: string]: DayPlan } = {};
-    const completedTasks = new Set(JSON.parse(localStorage.getItem('completedTasks') || '[]'));
-
-    dataRows.forEach((row) => {
-      const columns = row.split(',').map(c => c.trim());
-      const date = columns[0];
-      const dayName = columns[1];
-      const time = columns[3];
-      const subject = columns[4];
-      const topic = columns[5];
-      const activityType = columns[6];
-      const resources = columns[7];
-
-      if (!date || columns.length < 5) return;
-
-      if (!dayMap[date]) {
-        dayMap[date] = {
-          date: date,
-          day: dayName,
-          slots: []
-        };
-      }
-
-      // Use content-based ID to prevent collisions on CSV regeneration
-      const taskId = generateCSVTaskId(date, time, subject, topic);
-      const isCompleted = completedTasks.has(taskId);
-
-      dayMap[date].slots.push({
-        id: taskId,
-        time: time,
-        subject: subject,
-        activity: `${topic} (${activityType})`,
-        status: isCompleted ? 'completed' : 'pending',
-        resource_link: resources !== 'N/A' ? resources : undefined
-      });
-    });
-
-    return Object.values(dayMap);
-  };
-
-  const fetchCSVTasks = useCallback(async () => {
+  // --- Dynamic Plan Fetching Logic ---
+  const fetchScheduledTasks = useCallback(async () => {
     try {
-      const response = await fetch('/UPSC_Scheduler.csv');
-      if (!response.ok) throw new Error('Failed to fetch CSV');
-      const csvText = await response.text();
-      const allPlans = parseCSV(csvText);
-      const planForDate = allPlans.find(p => p.date === dateStr);
-      setCsvTasks(planForDate ? planForDate.slots : []);
+      const response = await fetch(`${API_BASE_URL}/api/planner/current?start_date=${dateStr}&days=1`);
+      if (!response.ok) throw new Error('Failed to fetch study plan from API');
+      const json = await response.json();
+      if (json.success && json.plan.length > 0) {
+        const planForDate = json.plan.find((p: DayPlan) => p.date === dateStr);
+        setCsvTasks(planForDate ? planForDate.slots : []);
+      } else {
+        setCsvTasks([]);
+      }
     } catch (err) {
-      console.error("Failed to fetch CSV plan:", err);
+      console.error("Failed to fetch dynamic schedule plan:", err);
       setCsvTasks([]);
     }
   }, [dateStr]);
 
-  const toggleCSVTaskStatus = (task: Slot) => {
-    const completedTasks = new Set(JSON.parse(localStorage.getItem('completedTasks') || '[]'));
-    const isCompleted = completedTasks.has(task.id);
+  const toggleCSVTaskStatus = async (task: Slot) => {
+    const isCompleted = task.status === 'completed';
+    const newStatus = isCompleted ? 'pending' : 'completed';
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/planner/task/${task.id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (!response.ok) throw new Error('Failed to update task status');
 
-    if (isCompleted) {
-      completedTasks.delete(task.id);
-    } else {
-      completedTasks.add(task.id);
+      // Refresh tasks and notify tracking updates
+      await fetchScheduledTasks();
+      onTaskCompleted();
+      window.dispatchEvent(new Event('taskUpdate'));
+    } catch (err) {
+      console.error('Error toggling study task status:', err);
+      alert('Failed to update study task status.');
     }
-
-    localStorage.setItem('completedTasks', JSON.stringify(Array.from(completedTasks)));
-
-    // Refresh tasks to reflect status change
-    fetchCSVTasks();
-
-    // Trigger any parent updates if necessary (though this is local state mostly)
-    onTaskCompleted();
-
-    // Dispatch event for other components
-    window.dispatchEvent(new Event('taskUpdate'));
   };
 
   // --- Backend Task Fetching (Existing) ---
@@ -162,8 +119,8 @@ const WarMapContainer: React.FC<WarMapContainerProps> = ({ onTaskCompleted }) =>
 
   useEffect(() => {
     fetchTasksForDate();
-    fetchCSVTasks();
-  }, [fetchTasksForDate, fetchCSVTasks]);
+    fetchScheduledTasks();
+  }, [fetchTasksForDate, fetchScheduledTasks]);
 
   const handleTaskComplete = async (taskId: number) => {
     try {

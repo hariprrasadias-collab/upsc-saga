@@ -10,13 +10,403 @@ Brain: Loaded persisted strategy with 2 steps.
  * Serving Flask app 'app'
  * Debug mode: on
 [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
  * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.100:5000
 [33mPress CTRL+C to quit[0m
  * Restarting with stat
  * Debugger is active!
  * Debugger PIN: 628-843-211
 🕵️ Hephaestus: Scanning logs at logs/app.log...
 ✅ No tracebacks found in logs.
+127.0.0.1 - - [04/Mar/2026 21:57:43] "GET /api/dashboard-data HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:57:43] "GET /api/dashboard-data HTTP/1.1" 200 -
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+127.0.0.1 - - [04/Mar/2026 21:57:43] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
+  [Previous line repeated 977 more times]
+  [Previous line repeated 977 more times]
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
+    user_id = session.get('user_id')
+              ^^^^^^^^^^^
+  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
+    obj = instance._get_current_object()
+RecursionError: maximum recursion depth exceeded
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
+    user_id = session.get('user_id')
+              ^^^^^^^^^^^
+127.0.0.1 - - [04/Mar/2026 21:57:43] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
+  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
+    obj = instance._get_current_object()
+RecursionError: maximum recursion depth exceeded
+127.0.0.1 - - [04/Mar/2026 21:57:43] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+127.0.0.1 - - [04/Mar/2026 21:57:43] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  [Previous line repeated 977 more times]
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
+    user_id = session.get('user_id')
+              ^^^^^^^^^^^
+  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
+    obj = instance._get_current_object()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
+    user_id = get_current_user_id()
+RecursionError: maximum recursion depth exceeded
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+127.0.0.1 - - [04/Mar/2026 21:57:43] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  [Previous line repeated 977 more times]
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
+    user_id = session.get('user_id')
+              ^^^^^^^^^^^
+  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
+    obj = instance._get_current_object()
+RecursionError: maximum recursion depth exceeded
+127.0.0.1 - - [04/Mar/2026 21:57:43] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
+127.0.0.1 - - [04/Mar/2026 21:57:43] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:57:43] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
+Autonomous Brain tables initialized
+✅ Automation tables initialized.
+Optimization: Checking indexes...
+✨ ModelManager Ready. Active Providers: ['openrouter', 'nvidia', 'openclaw', 'google']
+🧠 Synapse Connected: [ASSESSMENT] mock_tests
+BrainService Online: Connected to Gemini Cortex via ModelManager.
+Brain: Loaded persisted strategy with 2 steps.
+🦉 Night Watchman Routes Imported
+🦉 Registering Night Watchman Blueprint...
+Error fetching daily challenge: maximum recursion depth exceeded
+Error fetching streak: maximum recursion depth exceeded
+Error identifying weak areas: no such column: name
+Error fetching daily challenge: maximum recursion depth exceeded
+Error identifying weak areas: no such column: name
+Error fetching streak: maximum recursion depth exceeded
+🕵️ Hephaestus: Scanning logs at logs/app.log...
+✅ No tracebacks found in logs.
+127.0.0.1 - - [04/Mar/2026 21:57:53] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:57:53] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:57:54] "GET /api/automation/content?type=podcast HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:57:55] "GET /api/automation/content?type=essay HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:57:55] "GET /api/automation/content?type=visual_prompt HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:57:56] "GET /api/automation/content?type=roleplay HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:57:57] "GET /api/automation/content?type=cheat_sheet HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:57:57] "GET /api/automation/content?type=timeline HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:57:58] "GET /api/planner/current?start_date=2026-03-04&days=365 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:57:58] "GET /api/planner/current?start_date=2026-03-04&days=365 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:57:58] "GET /api/brain/status HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:57:58] "GET /api/brain/status HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:00] "OPTIONS /api/planner/task/66299/status HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:00] "PUT /api/planner/task/66299/status HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:00] "GET /api/brain/status HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:03] "GET /api/brain/proactive HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:03] "GET /api/brain/proactive HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:03] "GET /api/brain/proactive HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:03] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:03] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:05] "GET /api/automation/content?type=podcast HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:05] "GET /api/automation/content?type=essay HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:06] "GET /api/automation/content?type=visual_prompt HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:06] "GET /api/automation/content?type=roleplay HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:06] "GET /api/automation/content?type=cheat_sheet HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:09] "GET /api/automation/content?type=interview_sim HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:09] "GET /api/automation/content?type=heatmap HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:12] "GET /api/automation/content?type=self_review HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:13] "GET /api/automation/content?type=interview_sim HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:14] "GET /api/automation/content?type=subject_book HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:14] "GET /api/automation/content?type=map_work HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:15] "GET /api/automation/content?type=quote_bank HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:15] "GET /api/automation/content?type=pitfalls HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:16] "GET /api/automation/content?type=eli5 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 21:58:16] "GET /api/automation/content?type=cheat_sheet HTTP/1.1" 200 -
+🧠 Synapse Connected: [KNOWLEDGE] ravens
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
+✅ Success with nvidia (1.17s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
+Brain: Processing completion for History - NCERT Cl 6: Our Pasts I - Ch 1: What, Where, How and When? (Read) (User 1)
+Brain: 🚀 Launching 23 parallel automation tasks for NCERT Cl 6: Our Pasts I - Ch 1: What, Where, How and When? (Read)
+Brain: ⚡ Parallel Start -> CREATE_MOCK_TEST
+Brain Executing Action: CREATE_MOCK_TEST
+Brain: ⚡ Parallel Start -> CREATE_FLASHCARDS
+Brain Executing Action: CREATE_FLASHCARDS
+Brain: ⚡ Parallel Start -> GENERATE_TOPIC_LINKAGES
+Brain Executing Action: GENERATE_TOPIC_LINKAGES
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+Brain: ⚡ Parallel Start -> GENERATE_PODCAST_SCRIPT
+Brain Executing Action: GENERATE_PODCAST_SCRIPT
+Brain: ⚡ Parallel Start -> PREDICT_QUESTIONS
+Brain Executing Action: PREDICT_QUESTIONS
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+Brain: ⚡ Parallel Start -> GENERATE_SOCRATIC_DIALOGUE
+Brain Executing Action: GENERATE_SOCRATIC_DIALOGUE
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+🧠 Synapse Connected: [KNOWLEDGE] flashcards
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (0.97s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
+✅ Success with nvidia (2.17s)
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+✅ Success with nvidia (3.11s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (4.49s)
+Brain: ✅ Parallel Done & Saved -> CREATE_FLASHCARDS
+Brain: ⚡ Parallel Start -> GENERATE_SUBJECT_BOOK
+Brain Executing Action: GENERATE_SUBJECT_BOOK
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (3.01s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (1.17s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (4.41s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (1.12s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (14.79s)
+Brain: Saving Podcast Script...
+Brain: ✅ Parallel Done & Saved -> GENERATE_PODCAST_SCRIPT
+Brain: ⚡ Parallel Start -> GENERATE_INTERVIEW_SIM
+Brain Executing Action: GENERATE_INTERVIEW_SIM
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (3.18s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (1.66s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (3.11s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (18.57s)
+JSON Parse Error: Invalid control character at: line 7 column 19 (char 226)
+Brain: Saving Subject Book...
+Brain: ✅ Parallel Done & Saved -> GENERATE_SUBJECT_BOOK
+Brain: ⚡ Parallel Start -> GENERATE_HEATMAP
+Brain Executing Action: GENERATE_HEATMAP
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (1.03s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (23.87s)
+Brain: ✅ Parallel Done & Saved -> CREATE_MOCK_TEST
+Brain: ⚡ Parallel Start -> GENERATE_HEATMAP
+Brain Executing Action: GENERATE_HEATMAP
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (27.58s)
+Brain: ✅ Parallel Done & Saved -> GENERATE_TOPIC_LINKAGES
+Brain: ⚡ Parallel Start -> GENERATE_SELF_REVIEW
+Brain Executing Action: GENERATE_SELF_REVIEW
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (13.31s)
+Brain: Saving Interview Simulator...
+Brain: ✅ Parallel Done & Saved -> GENERATE_INTERVIEW_SIM
+Brain: ⚡ Parallel Start -> GENERATE_MNEMONICS
+Brain Executing Action: GENERATE_MNEMONICS
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
+✅ Success with nvidia (1.11s)
+Brain: Saving Mnemonics...
+Brain: Failed to save mnemonic: Error binding parameter 1: type 'dict' is not supported
+Brain: ✅ Parallel Done & Saved -> GENERATE_MNEMONICS
+Brain: ⚡ Parallel Start -> TRIANGULATE_TOPIC
+Brain Executing Action: TRIANGULATE_TOPIC
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (6.61s)
+Brain: Saving Heatmap...
+Brain: ✅ Parallel Done & Saved -> GENERATE_HEATMAP
+Brain: ⚡ Parallel Start -> CONSTRUCT_PALACE
+Brain Executing Action: CONSTRUCT_PALACE
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (6.84s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (3.39s)
+Brain: Saving Self Review...
+✅ Success with nvidia (1.28s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (12.90s)
+Brain: Saving Heatmap...
+✅ Success with nvidia (6.93s)
+ * Detected change in '/Users/openclaw/Downloads/upsc-saga/backend/app/routes/automation_routes.py', reloading
+Brain: Saving Triangulation...
+✅ Success with nvidia (10.76s)
+Brain: Saving Socratic Dialogue...
+✅ Success with nvidia (15.34s)
+JSON Parse Error: Extra data: line 5 column 4 (char 214)
+Brain: ✅ Parallel Done & Saved -> CONSTRUCT_PALACE
+Brain: ⚡ Parallel Start -> GENERATE_ESSAY_PROMPT
+Brain Executing Action: GENERATE_ESSAY_PROMPT
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+Brain: ✅ Parallel Done & Saved -> TRIANGULATE_TOPIC
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+Brain: ⚡ Parallel Start -> GENERATE_MAP_WORK
+Brain Executing Action: GENERATE_MAP_WORK
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+Brain: ✅ Parallel Done & Saved -> GENERATE_HEATMAP
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+Brain: ⚡ Parallel Start -> GENERATE_CHEAT_SHEET
+Brain Executing Action: GENERATE_CHEAT_SHEET
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+Brain: ✅ Parallel Done & Saved -> GENERATE_SOCRATIC_DIALOGUE
+Brain: ⚡ Parallel Start -> GENERATE_QUOTE_BANK
+Brain Executing Action: GENERATE_QUOTE_BANK
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+Brain: ✅ Parallel Done & Saved -> GENERATE_SELF_REVIEW
+Brain: ⚡ Parallel Start -> GENERATE_TIMELINE
+Brain Executing Action: GENERATE_TIMELINE
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (1.62s)
+Brain: Saving Quote Bank...
+Brain: ✅ Parallel Done & Saved -> GENERATE_QUOTE_BANK
+Brain: ⚡ Parallel Start -> GENERATE_ETHICS_DILEMMA
+Brain Executing Action: GENERATE_ETHICS_DILEMMA
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (2.53s)
+Brain: Saving Essay Prompt...
+Brain: Saved Essay Prompt for NCERT Cl 6: Our Pasts I - Ch 1: What, Where, How and When? (Read)
+Brain: ✅ Parallel Done & Saved -> GENERATE_ESSAY_PROMPT
+Brain: ⚡ Parallel Start -> GENERATE_ELI5
+Brain Executing Action: GENERATE_ELI5
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (5.47s)
+Brain: Saving Ethics Dilemma...
+Brain: ✅ Parallel Done & Saved -> GENERATE_ETHICS_DILEMMA
+Brain: ⚡ Parallel Start -> GENERATE_ROLEPLAY_SCENARIO
+Brain Executing Action: GENERATE_ROLEPLAY_SCENARIO
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (53.61s)
+DEBUG FORESIGHT RAW TEXT: Here are 20 "Black Swan" candidate questions that meet the specified requirements:
+
+1. 
+{
+"question": "How does the concept of 'intangible heritage' in archaeology relate to the recent UNESCO recognit...
+No JSON array found (brackets missing)
+Brain: ✅ Parallel Done & Saved -> PREDICT_QUESTIONS
+Brain: ⚡ Parallel Start -> GENERATE_VISUAL_PROMPT
+Brain Executing Action: GENERATE_VISUAL_PROMPT
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (1.99s)
+Brain: Saving Visual Prompt...
+Brain: Saved Mnemonic for NCERT Cl 6: Our Pasts I - Ch 1: What, Where, How and When? (Read)
+Brain: ✅ Parallel Done & Saved -> GENERATE_VISUAL_PROMPT
+✅ Success with nvidia (9.62s)
+Brain: Saving ELI5...
+Brain: ✅ Parallel Done & Saved -> GENERATE_ELI5
+✅ Success with nvidia (14.90s)
+Brain: Saving Timeline...
+Brain: ✅ Parallel Done & Saved -> GENERATE_TIMELINE
+✅ Success with nvidia (15.62s)
+JSON Parse Error: Invalid control character at: line 7 column 19 (char 167)
+Brain: Saving Cheat Sheet...
+Brain: ✅ Parallel Done & Saved -> GENERATE_CHEAT_SHEET
+✅ Success with nvidia (8.53s)
+Brain: Saving Roleplay Scenario...
+Brain: ✅ Parallel Done & Saved -> GENERATE_ROLEPLAY_SCENARIO
+✅ Success with nvidia (15.72s)
+JSON Parse Error: Extra data: line 7 column 4 (char 332)
+Brain: ✅ Parallel Done & Saved -> GENERATE_MAP_WORK
+Brain: 🏁 All parallel tasks completed for NCERT Cl 6: Our Pasts I - Ch 1: What, Where, How and When? (Read)
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 628-843-211
 Autonomous Brain tables initialized
 ✅ Automation tables initialized.
 Optimization: Checking indexes...
@@ -28,18 +418,23 @@ Brain: Loaded persisted strategy with 2 steps.
 🦉 Registering Night Watchman Blueprint...
 🕵️ Hephaestus: Scanning logs at logs/app.log...
 ✅ No tracebacks found in logs.
-127.0.0.1 - - [03/Mar/2026 18:12:52] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:52] "GET /api/dashboard-data HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:00:06] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:00:12] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:00:19] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:03:16] "GET /api/dashboard-data HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:03:16] "GET /api/dashboard-data HTTP/1.1" 200 -
 Traceback (most recent call last):
+Traceback (most recent call last):
+127.0.0.1 - - [04/Mar/2026 22:03:16] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
     user_id = get_current_user_id()
-Traceback (most recent call last):
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
     user_id = get_current_user_id()
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
     user_id = get_current_user_id()
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
     user_id = get_current_user_id()
+  [Previous line repeated 977 more times]
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
     user_id = get_current_user_id()
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
@@ -54,7 +449,6 @@ Traceback (most recent call last):
               ^^^^^^^^^^^
   File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
     obj = instance._get_current_object()
-  [Previous line repeated 977 more times]
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
     user_id = session.get('user_id')
               ^^^^^^^^^^^
@@ -62,121 +456,9 @@ Traceback (most recent call last):
     obj = instance._get_current_object()
 RecursionError: maximum recursion depth exceeded
 RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 18:12:52] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:12:52] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-RecursionError: maximum recursion depth exceeded
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-127.0.0.1 - - [03/Mar/2026 18:12:52] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 18:12:52] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:12:52] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:52] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:55] "GET /api/analytics/subject-wise HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:55] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:55] "GET /api/analytics/performance-scatter HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:55] "GET /api/analytics/mock-tests HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:55] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:55] "GET /api/analytics/subject-wise HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:55] "GET /api/analytics/performance-scatter HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:55] "GET /api/analytics/mock-tests HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:55] "GET /api/analytics/predictive/all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:55] "GET /api/analytics/predictive/all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:56] "GET /api/weak-areas/dashboard HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:56] "GET /api/weak-areas/dashboard HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:57] "GET /api/analytics/subject-wise HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:57] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:57] "GET /api/analytics/performance-scatter HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:57] "GET /api/analytics/mock-tests HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:57] "GET /api/analytics/subject-wise HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:57] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:57] "GET /api/analytics/performance-scatter HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:57] "GET /api/analytics/mock-tests HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:57] "GET /api/analytics/predictive/all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:12:57] "GET /api/analytics/predictive/all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:01] "GET /api/analytics/subject-wise HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:01] "GET /api/analytics/mock-tests HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:01] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:01] "GET /api/analytics/performance-scatter HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:01] "GET /api/analytics/predictive/all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:04] "GET /api/weak-areas/dashboard HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:04] "GET /api/weak-areas/dashboard HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:06] "GET /api/planner/current?start_date=2026-03-03&days=365 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:06] "GET /api/planner/current?start_date=2026-03-03&days=365 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:06] "GET /api/brain/status HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:06] "GET /api/brain/status HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:10] "GET /api/brain/proactive HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:10] "GET /api/brain/proactive HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:13] "GET /api/tasks?date=2026-03-03 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:13] "GET /api/tasks?date=2026-03-03 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:13] "OPTIONS /api/planner/tactical-brief HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:16] "POST /api/planner/tactical-brief HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:16] "POST /api/planner/tactical-brief HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:17] "POST /api/planner/tactical-brief HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:27] "GET /api/triangulation/history?limit=50 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:27] "GET /api/triangulation/history?limit=50 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:28] "GET /api/syllabus/ HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:28] "GET /api/syllabus/ HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:38] "OPTIONS /api/syllabus/228/status HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:38] "POST /api/syllabus/228/status HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:44] "GET /api/quests HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:44] "GET /api/quests HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:53] "GET /api/revision/cards HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:53] "GET /api/revision/cards HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:57] "GET /api/mindmap/list HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:57] "GET /api/mindmap/list HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:58] "GET /api/mind_palace/locations HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:58] "GET /api/mind_palace/locations HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:59] "GET /api/scheduler/due HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:13:59] "GET /api/scheduler/due HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:14:00] "GET /api/mind_palace/locations HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:14:00] "GET /api/mind_palace/locations HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:14:00] "GET /api/mind_palace/locations/5/artifacts HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:14:03] "GET /api/mindmap/list HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:14:03] "GET /api/mindmap/list HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:14:04] "GET /api/mind_palace/locations HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:14:04] "GET /api/mind_palace/locations HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:14:06] "GET /api/mind_palace/locations/4/artifacts HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:14:11] "GET /api/scheduler/due HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:14:11] "GET /api/scheduler/due HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:14:13] "GET /api/timebox/suggestions HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:14:13] "GET /api/timebox/get HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:14:13] "GET /api/timebox/suggestions HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:14:13] "GET /api/timebox/get HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:14:18] "GET /api/golden-path/graph HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:14:19] "GET /api/golden-path/graph HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:14:26] "OPTIONS /api/golden-path/optimize HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:14:26] "POST /api/golden-path/optimize HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:18:25] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:18:25] "GET /api/dashboard-data HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:03:16] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
+127.0.0.1 - - [04/Mar/2026 22:03:16] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
+127.0.0.1 - - [04/Mar/2026 22:03:16] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
 Traceback (most recent call last):
 Traceback (most recent call last):
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
@@ -188,40 +470,13 @@ Traceback (most recent call last):
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
     user_id = get_current_user_id()
   [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
     user_id = session.get('user_id')
               ^^^^^^^^^^^
   File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
     obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
 RecursionError: maximum recursion depth exceeded
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-127.0.0.1 - - [03/Mar/2026 18:18:25] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 18:18:25] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
+127.0.0.1 - - [04/Mar/2026 22:03:16] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
     user_id = get_current_user_id()
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
@@ -237,123 +492,188 @@ Traceback (most recent call last):
   File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
     obj = instance._get_current_object()
 RecursionError: maximum recursion depth exceeded
+127.0.0.1 - - [04/Mar/2026 22:03:16] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
+127.0.0.1 - - [04/Mar/2026 22:03:17] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:03:18] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:04:49] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:04:49] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:06:40] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:07:09] "GET /api/automation/content?type=all HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:08:23] "GET /api/dashboard-data HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:08:23] "GET /api/dashboard-data HTTP/1.1" 200 -
+Traceback (most recent call last):
+Traceback (most recent call last):
+127.0.0.1 - - [04/Mar/2026 22:08:23] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  [Previous line repeated 977 more times]
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
     user_id = session.get('user_id')
               ^^^^^^^^^^^
-127.0.0.1 - - [03/Mar/2026 18:18:25] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
+  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
+    obj = instance._get_current_object()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+RecursionError: maximum recursion depth exceeded
+  [Previous line repeated 977 more times]
+127.0.0.1 - - [04/Mar/2026 22:08:23] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
+    user_id = session.get('user_id')
+              ^^^^^^^^^^^
   File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
     obj = instance._get_current_object()
 RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 18:18:25] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:18:25] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:18:25] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:19:06] "GET /api/tasks?date=2026-03-03 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:19:06] "GET /api/tasks?date=2026-03-03 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:19:07] "OPTIONS /api/planner/tactical-brief HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:19:09] "POST /api/planner/tactical-brief HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:19:10] "POST /api/planner/tactical-brief HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:19:10] "POST /api/planner/tactical-brief HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:19:10] "POST /api/planner/tactical-brief HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:19:38] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:19:38] "GET /api/analytics/mock-tests HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:19:38] "GET /api/analytics/performance-scatter HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:19:38] "GET /api/analytics/subject-wise HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:19:38] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:19:38] "GET /api/analytics/mock-tests HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:19:38] "GET /api/analytics/performance-scatter HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:19:38] "GET /api/analytics/subject-wise HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:19:38] "GET /api/analytics/predictive/all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:19:38] "GET /api/analytics/predictive/all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:20:09] "GET /api/syllabus/ HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:20:09] "GET /api/syllabus/ HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:20:40] "GET /api/heatmap/subjects HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:20:40] "GET /api/heatmap/subjects HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:20:40] "GET /api/heatmap/pyq HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:20:40] "GET /api/heatmap/pyq HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:20:47] "GET /api/compilation/months HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:20:47] "GET /api/compilation/months HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:20:47] "GET /api/compilation/2026/3 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:20:47] "GET /api/compilation/2026/3 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:20:52] "GET /api/heatmap/subjects HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:20:52] "GET /api/heatmap/subjects HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:20:52] "GET /api/heatmap/pyq HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:20:52] "GET /api/heatmap/pyq HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:20:58] "GET /api/heatmap/pyq?subject=Current+Affairs&year_start=2014&year_end=2024 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:03] "GET /api/heatmap/pyq?subject=Biology&year_start=2014&year_end=2024 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:04] "GET /api/triangulation/history?limit=50 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:04] "GET /api/triangulation/history?limit=50 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:17] "GET /api/heatmap/pyq?subject=Geography&year_start=2014&year_end=2024 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:23] "GET /api/heatmap/cell?topic=Climate&year=2016 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:38] "GET /api/heatmap/cell?topic=Central%20Asia%20-%20Borders%20with%20Afghanistan&year=2022 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:40] "GET /api/heatmap/cell?topic=Botany%20-%20Trees&year=2023 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:43] "GET /api/heatmap/cell?topic=Black%20Cotton%20Soil&year=2021 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:46] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:46] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:46] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:46] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:47] "GET /api/analytics/subject-wise HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:47] "GET /api/analytics/mock-tests HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:47] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:47] "GET /api/analytics/performance-scatter HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:47] "GET /api/analytics/subject-wise HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:47] "GET /api/analytics/mock-tests HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:47] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:47] "GET /api/analytics/performance-scatter HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:47] "GET /api/analytics/predictive/all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:47] "GET /api/analytics/predictive/all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:52] "GET /api/heatmap/cell?topic=National%20Parks&year=2015 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:21:55] "GET /api/heatmap/cell?topic=National%20Highways&year=2014 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:22:21] "GET /api/neural_hash/history HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:22:21] "GET /api/neural_hash/history HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:22:22] "GET /api/panopticon/dashboard HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:22:22] "GET /api/panopticon/dashboard HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:22:43] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:22:43] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:22:43] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:22:43] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:24] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:24] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:24] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:24] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:43] "GET /api/model-answers HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:43] "GET /api/model-answers HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:43] "GET /api/codex/progress HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:43] "GET /api/codex/progress HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:45] "GET /api/lore HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:45] "GET /api/lore HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:46] "GET /night-watchman/latest HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:46] "GET /night-watchman/history HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:46] "GET /night-watchman/history HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:46] "GET /night-watchman/latest HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:46] "GET /api/codex/progress HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:46] "GET /api/codex/progress HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:47] "GET /api/compilation/months HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:47] "GET /api/compilation/months HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:47] "GET /api/compilation/2026/3 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:47] "GET /api/compilation/2026/3 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:48] "GET /api/ravens/saved HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:48] "GET /api/ravens/saved HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:50] "GET /api/ravens?type=munin HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:50] "GET /api/ravens?type=hugin HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:23:50] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:24:05] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:24:05] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:24:05] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:24:05] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:24:06] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:24:06] "GET /api/analytics/subject-wise HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:24:06] "GET /api/analytics/mock-tests HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:24:06] "GET /api/analytics/performance-scatter HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:24:06] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:24:06] "GET /api/analytics/mock-tests HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:24:06] "GET /api/analytics/subject-wise HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:24:06] "GET /api/analytics/performance-scatter HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:24:06] "GET /api/analytics/predictive/all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:24:06] "GET /api/analytics/predictive/all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:24:14] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:24:14] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:24:23] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:24:23] "GET /api/dashboard-data HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:08:23] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  [Previous line repeated 977 more times]
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
+    user_id = session.get('user_id')
+              ^^^^^^^^^^^
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
+    obj = instance._get_current_object()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+RecursionError: maximum recursion depth exceeded
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+127.0.0.1 - - [04/Mar/2026 22:08:23] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
+  [Previous line repeated 977 more times]
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
+    user_id = session.get('user_id')
+              ^^^^^^^^^^^
+127.0.0.1 - - [04/Mar/2026 22:08:23] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
+  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
+    obj = instance._get_current_object()
+RecursionError: maximum recursion depth exceeded
+127.0.0.1 - - [04/Mar/2026 22:08:23] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
+127.0.0.1 - - [04/Mar/2026 22:08:23] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:08:23] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:09:07] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:09:07] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:09:20] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:09:20] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+127.0.0.1 - - [04/Mar/2026 22:10:19] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:11:18] "GET /api/dashboard-data HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:11:18] "GET /api/dashboard-data HTTP/1.1" 200 -
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  [Previous line repeated 977 more times]
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
+    user_id = session.get('user_id')
+              ^^^^^^^^^^^
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
+    obj = instance._get_current_object()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  [Previous line repeated 977 more times]
+RecursionError: maximum recursion depth exceeded
+127.0.0.1 - - [04/Mar/2026 22:11:19] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
+    user_id = session.get('user_id')
+              ^^^^^^^^^^^
+  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
+    obj = instance._get_current_object()
+127.0.0.1 - - [04/Mar/2026 22:11:19] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
+RecursionError: maximum recursion depth exceeded
+127.0.0.1 - - [04/Mar/2026 22:11:19] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  [Previous line repeated 977 more times]
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
+    user_id = session.get('user_id')
+              ^^^^^^^^^^^
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  [Previous line repeated 977 more times]
+  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
+    obj = instance._get_current_object()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
+    user_id = session.get('user_id')
+              ^^^^^^^^^^^
+127.0.0.1 - - [04/Mar/2026 22:11:19] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
+RecursionError: maximum recursion depth exceeded
+  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
+    obj = instance._get_current_object()
+RecursionError: maximum recursion depth exceeded
+127.0.0.1 - - [04/Mar/2026 22:11:19] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
+127.0.0.1 - - [04/Mar/2026 22:11:19] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
+127.0.0.1 - - [04/Mar/2026 22:11:19] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:11:19] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:11:22] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:11:38] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:11:55] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:12:13] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:12:31] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:12:44] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:12:59] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:13:13] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:13:24] "GET /api/dashboard-data HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:13:24] "GET /api/dashboard-data HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:13:24] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:13:24] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:13:51] "GET /api/brain/status HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:15:07] "GET /api/triangulation/history?limit=50 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:15:07] "GET /api/triangulation/history?limit=50 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:15:21] "GET /api/dashboard-data HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:15:21] "GET /api/dashboard-data HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:15:21] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:15:21] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:15:40] "GET /api/brain/status HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:17:32] "GET /api/dashboard-data HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:17:32] "GET /api/dashboard-data HTTP/1.1" 200 -
 Traceback (most recent call last):
 Traceback (most recent call last):
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
@@ -373,48 +693,49 @@ Traceback (most recent call last):
     user_id = get_current_user_id()
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
     user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
   [Previous line repeated 977 more times]
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
     user_id = session.get('user_id')
               ^^^^^^^^^^^
   File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
     obj = instance._get_current_object()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
+    user_id = session.get('user_id')
+              ^^^^^^^^^^^
   File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
     obj = instance._get_current_object()
 RecursionError: maximum recursion depth exceeded
 RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 18:24:24] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:24:24] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
+127.0.0.1 - - [04/Mar/2026 22:17:32] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:17:32] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
+127.0.0.1 - - [04/Mar/2026 22:17:32] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
 Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
     user_id = get_current_user_id()
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
     user_id = get_current_user_id()
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
     user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-Traceback (most recent call last):
-127.0.0.1 - - [03/Mar/2026 18:24:24] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
   [Previous line repeated 977 more times]
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
     user_id = session.get('user_id')
               ^^^^^^^^^^^
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
   File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
     obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
     user_id = get_current_user_id()
 RecursionError: maximum recursion depth exceeded
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
     user_id = get_current_user_id()
-127.0.0.1 - - [03/Mar/2026 18:24:24] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
+127.0.0.1 - - [04/Mar/2026 22:17:32] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+127.0.0.1 - - [04/Mar/2026 22:17:32] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
   [Previous line repeated 977 more times]
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
     user_id = session.get('user_id')
@@ -422,1499 +743,54 @@ RecursionError: maximum recursion depth exceeded
   File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
     obj = instance._get_current_object()
 RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 18:24:24] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:24:24] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:24:59] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:25:00] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:25:02] "GET /api/analytics/subject-wise HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:25:02] "GET /api/analytics/mock-tests HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:25:02] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:25:02] "GET /api/analytics/performance-scatter HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:25:02] "GET /api/analytics/subject-wise HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:25:02] "GET /api/analytics/mock-tests HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:25:02] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:25:02] "GET /api/analytics/performance-scatter HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:25:02] "GET /api/analytics/predictive/all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:25:02] "GET /api/analytics/predictive/all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:25:42] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:25:42] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:26:05] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:26:05] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-Error fetching daily challenge: maximum recursion depth exceeded
-Error fetching streak: maximum recursion depth exceeded
+127.0.0.1 - - [04/Mar/2026 22:17:32] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
+127.0.0.1 - - [04/Mar/2026 22:17:32] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:17:32] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:17:39] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:18:29] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:18:54] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:23] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [04/Mar/2026 22:19:55] "GET /api/automation/content HTTP/1.1" 200 -
+ * Detected change in '/Users/openclaw/Downloads/upsc-saga/backend/app/__init__.py', reloading
 Error fetching daily challenge: maximum recursion depth exceeded
 Error fetching streak: maximum recursion depth exceeded
 Error identifying weak areas: no such column: name
 Error identifying weak areas: no such column: name
+Error fetching daily challenge: maximum recursion depth exceeded
+Error fetching streak: maximum recursion depth exceeded
+Error fetching streak: maximum recursion depth exceeded
+Error fetching daily challenge: maximum recursion depth exceeded
 Error identifying weak areas: no such column: name
+Error fetching streak: maximum recursion depth exceeded
+Error fetching daily challenge: maximum recursion depth exceeded
 Error identifying weak areas: no such column: name
+Error fetching daily challenge: maximum recursion depth exceeded
+Error fetching streak: maximum recursion depth exceeded
 Error identifying weak areas: no such column: name
-🧠 Synapse Connected: [KNOWLEDGE] ravens
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
-✅ Success with nvidia (0.97s)
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
-✅ Success with nvidia (0.98s)
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
-✅ Success with nvidia (2.64s)
-⚡ Returning cached response.
-⚡ Returning cached response.
-⚡ Returning cached response.
+Error fetching daily challenge: maximum recursion depth exceeded
+Error fetching streak: maximum recursion depth exceeded
+Error identifying weak areas: no such column: name
+Error fetching streak: maximum recursion depth exceeded
+Error fetching daily challenge: maximum recursion depth exceeded
+Error identifying weak areas: no such column: name
+Error fetching streak: maximum recursion depth exceeded
+Error fetching daily challenge: maximum recursion depth exceeded
+Error identifying weak areas: no such column: name
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 628-843-211
+Autonomous Brain tables initialized
+✅ Automation tables initialized.
+Optimization: Checking indexes...
 ✨ ModelManager Ready. Active Providers: ['openrouter', 'nvidia', 'openclaw', 'google']
-✨ ModelManager Ready. Active Providers: ['openrouter', 'nvidia', 'openclaw', 'google']
-✨ ModelManager Ready. Active Providers: ['openrouter', 'nvidia', 'openclaw', 'google']
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
-✅ Success with nvidia (2.91s)
-✅ Success with nvidia (3.49s)
-✅ Success with nvidia (3.78s)
-Error identifying weak areas: no such column: name
-Error identifying weak areas: no such column: name
-Error fetching daily challenge: maximum recursion depth exceeded
-Error fetching streak: maximum recursion depth exceeded
-Error fetching daily challenge: maximum recursion depth exceeded
-Error fetching streak: maximum recursion depth exceeded
-✨ ModelManager Ready. Active Providers: ['openrouter', 'nvidia', 'openclaw', 'google']
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-✨ ModelManager Ready. Active Providers: ['openrouter', 'nvidia', 'openclaw', 'google']
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
-✨ ModelManager Ready. Active Providers: ['openrouter', 'nvidia', 'openclaw', 'google']
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-✨ ModelManager Ready. Active Providers: ['openrouter', 'nvidia', 'openclaw', 'google']
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
-✅ Success with nvidia (2.95s)
-✅ Success with nvidia (3.21s)
-✅ Success with nvidia (3.50s)
-✅ Success with nvidia (3.92s)
-Error identifying weak areas: no such column: name
-Error identifying weak areas: no such column: name
-Error identifying weak areas: no such column: name
-Error identifying weak areas: no such column: name
-Failed to fetch content from https://www.thehindu.com/shorts/watch-attukal-pongala-worlds-largest-womens-religious-gathering-lights-up-kerala/article70699649.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-Error identifying weak areas: no such column: name
-Error identifying weak areas: no such column: name
-✅ Success with nvidia (23.30s)
-Gemini error for Watch: Attukal Pongala: World’s largest women’s religious gathering lights up Kerala: Expecting ',' delimiter: line 154 column 6 (char 8522)
-Image extraction failed for https://www.thehindu.com/shorts/watch-attukal-pongala-worlds-largest-womens-religious-gathering-lights-up-kerala/article70699649.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/news/national/karnataka/bengaluru-man-stabbed-to-death-over-trivial-row/article70698816.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-Error fetching daily challenge: maximum recursion depth exceeded
-Error fetching streak: maximum recursion depth exceeded
-Error fetching daily challenge: maximum recursion depth exceeded
-Error fetching streak: maximum recursion depth exceeded
-✅ Success with nvidia (44.96s)
-Gemini error for Bengaluru: Man stabbed to death over trivial row: Expecting ',' delimiter: line 142 column 6 (char 9440)
-Image extraction failed for https://www.thehindu.com/news/national/karnataka/bengaluru-man-stabbed-to-death-over-trivial-row/article70698816.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/news/national/nagaland/study-finds-climate-resilient-traits-in-wild-sikkim-banana/article70699485.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-Error identifying weak areas: no such column: name
-Error identifying weak areas: no such column: name
-✅ Success with nvidia (41.98s)
-Gemini error for Study finds climate-resilient traits in wild ‘Sikkim banana’: Expecting ',' delimiter: line 169 column 6 (char 9133)
-Image extraction failed for https://www.thehindu.com/news/national/nagaland/study-finds-climate-resilient-traits-in-wild-sikkim-banana/article70699485.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/entertainment/movies/sapthami-gowda-slams-paparazzi-photos-inappropriate-angles-and-unnecessary-zooms-female-actors/article70699439.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (22.80s)
-✓ Processed: ‘Kantara’ actor Sapthami Gowda slams paparazzi for... → ['GS1', 'GS2'] | ['Sociology', 'Media Studies']
-Image extraction failed for https://www.thehindu.com/entertainment/movies/sapthami-gowda-slams-paparazzi-photos-inappropriate-angles-and-unnecessary-zooms-female-actors/article70699439.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/news/national/karnataka/dubai-authorities-stepped-in-indian-embassy-absent-karnataka-mlc-bhojegowda-after-return-from-west-asia-conflict-zone/article70699239.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (27.79s)
-Gemini error for Dubai authorities stepped in, Indian embassy absent: Karnataka MLC Bhojegowda after return from West Asia conflict zone: Expecting ',' delimiter: line 184 column 6 (char 9267)
-Image extraction failed for https://www.thehindu.com/news/national/karnataka/dubai-authorities-stepped-in-indian-embassy-absent-karnataka-mlc-bhojegowda-after-return-from-west-asia-conflict-zone/article70699239.ece: No module named 'bs4'127.0.0.1 - - [03/Mar/2026 18:26:33] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:26:34] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:26:57] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:26:57] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:27:48] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:27:48] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:28:27] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:28:27] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:28:40] "GET /api/triangulation/history?limit=50 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:28:40] "GET /api/triangulation/history?limit=50 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:28:46] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:28:46] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:29:14] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:29:14] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:29:41] "GET /api/brain/proactive HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:29:42] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:29:42] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:30:01] "GET /api/syllabus/ HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:30:01] "GET /api/syllabus/ HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:30:05] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:30:06] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:30:29] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:30:30] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:30:44] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:30:44] "GET /api/analytics/subject-wise HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:30:44] "GET /api/analytics/mock-tests HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:30:44] "GET /api/analytics/performance-scatter HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:30:44] "GET /api/analytics/subject-wise HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:30:44] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:30:44] "GET /api/analytics/performance-scatter HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:30:44] "GET /api/analytics/mock-tests HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:30:44] "GET /api/analytics/predictive/all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:30:44] "GET /api/analytics/predictive/all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:30:53] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:30:54] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:31:08] "GET /api/scheduler/due HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:31:08] "GET /api/scheduler/due HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:31:17] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:31:17] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-
-Failed to fetch content from https://www.thehindu.com/news/national/kerala/hotel-owner-arrested-for-assaulting-employee-in-valiyathura/article70699462.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (23.22s)
-Gemini error for Hotel owner arrested for assaulting employee in Valiyathura: Expecting ',' delimiter: line 200 column 6 (char 9016)
-Image extraction failed for https://www.thehindu.com/news/national/kerala/hotel-owner-arrested-for-assaulting-employee-in-valiyathura/article70699462.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/news/national/kerala/chithranjali-studio-inauguration-of-first-phase-redevelopment-on-march-4/article70696285.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (50.32s)
-Gemini error for Chithranjali Studio: inauguration of first phase redevelopment on March 4: Expecting ',' delimiter: line 162 column 6 (char 8889)
-Image extraction failed for https://www.thehindu.com/news/national/kerala/chithranjali-studio-inauguration-of-first-phase-redevelopment-on-march-4/article70696285.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/news/national/kerala/congress-inches-closer-to-finalising-candidate-list-for-assembly-polls-in-kerala/article70699326.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (38.55s)
-Gemini error for Congress inches closer to finalising candidate list for Assembly polls in Kerala: Expecting ',' delimiter: line 179 column 6 (char 9218)
-Image extraction failed for https://www.thehindu.com/news/national/kerala/congress-inches-closer-to-finalising-candidate-list-for-assembly-polls-in-kerala/article70699326.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/news/national/tamil-nadu/dmk-plays-hard-now-it-is-for-aicc-high-command-to-decide-tncc-leadership/article70699231.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (18.34s)
-✓ Processed: DMK plays hard, now it is for AICC high command to... → ['GS2'] | ['Polity']
-Image extraction failed for https://www.thehindu.com/news/national/tamil-nadu/dmk-plays-hard-now-it-is-for-aicc-high-command-to-decide-tncc-leadership/article70699231.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/news/national/iran-israel-war-india-expresses-great-anxiety-over-intensification-of-conflict-in-west-asia/article70699308.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (27.59s)
-✓ Processed: Iran-Israel war: India expresses ‘great anxiety’ o... → ['GS1', 'GS2'] | ['International relations']
-Image extraction failed for https://www.thehindu.com/news/national/iran-israel-war-india-expresses-great-anxiety-over-intensification-of-conflict-in-west-asia/article70699308.ece: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/india/pm-modi-telephonic-talks-oman-sultan-kuwait-crown-prince-west-asia-conflict-10562965/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-⚡ Returning cached response.
-⚡ Returning cached response.
-⚡ Returning cached response.
-✅ Success with nvidia (27.28s)
-Gemini error for West Asia conflict: PM Modi speaks to Sultan of Oman, Crown Prince of Kuwait: Expecting ',' delimiter: line 193 column 6 (char 8997)
-Image extraction failed for https://indianexpress.com/article/india/pm-modi-telephonic-talks-oman-sultan-kuwait-crown-prince-west-asia-conflict-10562965/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/india/dubai-india-flights-6-things-to-know-as-limited-services-resume-amid-iran-israel-war-10563072/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (23.31s)
-Gemini error for Dubai to India flights: 6 things to know as limited services resume amid Iran-Israel War: Expecting ',' delimiter: line 157 column 4 (char 8969)
-Image extraction failed for https://indianexpress.com/article/india/dubai-india-flights-6-things-to-know-as-limited-services-resume-amid-iran-israel-war-10563072/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/india/india-govt-iran-conflict-gulf-nation-death-israel-us-10563034/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (23.53s)
-Gemini error for Iran situation evoking ‘great anxiety’: Govt says some Indians dead, missing amid Iran conflict: Expecting ',' delimiter: line 170 column 4 (char 9622)
-Image extraction failed for https://indianexpress.com/article/india/india-govt-iran-conflict-gulf-nation-death-israel-us-10563034/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/india/chandra-grahan-2026-timings-in-india-city-wise-total-lunar-eclipse-start-and-end-time-in-delhi-bengaluru-hyderabad-and-more-10562346/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-Error identifying weak areas: no such column: name
-Error identifying weak areas: no such column: name
-✅ Success with nvidia (23.21s)
-✓ Processed: Chandra Grahan 2026 Timings in India: City-wise lu... → ['GS1', 'GS2'] | ['Astronomy', 'Space Exploration']
-Image extraction failed for https://indianexpress.com/article/india/chandra-grahan-2026-timings-in-india-city-wise-total-lunar-eclipse-start-and-end-time-in-delhi-bengaluru-hyderabad-and-more-10562346/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/india/middle-east-crisis-indian-embassy-helplines-special-flights-indigo-spicejet-10562920/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (23.05s)
-Gemini error for What can NRIs do if stuck in airports in Middle East countries? Special flights, advisories, helplines and more: Expecting ',' delimiter: line 201 column 6 (char 9022)
-Image extraction failed for https://indianexpress.com/article/india/middle-east-crisis-indian-embassy-helplines-special-flights-indigo-spicejet-10562920/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/india/israel-ambassador-reuven-azhar-interview-iran-strikes-pm-modi-visit-iron-beam-10562782/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (24.81s)
-Gemini error for ‘Operational opportunity came up only after PM Modi left’: Israel envoy Reuven Azhar on ‘right moment’ for strike on Iran: Expecting ',' delimiter: line 163 column 4 (char 9201)
-Image extraction failed for https://indianexpress.com/article/india/israel-ambassador-reuven-azhar-interview-iran-strikes-pm-modi-visit-iron-beam-10562782/: No module named 'bs4'127.0.0.1 - - [03/Mar/2026 18:31:42] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:31:43] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:32:13] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:32:13] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:32:39] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:32:39] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:32:59] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:32:59] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:33:23] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:33:24] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:33:56] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:33:56] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:34:20] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:34:21] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:34:47] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:34:47] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:35:11] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:35:11] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:35:35] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:35:36] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:35:46] "GET /api/mind_palace/locations HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:35:46] "GET /api/mind_palace/locations HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:35:58] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:35:58] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:36:21] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:36:22] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-
-Failed to fetch content from https://indianexpress.com/article/india/does-pm-modi-support-assassination-of-a-head-of-state-rahul-gandhi-questions-govts-silence-on-west-asia-conflict-10562775/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (30.23s)
-Gemini error for ‘Does PM Modi support assassination of a head of state…’: Rahul Gandhi questions govt’s silence on West Asia conflict: Expecting ',' delimiter: line 219 column 4 (char 9115)
-Image extraction failed for https://indianexpress.com/article/india/does-pm-modi-support-assassination-of-a-head-of-state-rahul-gandhi-questions-govts-silence-on-west-asia-conflict-10562775/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/india/gold-today-rate-march-3-check-18-22-and-24-carat-gold-prices-chennai-mumbai-delhi-kolkata-and-other-cities-10562278/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (25.55s)
-Gemini error for Gold Today Rate, March 3: Check 18, 22 and 24 carat gold prices Chennai, Mumbai, Delhi, Kolkata and other cities: Expecting ',' delimiter: line 150 column 6 (char 9339)
-Image extraction failed for https://indianexpress.com/article/india/gold-today-rate-march-3-check-18-22-and-24-carat-gold-prices-chennai-mumbai-delhi-kolkata-and-other-cities-10562278/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/india/west-asia-conflict-amid-cancelled-flights-safety-concerns-andhra-takes-steps-to-coordinate-relief-for-its-people-abroad-10561837/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (19.21s)
-✓ Processed: West Asia conflict: Amid cancelled flights, safety... → ['GS1', 'GS2'] | ['International Relations']
-Image extraction failed for https://indianexpress.com/article/india/west-asia-conflict-amid-cancelled-flights-safety-concerns-andhra-takes-steps-to-coordinate-relief-for-its-people-abroad-10561837/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/india/zubeen-garg-death-assam-court-orders-unfreezing-of-accuseds-accounts-flags-procedural-lapses-10561845/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (24.27s)
-Gemini error for Zubeen Garg death: Assam court orders unfreezing of accused’s accounts, flags ‘procedural lapses’: Expecting ',' delimiter: line 127 column 233 (char 8793)
-Image extraction failed for https://indianexpress.com/article/india/zubeen-garg-death-assam-court-orders-unfreezing-of-accuseds-accounts-flags-procedural-lapses-10561845/: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/opinion/editorial/new-reality-on-new-series-of-national-accounts-data/article70695585.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (31.65s)
-Gemini error for ​New reality: On new series of national accounts data: Expecting ',' delimiter: line 224 column 4 (char 9155)
-Image extraction failed for https://www.thehindu.com/opinion/editorial/new-reality-on-new-series-of-national-accounts-data/article70695585.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/opinion/editorial/the-waning-sheen-on-prices-gst-rationalisation/article70696287.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (23.99s)
-Gemini error for The waning sheen: On prices, GST rationalisation: Expecting ',' delimiter: line 181 column 6 (char 9024)
-Image extraction failed for https://www.thehindu.com/opinion/editorial/the-waning-sheen-on-prices-gst-rationalisation/article70696287.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/opinion/editorial/imperial-war-on-the-war-against-iran/article70691615.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (25.97s)
-Gemini error for ​Imperial war: on the war against Iran: Expecting ',' delimiter: line 162 column 4 (char 9503)
-Image extraction failed for https://www.thehindu.com/opinion/editorial/imperial-war-on-the-war-against-iran/article70691615.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/opinion/editorial/selective-outrage-on-supreme-court-and-ncert-textbook/article70691626.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (23.62s)
-Gemini error for Selective outrage: on Supreme Court and NCERT textbook: Expecting ',' delimiter: line 194 column 4 (char 9542)
-Image extraction failed for https://www.thehindu.com/opinion/editorial/selective-outrage-on-supreme-court-and-ncert-textbook/article70691626.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/opinion/editorial/bad-publicity-on-ai-summit-youth-congress-protest-police-action/article70680297.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (23.79s)
-Gemini error for Bad publicity: On AI Summit, Youth Congress protest, police action: Expecting ',' delimiter: line 162 column 6 (char 8715)
-Image extraction failed for https://www.thehindu.com/opinion/editorial/bad-publicity-on-ai-summit-youth-congress-protest-police-action/article70680297.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/opinion/editorial/up-in-the-air-on-non-scheduled-operators-aviation-safety/article70683298.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (22.16s)
-✓ Processed: Up in the air: On non-scheduled operators, aviatio... → ['GS1', 'GS2'] | ['Subject 1']
-Image extraction failed for https://www.thehindu.com/opinion/editorial/up-in-the-air-on-non-scheduled-operators-aviation-safety/article70683298.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/opinion/editorial/taking-sides-on-prime-minister-narendra-modis-visit-to-israel/article70680503.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (22.87s)
-Gemini error for Taking sides: On Prime Minister Narendra Modi’s visit to Israel: Expecting ',' delimiter: line 217 column 6 (char 9338)
-Image extraction failed for https://www.thehindu.com/opinion/editorial/taking-sides-on-prime-minister-narendra-modis-visit-to-israel/article70680503.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/opinion/editorial/a-brittle-shell-on-isro-and-transparency/article70680318.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...127.0.0.1 - - [03/Mar/2026 18:36:53] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:36:54] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:37:19] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:37:20] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:37:44] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:37:45] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:38:27] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:38:27] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:39:15] "GET /api/heatmap/subjects HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:39:15] "GET /api/heatmap/subjects HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:39:15] "GET /api/heatmap/pyq HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:39:15] "GET /api/heatmap/pyq HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:40:22] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:40:22] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:40:54] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:40:54] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:41:19] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:41:19] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:41:36] "GET /api/heatmap/pyq?subject=History+%26+Culture&year_start=2014&year_end=2024 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:42:26] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:42:27] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:43:48] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:43:48] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:44:10] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:44:10] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:44:32] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:44:33] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:44:57] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:44:58] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-
-✅ Success with nvidia (31.65s)
-Gemini error for ​A brittle shell: On ISRO and transparency: Expecting ',' delimiter: line 225 column 6 (char 8913)
-Image extraction failed for https://www.thehindu.com/opinion/editorial/a-brittle-shell-on-isro-and-transparency/article70680318.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/opinion/editorial/a-jab-well-done-on-indias-human-papillomavirus-vaccination-programme/article70676350.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (25.28s)
-✓ Processed: A jab well done: On India’s Human Papillomavirus v... → ['GS1', 'GS2'] | ['Public Health']
-Image extraction failed for https://www.thehindu.com/opinion/editorial/a-jab-well-done-on-indias-human-papillomavirus-vaccination-programme/article70676350.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/opinion/editorial/demagogue-salesman-on-donald-trump-and-2026-state-of-the-union-address/article70676086.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (24.63s)
-Gemini error for ​Demagogue salesman: On Donald Trump and 2026 State of the Union address: Expecting ',' delimiter: line 199 column 4 (char 8776)
-Image extraction failed for https://www.thehindu.com/opinion/editorial/demagogue-salesman-on-donald-trump-and-2026-state-of-the-union-address/article70676086.ece: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/opinion/editorials/jk-ranji-win-back-stories-10561775/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (41.90s)
-Gemini error for J&K Ranji win has many back stories: Expecting ',' delimiter: line 149 column 4 (char 8707)
-Image extraction failed for https://indianexpress.com/article/opinion/editorials/jk-ranji-win-back-stories-10561775/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/opinion/editorials/conflict-roils-markets-pain-widely-10561774/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (114.56s)
-Gemini error for As conflict roils markets, pain will be felt widely: Expecting ',' delimiter: line 147 column 6 (char 9181)
-Image extraction failed for https://indianexpress.com/article/opinion/editorials/conflict-roils-markets-pain-widely-10561774/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/opinion/editorials/war-without-plan-day-after-10561772/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (31.58s)
-Gemini error for A war without a plan for the day after: Expecting ',' delimiter: line 209 column 6 (char 9106)
-Image extraction failed for https://indianexpress.com/article/opinion/editorials/war-without-plan-day-after-10561772/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/opinion/editorials/new-gdp-series-with-sharper-data-and-clearer-signals-for-the-economy-10559944/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (24.57s)
-Gemini error for New GDP series, with sharper data, and clearer signals for the economy: Expecting ',' delimiter: line 180 column 6 (char 9382)
-Image extraction failed for https://indianexpress.com/article/opinion/editorials/new-gdp-series-with-sharper-data-and-clearer-signals-for-the-economy-10559944/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/opinion/editorials/in-us-and-israel-strikes-death-of-irans-leader-and-the-unleashing-of-new-ghosts-10559920/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (67.02s)
-Gemini error for In US and Israel strikes, death of Iran’s leader — and the unleashing of new ghosts: Expecting ',' delimiter: line 21 column 4 (char 1477)
-Image extraction failed for https://indianexpress.com/article/opinion/editorials/in-us-and-israel-strikes-death-of-irans-leader-and-the-unleashing-of-new-ghosts-10559920/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/opinion/editorials/because-to-write-is-to-think-10556360/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (80.81s)
-Gemini error for Because to write is to think: Expecting ',' delimiter: line 163 column 6 (char 9861)
-Image extraction failed for https://indianexpress.com/article/opinion/editorials/because-to-write-is-to-think-10556360/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/opinion/editorials/pms-israel-visit-frames-a-delhi-shift-10556359/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (21.33s)
-✓ Processed: PM’s Israel visit frames a Delhi shift... → ['GS2'] | ['International Relations']
-Image extraction failed for https://indianexpress.com/article/opinion/editorials/pms-israel-visit-frames-a-delhi-shift-10556359/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/opinion/editorials/verdict-vindicates-kejriwal-and-due-process-10556353/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (22.05s)
-Gemini error for Verdict vindicates Kejriwal, and due process: Expecting ',' delimiter: line 198 column 6 (char 8724)
-Image extraction failed for https://indianexpress.com/article/opinion/editorials/verdict-vindicates-kejriwal-and-due-process-10556353/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/opinion/editorials/arvind-kejriwal-sisodia-clean-chit-aap-delhi-cbi-excise-policy-case-10556164/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (24.42s)
-Gemini error for Clearing Arvind Kejriwal in liquor case, slamming CBI, court sends out message that government must listen to: Expecting ',' delimiter: line 124 column 152 (char 8946)
-Image extraction failed for https://indianexpress.com/article/opinion/editorials/arvind-kejriwal-sisodia-clean-chit-aap-delhi-cbi-excise-policy-case-10556164/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/opinion/editorials/what-the-crackdown-on-congresss-shirtless-protest-reveals-about-our-democracy-10554364/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (19.68s)
-✓ Processed: What the crackdown on Congress’s ‘shirtless’ prote... → ['GS1', 'GS2'] | ['Polity']
-Image extraction failed for https://indianexpress.com/article/opinion/editorials/what-the-crackdown-on-congresss-shirtless-protest-reveals-about-our-democracy-10554364/: No module named 'bs4'127.0.0.1 - - [03/Mar/2026 18:45:17] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:45:18] "GET /api/ravens/saved HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:51:06] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:51:06] "GET /api/dashboard-data HTTP/1.1" 200 -
-Traceback (most recent call last):
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 18:51:06] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:51:06] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-Traceback (most recent call last):
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-RecursionError: maximum recursion depth exceeded
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-127.0.0.1 - - [03/Mar/2026 18:51:06] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 18:51:06] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:51:06] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:51:06] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:52:28] "GET /api/csat/topics HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:52:28] "GET /api/csat/topics HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:54:20] "GET /api/ravens?type=munin HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:54:21] "GET /api/ravens?type=hugin HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:54:21] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:54:31] "OPTIONS /api/triangulation/analyze HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:54:31] "OPTIONS /api/triangulation/analyze HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:54:35] "GET /api/csat/questions?category=Quant&topic=Number%20System&difficulty=Easy HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:54:41] "POST /api/triangulation/analyze HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:54:42] "POST /api/triangulation/analyze HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:54:44] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:54:44] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:55:09] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:55:09] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:55:34] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:55:35] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:56:06] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:56:06] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:56:28] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:56:29] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:56:51] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:56:51] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:57:25] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:57:26] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:57:51] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:57:51] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:58:12] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:58:13] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:58:47] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:58:47] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-
-Error fetching daily challenge: maximum recursion depth exceeded
-Error fetching streak: maximum recursion depth exceeded
-Error fetching streak: maximum recursion depth exceeded
-Error fetching daily challenge: maximum recursion depth exceeded
-Failed to fetch content from https://www.thehindu.com/news/national/andhra-pradesh/kvps-condemns-police-crackdown-on-protesting-anganwadi-workers/article70698606.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (10.41s)
-✅ Success with nvidia (10.82s)
-✅ Success with nvidia (22.98s)
-✓ Processed: KVPS condemns police ‘crackdown’ on protesting ang... → ['GS1', 'GS2'] | ['Subject 1']
-Image extraction failed for https://www.thehindu.com/news/national/andhra-pradesh/kvps-condemns-police-crackdown-on-protesting-anganwadi-workers/article70698606.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/news/national/andhra-pradesh/relocation-plans-for-carpenters-colony-residents-under-way-says-rb-minister/article70699503.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (24.48s)
-✓ Processed: Relocation plans under way for Carpenters Colony r... → ['GS1', 'GS2'] | ['Subject 1']
-Image extraction failed for https://www.thehindu.com/news/national/andhra-pradesh/relocation-plans-for-carpenters-colony-residents-under-way-says-rb-minister/article70699503.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/news/national/andhra-pradesh/visakhapatnam-steel-plant-posts-54-crore-cash-profit-in-january-reverses-losses/article70699186.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (24.97s)
-Gemini error for Visakhapatnam Steel Plant posts ₹54 crore cash profit in January, reverses losses: Expecting ',' delimiter: line 171 column 6 (char 8568)
-Image extraction failed for https://www.thehindu.com/news/national/andhra-pradesh/visakhapatnam-steel-plant-posts-54-crore-cash-profit-in-january-reverses-losses/article70699186.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/news/national/andhra-pradesh/ysrcp-to-press-for-debate-on-heritageindapur-link-in-legislative-council/article70699251.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (30.91s)
-Gemini error for YSRCP to press for debate on Heritage–Indapur link in Legislative Council: Expecting ',' delimiter: line 128 column 6 (char 8358)
-Image extraction failed for https://www.thehindu.com/news/national/andhra-pradesh/ysrcp-to-press-for-debate-on-heritageindapur-link-in-legislative-council/article70699251.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/news/national/karnataka/interstate-mobile-theft-gang-busted-14-phones-worth-9-lakh-recovered/article70698682.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (21.96s)
-Gemini error for Interstate mobile theft gang busted; 14 phones worth ₹9 lakh recovered: Expecting ',' delimiter: line 160 column 6 (char 9003)
-Image extraction failed for https://www.thehindu.com/news/national/karnataka/interstate-mobile-theft-gang-busted-14-phones-worth-9-lakh-recovered/article70698682.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/news/national/karnataka/communication-skills-can-help-students-land-jobs-says-minister/article70695722.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (22.17s)
-Gemini error for Communication skills can help students land jobs, says Minister: Expecting ',' delimiter: line 164 column 4 (char 9850)
-Image extraction failed for https://www.thehindu.com/news/national/karnataka/communication-skills-can-help-students-land-jobs-says-minister/article70695722.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/news/national/andhra-pradesh/grand-kalyana-mahotsavam-celebrated-at-sri-lakshmi-narasimha-swamy-temple/article70698521.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (33.63s)
-✓ Processed: ‘Kalyana Mahotsavam’ celebrated at Sri Lakshmi Nar... → ['GS1', 'GS2'] | ['Subject 1']
-Image extraction failed for https://www.thehindu.com/news/national/andhra-pradesh/grand-kalyana-mahotsavam-celebrated-at-sri-lakshmi-narasimha-swamy-temple/article70698521.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/news/national/supreme-court-fastens-liability-of-paying-penalty-on-employer-for-delay-in-depositing-compensation/article70699695.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (25.08s)
-Gemini error for Supreme Court fastens liability of paying penalty on employer for delay in depositing compensation: Expecting ',' delimiter: line 193 column 6 (char 9571)
-Image extraction failed for https://www.thehindu.com/news/national/supreme-court-fastens-liability-of-paying-penalty-on-employer-for-delay-in-depositing-compensation/article70699695.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/news/national/seat-sharing-talks-between-cpiml-left-front-make-no-headway-ahead-of-bengal-polls/article70699472.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (21.21s)
-✓ Processed: Seat-sharing talks between CPI(ML), Left Front mak... → ['GS1', 'GS2'] | ['Subject 1']
-Image extraction failed for https://www.thehindu.com/news/national/seat-sharing-talks-between-cpiml-left-front-make-no-headway-ahead-of-bengal-polls/article70699472.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/news/national/andhra-pradesh/deputy-chief-minister-pawan-kalyan-calls-on-chief-minister-chandrababu-naidu-discusses-key-rural-development-issues/article70699348.ece: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (33.87s)
-Gemini error for Deputy Chief Minister Pawan Kalyan calls on Chief Minister Chandrababu Naidu, discusses key rural development issues: Expecting ',' delimiter: line 172 column 4 (char 8517)
-Image extraction failed for https://www.thehindu.com/news/national/andhra-pradesh/deputy-chief-minister-pawan-kalyan-calls-on-chief-minister-chandrababu-naidu-discusses-key-rural-development-issues/article70699348.ece: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/india/pm-modi-telephonic-talks-oman-sultan-kuwait-crown-prince-west-asia-conflict-10562965/: No module named 'bs4'127.0.0.1 - - [03/Mar/2026 18:58:47] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:58:48] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:58:49] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:58:49] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:09] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:10] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:59:10] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:10] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:11] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:11] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:12] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:13] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:13] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:14] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:14] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:15] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-
-⚡ Returning cached response.
-Gemini error for West Asia conflict: PM Modi speaks to Sultan of Oman, Crown Prince of Kuwait: Expecting ',' delimiter: line 193 column 6 (char 8997)
-Image extraction failed for https://indianexpress.com/article/india/pm-modi-telephonic-talks-oman-sultan-kuwait-crown-prince-west-asia-conflict-10562965/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/india/dubai-india-flights-6-things-to-know-as-limited-services-resume-amid-iran-israel-war-10563072/: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for Dubai to India flights: 6 things to know as limited services resume amid Iran-Israel War: Expecting ',' delimiter: line 157 column 4 (char 8969)
-Image extraction failed for https://indianexpress.com/article/india/dubai-india-flights-6-things-to-know-as-limited-services-resume-amid-iran-israel-war-10563072/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/india/india-govt-iran-conflict-gulf-nation-death-israel-us-10563034/: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for Iran situation evoking ‘great anxiety’: Govt says some Indians dead, missing amid Iran conflict: Expecting ',' delimiter: line 170 column 4 (char 9622)
-Image extraction failed for https://indianexpress.com/article/india/india-govt-iran-conflict-gulf-nation-death-israel-us-10563034/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/india/chandra-grahan-2026-timings-in-india-city-wise-total-lunar-eclipse-start-and-end-time-in-delhi-bengaluru-hyderabad-and-more-10562346/: No module named 'bs4'
-⚡ Returning cached response.
-✓ Processed: Chandra Grahan 2026 Timings in India: City-wise lu... → ['GS1', 'GS2'] | ['Astronomy', 'Space Exploration']
-Image extraction failed for https://indianexpress.com/article/india/chandra-grahan-2026-timings-in-india-city-wise-total-lunar-eclipse-start-and-end-time-in-delhi-bengaluru-hyderabad-and-more-10562346/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/india/middle-east-crisis-indian-embassy-helplines-special-flights-indigo-spicejet-10562920/: No module named 'bs4'
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Method Not Allowed
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (19.36s)
-✓ Processed: Iran conflict: What can NRIs do if stuck in Middle... → ['GS2'] | ['International Relations']
-Image extraction failed for https://indianexpress.com/article/india/middle-east-crisis-indian-embassy-helplines-special-flights-indigo-spicejet-10562920/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/india/israel-ambassador-reuven-azhar-interview-iran-strikes-pm-modi-visit-iron-beam-10562782/: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for ‘Operational opportunity came up only after PM Modi left’: Israel envoy Reuven Azhar on ‘right moment’ for strike on Iran: Expecting ',' delimiter: line 163 column 4 (char 9201)
-Image extraction failed for https://indianexpress.com/article/india/israel-ambassador-reuven-azhar-interview-iran-strikes-pm-modi-visit-iron-beam-10562782/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/india/does-pm-modi-support-assassination-of-a-head-of-state-rahul-gandhi-questions-govts-silence-on-west-asia-conflict-10562775/: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for ‘Does PM Modi support assassination of a head of state…’: Rahul Gandhi questions govt’s silence on West Asia conflict: Expecting ',' delimiter: line 219 column 4 (char 9115)
-Image extraction failed for https://indianexpress.com/article/india/does-pm-modi-support-assassination-of-a-head-of-state-rahul-gandhi-questions-govts-silence-on-west-asia-conflict-10562775/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/india/gold-today-rate-march-3-check-18-22-and-24-carat-gold-prices-chennai-mumbai-delhi-kolkata-and-other-cities-10562278/: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for Gold Today Rate, March 3: Check 18, 22 and 24 carat gold prices Chennai, Mumbai, Delhi, Kolkata and other cities: Expecting ',' delimiter: line 150 column 6 (char 9339)
-Image extraction failed for https://indianexpress.com/article/india/gold-today-rate-march-3-check-18-22-and-24-carat-gold-prices-chennai-mumbai-delhi-kolkata-and-other-cities-10562278/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/india/west-asia-conflict-amid-cancelled-flights-safety-concerns-andhra-takes-steps-to-coordinate-relief-for-its-people-abroad-10561837/: No module named 'bs4'
-⚡ Returning cached response.
-✓ Processed: West Asia conflict: Amid cancelled flights, safety... → ['GS1', 'GS2'] | ['International Relations']
-Image extraction failed for https://indianexpress.com/article/india/west-asia-conflict-amid-cancelled-flights-safety-concerns-andhra-takes-steps-to-coordinate-relief-for-its-people-abroad-10561837/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/india/zubeen-garg-death-assam-court-orders-unfreezing-of-accuseds-accounts-flags-procedural-lapses-10561845/: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for Zubeen Garg death: Assam court orders unfreezing of accused’s accounts, flags ‘procedural lapses’: Expecting ',' delimiter: line 127 column 233 (char 8793)
-Image extraction failed for https://indianexpress.com/article/india/zubeen-garg-death-assam-court-orders-unfreezing-of-accuseds-accounts-flags-procedural-lapses-10561845/: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/opinion/editorial/new-reality-on-new-series-of-national-accounts-data/article70695585.ece: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for ​New reality: On new series of national accounts data: Expecting ',' delimiter: line 224 column 4 (char 9155)
-Image extraction failed for https://www.thehindu.com/opinion/editorial/new-reality-on-new-series-of-national-accounts-data/article70695585.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/opinion/editorial/the-waning-sheen-on-prices-gst-rationalisation/article70696287.ece: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for The waning sheen: On prices, GST rationalisation: Expecting ',' delimiter: line 181 column 6 (char 9024)
-Image extraction failed for https://www.thehindu.com/opinion/editorial/the-waning-sheen-on-prices-gst-rationalisation/article70696287.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/opinion/editorial/imperial-war-on-the-war-against-iran/article70691615.ece: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for ​Imperial war: on the war against Iran: Expecting ',' delimiter: line 162 column 4 (char 9503)
-Image extraction failed for https://www.thehindu.com/opinion/editorial/imperial-war-on-the-war-against-iran/article70691615.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/opinion/editorial/selective-outrage-on-supreme-court-and-ncert-textbook/article70691626.ece: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for Selective outrage: on Supreme Court and NCERT textbook: Expecting ',' delimiter: line 194 column 4 (char 9542)
-Image extraction failed for https://www.thehindu.com/opinion/editorial/selective-outrage-on-supreme-court-and-ncert-textbook/article70691626.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/opinion/editorial/bad-publicity-on-ai-summit-youth-congress-protest-police-action/article70680297.ece: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for Bad publicity: On AI Summit, Youth Congress protest, police action: Expecting ',' delimiter: line 162 column 6 (char 8715)
-Image extraction failed for https://www.thehindu.com/opinion/editorial/bad-publicity-on-ai-summit-youth-congress-protest-police-action/article70680297.ece: No module named 'bs4'127.0.0.1 - - [03/Mar/2026 18:59:15] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:16] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:16] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:17] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:17] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:18] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:19] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:19] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:20] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:20] "OPTIONS /api/ravens/process HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 18:59:20] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:21] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:21] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:22] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:23] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:23] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:24] "[35m[1mPOST /api/ravens/process HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 18:59:25] "GET /api/ravens/saved HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:06:53] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:06:53] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:06:53] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:06:53] "GET /api/dashboard-data HTTP/1.1" 200 -
-Traceback (most recent call last):
-Traceback (most recent call last):
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-127.0.0.1 - - [03/Mar/2026 19:06:53] "GET /api/dashboard-data HTTP/1.1" 200 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  [Previous line repeated 977 more times]
-RecursionError: maximum recursion depth exceeded
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 19:06:53] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-RecursionError: maximum recursion depth exceeded
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-127.0.0.1 - - [03/Mar/2026 19:06:53] "GET /api/dashboard-data HTTP/1.1" 200 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-Traceback (most recent call last):
-127.0.0.1 - - [03/Mar/2026 19:06:53] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 19:06:53] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 19:06:53] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:06:53] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:06:53] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-Traceback (most recent call last):
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-127.0.0.1 - - [03/Mar/2026 19:06:53] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 19:06:53] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-127.0.0.1 - - [03/Mar/2026 19:06:53] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 19:06:53] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-Traceback (most recent call last):
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-RecursionError: maximum recursion depth exceeded
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-127.0.0.1 - - [03/Mar/2026 19:06:53] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-127.0.0.1 - - [03/Mar/2026 19:06:53] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 19:06:53] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 19:06:53] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-Traceback (most recent call last):
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-127.0.0.1 - - [03/Mar/2026 19:06:53] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 19:06:53] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 19:06:53] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:06:53] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:08:31] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:08:31] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:08:31] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:08:31] "GET /api/dashboard-data HTTP/1.1" 200 -
-
-Failed to fetch content from https://www.thehindu.com/opinion/editorial/up-in-the-air-on-non-scheduled-operators-aviation-safety/article70683298.ece: No module named 'bs4'
-⚡ Returning cached response.
-✓ Processed: Up in the air: On non-scheduled operators, aviatio... → ['GS1', 'GS2'] | ['Subject 1']
-Image extraction failed for https://www.thehindu.com/opinion/editorial/up-in-the-air-on-non-scheduled-operators-aviation-safety/article70683298.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/opinion/editorial/taking-sides-on-prime-minister-narendra-modis-visit-to-israel/article70680503.ece: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for Taking sides: On Prime Minister Narendra Modi’s visit to Israel: Expecting ',' delimiter: line 217 column 6 (char 9338)
-Image extraction failed for https://www.thehindu.com/opinion/editorial/taking-sides-on-prime-minister-narendra-modis-visit-to-israel/article70680503.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/opinion/editorial/a-brittle-shell-on-isro-and-transparency/article70680318.ece: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for ​A brittle shell: On ISRO and transparency: Expecting ',' delimiter: line 225 column 6 (char 8913)
-Image extraction failed for https://www.thehindu.com/opinion/editorial/a-brittle-shell-on-isro-and-transparency/article70680318.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/opinion/editorial/a-jab-well-done-on-indias-human-papillomavirus-vaccination-programme/article70676350.ece: No module named 'bs4'
-⚡ Returning cached response.
-✓ Processed: A jab well done: On India’s Human Papillomavirus v... → ['GS1', 'GS2'] | ['Public Health']
-Image extraction failed for https://www.thehindu.com/opinion/editorial/a-jab-well-done-on-indias-human-papillomavirus-vaccination-programme/article70676350.ece: No module named 'bs4'
-Failed to fetch content from https://www.thehindu.com/opinion/editorial/demagogue-salesman-on-donald-trump-and-2026-state-of-the-union-address/article70676086.ece: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for ​Demagogue salesman: On Donald Trump and 2026 State of the Union address: Expecting ',' delimiter: line 199 column 4 (char 8776)
-Image extraction failed for https://www.thehindu.com/opinion/editorial/demagogue-salesman-on-donald-trump-and-2026-state-of-the-union-address/article70676086.ece: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/opinion/editorials/jk-ranji-win-back-stories-10561775/: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for J&K Ranji win has many back stories: Expecting ',' delimiter: line 149 column 4 (char 8707)
-Image extraction failed for https://indianexpress.com/article/opinion/editorials/jk-ranji-win-back-stories-10561775/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/opinion/editorials/conflict-roils-markets-pain-widely-10561774/: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for As conflict roils markets, pain will be felt widely: Expecting ',' delimiter: line 147 column 6 (char 9181)
-Image extraction failed for https://indianexpress.com/article/opinion/editorials/conflict-roils-markets-pain-widely-10561774/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/opinion/editorials/war-without-plan-day-after-10561772/: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for A war without a plan for the day after: Expecting ',' delimiter: line 209 column 6 (char 9106)
-Image extraction failed for https://indianexpress.com/article/opinion/editorials/war-without-plan-day-after-10561772/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/opinion/editorials/new-gdp-series-with-sharper-data-and-clearer-signals-for-the-economy-10559944/: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for New GDP series, with sharper data, and clearer signals for the economy: Expecting ',' delimiter: line 180 column 6 (char 9382)
-Image extraction failed for https://indianexpress.com/article/opinion/editorials/new-gdp-series-with-sharper-data-and-clearer-signals-for-the-economy-10559944/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/opinion/editorials/in-us-and-israel-strikes-death-of-irans-leader-and-the-unleashing-of-new-ghosts-10559920/: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for In US and Israel strikes, death of Iran’s leader — and the unleashing of new ghosts: Expecting ',' delimiter: line 21 column 4 (char 1477)
-Image extraction failed for https://indianexpress.com/article/opinion/editorials/in-us-and-israel-strikes-death-of-irans-leader-and-the-unleashing-of-new-ghosts-10559920/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/opinion/editorials/because-to-write-is-to-think-10556360/: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for Because to write is to think: Expecting ',' delimiter: line 163 column 6 (char 9861)
-Image extraction failed for https://indianexpress.com/article/opinion/editorials/because-to-write-is-to-think-10556360/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/opinion/editorials/pms-israel-visit-frames-a-delhi-shift-10556359/: No module named 'bs4'
-⚡ Returning cached response.
-✓ Processed: PM’s Israel visit frames a Delhi shift... → ['GS2'] | ['International Relations']
-Image extraction failed for https://indianexpress.com/article/opinion/editorials/pms-israel-visit-frames-a-delhi-shift-10556359/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/opinion/editorials/verdict-vindicates-kejriwal-and-due-process-10556353/: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for Verdict vindicates Kejriwal, and due process: Expecting ',' delimiter: line 198 column 6 (char 8724)
-Image extraction failed for https://indianexpress.com/article/opinion/editorials/verdict-vindicates-kejriwal-and-due-process-10556353/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/opinion/editorials/arvind-kejriwal-sisodia-clean-chit-aap-delhi-cbi-excise-policy-case-10556164/: No module named 'bs4'
-⚡ Returning cached response.
-Gemini error for Clearing Arvind Kejriwal in liquor case, slamming CBI, court sends out message that government must listen to: Expecting ',' delimiter: line 124 column 152 (char 8946)
-Image extraction failed for https://indianexpress.com/article/opinion/editorials/arvind-kejriwal-sisodia-clean-chit-aap-delhi-cbi-excise-policy-case-10556164/: No module named 'bs4'
-Failed to fetch content from https://indianexpress.com/article/opinion/editorials/what-the-crackdown-on-congresss-shirtless-protest-reveals-about-our-democracy-10554364/: No module named 'bs4'
-⚡ Returning cached response.
-✓ Processed: What the crackdown on Congress’s ‘shirtless’ prote... → ['GS1', 'GS2'] | ['Polity']
-Image extraction failed for https://indianexpress.com/article/opinion/editorials/what-the-crackdown-on-congresss-shirtless-protest-reveals-about-our-democracy-10554364/: No module named 'bs4'
-Error fetching daily challenge: maximum recursion depth exceeded
-Error fetching streak: maximum recursion depth exceeded
-Error fetching daily challenge: maximum recursion depth exceeded
-Error fetching streak: maximum recursion depth exceeded
-Error fetching streak: maximum recursion depth exceeded
-Error fetching daily challenge: maximum recursion depth exceeded
-Error fetching daily challenge: maximum recursion depth exceeded
-Error fetching streak: maximum recursion depth exceeded
-Error fetching daily challenge: maximum recursion depth exceeded
-Error fetching streak: maximum recursion depth exceeded
-Error fetching daily challenge: maximum recursion depth exceeded
-Error fetching streak: maximum recursion depth exceeded
-Error fetching daily challenge: maximum recursion depth exceeded
-Error fetching streak: maximum recursion depth exceededTraceback (most recent call last):
-Traceback (most recent call last):
-Traceback (most recent call last):
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-127.0.0.1 - - [03/Mar/2026 19:08:31] "GET /api/dashboard-data HTTP/1.1" 200 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-RecursionError: maximum recursion depth exceeded
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-127.0.0.1 - - [03/Mar/2026 19:08:31] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-RecursionError: maximum recursion depth exceeded
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-127.0.0.1 - - [03/Mar/2026 19:08:31] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-127.0.0.1 - - [03/Mar/2026 19:08:31] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-RecursionError: maximum recursion depth exceeded
-Traceback (most recent call last):
-127.0.0.1 - - [03/Mar/2026 19:08:31] "GET /api/dashboard-data HTTP/1.1" 200 -
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-127.0.0.1 - - [03/Mar/2026 19:08:31] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-RecursionError: maximum recursion depth exceeded
-  [Previous line repeated 977 more times]
-RecursionError: maximum recursion depth exceeded
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-127.0.0.1 - - [03/Mar/2026 19:08:31] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-127.0.0.1 - - [03/Mar/2026 19:08:31] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 19:08:31] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 19:08:31] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:08:31] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-Traceback (most recent call last):
-127.0.0.1 - - [03/Mar/2026 19:08:31] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 19:08:31] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 19:08:31] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-Traceback (most recent call last):
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-127.0.0.1 - - [03/Mar/2026 19:08:31] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-127.0.0.1 - - [03/Mar/2026 19:08:31] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-127.0.0.1 - - [03/Mar/2026 19:08:31] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 19:08:31] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 19:08:31] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:08:31] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:10:09] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:10:09] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:10:09] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:10:09] "GET /api/dashboard-data HTTP/1.1" 200 -
-Traceback (most recent call last):
-Traceback (most recent call last):
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-127.0.0.1 - - [03/Mar/2026 19:10:09] "GET /api/dashboard-data HTTP/1.1" 200 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-  [Previous line repeated 977 more times]
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 19:10:09] "GET /api/dashboard-data HTTP/1.1" 200 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-127.0.0.1 - - [03/Mar/2026 19:10:09] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-127.0.0.1 - - [03/Mar/2026 19:10:09] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 19:10:09] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-  [Previous line repeated 977 more times]
-127.0.0.1 - - [03/Mar/2026 19:10:09] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-Traceback (most recent call last):
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-127.0.0.1 - - [03/Mar/2026 19:10:09] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-Traceback (most recent call last):
-RecursionError: maximum recursion depth exceeded
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-127.0.0.1 - - [03/Mar/2026 19:10:09] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-Traceback (most recent call last):
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-RecursionError: maximum recursion depth exceeded
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-127.0.0.1 - - [03/Mar/2026 19:10:09] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-RecursionError: maximum recursion depth exceeded
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-127.0.0.1 - - [03/Mar/2026 19:10:09] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-RecursionError: maximum recursion depth exceeded
-  [Previous line repeated 977 more times]
-127.0.0.1 - - [03/Mar/2026 19:10:09] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-127.0.0.1 - - [03/Mar/2026 19:10:09] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-RecursionError: maximum recursion depth exceeded
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-127.0.0.1 - - [03/Mar/2026 19:10:09] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 19:10:09] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-RecursionError: maximum recursion depth exceeded
-  [Previous line repeated 977 more times]
-127.0.0.1 - - [03/Mar/2026 19:10:09] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-127.0.0.1 - - [03/Mar/2026 19:10:09] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 19:10:09] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [03/Mar/2026 19:10:09] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-127.0.0.1 - - [03/Mar/2026 19:10:09] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:10:09] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:11:24] "GET /api/csat/topics HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:11:24] "GET /api/csat/topics HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:11:37] "GET /api/csat/questions?category=Quant&topic=Number%20System HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:12:07] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:12:07] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:12:08] "GET /api/automation/content?type=podcast HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:12:08] "GET /api/automation/content?type=essay HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:12:09] "GET /api/automation/content?type=visual_prompt HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:12:11] "GET /api/ravens/saved HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:12:11] "GET /api/ravens/saved HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:12:20] "GET /api/compilation/months HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:12:20] "GET /api/compilation/months HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:12:20] "GET /api/compilation/2026/3 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:12:20] "GET /api/compilation/2026/3 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:12:24] "GET /api/compilation/2025/12 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:12:35] "GET /api/compilation/2026/2 HTTP/1.1" 200 -
-127.0.0.1 - - [03/Mar/2026 19:12:41] "GET /api/compilation/2026/3 HTTP/1.1" 200 -
+🧠 Synapse Connected: [ASSESSMENT] mock_tests
+BrainService Online: Connected to Gemini Cortex via ModelManager.
+Brain: Loaded persisted strategy with 2 steps.
+🦉 Night Watchman Routes Imported
+🦉 Registering Night Watchman Blueprint...
+🕵️ Hephaestus: Scanning logs at logs/app.log...
+✅ No tracebacks found in logs.
+/Users/openclaw/miniforge3/lib/python3.13/multiprocessing/resource_tracker.py:400: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/mp-0jye25zk'}
+  warnings.warn(
+/Users/openclaw/miniforge3/lib/python3.13/multiprocessing/resource_tracker.py:400: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/mp-soxter0r'}
+  warnings.warn(

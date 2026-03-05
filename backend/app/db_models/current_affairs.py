@@ -285,8 +285,17 @@ def get_saved_articles(filters=None):
             query += ' AND (title LIKE ? OR upsc_summary LIKE ?)'
             search_term = f'%{filters["search"]}%'
             params.extend([search_term, search_term])
+        
+        if filters.get('source'):
+            query += ' AND source LIKE ?'
+            params.append(f'%{filters["source"]}%')
     
     query += ' ORDER BY fetch_date DESC'
+    
+    if filters and filters.get('limit'):
+        query += f' LIMIT {int(filters["limit"])}'
+        if filters.get('offset'):
+            query += f' OFFSET {int(filters["offset"])}'
     
     rows = conn.execute(query, params).fetchall()
     

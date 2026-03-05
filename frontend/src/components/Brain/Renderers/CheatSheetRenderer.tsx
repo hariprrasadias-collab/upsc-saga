@@ -46,7 +46,7 @@ const MermaidDiagram: React.FC<{ code: string }> = ({ code }) => {
 
 // Quiz Component
 const ActiveRecallQuiz: React.FC<{ content: string }> = ({ content }) => {
-    const [questions, setQuestions] = useState<{q: string, a: string}[]>([]);
+    const [questions, setQuestions] = useState<{ q: string, a: string }[]>([]);
     const [revealed, setRevealed] = useState<number[]>([]);
 
     useEffect(() => {
@@ -110,18 +110,83 @@ const CheatSheetRenderer: React.FC<CheatSheetRendererProps> = ({ content }) => {
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        try {
-            const parsed = JSON.parse(content);
+        // Fix invalid JSON with literal newlines inside string values
+        const sanitizeJsonString = (jsonStr: string): string => {
+            let result = '';
+            let inString = false;
+            let escaped = false;
+            for (let i = 0; i < jsonStr.length; i++) {
+                const ch = jsonStr[i];
+                if (escaped) {
+                    result += ch;
+                    escaped = false;
+                    continue;
+                }
+                if (ch === '\\') {
+                    result += ch;
+                    escaped = true;
+                    continue;
+                }
+                if (ch === '"') {
+                    inString = !inString;
+                    result += ch;
+                    continue;
+                }
+                if (inString && ch === '\n') {
+                    result += '\\n';
+                    continue;
+                }
+                if (inString && ch === '\t') {
+                    result += '\\t';
+                    continue;
+                }
+                result += ch;
+            }
+            return result;
+        };
+
+        const tryParseJSON = (raw: string): any => {
+            try { return JSON.parse(raw); } catch { }
+            // Try with sanitized newlines
+            try { return JSON.parse(sanitizeJsonString(raw)); } catch { }
+            return null;
+        };
+
+        const tryParseCheatSheet = (raw: string): boolean => {
+            const parsed = tryParseJSON(raw);
+            if (!parsed) return false;
+
+            // Check if it's directly a valid cheat sheet
             if (parsed.tabs && Array.isArray(parsed.tabs)) {
                 setData(parsed);
                 if (parsed.tabs.length > 0) {
                     setActiveTab(parsed.tabs[0].id);
                 }
                 setIsLegacy(false);
-            } else {
-                setIsLegacy(true);
+                return true;
             }
-        } catch (e) {
+
+            // Unwrap debug envelope {thought_process, response_text}
+            if (parsed.response_text) {
+                let innerText = parsed.response_text;
+                // Extract JSON from markdown code fences
+                const jsonMatch = innerText.match(/```json\s*\n?([\s\S]*?)\n?```/);
+                if (jsonMatch) {
+                    innerText = jsonMatch[1].trim();
+                }
+                // Try parsing the inner text  
+                if (tryParseCheatSheet(innerText)) return true;
+
+                // If inner JSON fails, render response_text as legacy markdown
+                setIsLegacy(true);
+                return true;
+            }
+
+            setIsLegacy(true);
+            return true;
+        };
+
+        if (!tryParseCheatSheet(content)) {
             setIsLegacy(true);
         }
     }, [content]);
@@ -143,7 +208,7 @@ const CheatSheetRenderer: React.FC<CheatSheetRendererProps> = ({ content }) => {
                 try {
                     const qData = JSON.parse(currentTabObj.content);
                     textToRead = qData.map((x: any) => `Question: ${x.q}. Answer: ${x.a}`).join('. ');
-                } catch {}
+                } catch { }
             }
 
             const utterance = new SpeechSynthesisUtterance(textToRead);

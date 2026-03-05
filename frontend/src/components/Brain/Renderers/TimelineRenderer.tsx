@@ -55,26 +55,45 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
             if (!line.trim()) return;
             const cleanLine = line.replace(/^[\-\*]\s*/, '').trim();
 
-            // Enhanced Regex: Captures "1939-1945" or "1947"
-            const match = cleanLine.match(/^((?:\d{4}(?:\s?-\s?\d{4})?)|\d{4}(?:\s?BC|AD|BCE|CE)?|c\.\s?\d{4})[:\-\s]+(.+)/i);
+            // Pattern 1: AI format — **[2500 BCE]**: **Title** -> *The Catalyst:* desc -> *The Aftermath:* desc
+            const boldBracketMatch = cleanLine.match(/^\*{0,2}\[(\d+\s*(?:BCE?|CE|AD)?)\]\*{0,2}\s*:\s*\*{0,2}(.+)/i);
+
+            // Pattern 2: Standard "1947: Title - Description" or "1939-1945: Title"
+            const standardMatch = cleanLine.match(/^(\d{4}(?:\s?-\s?\d{4})?|\d{4}(?:\s?BC|AD|BCE|CE)?|c\.\s?\d{4})[:\-\s]+(.+)/i);
+
+            const match = boldBracketMatch || standardMatch;
 
             if (match) {
                 const yearStr = match[1].trim();
-                const rest = match[2].trim();
+                let rest = match[2].trim().replace(/^\*{1,2}/, '').replace(/\*{1,2}$/, '').trim();
 
                 let title = rest;
                 let desc = '';
-                const splitIndex = rest.indexOf(' - ');
-                if (splitIndex > 0) {
-                    title = rest.substring(0, splitIndex).trim();
-                    desc = rest.substring(splitIndex + 3).trim();
+
+                // Split on arrow separator (AI format)
+                const arrowIndex = rest.indexOf('->');
+                const colonDash = rest.indexOf(' - ');
+
+                if (arrowIndex > 0) {
+                    title = rest.substring(0, arrowIndex).trim().replace(/\*{1,2}/g, '');
+                    // Collect all arrow-separated descriptions
+                    const afterArrow = rest.substring(arrowIndex + 2).trim();
+                    desc = afterArrow
+                        .replace(/\*([^*]+)\*:\s*/g, '') // Remove italic labels like *The Catalyst:*
+                        .replace(/->\s*/g, ' | ')         // Collapse multiple arrows
+                        .replace(/\*{1,2}/g, '')          // Remove bold markers
+                        .trim();
+                } else if (colonDash > 0) {
+                    title = rest.substring(0, colonDash).trim();
+                    desc = rest.substring(colonDash + 3).trim();
                 } else if (rest.includes(': ')) {
                     const parts = rest.split(': ');
                     title = parts[0].trim();
                     desc = parts.slice(1).join(': ').trim();
                 }
 
-                // Range parsing
+                title = title.replace(/\*{1,2}/g, '').trim();
+
                 const rangeMatch = yearStr.match(/(\d{4})\s?-\s?(\d{4})/);
                 let numYear = 0;
                 let endYear: number | undefined = undefined;
@@ -90,14 +109,16 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
                     }
                 }
 
-                events.push({
-                    id: `text-${idx}`,
-                    year: yearStr,
-                    numericYear: numYear,
-                    endYear,
-                    event: title.replace(/^\*\*|\*\*$/g, ''),
-                    description: desc,
-                });
+                if (title) {
+                    events.push({
+                        id: `text-${idx}`,
+                        year: yearStr,
+                        numericYear: numYear,
+                        endYear,
+                        event: title,
+                        description: desc || undefined,
+                    });
+                }
             }
         });
         return events;

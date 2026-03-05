@@ -52,16 +52,22 @@ const BrainVault: React.FC = () => {
             }
             const response = await fetch(url);
             const data = await response.json();
-            if (data.success) {
+
+            // Handle both formats:
+            // 1) Global fetch monkey-patch unwraps envelope → data is already an array
+            // 2) Raw envelope → data is {success: true, data: [...]}
+            if (Array.isArray(data)) {
+                setContentList(data);
+            } else if (data.success && data.data) {
+                setContentList(data.data);
+            } else if (Array.isArray(data.data)) {
+                // Fallback: envelope exists but success might be missing
                 setContentList(data.data);
             } else {
-                // Fallback for dev/test
-                console.warn("API returned unsuccessful, using mock data if empty");
-                if (data.data && data.data.length === 0) throw new Error("Empty data");
+                console.warn("Brain Vault: Unexpected response format", data);
             }
         } catch (error) {
             console.error("Failed to fetch Brain Vault content", error);
-            // We could set an error state here, but for now just leave empty
         } finally {
             setLoading(false);
         }
@@ -231,12 +237,13 @@ const BrainVault: React.FC = () => {
                                 {renderContentBody(selectedContent)}
                             </div>
 
-                            {selectedContent.metadata && Object.keys(selectedContent.metadata).length > 0 && (
-                                <div className="metadata-box">
-                                    <h4>Artifact Metadata</h4>
-                                    <pre>{JSON.stringify(selectedContent.metadata, null, 2)}</pre>
-                                </div>
-                            )}
+                            {selectedContent.metadata && Object.keys(selectedContent.metadata).length > 0 &&
+                                !['map_work', 'mapwork'].includes(String(selectedContent.content_type || '').trim().toLowerCase()) && (
+                                    <details className="metadata-box">
+                                        <summary><h4 style={{ display: 'inline', cursor: 'pointer' }}>📎 Artifact Metadata</h4></summary>
+                                        <pre>{JSON.stringify(selectedContent.metadata, null, 2)}</pre>
+                                    </details>
+                                )}
                         </div>
                     ) : (
                         <div className="placeholder-state">

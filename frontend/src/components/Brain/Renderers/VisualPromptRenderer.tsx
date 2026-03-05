@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Renderers.css';
 import { FaDownload, FaCopy, FaRocket, FaMagic, FaCog, FaChevronDown, FaChevronUp, FaRandom, FaExpand, FaPalette, FaSave, FaThLarge, FaSquare, FaMicrophone, FaBolt, FaFileAlt } from 'react-icons/fa';
+import { API_BASE_URL } from '../../../config';
 
 interface VisualPromptRendererProps {
     content: string; // The raw prompt text
@@ -151,10 +152,33 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         });
     };
 
-    const buildUrl = (pText: string, pSeed: number, pModel: string, pWidth: number, pHeight: number, pNegative: string) => {
-        const apiPrompt = pNegative ? `${pText} excluding ${pNegative}` : pText;
-        const encoded = encodeURIComponent(apiPrompt.slice(0, 1000));
-        return `https://image.pollinations.ai/prompt/${encoded}?nologo=true&seed=${pSeed}&width=${pWidth}&height=${pHeight}&model=${pModel}`;
+    const sanitizePromptForImage = (text: string): string => {
+        // AI-generated visual prompts are often long paragraphs.
+        // Image APIs need concise, comma-separated tags.
+        // Strategy: extract key phrases and limit length.
+        let cleaned = text
+            .replace(/\n+/g, ', ')           // newlines → commas
+            .replace(/["""'']/g, '')          // remove quotes
+            .replace(/\([^)]*\)/g, '')        // remove parentheticals
+            .replace(/\s{2,}/g, ' ')          // collapse whitespace
+            .replace(/,\s*,/g, ',')           // remove double commas
+            .trim();
+
+        // If prompt is very long (AI-generated paragraph), take just the first 2 sentences
+        // and append style keywords
+        if (cleaned.length > 400) {
+            const sentences = cleaned.split(/[.!?]+/).filter(s => s.trim().length > 5);
+            cleaned = sentences.slice(0, 2).join('. ').trim();
+            // Append generic quality tags
+            cleaned += ', highly detailed, 8k resolution, cinematic lighting';
+        }
+
+        return cleaned.slice(0, 500);
+    };
+
+    const buildPromptText = (pText: string, pNegative: string): string => {
+        const sanitized = sanitizePromptForImage(pText);
+        return pNegative ? `${sanitized} excluding ${pNegative}` : sanitized;
     }
 
     const parsePrompt = () => {
@@ -204,53 +228,63 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         return { finalPrompt: finalPrompt.trim(), finalSeed, finalNegative, width, height };
     }
 
+    const generateViaBackend = async (promptText: string): Promise<string | null> => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/generate-image`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: promptText })
+            });
+            const data = await response.json();
+            if (data.success && data.image_url) {
+                return data.image_url;
+            }
+            console.error('Image gen failed:', data.error);
+            return null;
+        } catch (e) {
+            console.error('Image gen request failed:', e);
+            return null;
+        }
+    };
+
     const handleGenerate = async (isUpscale = false) => {
         if (isGenerating) return;
         setIsGenerating(true);
         setGeneratedImage(null);
         setGridImages([]);
         setImageError(false);
-        setGenerationLogs(["Initializing Neural Network..."]);
+        setGenerationLogs(["Initializing Nano Banana (Gemini) Neural Network..."]);
 
-        const { finalPrompt, finalSeed, finalNegative, width, height } = parsePrompt();
+        const { finalPrompt, finalSeed, finalNegative } = parsePrompt();
+        const promptText = buildPromptText(finalPrompt, finalNegative);
 
-        // Simulate Logs
+        // Progress logs 
         const sequence = [
             { text: `Parsing semantics...`, delay: 800 },
-            { text: `Allocating tensor (Seed: ${finalSeed})...`, delay: 1500 },
-            { text: "Denoising step 10/25...", delay: 2500 },
-            { text: "Applying aesthetics filter...", delay: 4000 }
+            { text: `Sending to Gemini Image Generator (Seed: ${finalSeed})...`, delay: 1500 },
+            { text: "Generating image via Nano Banana...", delay: 3000 },
         ];
-
         sequence.forEach(({ text, delay }) => {
             setTimeout(() => setGenerationLogs(prev => [...prev, text]), delay);
         });
 
-        setTimeout(() => {
-            if (viewMode === 'single') {
-                let w = width;
-                let h = height;
-                if (isUpscale) { w = Math.min(w * 2, 2048); h = Math.min(h * 2, 2048); }
-
-                const url = buildUrl(finalPrompt, finalSeed, model, w, h, finalNegative);
-                setGeneratedImage(url);
-                addToHistory(url, finalPrompt, finalSeed, model);
-
+        try {
+            const imageUrl = await generateViaBackend(promptText);
+            if (imageUrl) {
+                setGeneratedImage(imageUrl);
+                setImageLoading(false);
+                addToHistory(imageUrl, finalPrompt, finalSeed, 'gemini');
+                setGenerationLogs(prev => [...prev, '✅ Image generated successfully!']);
             } else {
-                // Grid Mode: Generate 4 variants
-                const gridModels = ['flux', 'flux-realism', 'any-dark', 'midjourney'];
-                const images = gridModels.map(m => ({
-                    url: buildUrl(finalPrompt, finalSeed, m, width, height, finalNegative),
-                    model: m
-                }));
-                setGridImages(images);
-                addToHistory(images[0].url, finalPrompt, finalSeed, "grid-mix");
+                setImageError(true);
+                setGenerationLogs(prev => [...prev, '❌ Generation failed. Try again.']);
             }
-
-            setImageLoading(true);
+        } catch (e) {
+            setImageError(true);
+            setGenerationLogs(prev => [...prev, '❌ Error connecting to image service.']);
+        } finally {
             setIsGenerating(false);
-
-        }, 4500);
+        }
     };
 
     const addToHistory = (url: string, promptText: string, seedVal: number, modelVal: string) => {
@@ -636,8 +670,6 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
                                 src={generatedImage}
                                 alt="Generated Visualization"
                                 className="generated-img"
-                                style={{ display: imageLoading ? 'none' : 'block' }}
-                                onLoad={() => setImageLoading(false)}
                                 onError={() => {
                                     setImageLoading(false);
                                     setImageError(true);
@@ -677,8 +709,29 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
                     )}
 
                     {imageError && (
-                        <div className="error-message" style={{ color: '#f85149', padding: '20px' }}>
-                            ⚠️ Image generation failed. The prompt might be too complex for the external grid.
+                        <div className="error-message" style={{ color: '#f85149', padding: '20px', textAlign: 'center' }}>
+                            <p>⚠️ Image generation service (Pollinations.ai) is currently unavailable.</p>
+                            <p style={{ color: '#8b949e', fontSize: '0.85rem', marginTop: '5px' }}>The external API is experiencing an outage. You can copy the prompt and use it in other generators.</p>
+                            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '15px' }}>
+                                <button
+                                    className="vp-action-btn primary"
+                                    onClick={() => {
+                                        setImageError(false);
+                                        handleGenerate(false);
+                                    }}
+                                >
+                                    <FaRocket /> Retry
+                                </button>
+                                <button
+                                    className="vp-action-btn"
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(prompt);
+                                        alert('Prompt copied! Paste it in Midjourney, DALL-E, or any image generator.');
+                                    }}
+                                >
+                                    <FaCopy /> Copy Prompt
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>

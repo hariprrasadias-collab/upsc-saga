@@ -67,7 +67,10 @@ const Ravens: React.FC = () => {
             const res = await fetch(`${API_BASE_URL}/api/ravens/saved?${params}`);
             if (res.ok) {
                 const raw = await res.json();
-                const data = raw.success === false ? [] : (raw.data || raw);
+                // Handle double-wrapped envelope: {success, data: {data: [...], page, per_page}}
+                let data = raw;
+                if (data && data.data) data = data.data; // unwrap middleware envelope
+                if (data && data.data) data = data.data; // unwrap route-level {data, page, per_page}
                 setArticles(Array.isArray(data) ? data : []);
             }
         } catch (err) {
@@ -110,45 +113,55 @@ const Ravens: React.FC = () => {
 
     const fetchAndProcessLatest = async () => {
         setProcessing(true);
-        setProcessingStatus('Scouting for news...');
+        setProcessingStatus('Dispatching Ravens to fetch latest news...');
         audioManager.play('click');
 
         try {
-            const muninRes = await fetch(`${API_BASE_URL}/api/ravens?type=munin`);
-            const huginRes = await fetch(`${API_BASE_URL}/api/ravens?type=hugin`);
+            // Use the background fetch endpoint — processes articles in parallel on server
+            const res = await fetch(`${API_BASE_URL}/api/ravens/background-fetch`, {
+                method: 'POST'
+            });
 
-            const rawMunin = await muninRes.json();
-            const rawHugin = await huginRes.json();
+            if (res.ok) {
+                setProcessingStatus('Ravens dispatched! Fetching & processing articles in background...');
+                addToast('Ravens dispatched! Articles will appear as they are processed.', 'info');
 
-            const muninNews = rawMunin.success === false ? [] : (rawMunin.data || rawMunin);
-            const huginNews = rawHugin.success === false ? [] : (rawHugin.data || rawHugin);
+                // Poll for new articles every 5 seconds while background processing runs
+                let pollCount = 0;
+                const maxPolls = 24; // 2 minutes max polling
+                const pollInterval = setInterval(async () => {
+                    pollCount++;
+                    setProcessingStatus(`Processing articles in background... (${pollCount * 5}s elapsed)`);
+                    await fetchArticles();
 
-            const allNews = [...(Array.isArray(muninNews) ? muninNews : []), ...(Array.isArray(huginNews) ? huginNews : [])];
+                    if (pollCount >= maxPolls) {
+                        clearInterval(pollInterval);
+                        setProcessing(false);
+                        setProcessingStatus('');
+                        addToast('Background fetch complete!', 'success');
+                        audioManager.play('success');
+                    }
+                }, 5000);
 
-            setProcessingStatus(`Found ${allNews.length} articles. Processing...`);
+                // Also do an initial fetch after 3 seconds
+                setTimeout(() => fetchArticles(), 3000);
 
-            for (let i = 0; i < allNews.length; i++) {
-                const article = allNews[i];
-                setProcessingStatus(`Processing ${i + 1}/${allNews.length}: ${article.title.substring(0, 30)}...`);
+                // Stop polling after 2 minutes
+                setTimeout(() => {
+                    clearInterval(pollInterval);
+                    setProcessing(false);
+                    setProcessingStatus('');
+                    fetchArticles();
+                }, maxPolls * 5000);
 
-                await fetch(`${API_BASE_URL}/api/ravens/process`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(article)
-                });
-
-                await new Promise(resolve => setTimeout(resolve, 500));
+            } else {
+                throw new Error('Background fetch failed');
             }
-
-            setProcessingStatus('All articles processed!');
-            audioManager.play('success');
-            await fetchArticles();
         } catch (err) {
-            console.error("Failed to fetch and process:", err);
-            setProcessingStatus('Error processing articles.');
+            console.error("Failed to dispatch ravens:", err);
+            setProcessingStatus('Error dispatching ravens.');
             audioManager.play('click');
-            addToast('Error processing articles', 'error');
-        } finally {
+            addToast('Error fetching articles', 'error');
             setProcessing(false);
             setProcessingStatus('');
         }

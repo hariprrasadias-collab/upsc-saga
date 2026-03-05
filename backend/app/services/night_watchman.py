@@ -4,12 +4,10 @@ The Night Watchman - Autonomous Research Service
 import os
 import json
 import feedparser
-import feedparser
 from datetime import datetime
 from app.db_models.night_watchman import save_briefing
 from app.services.model_manager import model_manager
 from dotenv import load_dotenv
-from app.services.model_manager import model_manager
 
 load_dotenv()
 
@@ -39,7 +37,7 @@ class NightWatchman:
             from app.db import get_db
             conn = get_db()
             today = datetime.now().strftime('%Y-%m-%d')
-            existing = conn.execute('SELECT id FROM night_watchman_briefings WHERE date = ?', (today,)).fetchone()
+            existing = conn.execute('SELECT id FROM morning_briefings WHERE date = ?', (today,)).fetchone()
             if existing:
                 print(f"🦉 Night Watchman: Briefing for {today} already exists. Standing down.")
                 return {"success": True, "briefing_id": existing['id'], "message": "Already completed today."}
