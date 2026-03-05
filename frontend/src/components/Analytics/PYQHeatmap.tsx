@@ -160,6 +160,54 @@ const PYQHeatmap: React.FC = () => {
         }
     }, [cellMap]);
 
+    // ⚡ Bolt Optimization: Memoize the entire heatmap grid to prevent re-rendering thousands of DOM elements
+    // when irrelevant state changes (e.g., when the drilldown modal opens/closes).
+    const heatmapGrid = useMemo(() => {
+        if (filteredTopics.length === 0) {
+            return (
+                <div className="empty-state">
+                    <span style={{ fontSize: '3rem' }}>📭</span>
+                    <p>No topics match your filters. Try adjusting the subject or year range.</p>
+                </div>
+            );
+        }
+
+        return (
+            <div className="heatmap-wrapper">
+                <div className="heatmap-grid">
+                    {/* Header Row */}
+                    <div className="heatmap-row header-row">
+                        <div className="heatmap-cell corner-cell">TOPIC / YEAR</div>
+                        {filteredYears.map(year => (
+                            <div key={year} className="heatmap-cell year-cell">{year}</div>
+                        ))}
+                    </div>
+
+                    {/* Data Rows */}
+                    {filteredTopics.map(topic => (
+                        <div key={topic} className="heatmap-row">
+                            <div className="heatmap-cell topic-cell" title={topic}>{topic}</div>
+                            {filteredYears.map(year => {
+                                const count = cellMap[topic]?.[year] || 0;
+                                return (
+                                    <div
+                                        key={`${topic}-${year}`}
+                                        className={`heatmap-cell data-cell${count > 0 ? ' has-data' : ''}`}
+                                        style={{ backgroundColor: getCellColor(count) }}
+                                        onClick={() => handleCellClick(topic, year)}
+                                        title={`${topic} (${year}): ${count} questions`}
+                                    >
+                                        {count > 0 ? count : ''}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }, [filteredTopics, filteredYears, cellMap, handleCellClick]);
+
     if (loading) {
         return (
             <div className="pyq-heatmap-container">
@@ -245,45 +293,7 @@ const PYQHeatmap: React.FC = () => {
             </div>
 
             {/* Heatmap Grid */}
-            {filteredTopics.length === 0 ? (
-                <div className="empty-state">
-                    <span style={{ fontSize: '3rem' }}>📭</span>
-                    <p>No topics match your filters. Try adjusting the subject or year range.</p>
-                </div>
-            ) : (
-                <div className="heatmap-wrapper">
-                    <div className="heatmap-grid">
-                        {/* Header Row */}
-                        <div className="heatmap-row header-row">
-                            <div className="heatmap-cell corner-cell">TOPIC / YEAR</div>
-                            {filteredYears.map(year => (
-                                <div key={year} className="heatmap-cell year-cell">{year}</div>
-                            ))}
-                        </div>
-
-                        {/* Data Rows */}
-                        {filteredTopics.map(topic => (
-                            <div key={topic} className="heatmap-row">
-                                <div className="heatmap-cell topic-cell" title={topic}>{topic}</div>
-                                {filteredYears.map(year => {
-                                    const count = cellMap[topic]?.[year] || 0;
-                                    return (
-                                        <div
-                                            key={`${topic}-${year}`}
-                                            className={`heatmap-cell data-cell${count > 0 ? ' has-data' : ''}`}
-                                            style={{ backgroundColor: getCellColor(count) }}
-                                            onClick={() => handleCellClick(topic, year)}
-                                            title={`${topic} (${year}): ${count} questions`}
-                                        >
-                                            {count > 0 ? count : ''}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
+            {heatmapGrid}
 
             {/* Drilldown Modal */}
             {modalData && (
