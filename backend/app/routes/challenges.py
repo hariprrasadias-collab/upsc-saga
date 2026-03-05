@@ -4,16 +4,8 @@ from app.services.challenge_service import challenge_service
 
 challenges_bp = Blueprint('challenges', __name__)
 
-def get_current_user_id():
-    """
-    Retrieve the logged-in user's ID from the session.
-    Falls back to User ID 1 for development/single-user environments.
-    """
-    user_id = session.get('user_id')
-    if not user_id:
-        # Defaults to 1 for single-user mode
-        user_id = get_current_user_id()
-    return user_id
+# We already imported get_current_user_id from app.utils.session, but the local function shadows it.
+# We will remove this shadowed function entirely so it uses the one from app.utils.session.
 
 @challenges_bp.route('/api/challenges/daily', methods=['GET'])
 def get_daily_challenge():
