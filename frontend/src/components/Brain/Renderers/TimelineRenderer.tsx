@@ -56,7 +56,8 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
             const cleanLine = line.replace(/^[\-\*]\s*/, '').trim();
 
             // Pattern 1: AI format — **[2500 BCE]**: **Title** -> *The Catalyst:* desc -> *The Aftermath:* desc
-            const boldBracketMatch = cleanLine.match(/^\*{0,2}\[(\d+\s*(?:BCE?|CE|AD)?)\]\*{0,2}\s*:\s*\*{0,2}(.+)/i);
+            // Allows alphanumeric inside brackets to support "2 Million Years Ago" or "Paleolithic Age"
+            const boldBracketMatch = cleanLine.match(/^\*{0,2}\[([^\]]+)\]\*{0,2}\s*:\s*\*{0,2}(.+)/i);
 
             // Pattern 2: Standard "1947: Title - Description" or "1939-1945: Title"
             const standardMatch = cleanLine.match(/^(\d{4}(?:\s?-\s?\d{4})?|\d{4}(?:\s?BC|AD|BCE|CE)?|c\.\s?\d{4})[:\-\s]+(.+)/i);
@@ -102,10 +103,24 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
                     numYear = parseInt(rangeMatch[1]);
                     endYear = parseInt(rangeMatch[2]);
                 } else {
-                    const numMatch = yearStr.match(/(\d+)/);
-                    numYear = numMatch ? parseInt(numMatch[1]) : 0;
-                    if (yearStr.toUpperCase().includes('BC') || yearStr.toUpperCase().includes('BCE')) {
+                    const numMatch = yearStr.match(/([\d.,]+)/);
+                    if (numMatch) {
+                        numYear = parseFloat(numMatch[1].replace(/,/g, ''));
+                    } else {
+                        // If no numbers at all, give it a generic negative number to sort it to the top
+                        numYear = -99999999;
+                    }
+
+                    const yearUpper = yearStr.toUpperCase();
+                    if (yearUpper.includes('BC') || yearUpper.includes('BCE') || yearUpper.includes('AGO') || yearUpper.includes('YA')) {
                         numYear = -numYear;
+                    }
+                    if (yearUpper.includes('MILLION') || yearUpper.includes('MYA')) {
+                        numYear *= 1000000;
+                    } else if (yearUpper.includes('LAKH')) {
+                        numYear *= 100000;
+                    } else if (yearUpper.includes('THOUSAND') || yearUpper.includes('KYA') || yearUpper.includes('K')) {
+                        numYear *= 1000;
                     }
                 }
 

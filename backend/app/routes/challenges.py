@@ -12,7 +12,7 @@ def get_current_user_id():
     user_id = session.get('user_id')
     if not user_id:
         # Defaults to 1 for single-user mode
-        user_id = get_current_user_id()
+        user_id = 1
     return user_id
 
 @challenges_bp.route('/api/challenges/daily', methods=['GET'])

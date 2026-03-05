@@ -54,40 +54,20 @@ def try_gemini_image(api_key: str, prompt: str, model: str) -> dict:
     return {'error': 'no_image_in_response', 'model': model}
 
 
-def try_openrouter_image(prompt: str) -> dict:
-    """Try generating an image via OpenRouter's image-capable models."""
-    or_key = os.environ.get('OPENROUTER_API_KEY')
-    if not or_key:
-        return {'error': 'no_openrouter_key'}
-    
+def try_pollinations_image(prompt: str) -> dict:
+    """Fallback: Generate an image using Pollinations.ai, which is free and requires no key."""
     try:
-        # Use OpenRouter with a model that supports image generation
-        url = "https://openrouter.ai/api/v1/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {or_key}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://github.com/hariprrasadias/upsc-saga",
-            "X-Title": "UPSC Second Brain"
-        }
+        import urllib.parse
+        encoded_prompt = urllib.parse.quote(prompt)
+        # Add educational parameters to get better results
+        image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=1024&height=1024&nologo=true&enhance=true"
         
-        payload = {
-            "model": "google/gemini-2.5-flash-image:free",
-            "messages": [{"role": "user", "content": prompt}],
-            "response_format": {"type": "image"}
-        }
-        
-        response = http_requests.post(url, json=payload, headers=headers, timeout=60)
+        # Test if it's reachable quickly
+        response = http_requests.head(image_url, timeout=10)
         if response.status_code == 200:
-            result = response.json()
-            # OpenRouter may return image data in the response
-            choices = result.get('choices', [])
-            if choices:
-                content = choices[0].get('message', {}).get('content', '')
-                # Check if it contains base64 image data
-                if content and 'data:image' in content:
-                    return {'success': True, 'image_url': content, 'model': 'openrouter'}
-        
-        return {'error': f'openrouter_failed_{response.status_code}'}
+            return {'success': True, 'image_url': image_url, 'model': 'pollinations.ai'}
+            
+        return {'error': f'pollinations_failed_{response.status_code}'}
     except Exception as e:
         return {'error': str(e)}
 
@@ -120,11 +100,11 @@ def generate_image():
             all_errors.append(result)
             print(f"Image gen: {model} failed - {result.get('error')}")
         
-        # Try OpenRouter as last resort
-        or_result = try_openrouter_image(image_prompt)
-        if or_result.get('success'):
-            or_result['prompt_used'] = clean_prompt
-            return jsonify(or_result)
+        # Try Pollinations as last resort fallback
+        fallback_result = try_pollinations_image(image_prompt)
+        if fallback_result.get('success'):
+            fallback_result['prompt_used'] = clean_prompt
+            return jsonify(fallback_result)
 
         # All failed — check if it was quota
         quota_errors = [e for e in all_errors if e.get('error') == 'quota_exceeded']
@@ -136,7 +116,7 @@ def generate_image():
         
         return jsonify({
             'success': False,
-            'error': f'All image models failed. Errors: {[e.get("error") for e in all_errors]}'
+            'error': f'All image models failed. Errors: {[e.get("error") for e in all_errors]}, Fallback: {fallback_result.get("error")}'
         }), 422
 
     except http_requests.exceptions.Timeout:

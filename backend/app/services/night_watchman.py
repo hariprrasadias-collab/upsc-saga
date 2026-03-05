@@ -273,7 +273,8 @@ class NightWatchman:
             end = text.rfind('}')
             
             if start != -1 and end != -1:
-                data = json.loads(text[start:end+1])
+                # Use strict=False to allow unescaped control characters (like newlines in the summary text)
+                data = json.loads(text[start:end+1], strict=False)
                 
                 # If flashcards are present, we could save them to the DB here
                 # For now, we just return them in the briefing

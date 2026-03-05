@@ -30,6 +30,20 @@ const MermaidDiagram: React.FC<{ code: string }> = ({ code }) => {
         if (ref.current) {
             try {
                 mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+                // Sanitize code: many AI models output A[Label (with parens)] which crashes Mermaid.
+                // We wrap the contents of brackets in double quotes: A["Label (with parens)"]
+                // But only if they aren't already quoted.
+                let safeCode = code;
+                if (safeCode) {
+                    safeCode = safeCode.replace(/\[([^"\]]+)\]/g, '["$1"]');
+                }
+
+                // Clear any previous render before running again
+                if (ref.current) {
+                    ref.current.innerHTML = safeCode;
+                    ref.current.removeAttribute('data-processed');
+                }
+
                 mermaid.run({ nodes: [ref.current] });
             } catch (e) {
                 console.error("Mermaid Render Error:", e);
@@ -51,9 +65,16 @@ const ActiveRecallQuiz: React.FC<{ content: string }> = ({ content }) => {
 
     useEffect(() => {
         try {
-            const parsed = JSON.parse(content);
+            let parsed = content;
+            if (typeof content === 'string') {
+                parsed = JSON.parse(content);
+            }
             if (Array.isArray(parsed)) {
                 setQuestions(parsed);
+            } else if (typeof parsed === 'object' && parsed !== null) {
+                // In case it's a single object wrapped in an array, or an object containing an array.
+                // Simple fallback to make it robust.
+                setQuestions(Object.values(parsed).filter(val => typeof val === 'object' && val !== null && 'q' in val) as any);
             }
         } catch (e) {
             console.error("Quiz Parse Error", e);
