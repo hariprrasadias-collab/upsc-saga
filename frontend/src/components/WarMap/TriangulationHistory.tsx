@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './TriangulationHistory.css';
 import MarkdownRenderer from '../Shared/MarkdownRenderer';
 import mermaid from 'mermaid';
+import DOMPurify from 'dompurify';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Mermaid Renderer Component (reused)
@@ -18,7 +19,7 @@ const MermaidDiagram: React.FC<{ code: string }> = ({ code }) => {
                 ref.current.innerHTML = ''; // Clear previous
                 mermaid.render(id, code).then(result => {
                     if (ref.current) {
-                        ref.current.innerHTML = result.svg;
+                        ref.current.innerHTML = DOMPurify.sanitize(result.svg, { USE_PROFILES: { svg: true } });
                     }
                 }).catch(e => {
                     console.error("Mermaid Render Error:", e);
