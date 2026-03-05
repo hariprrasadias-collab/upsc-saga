@@ -799,7 +799,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 ("GENERATE_SUBJECT_BOOK", {"topic": topic, "subject": subject}),
                 ("GENERATE_INTERVIEW_SIM", {"topic": topic}),
                 ("GENERATE_HEATMAP", {"topic": topic, "subject": subject}),
-                ("GENERATE_HEATMAP", {"topic": topic, "subject": subject}),
+                ("GENERATE_MIND_MAP", {"topic": topic, "subject": subject}),
                 ("GENERATE_SELF_REVIEW", {"topic": topic}),
                 # --- NEW GLOBAL AUTOMATION ENGINE MAPPINGS ---
                 ("GENERATE_MNEMONICS", {"topic": topic, "type": "facts"}),
@@ -2263,6 +2263,19 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                 except Exception as e:
                     result = {"success": False, "message": f"Heatmap Gen Failed: {str(e)}"}
 
+            elif action_type == "GENERATE_MIND_MAP":
+                try:
+                    from app.services.mindmap_service import MindMapService
+                    topic = payload.get('topic', '')
+                    mindmap_data = MindMapService.generate_mindmap(topic)
+                    if mindmap_data:
+                        MindMapService.save_mindmap(topic, mindmap_data)
+                        result = {"success": True, "message": "Mind Map Generated.", "mindmap": mindmap_data}
+                    else:
+                        result = {"success": False, "message": "Mind Map Gen Failed - empty response."}
+                except Exception as e:
+                    result = {"success": False, "message": f"Mind Map Gen Failed: {str(e)}"}
+
             elif action_type == "GENERATE_SELF_REVIEW":
                 try:
                     topic = payload.get('topic', '')
@@ -2384,14 +2397,24 @@ Your output must be structurally perfect, intellectually dense, and strictly com
             if text.startswith("```"):
                 text = text.replace('```json', '').replace('```', '').strip()
 
-            start = text.find('{')
-            end = text.rfind('}')
-            
+            # Handle both JSON objects and arrays
+            first_brace = text.find('{')
+            first_bracket = text.find('[')
+            last_brace = text.rfind('}')
+            last_bracket = text.rfind(']')
+
+            start = -1
+            end = -1
+
+            if first_brace != -1 and (first_bracket == -1 or first_brace < first_bracket):
+                start = first_brace
+                end = last_brace
+            elif first_bracket != -1:
+                start = first_bracket
+                end = last_bracket
+
             if start != -1 and end != -1:
                 text = text[start:end+1]
-            else:
-                 # Fallback for strict regex if scanner fails (unlikely but safe)
-                 pass 
             
             return json.loads(text)
         except (json.JSONDecodeError, Exception) as e:

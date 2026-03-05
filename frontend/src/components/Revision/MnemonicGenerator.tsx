@@ -371,17 +371,32 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
                                     </div>
 
                                     <div className="history-content">
+                                        {item.mnemonic_type === 'visual' ? (
+                                            <div className="history-section vis-section" style={{ marginBottom: '1rem', background: '#1a1f33', padding: '10px', borderRadius: '8px', borderLeft: '4px solid #f39c12' }}>
+                                                <span className="section-label" style={{ color: '#f39c12' }}>📸 Visual Generation Prompt (Midjourney)</span>
+                                                <p className="section-text" style={{ fontFamily: 'monospace', color: '#a8b2d1', fontSize: '0.9rem', marginTop: '5px' }}>
+                                                    {item.mnemonic_text}
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            <div className="history-section mnemonic-section" style={{ marginBottom: '1rem' }}>
+                                                <span className="section-label" style={{ color: 'var(--color-primary-light)' }}>🧠 Memory Hook</span>
+                                                <h3 className="section-text" style={{ fontSize: '1.2rem', color: 'var(--color-text)' }}>
+                                                    {item.mnemonic_text.replace(/\*\*/g, '')}
+                                                </h3>
+                                            </div>
+                                        )}
                                         {item.visualization_prompt && (
                                             <div className="history-section vis-section" style={{ marginBottom: '1rem' }}>
-                                                <span className="section-label">👁️ Visualization</span>
+                                                <span className="section-label">👁️ Visualization Suggestion</span>
                                                 <p className="section-text" style={{ color: 'var(--color-accent-orange)', fontStyle: 'italic' }}>
                                                     {item.visualization_prompt}
                                                 </p>
                                             </div>
                                         )}
                                         <div className="history-section input-section">
-                                            <span className="section-label">Source Data</span>
-                                            <p className="section-text">
+                                            <span className="section-label">Source Context</span>
+                                            <p className="section-text" style={{ opacity: 0.8, fontSize: '0.9rem' }}>
                                                 {item.original_text}
                                             </p>
                                         </div>

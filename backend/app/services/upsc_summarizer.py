@@ -475,7 +475,7 @@ Content: {text[:500]}
 
 Requirements:
 1. Make the mnemonic MEMORABLE and FUN (2-3 lines max).
-2. Create a vivid "Visualization Prompt" (1 sentence) that paints a highly weird, memorable, or funny mental image of this mnemonic in action.
+2. Create a vivid "Visualization Prompt" (1 sentence) that paints a highly weird, memorable, or funny mental image of this mnemonic in action. DO NOT output Midjourney tags or image generation parameters (no --v, --ar, --stylize, etc.). Keep it as a descriptive English sentence.
 3. RETURN EXCLUSIVELY VALID JSON IN THIS FORMAT:
 {{
   "mnemonic": "Your generated mnemonic text here",

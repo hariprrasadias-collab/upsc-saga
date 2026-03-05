@@ -19,11 +19,16 @@ Brain: Loaded persisted strategy with 2 steps.
  * Debugger PIN: 628-843-211
 🕵️ Hephaestus: Scanning logs at logs/app.log...
 ✅ No tracebacks found in logs.
-127.0.0.1 - - [04/Mar/2026 21:57:43] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:57:43] "GET /api/dashboard-data HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:57:48] "GET /api/dashboard-data HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:57:48] "GET /api/dashboard-data HTTP/1.1" 200 -
 Traceback (most recent call last):
 Traceback (most recent call last):
+127.0.0.1 - - [06/Mar/2026 00:57:48] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
     user_id = get_current_user_id()
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
     user_id = get_current_user_id()
@@ -35,52 +40,47 @@ Traceback (most recent call last):
     user_id = get_current_user_id()
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
     user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-127.0.0.1 - - [04/Mar/2026 21:57:43] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
   [Previous line repeated 977 more times]
   [Previous line repeated 977 more times]
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
     user_id = session.get('user_id')
               ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
     user_id = session.get('user_id')
               ^^^^^^^^^^^
-127.0.0.1 - - [04/Mar/2026 21:57:43] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
+  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
+    obj = instance._get_current_object()
   File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
     obj = instance._get_current_object()
 RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [04/Mar/2026 21:57:43] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
+RecursionError: maximum recursion depth exceeded
+127.0.0.1 - - [06/Mar/2026 00:57:48] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
+127.0.0.1 - - [06/Mar/2026 00:57:48] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
+127.0.0.1 - - [06/Mar/2026 00:57:48] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
 Traceback (most recent call last):
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
+    user_id = get_current_user_id()
+  [Previous line repeated 977 more times]
+Traceback (most recent call last):
+  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
+    user_id = session.get('user_id')
+              ^^^^^^^^^^^
+  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
+    obj = instance._get_current_object()
+RecursionError: maximum recursion depth exceeded
+127.0.0.1 - - [06/Mar/2026 00:57:48] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
     user_id = get_current_user_id()
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
     user_id = get_current_user_id()
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
     user_id = get_current_user_id()
-127.0.0.1 - - [04/Mar/2026 21:57:43] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-RecursionError: maximum recursion depth exceeded
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-127.0.0.1 - - [04/Mar/2026 21:57:43] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
   File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
     user_id = get_current_user_id()
   [Previous line repeated 977 more times]
@@ -90,9 +90,9 @@ RecursionError: maximum recursion depth exceeded
   File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
     obj = instance._get_current_object()
 RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [04/Mar/2026 21:57:43] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-127.0.0.1 - - [04/Mar/2026 21:57:43] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:57:43] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:57:48] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
+127.0.0.1 - - [06/Mar/2026 00:57:48] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:57:48] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
 Autonomous Brain tables initialized
 ✅ Automation tables initialized.
 Optimization: Checking indexes...
@@ -102,150 +102,165 @@ BrainService Online: Connected to Gemini Cortex via ModelManager.
 Brain: Loaded persisted strategy with 2 steps.
 🦉 Night Watchman Routes Imported
 🦉 Registering Night Watchman Blueprint...
-Error fetching daily challenge: maximum recursion depth exceeded
 Error fetching streak: maximum recursion depth exceeded
-Error identifying weak areas: no such column: name
 Error fetching daily challenge: maximum recursion depth exceeded
 Error identifying weak areas: no such column: name
+Error identifying weak areas: no such column: name
 Error fetching streak: maximum recursion depth exceeded
+Error fetching daily challenge: maximum recursion depth exceeded
 🕵️ Hephaestus: Scanning logs at logs/app.log...
 ✅ No tracebacks found in logs.
-127.0.0.1 - - [04/Mar/2026 21:57:53] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:57:53] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:57:54] "GET /api/automation/content?type=podcast HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:57:55] "GET /api/automation/content?type=essay HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:57:55] "GET /api/automation/content?type=visual_prompt HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:57:56] "GET /api/automation/content?type=roleplay HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:57:57] "GET /api/automation/content?type=cheat_sheet HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:57:57] "GET /api/automation/content?type=timeline HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:57:58] "GET /api/planner/current?start_date=2026-03-04&days=365 HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:57:58] "GET /api/planner/current?start_date=2026-03-04&days=365 HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:57:58] "GET /api/brain/status HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:57:58] "GET /api/brain/status HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:00] "OPTIONS /api/planner/task/66299/status HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:00] "PUT /api/planner/task/66299/status HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:00] "GET /api/brain/status HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:03] "GET /api/brain/proactive HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:03] "GET /api/brain/proactive HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:03] "GET /api/brain/proactive HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:03] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:03] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:05] "GET /api/automation/content?type=podcast HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:05] "GET /api/automation/content?type=essay HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:06] "GET /api/automation/content?type=visual_prompt HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:06] "GET /api/automation/content?type=roleplay HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:06] "GET /api/automation/content?type=cheat_sheet HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:09] "GET /api/automation/content?type=interview_sim HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:09] "GET /api/automation/content?type=heatmap HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:12] "GET /api/automation/content?type=self_review HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:13] "GET /api/automation/content?type=interview_sim HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:14] "GET /api/automation/content?type=subject_book HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:14] "GET /api/automation/content?type=map_work HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:15] "GET /api/automation/content?type=quote_bank HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:15] "GET /api/automation/content?type=pitfalls HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:16] "GET /api/automation/content?type=eli5 HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 21:58:16] "GET /api/automation/content?type=cheat_sheet HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:57:51] "GET /api/planner/current?start_date=2026-03-05&days=365 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:57:51] "GET /api/planner/current?start_date=2026-03-05&days=365 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:57:51] "GET /api/brain/status HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:57:52] "GET /api/brain/status HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:57:53] "GET /api/mindmap/list HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:57:53] "GET /api/mindmap/list HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:57:56] "GET /api/mindmap/28 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:03] "GET /api/mind_palace/locations HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:03] "GET /api/mind_palace/locations HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:04] "GET /api/mind_palace/locations/15/artifacts HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:06] "GET /api/brain/proactive HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:06] "GET /api/brain/proactive HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:12] "GET /api/planner/current?start_date=2026-03-05&days=365 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:12] "GET /api/planner/current?start_date=2026-03-05&days=365 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:12] "GET /api/brain/status HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:12] "GET /api/brain/proactive HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:12] "GET /api/brain/status HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:12] "GET /api/brain/proactive HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:14] "OPTIONS /api/planner/task/66301/status HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:14] "PUT /api/planner/task/66301/status HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:14] "GET /api/brain/status HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:15] "GET /api/brain/proactive HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:21] "GET /api/revision/mnemonic/history HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:29] "GET /api/mindmap/list HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:29] "GET /api/mindmap/list HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:35] "GET /api/planner/current?start_date=2026-03-05&days=365 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:35] "GET /api/planner/current?start_date=2026-03-05&days=365 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:35] "GET /api/brain/status HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:35] "GET /api/brain/proactive HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:35] "GET /api/brain/status HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:35] "GET /api/brain/proactive HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:45] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:45] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:49] "GET /api/automation/content?type=podcast HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:50] "GET /api/automation/content?type=essay HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:53] "GET /api/automation/content?type=podcast HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:53] "GET /api/automation/content?type=visual_prompt HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:55] "GET /api/automation/content?type=roleplay HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:56] "GET /api/automation/content?type=cheat_sheet HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:56] "GET /api/automation/content?type=timeline HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:58:57] "GET /api/automation/content?type=pitfalls HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:59:09] "GET /api/pyq/questions HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:59:09] "GET /api/pyq/questions HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:59:09] "GET /api/pyq/analytics HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:59:09] "GET /api/pyq/questions HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:59:09] "GET /api/pyq/analytics HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:59:09] "GET /api/pyq/analytics HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:59:10] "GET /api/heatmap/subjects HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:59:10] "GET /api/heatmap/subjects HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:59:10] "GET /api/heatmap/pyq HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:59:10] "GET /api/heatmap/pyq HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:59:11] "GET /api/ravens/saved HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 00:59:11] "GET /api/ravens/saved HTTP/1.1" 200 -
 🧠 Synapse Connected: [KNOWLEDGE] ravens
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
-✅ Success with nvidia (1.17s)
+✅ Success with nvidia (9.88s)
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
-Brain: Processing completion for History - NCERT Cl 6: Our Pasts I - Ch 1: What, Where, How and When? (Read) (User 1)
-Brain: 🚀 Launching 23 parallel automation tasks for NCERT Cl 6: Our Pasts I - Ch 1: What, Where, How and When? (Read)
-Brain: ⚡ Parallel Start -> CREATE_MOCK_TEST
-Brain Executing Action: CREATE_MOCK_TEST
-Brain: ⚡ Parallel Start -> CREATE_FLASHCARDS
-Brain Executing Action: CREATE_FLASHCARDS
+✅ Success with nvidia (1.12s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
+✅ Success with nvidia (0.78s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
+✅ Success with nvidia (2.64s)
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+Brain: Processing completion for History - NCERT Cl 6: Our Pasts I - Ch 2: From Hunting–Gathering (Read) (User 1)
+Brain: 🚀 Launching 23 parallel automation tasks for NCERT Cl 6: Our Pasts I - Ch 2: From Hunting–Gathering (Read)
 Brain: ⚡ Parallel Start -> GENERATE_TOPIC_LINKAGES
 Brain Executing Action: GENERATE_TOPIC_LINKAGES
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-Brain: ⚡ Parallel Start -> GENERATE_PODCAST_SCRIPT
-Brain Executing Action: GENERATE_PODCAST_SCRIPT
+Brain: ⚡ Parallel Start -> CREATE_MOCK_TEST
+Brain Executing Action: CREATE_MOCK_TEST
 Brain: ⚡ Parallel Start -> PREDICT_QUESTIONS
 Brain Executing Action: PREDICT_QUESTIONS
-⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+Brain: ⚡ Parallel Start -> CREATE_FLASHCARDS
+Brain Executing Action: CREATE_FLASHCARDS
+Brain: ⚡ Parallel Start -> GENERATE_PODCAST_SCRIPT
+Brain Executing Action: GENERATE_PODCAST_SCRIPT
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
 Brain: ⚡ Parallel Start -> GENERATE_SOCRATIC_DIALOGUE
 Brain Executing Action: GENERATE_SOCRATIC_DIALOGUE
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
 🧠 Synapse Connected: [KNOWLEDGE] flashcards
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+✅ Success with nvidia (2.33s)
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (0.97s)
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
-🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
-✅ Success with nvidia (2.17s)
-⚡ Returning cached response.
-⚡ Returning cached response.
-⚡ Returning cached response.
-⚡ Returning cached response.
-⚡ Returning cached response.
-⚡ Returning cached response.
-✅ Success with nvidia (3.11s)
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (4.49s)
+✅ Success with nvidia (10.37s)
 Brain: ✅ Parallel Done & Saved -> CREATE_FLASHCARDS
 Brain: ⚡ Parallel Start -> GENERATE_SUBJECT_BOOK
 Brain Executing Action: GENERATE_SUBJECT_BOOK
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (3.01s)
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (1.17s)
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (4.41s)
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (1.12s)
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (14.79s)
-Brain: Saving Podcast Script...
-Brain: ✅ Parallel Done & Saved -> GENERATE_PODCAST_SCRIPT
+✅ Success with nvidia (15.69s)
+Brain: ✅ Parallel Done & Saved -> GENERATE_TOPIC_LINKAGES
 Brain: ⚡ Parallel Start -> GENERATE_INTERVIEW_SIM
 Brain Executing Action: GENERATE_INTERVIEW_SIM
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (3.18s)
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+✅ Success with nvidia (24.95s)
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (1.66s)
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (3.11s)
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (18.57s)
-JSON Parse Error: Invalid control character at: line 7 column 19 (char 226)
+✅ Success with nvidia (17.32s)
+JSON Parse Error: Invalid control character at: line 7 column 19 (char 224)
 Brain: Saving Subject Book...
 Brain: ✅ Parallel Done & Saved -> GENERATE_SUBJECT_BOOK
 Brain: ⚡ Parallel Start -> GENERATE_HEATMAP
@@ -253,116 +268,183 @@ Brain Executing Action: GENERATE_HEATMAP
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (1.03s)
+✅ Success with nvidia (33.27s)
+Brain: Saving Podcast Script...
+Brain: ✅ Parallel Done & Saved -> GENERATE_PODCAST_SCRIPT
+Brain: ⚡ Parallel Start -> GENERATE_MIND_MAP
+Brain Executing Action: GENERATE_MIND_MAP
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (23.87s)
-Brain: ✅ Parallel Done & Saved -> CREATE_MOCK_TEST
-Brain: ⚡ Parallel Start -> GENERATE_HEATMAP
-Brain Executing Action: GENERATE_HEATMAP
+✅ Success with nvidia (33.35s)
+DEBUG FORESIGHT RAW TEXT: Based on the provided context and directives, I'll generate 20 "Black Swan" candidate questions that meet the specified criteria. Here they are:
+
+```json
+[
+  {
+    "question": "How did the concept of ...
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
+✅ Success with nvidia (6.22s)
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (27.58s)
-Brain: ✅ Parallel Done & Saved -> GENERATE_TOPIC_LINKAGES
+✅ Success with nvidia (19.29s)
+Brain: Saving Interview Simulator...
+Brain: ✅ Parallel Done & Saved -> GENERATE_INTERVIEW_SIM
 Brain: ⚡ Parallel Start -> GENERATE_SELF_REVIEW
 Brain Executing Action: GENERATE_SELF_REVIEW
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (13.31s)
-Brain: Saving Interview Simulator...
-Brain: ✅ Parallel Done & Saved -> GENERATE_INTERVIEW_SIM
+✅ Success with nvidia (37.84s)
+Brain: ✅ Parallel Done & Saved -> CREATE_MOCK_TEST
 Brain: ⚡ Parallel Start -> GENERATE_MNEMONICS
 Brain Executing Action: GENERATE_MNEMONICS
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
-✅ Success with nvidia (1.11s)
-Brain: Saving Mnemonics...
-Brain: Failed to save mnemonic: Error binding parameter 1: type 'dict' is not supported
-Brain: ✅ Parallel Done & Saved -> GENERATE_MNEMONICS
+✅ Success with nvidia (3.17s)
+Brain: Saving Self Review...
+Brain: ✅ Parallel Done & Saved -> GENERATE_SELF_REVIEW
 Brain: ⚡ Parallel Start -> TRIANGULATE_TOPIC
 Brain Executing Action: TRIANGULATE_TOPIC
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (6.61s)
-Brain: Saving Heatmap...
-Brain: ✅ Parallel Done & Saved -> GENERATE_HEATMAP
+✅ Success with nvidia (2.46s)
+Brain: Saving Mnemonics...
+Brain: Failed to save mnemonic: Error binding parameter 1: type 'dict' is not supported
+Brain: ✅ Parallel Done & Saved -> GENERATE_MNEMONICS
 Brain: ⚡ Parallel Start -> CONSTRUCT_PALACE
 Brain Executing Action: CONSTRUCT_PALACE
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (6.84s)
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (3.39s)
-Brain: Saving Self Review...
-✅ Success with nvidia (1.28s)
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (12.90s)
+✅ Success with nvidia (7.64s)
+✅ Success with nvidia (12.93s)
+✅ Success with nvidia (28.03s)
 Brain: Saving Heatmap...
-✅ Success with nvidia (6.93s)
- * Detected change in '/Users/openclaw/Downloads/upsc-saga/backend/app/routes/automation_routes.py', reloading
-Brain: Saving Triangulation...
-✅ Success with nvidia (10.76s)
-Brain: Saving Socratic Dialogue...
-✅ Success with nvidia (15.34s)
-JSON Parse Error: Extra data: line 5 column 4 (char 214)
-Brain: ✅ Parallel Done & Saved -> CONSTRUCT_PALACE
+✅ Success with nvidia (34.67s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (1.83s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+Error saving mind map: database is locked127.0.0.1 - - [06/Mar/2026 01:00:11] "GET /api/planner/current?start_date=2026-03-05&days=365 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:00:11] "GET /api/planner/current?start_date=2026-03-05&days=365 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:00:11] "GET /api/brain/status HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:00:11] "GET /api/brain/proactive HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:00:11] "GET /api/brain/status HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:00:11] "GET /api/brain/proactive HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:00:43] "GET /api/tasks?date=2026-03-06 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:00:43] "GET /api/planner/current?start_date=2026-03-06&days=1 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:00:43] "GET /api/tasks?date=2026-03-06 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:00:43] "GET /api/planner/current?start_date=2026-03-06&days=1 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:00:43] "OPTIONS /api/planner/tactical-brief HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:00:45] "POST /api/planner/tactical-brief HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:00:52] "GET /api/planner/current?start_date=2026-03-05&days=365 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:00:52] "GET /api/planner/current?start_date=2026-03-05&days=365 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:00:52] "GET /api/brain/status HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:00:52] "GET /api/brain/proactive HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:00:52] "GET /api/brain/status HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:00:52] "GET /api/brain/proactive HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:00:56] "GET /api/revision/mnemonic/history HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:01:26] "GET /api/mindmap/list HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:01:26] "GET /api/mindmap/list HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:01:30] "GET /api/mind_palace/locations HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:01:30] "GET /api/mind_palace/locations HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:01:31] "GET /api/mind_palace/locations/16/artifacts HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:01:46] "GET /api/mock-tests HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:01:46] "GET /api/mock-tests HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:01:48] "POST /api/mock-tests/41/start HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:01:54] "GET /api/essay/topics HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:01:54] "GET /api/essay/topics HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:01:56] "GET /api/battles HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:01:56] "GET /api/arena/bosses HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:01:56] "GET /api/battles HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:01:56] "GET /api/arena/bosses HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:01:59] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:01:59] "GET /api/automation/content HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:02:02] "GET /api/automation/content?type=podcast HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:02:04] "GET /api/automation/content?type=essay HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:02:11] "GET /api/automation/content?type=visual_prompt HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:02:13] "OPTIONS /api/generate-image HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:02:14] "[31m[1mPOST /api/generate-image HTTP/1.1[0m" 429 -
+127.0.0.1 - - [06/Mar/2026 01:02:31] "GET /api/automation/content?type=roleplay HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:02:35] "GET /api/automation/content?type=cheat_sheet HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:02:37] "GET /api/automation/content?type=timeline HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:02:44] "GET /api/automation/content?type=eli5 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:02:47] "GET /api/automation/content?type=pitfalls HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:02:50] "GET /api/automation/content?type=quote_bank HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:02:54] "GET /api/automation/content?type=map_work HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:03:07] "GET /api/automation/content?type=subject_book HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:03:16] "GET /api/automation/content?type=interview_sim HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:03:28] "GET /api/automation/content?type=heatmap HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:03:38] "GET /api/automation/content?type=self_review HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:03:46] "GET /api/automation/content?type=pitfalls HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:03:49] "GET /api/automation/content?type=roleplay HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:03:52] "GET /api/automation/content?type=timeline HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:04:11] "GET /api/mindmap/list HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:04:11] "GET /api/mindmap/list HTTP/1.1" 200 -
+127.0.0.1 - - [06/Mar/2026 01:04:20] "GET /api/revision/mnemonic/history HTTP/1.1" 200 -
+ * Detected change in '/Users/openclaw/Downloads/upsc-saga/backend/app/services/upsc_summarizer.py', reloading
+
+Brain: ✅ Parallel Done & Saved -> GENERATE_MIND_MAP
 Brain: ⚡ Parallel Start -> GENERATE_ESSAY_PROMPT
 Brain Executing Action: GENERATE_ESSAY_PROMPT
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-Brain: ✅ Parallel Done & Saved -> TRIANGULATE_TOPIC
-⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (31.79s)
+Brain: ✅ Parallel Done & Saved -> CONSTRUCT_PALACE
 Brain: ⚡ Parallel Start -> GENERATE_MAP_WORK
 Brain Executing Action: GENERATE_MAP_WORK
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+Brain: Saving 3 predictions...
+Brain: ✅ Parallel Done & Saved -> PREDICT_QUESTIONS
+Brain: ⚡ Parallel Start -> GENERATE_CHEAT_SHEET
+Brain Executing Action: GENERATE_CHEAT_SHEET
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 Brain: ✅ Parallel Done & Saved -> GENERATE_HEATMAP
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-Brain: ⚡ Parallel Start -> GENERATE_CHEAT_SHEET
-Brain Executing Action: GENERATE_CHEAT_SHEET
-🚀 Attempting with openclaw :: ollama/qwen3:14b...
-⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
-🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-Brain: ✅ Parallel Done & Saved -> GENERATE_SOCRATIC_DIALOGUE
 Brain: ⚡ Parallel Start -> GENERATE_QUOTE_BANK
 Brain Executing Action: GENERATE_QUOTE_BANK
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-Brain: ✅ Parallel Done & Saved -> GENERATE_SELF_REVIEW
+✅ Success with nvidia (3.08s)
+Brain: Saving Essay Prompt...
+Brain: Saved Essay Prompt for NCERT Cl 6: Our Pasts I - Ch 2: From Hunting–Gathering (Read)
+Brain: ✅ Parallel Done & Saved -> GENERATE_ESSAY_PROMPT
 Brain: ⚡ Parallel Start -> GENERATE_TIMELINE
 Brain Executing Action: GENERATE_TIMELINE
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (1.62s)
-Brain: Saving Quote Bank...
-Brain: ✅ Parallel Done & Saved -> GENERATE_QUOTE_BANK
+✅ Success with nvidia (57.89s)
+Brain: Saving Triangulation...
+Brain: ✅ Parallel Done & Saved -> TRIANGULATE_TOPIC
 Brain: ⚡ Parallel Start -> GENERATE_ETHICS_DILEMMA
 Brain Executing Action: GENERATE_ETHICS_DILEMMA
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (2.53s)
-Brain: Saving Essay Prompt...
-Brain: Saved Essay Prompt for NCERT Cl 6: Our Pasts I - Ch 1: What, Where, How and When? (Read)
-Brain: ✅ Parallel Done & Saved -> GENERATE_ESSAY_PROMPT
+✅ Success with nvidia (25.89s)
+Brain: Saving Map Work...
+Brain: ✅ Parallel Done & Saved -> GENERATE_MAP_WORK
 Brain: ⚡ Parallel Start -> GENERATE_ELI5
 Brain Executing Action: GENERATE_ELI5
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (5.47s)
+✅ Success with nvidia (7.32s)
 Brain: Saving Ethics Dilemma...
 Brain: ✅ Parallel Done & Saved -> GENERATE_ETHICS_DILEMMA
 Brain: ⚡ Parallel Start -> GENERATE_ROLEPLAY_SCENARIO
@@ -370,427 +452,72 @@ Brain Executing Action: GENERATE_ROLEPLAY_SCENARIO
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (53.61s)
-DEBUG FORESIGHT RAW TEXT: Here are 20 "Black Swan" candidate questions that meet the specified requirements:
-
-1. 
-{
-"question": "How does the concept of 'intangible heritage' in archaeology relate to the recent UNESCO recognit...
-No JSON array found (brackets missing)
-Brain: ✅ Parallel Done & Saved -> PREDICT_QUESTIONS
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+✅ Success with nvidia (45.20s)
+Brain: Saving Quote Bank...
+Brain: ✅ Parallel Done & Saved -> GENERATE_QUOTE_BANK
 Brain: ⚡ Parallel Start -> GENERATE_VISUAL_PROMPT
 Brain Executing Action: GENERATE_VISUAL_PROMPT
 🚀 Attempting with openclaw :: ollama/qwen3:14b...
 ⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
 🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
-✅ Success with nvidia (1.99s)
+✅ Success with nvidia (1.58s)
 Brain: Saving Visual Prompt...
-Brain: Saved Mnemonic for NCERT Cl 6: Our Pasts I - Ch 1: What, Where, How and When? (Read)
+Brain: Saved Mnemonic for NCERT Cl 6: Our Pasts I - Ch 2: From Hunting–Gathering (Read)
 Brain: ✅ Parallel Done & Saved -> GENERATE_VISUAL_PROMPT
-✅ Success with nvidia (9.62s)
-Brain: Saving ELI5...
-Brain: ✅ Parallel Done & Saved -> GENERATE_ELI5
-✅ Success with nvidia (14.90s)
-Brain: Saving Timeline...
-Brain: ✅ Parallel Done & Saved -> GENERATE_TIMELINE
-✅ Success with nvidia (15.62s)
-JSON Parse Error: Invalid control character at: line 7 column 19 (char 167)
-Brain: Saving Cheat Sheet...
-Brain: ✅ Parallel Done & Saved -> GENERATE_CHEAT_SHEET
-✅ Success with nvidia (8.53s)
+✅ Success with nvidia (31.92s)
 Brain: Saving Roleplay Scenario...
 Brain: ✅ Parallel Done & Saved -> GENERATE_ROLEPLAY_SCENARIO
-✅ Success with nvidia (15.72s)
-JSON Parse Error: Extra data: line 7 column 4 (char 332)
-Brain: ✅ Parallel Done & Saved -> GENERATE_MAP_WORK
-Brain: 🏁 All parallel tasks completed for NCERT Cl 6: Our Pasts I - Ch 1: What, Where, How and When? (Read)
- * Restarting with stat
- * Debugger is active!
- * Debugger PIN: 628-843-211
-Autonomous Brain tables initialized
-✅ Automation tables initialized.
-Optimization: Checking indexes...
+✅ Success with nvidia (77.34s)
+Moderator Error: Extra data: line 5 column 1 (char 230)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
 ✨ ModelManager Ready. Active Providers: ['openrouter', 'nvidia', 'openclaw', 'google']
-🧠 Synapse Connected: [ASSESSMENT] mock_tests
-BrainService Online: Connected to Gemini Cortex via ModelManager.
-Brain: Loaded persisted strategy with 2 steps.
-🦉 Night Watchman Routes Imported
-🦉 Registering Night Watchman Blueprint...
-🕵️ Hephaestus: Scanning logs at logs/app.log...
-✅ No tracebacks found in logs.
-127.0.0.1 - - [04/Mar/2026 22:00:06] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:00:12] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:00:19] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:03:16] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:03:16] "GET /api/dashboard-data HTTP/1.1" 200 -
-Traceback (most recent call last):
-Traceback (most recent call last):
-127.0.0.1 - - [04/Mar/2026 22:03:16] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [04/Mar/2026 22:03:16] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-127.0.0.1 - - [04/Mar/2026 22:03:16] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-127.0.0.1 - - [04/Mar/2026 22:03:16] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-Traceback (most recent call last):
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [04/Mar/2026 22:03:16] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [04/Mar/2026 22:03:16] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-127.0.0.1 - - [04/Mar/2026 22:03:17] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:03:18] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:04:49] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:04:49] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:06:40] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:07:09] "GET /api/automation/content?type=all HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:08:23] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:08:23] "GET /api/dashboard-data HTTP/1.1" 200 -
-Traceback (most recent call last):
-Traceback (most recent call last):
-127.0.0.1 - - [04/Mar/2026 22:08:23] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-RecursionError: maximum recursion depth exceeded
-  [Previous line repeated 977 more times]
-127.0.0.1 - - [04/Mar/2026 22:08:23] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [04/Mar/2026 22:08:23] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-Traceback (most recent call last):
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-RecursionError: maximum recursion depth exceeded
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-127.0.0.1 - - [04/Mar/2026 22:08:23] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-127.0.0.1 - - [04/Mar/2026 22:08:23] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [04/Mar/2026 22:08:23] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-127.0.0.1 - - [04/Mar/2026 22:08:23] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:08:23] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:09:07] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:09:07] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:09:20] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:09:20] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
-127.0.0.1 - - [04/Mar/2026 22:10:19] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:11:18] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:11:18] "GET /api/dashboard-data HTTP/1.1" 200 -
-Traceback (most recent call last):
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [04/Mar/2026 22:11:19] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-127.0.0.1 - - [04/Mar/2026 22:11:19] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [04/Mar/2026 22:11:19] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-Traceback (most recent call last):
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-127.0.0.1 - - [04/Mar/2026 22:11:19] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-RecursionError: maximum recursion depth exceeded
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [04/Mar/2026 22:11:19] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-127.0.0.1 - - [04/Mar/2026 22:11:19] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-127.0.0.1 - - [04/Mar/2026 22:11:19] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:11:19] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:11:22] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:11:38] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:11:55] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:12:13] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:12:31] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:12:44] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:12:59] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:13:13] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:13:24] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:13:24] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:13:24] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:13:24] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:13:51] "GET /api/brain/status HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:15:07] "GET /api/triangulation/history?limit=50 HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:15:07] "GET /api/triangulation/history?limit=50 HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:15:21] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:15:21] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:15:21] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:15:21] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:15:40] "GET /api/brain/status HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:17:32] "GET /api/dashboard-data HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:17:32] "GET /api/dashboard-data HTTP/1.1" 200 -
-Traceback (most recent call last):
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [04/Mar/2026 22:17:32] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:17:32] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-127.0.0.1 - - [04/Mar/2026 22:17:32] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-Traceback (most recent call last):
-Traceback (most recent call last):
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 59, in get_streak
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 24, in get_daily_challenge
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-RecursionError: maximum recursion depth exceeded
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-127.0.0.1 - - [04/Mar/2026 22:17:32] "[35m[1mGET /api/challenges/streak HTTP/1.1[0m" 500 -
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 15, in get_current_user_id
-    user_id = get_current_user_id()
-127.0.0.1 - - [04/Mar/2026 22:17:32] "GET /api/analytics/weak-areas?limit=5 HTTP/1.1" 200 -
-  [Previous line repeated 977 more times]
-  File "/Users/openclaw/Downloads/upsc-saga/backend/app/routes/challenges.py", line 12, in get_current_user_id
-    user_id = session.get('user_id')
-              ^^^^^^^^^^^
-  File "/Users/openclaw/miniforge3/lib/python3.13/site-packages/werkzeug/local.py", line 318, in __get__
-    obj = instance._get_current_object()
-RecursionError: maximum recursion depth exceeded
-127.0.0.1 - - [04/Mar/2026 22:17:32] "[35m[1mGET /api/challenges/daily HTTP/1.1[0m" 500 -
-127.0.0.1 - - [04/Mar/2026 22:17:32] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:17:32] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:17:39] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:18:29] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:18:54] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:19:23] "GET /api/automation/content HTTP/1.1" 200 -
-127.0.0.1 - - [04/Mar/2026 22:19:55] "GET /api/automation/content HTTP/1.1" 200 -
- * Detected change in '/Users/openclaw/Downloads/upsc-saga/backend/app/__init__.py', reloading
-Error fetching daily challenge: maximum recursion depth exceeded
-Error fetching streak: maximum recursion depth exceeded
-Error identifying weak areas: no such column: name
-Error identifying weak areas: no such column: name
-Error fetching daily challenge: maximum recursion depth exceeded
-Error fetching streak: maximum recursion depth exceeded
-Error fetching streak: maximum recursion depth exceeded
-Error fetching daily challenge: maximum recursion depth exceeded
-Error identifying weak areas: no such column: name
-Error fetching streak: maximum recursion depth exceeded
-Error fetching daily challenge: maximum recursion depth exceeded
-Error identifying weak areas: no such column: name
-Error fetching daily challenge: maximum recursion depth exceeded
-Error fetching streak: maximum recursion depth exceeded
-Error identifying weak areas: no such column: name
-Error fetching daily challenge: maximum recursion depth exceeded
-Error fetching streak: maximum recursion depth exceeded
-Error identifying weak areas: no such column: name
-Error fetching streak: maximum recursion depth exceeded
-Error fetching daily challenge: maximum recursion depth exceeded
-Error identifying weak areas: no such column: name
-Error fetching streak: maximum recursion depth exceeded
-Error fetching daily challenge: maximum recursion depth exceeded
-Error identifying weak areas: no such column: name
- * Restarting with stat
- * Debugger is active!
- * Debugger PIN: 628-843-211
-Autonomous Brain tables initialized
-✅ Automation tables initialized.
-Optimization: Checking indexes...
-✨ ModelManager Ready. Active Providers: ['openrouter', 'nvidia', 'openclaw', 'google']
-🧠 Synapse Connected: [ASSESSMENT] mock_tests
-BrainService Online: Connected to Gemini Cortex via ModelManager.
-Brain: Loaded persisted strategy with 2 steps.
-🦉 Night Watchman Routes Imported
-🦉 Registering Night Watchman Blueprint...
-🕵️ Hephaestus: Scanning logs at logs/app.log...
-✅ No tracebacks found in logs.
-/Users/openclaw/miniforge3/lib/python3.13/multiprocessing/resource_tracker.py:400: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/mp-0jye25zk'}
-  warnings.warn(
-/Users/openclaw/miniforge3/lib/python3.13/multiprocessing/resource_tracker.py:400: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/mp-soxter0r'}
-  warnings.warn(
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: mistralai/mixtral-8x22b-instruct-v0.1...
+✅ Success with nvidia (2.26s)
+✅ Success with nvidia (79.79s)
+Brain: Saving Timeline...
+Brain: ✅ Parallel Done & Saved -> GENERATE_TIMELINE
+✅ Success with nvidia (58.12s)
+Brain: Saving ELI5...
+Brain: ✅ Parallel Done & Saved -> GENERATE_ELI5
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+⚡ Returning cached response.
+✅ Success with nvidia (10.51s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (41.26s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (25.03s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (6.32s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+✅ Success with nvidia (1.41s)
+🚀 Attempting with openclaw :: ollama/qwen3:14b...
+⚠️ openclaw (ollama/qwen3:14b) failed: Not Found
+🚀 Attempting with nvidia :: meta/llama-3.3-70b-instruct...
+Image gen: gemini-2.5-flash-image failed - quota_exceeded
+Image gen: gemini-2.0-flash-exp-image-generation failed - quota_exceeded
