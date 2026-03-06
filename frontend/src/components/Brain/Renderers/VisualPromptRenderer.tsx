@@ -256,8 +256,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         setGenerationLogs(["Initializing Nano Banana (Gemini) Neural Network..."]);
 
         const { finalPrompt, finalSeed, finalNegative } = parsePrompt();
-        // Use isUpscale if applicable (e.g., adding a keyword to prompt, or changing resolution later)
-        const upscaleText = isUpscale ? ", high resolution, 4k, ultra detailed, masterpiece" : "";
+        const upscaleText = isUpscale ? ", high resolution, 4k, ultra detailed" : "";
         const promptText = buildPromptText(finalPrompt + upscaleText, finalNegative);
 
         // Progress logs 
