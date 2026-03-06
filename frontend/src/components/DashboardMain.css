@@ -390,10 +390,16 @@
 
 @media (max-width: 1400px) {
   .dashboard-content {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 
   .boons-curses {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .dashboard-content {
     grid-template-columns: 1fr;
   }
 }
@@ -424,6 +430,11 @@
   .character-art {
     max-width: 150px;
     max-height: 200px;
+  }
+
+  .character-section {
+    width: 300px;
+    height: 300px;
   }
 
   .progress-circle-container {

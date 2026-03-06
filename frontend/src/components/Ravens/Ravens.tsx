@@ -63,8 +63,15 @@ const Ravens: React.FC = () => {
             if (selectedSource && selectedSource !== 'All Sources') params.append('source', selectedSource);
             if (showBookmarked) params.append('bookmarked', 'true');
             if (searchQuery) params.append('search', searchQuery);
+            params.append('_t', Date.now().toString()); // Bust cache aggressively
 
-            const res = await fetch(`${API_BASE_URL}/api/ravens/saved?${params}`);
+            const res = await fetch(`${API_BASE_URL}/api/ravens/saved?${params}`, {
+                cache: 'no-store',
+                headers: {
+                    'Pragma': 'no-cache',
+                    'Cache-Control': 'no-cache'
+                }
+            });
             if (res.ok) {
                 const raw = await res.json();
                 // Handle double-wrapped envelope: {success, data: {data: [...], page, per_page}}

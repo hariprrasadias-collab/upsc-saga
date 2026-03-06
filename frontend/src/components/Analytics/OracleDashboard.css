@@ -243,3 +243,20 @@
     color: #666;
     padding: 2rem;
 }
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+@media (max-width: 768px) {
+    .predictive-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .probability-value {
+        font-size: 2.2rem;
+    }
+
+    .prediction-card {
+        padding: 1rem;
+    }
+}

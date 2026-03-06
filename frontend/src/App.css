@@ -256,35 +256,40 @@
 
 @media (max-width: 1024px) {
   .app-container {
-    grid-template-columns: 1fr;
-  }
-
-  .app-container>.sidebar {
-    grid-column: 1;
-    grid-row: 1;
-    max-width: 260px;
-    border-right: 1px solid rgba(232, 160, 32, 0.2);
-    border-bottom: none;
-  }
-
-  .content {
-    grid-column: 1;
-    grid-row: 2;
-  }
-
-  .app-container>.rituals-panel {
-    grid-column: 1;
-    grid-row: 3;
-    border-left: none;
-    border-top: 1px solid rgba(232, 160, 32, 0.2);
-    max-height: 200px;
+    grid-template-columns: 0px 1fr 0px;
   }
 }
 
 @media (max-width: 768px) {
   .app-container {
-    grid-template-columns: 1fr;
-    height: auto;
+    grid-template-columns: 0px 1fr 0px;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .app-container.left-open {
+    grid-template-columns: 0px 1fr 0px;
+  }
+
+  .app-container.right-open {
+    grid-template-columns: 0px 1fr 0px;
+  }
+
+  .app-container.left-open.right-open {
+    grid-template-columns: 0px 1fr 0px;
+  }
+
+  .app-container>.sidebar {
+    position: fixed;
+    height: 100vh;
+    z-index: 2000;
+  }
+
+  .rituals-panel-wrapper {
+    position: fixed;
+    right: 0;
+    height: 100vh;
+    z-index: 2000;
   }
 
   .sidebar-toggle-btn {
@@ -293,10 +298,23 @@
   }
 
   .sidebar-toggle-btn.right {
-    right: var(--space-10);
+    right: var(--space-3);
+    /* Fixed spacing on mobile */
+  }
+
+  .sidebar-toggle-btn.open {
+    left: calc(var(--sidebar-w) + 8px);
+    z-index: 2001;
+    /* Keep above sidebar */
+  }
+
+  .sidebar-toggle-btn.right.open {
+    right: calc(var(--rituals-w) + 8px);
+    z-index: 2001;
   }
 
   .content {
-    min-height: calc(100vh - 200px);
+    width: 100vw;
+    min-height: 100vh;
   }
 }
