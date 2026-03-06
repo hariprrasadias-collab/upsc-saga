@@ -245,8 +245,9 @@ const SocraticHistory: React.FC = () => {
                         placeholder="Search archives..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        aria-label="Search archives"
                     />
-                    <span className="search-icon">🔍</span>
+                    <span className="search-icon" aria-hidden="true">🔍</span>
                 </div>
             </div>
 
@@ -258,16 +259,19 @@ const SocraticHistory: React.FC = () => {
                     ) : (
                         <ul>
                             {filteredHistory.map(item => (
-                                <li
-                                    key={item.id}
-                                    className={`history-item ${selectedDialogue?.id === item.id ? 'active' : ''}`}
-                                    onClick={() => {
-                                        stopPlayback();
-                                        setSelectedDialogue(item);
-                                    }}
-                                >
-                                    <div className="item-topic">{item.topic}</div>
-                                    <div className="item-date">{new Date(item.created_at).toLocaleDateString()}</div>
+                                <li key={item.id} className="history-item">
+                                    <button
+                                        type="button"
+                                        className={`history-item-btn ${selectedDialogue?.id === item.id ? 'active' : ''}`}
+                                        onClick={() => {
+                                            stopPlayback();
+                                            setSelectedDialogue(item);
+                                        }}
+                                        aria-pressed={selectedDialogue?.id === item.id}
+                                    >
+                                        <div className="item-topic">{item.topic}</div>
+                                        <div className="item-date">{new Date(item.created_at).toLocaleDateString()}</div>
+                                    </button>
                                 </li>
                             ))}
                         </ul>
@@ -284,6 +288,8 @@ const SocraticHistory: React.FC = () => {
                                         className={`mode-btn ${analysisMode ? 'active' : ''}`}
                                         onClick={() => setAnalysisMode(!analysisMode)}
                                         title="Toggle Logical Analysis"
+                                        aria-label={analysisMode ? "Disable Logical Analysis" : "Enable Logical Analysis"}
+                                        aria-pressed={analysisMode}
                                     >
                                         🧠 Analysis
                                     </button>
@@ -292,14 +298,15 @@ const SocraticHistory: React.FC = () => {
                                             className={`play-btn ${isPlaying ? 'playing' : ''}`}
                                             onClick={togglePlay}
                                             title={isPlaying ? "Stop Debate" : "Listen to Debate"}
+                                            aria-label={isPlaying ? "Stop Debate" : "Listen to Debate"}
                                         >
                                             {isPlaying ? "⏹️ Stop" : "▶️ Listen"}
                                         </button>
                                     )}
-                                    <button className="copy-btn" onClick={handleDownload} title="Download">
+                                    <button className="copy-btn" onClick={handleDownload} title="Download" aria-label="Download Debate">
                                         📥
                                     </button>
-                                    <button className="copy-btn" onClick={handleCopy} title="Copy">
+                                    <button className="copy-btn" onClick={handleCopy} title="Copy" aria-label="Copy to Clipboard">
                                         📋
                                     </button>
                                 </div>
@@ -371,6 +378,7 @@ const SocraticHistory: React.FC = () => {
                                                                 createFlashcard(`${AGENTS[turn.speakerId]?.name} on ${selectedDialogue.topic}`, turn.text);
                                                             }}
                                                             title="Save as Flashcard"
+                                                            aria-label="Save as Flashcard"
                                                         >
                                                             ⚡
                                                         </button>
