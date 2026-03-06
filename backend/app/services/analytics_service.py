@@ -8,68 +8,44 @@ import sqlite3
 
 def calculate_study_hours(conn, user_id, start_date, end_date):
     """
-    Estimate study hours based on activity timestamps
+    Estimate study hours based on activity timestamps.
+    Optimized: Uses SQLite UNION to count distinct days instead of transferring thousands of rows to Python.
     """
     try:
-        # Get all activity timestamps across modules
-        activities = []
-
-        # Mock tests
-        mock_tests = conn.execute('''
-            SELECT submitted_at FROM test_attempts
-            WHERE user_id = ? AND submitted_at BETWEEN ? AND ?
-            ORDER BY submitted_at
-        ''', (user_id, start_date, end_date)).fetchall()
-        activities.extend([r['submitted_at'] for r in mock_tests])
-
-        # Answer writing
-        answers = conn.execute('''
-            SELECT submitted_at FROM user_answers
-            WHERE user_id = ? AND submitted_at BETWEEN ? AND ?
-            ORDER BY submitted_at
-        ''', (user_id, start_date, end_date)).fetchall()
-        activities.extend([r['submitted_at'] for r in answers])
-
-        # Flashcard reviews
-        reviews = conn.execute('''
-            SELECT reviewed_at FROM review_sessions
-            WHERE user_id = ? AND reviewed_at BETWEEN ? AND ?
-            ORDER BY reviewed_at
-        ''', (user_id, start_date, end_date)).fetchall()
-        activities.extend([r['reviewed_at'] for r in reviews])
-
-        # Pomodoro Sessions
+        # Get Pomodoro hours
         pomodoros = conn.execute('''
-            SELECT timestamp, duration FROM pomodoro_sessions
+            SELECT SUM(duration) as total_duration FROM pomodoro_sessions
             WHERE user_id = ? AND timestamp BETWEEN ? AND ?
-            ORDER BY timestamp
-        ''', (user_id, start_date, end_date)).fetchall()
-        # For study hours, we can use the actual duration
-        pomodoro_minutes = sum([r['duration'] for r in pomodoros])
+        ''', (user_id, start_date, end_date)).fetchone()
+
+        pomodoro_minutes = pomodoros['total_duration'] if pomodoros and pomodoros['total_duration'] else 0
         pomodoro_hours = pomodoro_minutes / 60.0
 
-        if not activities:
-            return round(pomodoro_hours, 1)
+        # Count unique days with activity across modules using SQLite's DATE() function
+        query = """
+        SELECT COUNT(DISTINCT date) as unique_days FROM (
+            SELECT DATE(submitted_at) as date FROM test_attempts WHERE user_id = ? AND submitted_at BETWEEN ? AND ?
+            UNION
+            SELECT DATE(submitted_at) as date FROM user_answers WHERE user_id = ? AND submitted_at BETWEEN ? AND ?
+            UNION
+            SELECT DATE(reviewed_at) as date FROM review_sessions WHERE user_id = ? AND reviewed_at BETWEEN ? AND ?
+        ) WHERE date IS NOT NULL
+        """
 
-        # Sort all activities
-        try:
-            activities = sorted([datetime.fromisoformat(a) for a in activities])
-        except ValueError:
-            # If date parsing fails, skip estimates and return just pomodoro
-            return round(pomodoro_hours, 1)
+        result = conn.execute(query, (
+            user_id, start_date, end_date,
+            user_id, start_date, end_date,
+            user_id, start_date, end_date
+        )).fetchone()
 
-        # Estimate: assume 30min per mock test, 20min per answer, 10min per review session
-        # Or calculate gaps between activities (if < 2 hours, count as continuous)
+        unique_days_count = result['unique_days'] if result else 0
 
-        # Count unique days with activity and estimate
-        unique_days = set(a.date() for a in activities)
         # Conservative estimate: 2 hours per active day
-        estimated_hours = len(unique_days) * 2
+        estimated_hours = unique_days_count * 2
 
-        # Add actual Pomodoro time
         total_hours = estimated_hours + pomodoro_hours
-
         return round(total_hours, 1)
+
     except Exception as e:
         print(f"Error calculating study hours: {e}")
         return 0
@@ -221,58 +197,35 @@ def calculate_improvement_rate(scores):
 
 def get_streak_days(conn, user_id):
     """
-    Calculate consecutive days with activity
+    Calculate consecutive days with activity.
+    Optimized: Uses a single SQLite UNION query to fetch distinct dates instead of transferring thousands of rows to Python.
     """
     try:
-        # Get all activity dates
-        dates = set()
-
-        # Mock tests
-        mock_dates = conn.execute('''
-            SELECT DATE(submitted_at) as date FROM test_attempts
-            WHERE user_id = ?
-        ''', (user_id,)).fetchall()
-        dates.update([r['date'] for r in mock_dates])
-
-        # Answer writing
-        answer_dates = conn.execute('''
-            SELECT DATE(submitted_at) as date FROM user_answers
-            WHERE user_id = ?
-        ''', (user_id,)).fetchall()
-        dates.update([r['date'] for r in answer_dates])
-
-        # Flashcards
-        review_dates = conn.execute('''
-            SELECT DATE(reviewed_at) as date FROM review_sessions
-            WHERE user_id = ?
-        ''', (user_id,)).fetchall()
-        dates.update([r['date'] for r in review_dates])
-
-        # Pomodoro Sessions
-        pomodoro_dates = conn.execute('''
-            SELECT DATE(timestamp) as date FROM pomodoro_sessions
-            WHERE user_id = ?
-        ''', (user_id,)).fetchall()
-        dates.update([r['date'] for r in pomodoro_dates])
-
-        # War Map (Calendar Events) Completed
-        warmap_dates = conn.execute('''
-            SELECT DATE(updated_at) as date FROM calendar_event_metadata
-            WHERE user_id = ? AND is_completed = 1
-        ''', (user_id,)).fetchall()
-        dates.update([r['date'] for r in warmap_dates])
+        query = """
+        SELECT DISTINCT date FROM (
+            SELECT DATE(submitted_at) as date FROM test_attempts WHERE user_id = ? AND submitted_at IS NOT NULL
+            UNION
+            SELECT DATE(submitted_at) as date FROM user_answers WHERE user_id = ? AND submitted_at IS NOT NULL
+            UNION
+            SELECT DATE(reviewed_at) as date FROM review_sessions WHERE user_id = ? AND reviewed_at IS NOT NULL
+            UNION
+            SELECT DATE(timestamp) as date FROM pomodoro_sessions WHERE user_id = ? AND timestamp IS NOT NULL
+            UNION
+            SELECT DATE(updated_at) as date FROM calendar_event_metadata WHERE user_id = ? AND is_completed = 1 AND updated_at IS NOT NULL
+        )
+        WHERE date IS NOT NULL
+        """
+        rows = conn.execute(query, (user_id, user_id, user_id, user_id, user_id)).fetchall()
         
-        if not dates:
+        if not rows:
             return 0
 
-        # Filter out None values and convert to set of date objects
         dates_objs = set()
-        for d in dates:
-            if d:
-                try:
-                    dates_objs.add(datetime.fromisoformat(d).date())
-                except ValueError:
-                    pass # Ignore invalid date formats
+        for r in rows:
+            try:
+                dates_objs.add(datetime.fromisoformat(r['date']).date())
+            except ValueError:
+                pass
 
         today = datetime.now().date()
         yesterday = today - timedelta(days=1)
