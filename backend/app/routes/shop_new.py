@@ -3,7 +3,7 @@ from app.services.shop_service import shop_service
 
 shop_bp_new = Blueprint('shop_new', __name__)
 
-@shop_bp_new.route('/api/shop/items', methods=['GET'])
+@shop_bp_new.route('/api/shop-new/items', methods=['GET'])
 def get_shop_items():
     """Get all shop items."""
     try:
@@ -13,7 +13,7 @@ def get_shop_items():
         print(f"Error fetching shop items: {e}")
         return jsonify({'error': str(e)}), 500
 
-@shop_bp_new.route('/api/shop/balance', methods=['GET'])
+@shop_bp_new.route('/api/shop-new/balance', methods=['GET'])
 def get_balance():
     """Get user's currency balance."""
     try:
@@ -26,7 +26,7 @@ def get_balance():
         print(f"Error fetching balance: {e}")
         return jsonify({'error': str(e)}), 500
 
-@shop_bp_new.route('/api/shop/purchase', methods=['POST'])
+@shop_bp_new.route('/api/shop-new/purchase', methods=['POST'])
 def purchase_item():
     """Purchase an item."""
     try:
@@ -52,7 +52,7 @@ def purchase_item():
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
-@shop_bp_new.route('/api/shop/inventory', methods=['GET'])
+@shop_bp_new.route('/api/shop-new/inventory', methods=['GET'])
 def get_inventory():
     """Get user's inventory."""
     try:
@@ -65,7 +65,7 @@ def get_inventory():
         print(f"Error fetching inventory: {e}")
         return jsonify({'error': str(e)}), 500
 
-@shop_bp_new.route('/api/shop/activate', methods=['POST'])
+@shop_bp_new.route('/api/shop-new/activate', methods=['POST'])
 def activate_item():
     """Activate an item from inventory."""
     try:
@@ -91,7 +91,7 @@ def activate_item():
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
-@shop_bp_new.route('/api/shop/active', methods=['GET'])
+@shop_bp_new.route('/api/shop-new/active', methods=['GET'])
 def get_active_powerups():
     """Get currently active power-ups."""
     try:

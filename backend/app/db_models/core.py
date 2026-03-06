@@ -36,10 +36,24 @@ def init_core_tables():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER,
             item_id TEXT NOT NULL, -- 'leviathan_axe', 'chaos_blades'
+            item_name TEXT,
+            equipped INTEGER DEFAULT 0,
             acquired_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
     ''')
+
+    # Migration for existing inventory table (if missing columns)
+    try:
+        conn.execute('SELECT item_name FROM inventory LIMIT 1')
+    except Exception:
+        print("Migrating inventory table: Adding item_name and equipped columns...")
+        try:
+            conn.execute('ALTER TABLE inventory ADD COLUMN item_name TEXT')
+            conn.execute('ALTER TABLE inventory ADD COLUMN equipped INTEGER DEFAULT 0')
+            print("Migration successful.")
+        except Exception as e:
+            print(f"Migration failed: {e}")
     
     # Activity Log Table
     conn.execute('''
