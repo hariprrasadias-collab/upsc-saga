@@ -18,12 +18,10 @@ const QuestsPage: React.FC<QuestsPageProps> = ({ onTaskCompleted }) => {
   const [error, setError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
 
-  // --- FIX: Fetch from the specific /api/quests endpoint ---
   const fetchQuests = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      // CRITICAL FIX: Use '/api/quests', NOT '/api/tasks'
       const response = await fetch(`${API_BASE_URL}/api/quests`);
 
       if (!response.ok) {
