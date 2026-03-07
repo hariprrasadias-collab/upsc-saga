@@ -241,18 +241,18 @@ def get_due_cards():
         conn = get_db()
         
         # Get cards with their latest review session
+        # Optimized with Window Function and LIMIT to avoid full table scan
         query = '''
             SELECT f.*,
                    rs.halflife, rs.alpha, rs.beta, rs.next_review, rs.reviewed_at
             FROM flashcards f
             LEFT JOIN (
                 SELECT flashcard_id, halflife, alpha, beta, next_review, reviewed_at
-                FROM review_sessions
-                WHERE (flashcard_id, reviewed_at) IN (
-                    SELECT flashcard_id, MAX(reviewed_at)
+                FROM (
+                    SELECT *, ROW_NUMBER() OVER (PARTITION BY flashcard_id ORDER BY reviewed_at DESC) as rn
                     FROM review_sessions
-                    GROUP BY flashcard_id
-                )
+                ) tmp
+                WHERE rn = 1
             ) rs ON f.id = rs.flashcard_id
             WHERE 1=1
         '''
@@ -262,7 +262,20 @@ def get_due_cards():
             query += ' AND f.deck_id = ?'
             params.append(deck_id)
         
-        # Get all cards
+        # Optimization: Fetch a candidate pool of most likely urgent cards
+        # 1. New cards (never reviewed) - Highest Priority
+        # 2. Oldest scheduled reviews (most overdue) - Next Priority
+        query += '''
+            ORDER BY
+                CASE WHEN rs.reviewed_at IS NULL THEN 0 ELSE 1 END ASC,
+                rs.next_review ASC,
+                f.created_at ASC
+            LIMIT ?
+        '''
+        # Fetch 5x limit to allow for local urgency reordering (Ebisu vs Due Date)
+        params.append(limit * 5)
+
+        # Get candidate cards
         all_cards = conn.execute(query, params).fetchall()
         
         # Calculate urgency for each card
