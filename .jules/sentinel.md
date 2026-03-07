@@ -1,0 +1,4 @@
+## 2024-05-24 - [SSRF via Unvalidated URL Imports]
+**Vulnerability:** The application was directly feeding user-supplied URLs (like `data.get('url')` and `data.get('link')`) into `requests.get()` without any validation. This allowed Server-Side Request Forgery (SSRF), meaning an attacker could make the backend fetch data from internal IPs, private networks, or metadata endpoints.
+**Learning:** Checking for string patterns (e.g., matching '127.0.0.1') is insufficient to prevent SSRF because attackers can use DNS rebinding or obfuscated hostnames.
+**Prevention:** Validate URLs strictly: enforce the scheme (`http/https`) and perform a DNS lookup (`socket.getaddrinfo`) to ensure the resolved IP address is not a private, loopback, or reserved address (`ipaddress` module) before sending the request.

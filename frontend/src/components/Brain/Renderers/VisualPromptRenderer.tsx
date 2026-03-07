@@ -248,6 +248,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
     };
 
     const handleGenerate = async (isUpscale = false) => {
+        if (isUpscale) console.log('Upscaling...');
         if (isGenerating) return;
         setIsGenerating(true);
         setGeneratedImage(null);

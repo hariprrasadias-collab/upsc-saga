@@ -261,6 +261,10 @@ def extract_image_from_article(link):
     Tries Open Graph, Twitter meta, then first <img> tag.
     """
     try:
+        from app.utils.security import is_safe_url
+        if not is_safe_url(link):
+            print(f"Image extraction blocked for unsafe link: {link}")
+            return None
         import requests
         from bs4 import BeautifulSoup
         response = requests.get(link, timeout=10)
@@ -282,6 +286,11 @@ def extract_image_from_article(link):
 def fetch_article_content(url):
     """Fetch full article content from URL."""
     try:
+        from app.utils.security import is_safe_url
+        if not is_safe_url(url):
+            print(f"Article fetch blocked for unsafe URL: {url}")
+            return ""
+
         import requests
         from bs4 import BeautifulSoup
         
