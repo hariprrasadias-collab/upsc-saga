@@ -247,7 +247,8 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         }
     };
 
-    const handleGenerate = async () => {
+    const handleGenerate = async (isUpscale = false) => {
+        if (isUpscale) console.log('Upscaling...');
         if (isGenerating) return;
         setIsGenerating(true);
         setGeneratedImage(null);
@@ -300,7 +301,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
 
     const handleRemix = () => {
         setRandomSeed(true);
-        setTimeout(() => handleGenerate(), 0);
+        setTimeout(() => handleGenerate(false), 0);
     };
 
     const handleChaos = () => {
@@ -325,7 +326,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
             return p;
         });
 
-        setTimeout(() => handleGenerate(), 100);
+        setTimeout(() => handleGenerate(false), 100);
     };
 
     const handleVoiceInput = () => {
@@ -677,7 +678,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
                             />
                             {!imageLoading && (
                                 <div className="vp-overlay">
-                                    <button className="download-img-btn" onClick={() => handleGenerate()}>
+                                    <button className="download-img-btn" onClick={() => handleGenerate(true)}>
                                         <FaExpand /> Upscale 2x
                                     </button>
                                     <button className="download-img-btn" onClick={() => downloadImage(generatedImage)}>
@@ -717,7 +718,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
                                     className="vp-action-btn primary"
                                     onClick={() => {
                                         setImageError(false);
-                                        handleGenerate();
+                                        handleGenerate(false);
                                     }}
                                 >
                                     <FaRocket /> Retry
@@ -754,7 +755,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
                 </button>
                 <button
                     className={`vp-action-btn primary ${(isGenerating || imageLoading) ? 'disabled' : ''}`}
-                    onClick={() => handleGenerate()}
+                    onClick={() => handleGenerate(false)}
                     disabled={isGenerating || imageLoading}
                 >
                     {(isGenerating || imageLoading) ? <><div className="spinner" style={{ width: 12, height: 12, borderWidth: 2 }}></div> Processing...</> : <><FaRocket /> Generate Image</>}
