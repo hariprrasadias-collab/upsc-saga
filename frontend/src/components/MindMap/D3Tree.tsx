@@ -185,7 +185,6 @@ const D3Tree: React.FC<D3TreeProps> = ({ data, onNodeRightClick }) => {
         root.descendants().forEach((d: any, i) => {
             d.id = i;
             d._children = d.children as CustomHierarchyNode[] | undefined;
-            // if (d.depth && d.data.name.length !== 7) d.children = undefined;
         });
 
         update(root);
