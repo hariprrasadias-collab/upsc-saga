@@ -21,6 +21,11 @@ class NeuralLaceService:
         content = text_content
         if url:
             try:
+                from app.utils.security import is_safe_url
+                if not is_safe_url(url):
+                    print(f"🕸️ Neural Lace blocked unsafe URL: {url}")
+                    return {"success": False, "error": "Unsafe URL rejected."}
+
                 # Basic Fetch
                 # In real prod, use a scraper service or headless browser
                 # For now, we simulate success or use a simple fetch if possible
