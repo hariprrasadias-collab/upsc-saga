@@ -4,7 +4,7 @@
     "passed": 13,
     "failed": 11,
     "pass_rate": 54.166666666666664,
-    "timestamp": "2026-02-27T15:11:48.734115"
+    "timestamp": "2026-03-07T11:00:36.255900"
   },
   "results": [
     {
@@ -13,7 +13,7 @@
       "endpoint": "/api/analytics/overview?timeframe=all",
       "status": "PASS",
       "status_code": 200,
-      "response": "{\n  \"activities_completed\": 66,\n  \"level\": 19,\n  \"max_xp\": 2317,\n  \"streak_days\": 0,\n  \"study_hours\": 18.0,\n  \"xp\": 209\n}\n"
+      "response": "{\"success\": true, \"request_id\": \"7ad8045b-e771-4ef7-ba80-610f6ce1b7c9\", \"data\": {\"activities_completed\": 66, \"level\": 19, \"max_xp\": 2317, \"streak_days\": 0, \"study_hours\": 18.0, \"xp\": 629}}"
     },
     {
       "test": "TC-API-014b: Get weekly analytics",
@@ -21,7 +21,7 @@
       "endpoint": "/api/analytics/overview?timeframe=week",
       "status": "PASS",
       "status_code": 200,
-      "response": "{\n  \"activities_completed\": 66,\n  \"level\": 19,\n  \"max_xp\": 2317,\n  \"streak_days\": 0,\n  \"study_hours\": 18.0,\n  \"xp\": 209\n}\n"
+      "response": "{\"success\": true, \"request_id\": \"051aa6e3-961d-4b61-bcd9-7465a2ed2d7c\", \"data\": {\"activities_completed\": 66, \"level\": 19, \"max_xp\": 2317, \"streak_days\": 0, \"study_hours\": 18.0, \"xp\": 629}}"
     },
     {
       "test": "TC-API-015: Get subject analytics (valid)",
@@ -45,7 +45,7 @@
       "endpoint": "/api/syllabus/",
       "status": "PASS",
       "status_code": 200,
-      "response": "[\n  {\n    \"id\": 222,\n    \"last_revised_at\": null,\n    \"last_updated\": \"2025-11-26 14:56:56\",\n    \"next_revision_date\": null,\n    \"notes\": null,\n    \"paper\": \"GS1\",\n    \"revision_count\": null,\n    \"status\": \"Not Started\",\n    \"subject\": \"Art & Culture\",\n    \"subtopic\": null,\n    \"topic\": \"Indian Culture - Salient aspects of Art Forms\"\n  },\n  {\n    \"id\": 223,\n    \"last_revised_at\": null,\n    \"last_updated\": \"2025-11-26 08:40:30\",\n    \"next_revision_date\": null,\n    \"notes\": null,\n    \"paper\": \"GS1"
+      "response": "{\"success\": true, \"request_id\": \"a9c14ca6-52b7-40c7-ad14-57257e134742\", \"data\": [{\"id\": 222, \"last_revised_at\": null, \"last_updated\": \"2025-11-26 14:56:56\", \"next_revision_date\": null, \"notes\": null, \"paper\": \"GS1\", \"revision_count\": null, \"status\": \"Not Started\", \"subject\": \"Art & Culture\", \"subtopic\": null, \"topic\": \"Indian Culture - Salient aspects of Art Forms\"}, {\"id\": 223, \"last_revised_at\": null, \"last_updated\": \"2025-11-26 08:40:30\", \"next_revision_date\": null, \"notes\": null, \"paper\": \"G"
     },
     {
       "test": "TC-API-016b: Get syllabus analytics",
@@ -53,7 +53,7 @@
       "endpoint": "/api/syllabus/analytics",
       "status": "PASS",
       "status_code": 200,
-      "response": "{\n  \"breakdown\": [\n    {\n      \"count\": 24,\n      \"paper\": \"GS1\",\n      \"status\": \"Not Started\"\n    },\n    {\n      \"count\": 28,\n      \"paper\": \"GS2\",\n      \"status\": \"Not Started\"\n    },\n    {\n      \"count\": 33,\n      \"paper\": \"GS3\",\n      \"status\": \"Not Started\"\n    },\n    {\n      \"count\": 31,\n      \"paper\": \"GS4\",\n      \"status\": \"Not Started\"\n    },\n    {\n      \"count\": 10,\n      \"paper\": \"Optional\",\n      \"status\": \"Not Started\"\n    },\n    {\n      \"count\": 7,\n      \"paper\": \"Prelims\",\n      "
+      "response": "{\"success\": true, \"request_id\": \"83ca1191-0de6-4510-bc5c-6b0d4de9f301\", \"data\": {\"breakdown\": [{\"count\": 24, \"paper\": \"GS1\", \"status\": \"Not Started\"}, {\"count\": 28, \"paper\": \"GS2\", \"status\": \"Not Started\"}, {\"count\": 33, \"paper\": \"GS3\", \"status\": \"Not Started\"}, {\"count\": 31, \"paper\": \"GS4\", \"status\": \"Not Started\"}, {\"count\": 10, \"paper\": \"Optional\", \"status\": \"Not Started\"}, {\"count\": 7, \"paper\": \"Prelims\", \"status\": \"Not Started\"}], \"totals\": [{\"paper\": \"GS1\", \"total\": 24}, {\"paper\": \"GS2\", \""
     },
     {
       "test": "TC-API-017: Update topic status",
@@ -61,7 +61,7 @@
       "endpoint": "/api/syllabus/1/status",
       "status": "PASS",
       "status_code": 200,
-      "response": "{\n  \"id\": 1,\n  \"status\": \"Reading\"\n}\n"
+      "response": "{\"success\": true, \"request_id\": \"51a338d4-451a-44e4-a183-27d510d44ed2\", \"data\": {\"id\": 1, \"status\": \"Reading\"}}"
     },
     {
       "test": "TC-API-018: Save topic notes",
@@ -69,7 +69,7 @@
       "endpoint": "/api/syllabus/1/notes",
       "status": "PASS",
       "status_code": 200,
-      "response": "{\n  \"id\": 1,\n  \"notes\": \"Test notes\"\n}\n"
+      "response": "{\"success\": true, \"request_id\": \"107ef4c3-339a-412d-89ec-a9605b989655\", \"data\": {\"id\": 1, \"notes\": \"Test notes\"}}"
     },
     {
       "test": "TC-API-018b: Mark topic as revised",
@@ -77,12 +77,12 @@
       "endpoint": "/api/syllabus/1/revise",
       "status": "PASS",
       "status_code": 200,
-      "response": "{\n  \"next_revision_date\": \"2026-03-29\",\n  \"revision_count\": 5,\n  \"topic_id\": 1\n}\n"
+      "response": "{\"success\": true, \"request_id\": \"15c9bea1-bf0e-4998-a25a-2cd33deb67fd\", \"data\": {\"next_revision_date\": \"2026-04-06\", \"revision_count\": 6, \"topic_id\": 1}}"
     },
     {
       "test": "TC-API-003: Get tasks for today",
       "method": "GET",
-      "endpoint": "/api/warmap/tasks?date=2026-02-27",
+      "endpoint": "/api/warmap/tasks?date=2026-03-07",
       "status": "FAIL",
       "status_code": 404,
       "response": "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>\n"
@@ -93,7 +93,7 @@
       "endpoint": "/api/warmap/status",
       "status": "PASS",
       "status_code": 200,
-      "response": "{\n  \"connected\": false\n}\n"
+      "response": "{\"success\": true, \"request_id\": \"e1f67759-a904-4075-9013-669af07d2d05\", \"data\": {\"connected\": false}}"
     },
     {
       "test": "TC-API-004: Create new task (positive)",
@@ -125,7 +125,7 @@
       "endpoint": "/api/arena/bosses",
       "status": "PASS",
       "status_code": 200,
-      "response": "{\n  \"custom_bosses\": [\n    {\n      \"hp\": 0,\n      \"id\": 4,\n      \"loot\": [\n        \"Custom Reward\",\n        \"Glory\"\n      ],\n      \"max_hp\": 0,\n      \"name\": \"The History Final Boss\",\n      \"type\": \"CUSTOM\",\n      \"xp_reward\": 0\n    },\n    {\n      \"hp\": 0,\n      \"id\": 3,\n      \"loot\": [\n        \"Custom Reward\",\n        \"Glory\"\n      ],\n      \"max_hp\": 0,\n      \"name\": \"The History Final Boss\",\n      \"type\": \"CUSTOM\",\n      \"xp_reward\": 0\n    },\n    {\n      \"hp\": 20,\n      \"id\": 2,\n      \"loot\": "
+      "response": "{\"success\": true, \"request_id\": \"e3274760-cd72-422c-857f-679b42111ee3\", \"data\": {\"custom_bosses\": [{\"hp\": 0, \"id\": 4, \"loot\": [\"Custom Reward\", \"Glory\"], \"max_hp\": 0, \"name\": \"The History Final Boss\", \"type\": \"CUSTOM\", \"xp_reward\": 0}, {\"hp\": 0, \"id\": 3, \"loot\": [\"Custom Reward\", \"Glory\"], \"max_hp\": 0, \"name\": \"The History Final Boss\", \"type\": \"CUSTOM\", \"xp_reward\": 0}, {\"hp\": 20, \"id\": 2, \"loot\": [\"Custom Reward\", \"Glory\"], \"max_hp\": 188, \"name\": \"Polity All year\", \"type\": \"CUSTOM\", \"xp_reward\""
     },
     {
       "test": "TC-API-011b: Get year bosses",
@@ -157,7 +157,7 @@
       "endpoint": "/api/flashcards/decks",
       "status": "PASS",
       "status_code": 200,
-      "response": "[\n  {\n    \"card_count\": 5,\n    \"color\": \"#3498db\",\n    \"created_at\": \"2025-12-13 07:40:53\",\n    \"description\": null,\n    \"id\": 39,\n    \"name\": \"Auto-Gen: Class 6: Social and Political Life I - Ch 4: Key Elements of a Democratic Government\",\n    \"subject\": \"General\"\n  },\n  {\n    \"card_count\": 5,\n    \"color\": \"#3498db\",\n    \"created_at\": \"2025-12-13 06:28:23\",\n    \"description\": null,\n    \"id\": 38,\n    \"name\": \"Auto-Gen: Class 6: Social and Political Life I - Ch 3: What is Government?\",\n    \"subje"
+      "response": "{\"success\": true, \"request_id\": \"f3c91c14-d2f3-4ec4-aeaa-ebdf71449085\", \"data\": [{\"card_count\": 5, \"color\": \"#3498db\", \"created_at\": \"2026-03-06 12:13:02\", \"description\": null, \"id\": 49, \"name\": \"Auto-Gen: NCERT Cl 6: Our Pasts I - Ch 3: In the Earliest Cities (Read)\", \"subject\": \"General\"}, {\"card_count\": 5, \"color\": \"#3498db\", \"created_at\": \"2026-03-05 19:28:25\", \"description\": null, \"id\": 48, \"name\": \"Auto-Gen: NCERT Cl 6: Our Pasts I - Ch 2: From Hunting\\u2013Gathering (Read)\", \"subject\": \"G"
     },
     {
       "test": "TC-API-019: Create new deck (positive)",
@@ -165,7 +165,7 @@
       "endpoint": "/api/flashcards/decks",
       "status": "FAIL",
       "status_code": 201,
-      "response": "{\n  \"id\": 40,\n  \"message\": \"Deck created\"\n}\n"
+      "response": "{\"success\": true, \"request_id\": \"f0d8ce57-3a63-4b76-abbe-a0c7b7da4b3f\", \"data\": {\"id\": 50, \"message\": \"Deck created\"}}"
     },
     {
       "test": "TC-API-019c: Create deck without name (negative)",
@@ -173,7 +173,7 @@
       "endpoint": "/api/flashcards/decks",
       "status": "FAIL",
       "status_code": 201,
-      "response": "{\n  \"id\": 41,\n  \"message\": \"Deck created\"\n}\n"
+      "response": "{\"success\": true, \"request_id\": \"d347c1f4-fddd-494a-8bc5-dae67b02c50e\", \"data\": {\"id\": 51, \"message\": \"Deck created\"}}"
     },
     {
       "test": "TC-API-023: Get all revision cards",
@@ -181,7 +181,7 @@
       "endpoint": "/api/revision/cards",
       "status": "PASS",
       "status_code": 200,
-      "response": "{\n  \"cards\": [\n    {\n      \"created_at\": \"2026-02-18 18:48:45\",\n      \"id\": 12,\n      \"one_liner\": \"Oracle is silent. All providers failed. Errors: google:gemini-2.0-flash-lite-preview-02-05 -> 404 models/gemini-2.0-flash-lite-preview-02-05 is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.; google:gemini-1.5-flash -> 404 models/gemini-1.5-flash is not found for API version v1beta, or is n"
+      "response": "{\"success\": true, \"request_id\": \"20061cf5-fa01-41c0-bde1-2db88dafd06a\", \"data\": {\"cards\": [{\"created_at\": \"2025-12-11 07:41:26\", \"id\": 11, \"one_liner\": \"## CORE THEME: Accountability & Deliberation\\n* **Bicameralism:**\\n    * **Lok Sabha (LS):** Represent People.\", \"title\": \"Revision Note: NCERT Class 11: Ch 5 - Legislature (Law Making/Funds/Committees) (Read)\", \"topic_id\": \"0\"}, {\"created_at\": \"2025-12-08 10:41:50\", \"id\": 10, \"one_liner\": \"### India After Independence: The Consolidation Protoco"
     },
     {
       "test": "TC-API-022: Generate revision card (positive)",
@@ -189,7 +189,7 @@
       "endpoint": "/api/revision/one-liner",
       "status": "PASS",
       "status_code": 200,
-      "response": "{\n  \"card\": {\n    \"id\": 13,\n    \"one_liner\": \"\\u26a0\\ufe0f AI service not configured. Please add GEMINI_API_KEY to backend/.env file.\",\n    \"title\": \"Preamble of Indian Constitution\",\n    \"topic_id\": null\n  },\n  \"success\": true\n}\n"
+      "response": "{\"success\": true, \"request_id\": \"dfe1ce1e-3b49-4af1-a4aa-0e55b872b71e\", \"data\": {\"card\": {\"id\": 12, \"one_liner\": \"\\u26a0\\ufe0f AI service not configured. Please add GEMINI_API_KEY to backend/.env file.\", \"title\": \"Preamble of Indian Constitution\", \"topic_id\": null}, \"success\": true}}"
     },
     {
       "test": "TC-API-022b: Generate card without title (negative)",
@@ -197,7 +197,7 @@
       "endpoint": "/api/revision/one-liner",
       "status": "PASS",
       "status_code": 400,
-      "response": "{\n  \"error\": \"Title required\",\n  \"success\": false\n}\n"
+      "response": "{\"error\": \"Title required\", \"success\": false, \"request_id\": \"73857ebc-3d91-47e1-a194-f8a157e2b06f\"}"
     }
   ]
 }

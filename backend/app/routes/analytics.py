@@ -293,9 +293,8 @@ def get_weak_areas():
     try:
         user_id = session.get('user_id') or 1
 
-
         limit = request.args.get('limit', 10, type=int)
-        
+
         conn = get_db()
         weak_areas = identify_weak_areas(conn, user_id, limit)
         
@@ -313,10 +312,9 @@ def get_progress_trend():
     try:
         user_id = session.get('user_id') or 1
 
-
         metric = request.args.get('metric', 'xp')  # xp, syllabus, mock_score
         days = request.args.get('days', 30, type=int)
-        
+
         conn = get_db()
         start_date = (datetime.now() - timedelta(days=days)).date()
         
