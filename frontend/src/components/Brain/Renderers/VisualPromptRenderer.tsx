@@ -247,9 +247,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         }
     };
 
-    // @ts-expect-error isUpscale parameter is kept for future upscale implementation
     const handleGenerate = async (isUpscale = false) => {
-        if (isUpscale) console.log('Upscaling...');
         if (isGenerating) return;
         setIsGenerating(true);
         setGeneratedImage(null);
