@@ -13,16 +13,16 @@ class FlashcardService:
         # Total cards
         total = conn.execute('SELECT COUNT(*) FROM flashcards').fetchone()[0]
         
-        # Due cards (simple check based on review_sessions)
-        # This is a simplified check compared to the full route logic for performance
-        due_count = 0
+        # ⚡ Bolt Optimization: Use SQLite for time-based aggregation but preserve domain logic
+        from datetime import datetime
+        now_iso = datetime.now().isoformat()
         
-        # Get all cards with their latest review
-        all_cards = conn.execute('''
-            SELECT f.id, rs.halflife, rs.alpha, rs.beta, rs.next_review
+        # Calculate due count directly in SQL to avoid slow datetime.fromisoformat loops
+        due_count = conn.execute('''
+            SELECT COUNT(*)
             FROM flashcards f
             LEFT JOIN (
-                SELECT flashcard_id, halflife, alpha, beta, next_review, reviewed_at
+                SELECT flashcard_id, next_review
                 FROM review_sessions
                 WHERE (flashcard_id, reviewed_at) IN (
                     SELECT flashcard_id, MAX(reviewed_at)
@@ -30,27 +30,26 @@ class FlashcardService:
                     GROUP BY flashcard_id
                 )
             ) rs ON f.id = rs.flashcard_id
+            WHERE rs.next_review IS NULL OR rs.next_review <= ?
+        ''', (now_iso,)).fetchone()[0]
+        
+        # Fetch only the exact latest review parameters needed for the Ebisu SRS domain logic
+        mastery_data = conn.execute('''
+            SELECT alpha, beta, halflife
+            FROM review_sessions
+            WHERE halflife IS NOT NULL AND (flashcard_id, reviewed_at) IN (
+                SELECT flashcard_id, MAX(reviewed_at)
+                FROM review_sessions
+                GROUP BY flashcard_id
+            )
         ''').fetchall()
-        
+
+        # Calculate mastery strictly using the domain-specific get_card_maturity function
         mastered_count = 0
-        from datetime import datetime
-        now = datetime.now()
-        
-        for card in all_cards:
-            # Check if due
-            if card['next_review']:
-                next_review = datetime.fromisoformat(card['next_review'])
-                if next_review <= now:
-                    due_count += 1
-            else:
-                # New card is effectively due
-                due_count += 1
-                
-            # Check mastery
-            if card['halflife']:
-                maturity = get_card_maturity(card['alpha'], card['beta'], card['halflife'])
-                if maturity == 'mastered':
-                    mastered_count += 1
+        for card in mastery_data:
+            maturity = get_card_maturity(card['alpha'], card['beta'], card['halflife'])
+            if maturity == 'mastered':
+                mastered_count += 1
 
         return {
             "status": "active",
