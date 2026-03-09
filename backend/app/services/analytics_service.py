@@ -224,50 +224,27 @@ def get_streak_days(conn, user_id):
     Calculate consecutive days with activity
     """
     try:
-        # Get all activity dates
-        dates = set()
-
-        # Mock tests
-        mock_dates = conn.execute('''
-            SELECT DATE(submitted_at) as date FROM test_attempts
-            WHERE user_id = ?
-        ''', (user_id,)).fetchall()
-        dates.update([r['date'] for r in mock_dates])
-
-        # Answer writing
-        answer_dates = conn.execute('''
-            SELECT DATE(submitted_at) as date FROM user_answers
-            WHERE user_id = ?
-        ''', (user_id,)).fetchall()
-        dates.update([r['date'] for r in answer_dates])
-
-        # Flashcards
-        review_dates = conn.execute('''
-            SELECT DATE(reviewed_at) as date FROM review_sessions
-            WHERE user_id = ?
-        ''', (user_id,)).fetchall()
-        dates.update([r['date'] for r in review_dates])
-
-        # Pomodoro Sessions
-        pomodoro_dates = conn.execute('''
-            SELECT DATE(timestamp) as date FROM pomodoro_sessions
-            WHERE user_id = ?
-        ''', (user_id,)).fetchall()
-        dates.update([r['date'] for r in pomodoro_dates])
-
-        # War Map (Calendar Events) Completed
-        warmap_dates = conn.execute('''
-            SELECT DATE(updated_at) as date FROM calendar_event_metadata
-            WHERE user_id = ? AND is_completed = 1
-        ''', (user_id,)).fetchall()
-        dates.update([r['date'] for r in warmap_dates])
+        # ⚡ Bolt optimization: Use UNION ALL to batch multiple queries into a single database round trip
+        # This converts 5 independent O(N) index scans into a single combined query
+        dates_rows = conn.execute('''
+            SELECT DATE(submitted_at) as date FROM test_attempts WHERE user_id = ?
+            UNION ALL
+            SELECT DATE(submitted_at) as date FROM user_answers WHERE user_id = ?
+            UNION ALL
+            SELECT DATE(reviewed_at) as date FROM review_sessions WHERE user_id = ?
+            UNION ALL
+            SELECT DATE(timestamp) as date FROM pomodoro_sessions WHERE user_id = ?
+            UNION ALL
+            SELECT DATE(updated_at) as date FROM calendar_event_metadata WHERE user_id = ? AND is_completed = 1
+        ''', (user_id, user_id, user_id, user_id, user_id)).fetchall()
         
-        if not dates:
+        if not dates_rows:
             return 0
 
         # Filter out None values and convert to set of date objects
         dates_objs = set()
-        for d in dates:
+        for r in dates_rows:
+            d = r['date']
             if d:
                 try:
                     dates_objs.add(datetime.fromisoformat(d).date())
