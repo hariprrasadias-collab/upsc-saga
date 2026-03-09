@@ -137,7 +137,7 @@ def get_card_hint():
         if item_type == 'concept':
              table = 'revision_cards' # Map it
 
-        cursor.execute(f"SELECT title, one_liner, full_content FROM revision_cards WHERE id = ?", (item_id,))
+        cursor.execute("SELECT title, one_liner, full_content FROM revision_cards WHERE id = ?", (item_id,))
         card = cursor.fetchone()
         conn.close()
 
