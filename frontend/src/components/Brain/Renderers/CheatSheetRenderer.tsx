@@ -40,7 +40,7 @@ const MermaidDiagram: React.FC<{ code: string }> = ({ code }) => {
 
                 // Clear any previous render before running again
                 if (ref.current) {
-                    ref.current.innerHTML = safeCode;
+                    ref.current.textContent = safeCode;
                     ref.current.removeAttribute('data-processed');
                 }
 

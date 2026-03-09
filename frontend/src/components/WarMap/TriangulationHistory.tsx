@@ -3,6 +3,7 @@ import './TriangulationHistory.css';
 import MarkdownRenderer from '../Shared/MarkdownRenderer';
 import mermaid from 'mermaid';
 import { motion, AnimatePresence } from 'framer-motion';
+import DOMPurify from 'dompurify';
 
 // Mermaid Renderer Component (reused)
 const MermaidDiagram: React.FC<{ code: string }> = ({ code }) => {
@@ -18,7 +19,7 @@ const MermaidDiagram: React.FC<{ code: string }> = ({ code }) => {
                 ref.current.innerHTML = ''; // Clear previous
                 mermaid.render(id, code).then(result => {
                     if (ref.current) {
-                        ref.current.innerHTML = result.svg;
+                        ref.current.innerHTML = DOMPurify.sanitize(result.svg, { ADD_TAGS: ['foreignObject'] });
                     }
                 }).catch(e => {
                     console.error("Mermaid Render Error:", e);
