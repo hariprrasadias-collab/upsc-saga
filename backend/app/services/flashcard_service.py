@@ -13,44 +13,30 @@ class FlashcardService:
         # Total cards
         total = conn.execute('SELECT COUNT(*) FROM flashcards').fetchone()[0]
         
-        # Due cards (simple check based on review_sessions)
-        # This is a simplified check compared to the full route logic for performance
-        due_count = 0
+        # ⚡ Bolt Optimization: Push aggregation directly to SQLite query
+        # Avoids loading all rows into Python memory and slow loops/datetime conversions
+        from datetime import datetime
+        now_iso = datetime.now().isoformat()
         
-        # Get all cards with their latest review
-        all_cards = conn.execute('''
-            SELECT f.id, rs.halflife, rs.alpha, rs.beta, rs.next_review
-            FROM flashcards f
-            LEFT JOIN (
-                SELECT flashcard_id, halflife, alpha, beta, next_review, reviewed_at
+        stats = conn.execute('''
+            WITH LatestReviews AS (
+                SELECT flashcard_id, halflife, next_review
                 FROM review_sessions
                 WHERE (flashcard_id, reviewed_at) IN (
                     SELECT flashcard_id, MAX(reviewed_at)
                     FROM review_sessions
                     GROUP BY flashcard_id
                 )
-            ) rs ON f.id = rs.flashcard_id
-        ''').fetchall()
+            )
+            SELECT
+                COALESCE(SUM(CASE WHEN rs.next_review IS NULL OR rs.next_review <= ? THEN 1 ELSE 0 END), 0) as due_count,
+                COALESCE(SUM(CASE WHEN rs.halflife >= 180 THEN 1 ELSE 0 END), 0) as mastered_count
+            FROM flashcards f
+            LEFT JOIN LatestReviews rs ON f.id = rs.flashcard_id
+        ''', (now_iso,)).fetchone()
         
-        mastered_count = 0
-        from datetime import datetime
-        now = datetime.now()
-        
-        for card in all_cards:
-            # Check if due
-            if card['next_review']:
-                next_review = datetime.fromisoformat(card['next_review'])
-                if next_review <= now:
-                    due_count += 1
-            else:
-                # New card is effectively due
-                due_count += 1
-                
-            # Check mastery
-            if card['halflife']:
-                maturity = get_card_maturity(card['alpha'], card['beta'], card['halflife'])
-                if maturity == 'mastered':
-                    mastered_count += 1
+        due_count = stats['due_count'] if stats else 0
+        mastered_count = stats['mastered_count'] if stats else 0
 
         return {
             "status": "active",
