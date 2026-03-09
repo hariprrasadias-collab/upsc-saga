@@ -13,30 +13,43 @@ class FlashcardService:
         # Total cards
         total = conn.execute('SELECT COUNT(*) FROM flashcards').fetchone()[0]
         
-        # ⚡ Bolt Optimization: Push aggregation directly to SQLite query
-        # Avoids loading all rows into Python memory and slow loops/datetime conversions
+        # ⚡ Bolt Optimization: Use SQLite for time-based aggregation but preserve domain logic
         from datetime import datetime
         now_iso = datetime.now().isoformat()
         
-        stats = conn.execute('''
-            WITH LatestReviews AS (
-                SELECT flashcard_id, halflife, next_review
+        # Calculate due count directly in SQL to avoid slow datetime.fromisoformat loops
+        due_count = conn.execute('''
+            SELECT COUNT(*)
+            FROM flashcards f
+            LEFT JOIN (
+                SELECT flashcard_id, next_review
                 FROM review_sessions
                 WHERE (flashcard_id, reviewed_at) IN (
                     SELECT flashcard_id, MAX(reviewed_at)
                     FROM review_sessions
                     GROUP BY flashcard_id
                 )
-            )
-            SELECT
-                COALESCE(SUM(CASE WHEN rs.next_review IS NULL OR rs.next_review <= ? THEN 1 ELSE 0 END), 0) as due_count,
-                COALESCE(SUM(CASE WHEN rs.halflife >= 180 THEN 1 ELSE 0 END), 0) as mastered_count
-            FROM flashcards f
-            LEFT JOIN LatestReviews rs ON f.id = rs.flashcard_id
-        ''', (now_iso,)).fetchone()
+            ) rs ON f.id = rs.flashcard_id
+            WHERE rs.next_review IS NULL OR rs.next_review <= ?
+        ''', (now_iso,)).fetchone()[0]
         
-        due_count = stats['due_count'] if stats else 0
-        mastered_count = stats['mastered_count'] if stats else 0
+        # Fetch only the exact latest review parameters needed for the Ebisu SRS domain logic
+        mastery_data = conn.execute('''
+            SELECT alpha, beta, halflife
+            FROM review_sessions
+            WHERE halflife IS NOT NULL AND (flashcard_id, reviewed_at) IN (
+                SELECT flashcard_id, MAX(reviewed_at)
+                FROM review_sessions
+                GROUP BY flashcard_id
+            )
+        ''').fetchall()
+
+        # Calculate mastery strictly using the domain-specific get_card_maturity function
+        mastered_count = 0
+        for card in mastery_data:
+            maturity = get_card_maturity(card['alpha'], card['beta'], card['halflife'])
+            if maturity == 'mastered':
+                mastered_count += 1
 
         return {
             "status": "active",
