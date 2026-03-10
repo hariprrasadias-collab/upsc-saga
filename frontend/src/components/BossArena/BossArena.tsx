@@ -153,9 +153,11 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
                     className="summon-btn"
                     onClick={handleSummonNemesis}
                     disabled={isSummoning}
+                    aria-label={isSummoning ? "Summoning Nemesis..." : "Summon Nemesis via Brain"}
+                    aria-busy={isSummoning}
                     style={{ marginTop: '15px', background: 'linear-gradient(45deg, #8e44ad, #c0392b)', border: 'none', padding: '10px 20px', color: 'white', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
                 >
-                    {isSummoning ? 'Summoning...' : '👹 Summon Nemesis (Brain)'}
+                    {isSummoning ? 'Summoning...' : <><span aria-hidden="true">👹</span> Summon Nemesis (Brain)</>}
                 </button>
             </div>
 
@@ -190,8 +192,8 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
                                         <span className="value">{boss.xp_reward} XP</span>
                                     </div>
                                 </div>
-                                <button className="challenge-btn" onClick={() => startBossBattle(boss)}>
-                                    ⚔️ Challenge
+                                <button className="challenge-btn" onClick={() => startBossBattle(boss)} aria-label={`Challenge ${boss.name}`}>
+                                    <span aria-hidden="true">⚔️</span> Challenge
                                 </button>
                             </div>
                         </div>
@@ -270,8 +272,8 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
                                                 <span className="value">{boss.xp_reward} XP</span>
                                             </div>
                                         </div>
-                                        <button className="challenge-btn" onClick={() => startBossBattle(boss)}>
-                                            ⚔️ Challenge
+                                        <button className="challenge-btn" onClick={() => startBossBattle(boss)} aria-label={`Challenge ${boss.name}`}>
+                                            <span aria-hidden="true">⚔️</span> Challenge
                                         </button>
                                     </div>
                                 </div>
@@ -308,7 +310,7 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
                 )}
             </div>
 
-            <button className="challenge-btn" onClick={() => setShowModal(true)} style={{ marginTop: '30px' }}>
+            <button className="challenge-btn" onClick={() => setShowModal(true)} style={{ marginTop: '30px' }} aria-label="Log Manual Battle">
                 LOG MANUAL BATTLE
             </button>
 
@@ -360,8 +362,8 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
                                 required
                             />
 
-                            <button type="submit" className="fight-btn">RECORD</button>
-                            <button type="button" className="cancel-fight" onClick={() => setShowModal(false)}>Cancel</button>
+                            <button type="submit" className="fight-btn" aria-label="Record manual battle">RECORD</button>
+                            <button type="button" className="cancel-fight" onClick={() => setShowModal(false)} aria-label="Cancel manual battle logging">Cancel</button>
                         </form>
                     </div>
                 </div>
