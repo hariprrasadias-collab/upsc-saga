@@ -247,6 +247,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         }
     };
 
+    // @ts-expect-error isUpscale is temporarily unused
     const handleGenerate = async (isUpscale = false) => {
         if (isGenerating) return;
         setIsGenerating(true);
