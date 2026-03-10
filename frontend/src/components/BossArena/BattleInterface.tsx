@@ -163,7 +163,7 @@ const BattleInterface: React.FC<BattleInterfaceProps> = ({ boss, onBattleEnd }) 
             <div className="battle-result">
                 <h2>No Questions Available</h2>
                 <p>The Oracle could not find any challenges for this battle.</p>
-                <button className="return-btn" onClick={onBattleEnd}>Return to Arena</button>
+                <button className="return-btn" onClick={onBattleEnd} aria-label="Return to Boss Arena">Return to Arena</button>
             </div>
         );
     }
@@ -171,7 +171,13 @@ const BattleInterface: React.FC<BattleInterfaceProps> = ({ boss, onBattleEnd }) 
     if (battleState !== 'active') {
         return (
             <div className={`battle-result ${battleState}`}>
-                <h1>{battleState === 'victory' ? '⚔️ VICTORY ⚔️' : '💀 DEFEATED 💀'}</h1>
+                <h1>
+                    {battleState === 'victory' ? (
+                        <><span aria-hidden="true">⚔️</span> VICTORY <span aria-hidden="true">⚔️</span></>
+                    ) : (
+                        <><span aria-hidden="true">💀</span> DEFEATED <span aria-hidden="true">💀</span></>
+                    )}
+                </h1>
                 <div className="battle-stats">
                     <p>Damage Dealt: {damageDealt}</p>
                     <p>Damage Taken: {damageTaken}</p>
@@ -184,7 +190,7 @@ const BattleInterface: React.FC<BattleInterfaceProps> = ({ boss, onBattleEnd }) 
                         </div>
                     )}
                 </div>
-                <button className="return-btn" onClick={onBattleEnd}>Return to Arena</button>
+                <button className="return-btn" onClick={onBattleEnd} aria-label="Return to Boss Arena">Return to Arena</button>
             </div>
         );
     }
@@ -196,8 +202,8 @@ const BattleInterface: React.FC<BattleInterfaceProps> = ({ boss, onBattleEnd }) 
     return (
         <div className="battle-interface">
             {/* End Battle Button in top-right */}
-            <button className="end-battle-btn" onClick={onBattleEnd} title="End battle and return">
-                ✕ End Battle
+            <button className="end-battle-btn" onClick={onBattleEnd} title="End battle and return" aria-label="End battle and return">
+                <span aria-hidden="true">✕</span> End Battle
             </button>
 
             {/* HUD */}
@@ -241,7 +247,7 @@ const BattleInterface: React.FC<BattleInterfaceProps> = ({ boss, onBattleEnd }) 
                 </div>
                 <div className="options-grid">
                     {currentQ.options.map((opt, i) => (
-                        <button key={i} className="option-btn" onClick={() => handleAnswer(i)}>
+                        <button key={i} className="option-btn" onClick={() => handleAnswer(i)} aria-label={`Option ${['A', 'B', 'C', 'D'][i]}: ${opt}`}>
                             {opt}
                         </button>
                     ))}

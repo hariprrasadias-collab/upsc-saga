@@ -251,15 +251,19 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                     className="brain-audit-btn priority-btn"
                     onClick={handlePrioritize}
                     disabled={isPrioritizing}
+                    aria-label={isPrioritizing ? "Scanning weaknesses" : "Vulnerability Scan"}
+                    aria-busy={isPrioritizing}
                 >
-                    {isPrioritizing ? 'SCANNING WEAKNESSES...' : '🔥 VULNERABILITY SCAN'}
+                    {isPrioritizing ? 'SCANNING WEAKNESSES...' : <><span aria-hidden="true">🔥</span> VULNERABILITY SCAN</>}
                 </button>
                 <button
                     className="brain-audit-btn"
                     onClick={handleBrainAudit}
                     disabled={isBrainLoading}
+                    aria-label={isBrainLoading ? "Analyzing" : "Strategos Audit"}
+                    aria-busy={isBrainLoading}
                 >
-                    {isBrainLoading ? 'ANALYZING...' : '🧠 STRATEGOS AUDIT'}
+                    {isBrainLoading ? 'ANALYZING...' : <><span aria-hidden="true">🧠</span> STRATEGOS AUDIT</>}
                 </button>
             </div>
 
@@ -337,8 +341,8 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                             placeholder="Add your notes, strategy, or resource links here..."
                         />
                         <div className="modal-actions">
-                            <button className="cancel-btn" onClick={() => setShowNotesModal(false)}>Cancel</button>
-                            <button className="save-btn" onClick={saveNotes}>Save Notes</button>
+                            <button className="cancel-btn" onClick={() => setShowNotesModal(false)} aria-label="Cancel notes">Cancel</button>
+                            <button className="save-btn" onClick={saveNotes} aria-label="Save topic notes">Save Notes</button>
                         </div>
                     </div>
                 </div>
@@ -348,7 +352,19 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
             {(brainInsight || isBrainLoading) && (
                 <div className="notes-modal-overlay" onClick={() => !isBrainLoading && setBrainInsight(null)}>
                     <div className="notes-modal brain-modal" onClick={e => e.stopPropagation()}>
-                        <h3>Strategos Strategic Audit</h3>
+                        <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h3 style={{ margin: 0 }}>Strategos Strategic Audit</h3>
+                            {!isBrainLoading && (
+                                <button
+                                    className="close-btn"
+                                    onClick={() => setBrainInsight(null)}
+                                    aria-label="Close insight"
+                                    style={{ background: 'none', border: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer', fontSize: '1.2rem' }}
+                                >
+                                    <span aria-hidden="true">✕</span>
+                                </button>
+                            )}
+                        </div>
                         {isBrainLoading ? (
                             <div className="loading-spinner">Analyzing Syllabus Matrix...</div>
                         ) : (
@@ -358,7 +374,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                         )}
                         {!isBrainLoading && (
                             <div className="modal-actions">
-                                <button className="save-btn" onClick={() => setBrainInsight(null)}>Acknowledge</button>
+                                <button className="save-btn" onClick={() => setBrainInsight(null)} aria-label="Acknowledge and close insight">Acknowledge</button>
                             </div>
                         )}
                     </div>
