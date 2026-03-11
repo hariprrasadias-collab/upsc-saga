@@ -44,8 +44,9 @@ def consult_the_seer():
         GROUP BY due_date
     ''', (user_id, start_date.isoformat(), today.isoformat())).fetchall()
     
-    # Create a lookup dictionary
-    xp_map = {row['due_date']: row['total_xp'] for row in xp_rows}
+    # Create a lookup dictionary using tuple unpacking
+    # The original code accessed row via fetchone()[0], so it returns tuples
+    xp_map = {due_date: total_xp for due_date, total_xp in xp_rows}
 
     xp_history = []
     for i in range(6, -1, -1):
