@@ -66,7 +66,7 @@ def create_app():
     app.config['CACHE_DEFAULT_TIMEOUT'] = int(os.environ.get('CACHE_DEFAULT_TIMEOUT', 300))  # 5 min default
     cache.init_app(app)
 
-    # Static Asset Caching (Cache-Control Headers)
+    # Static Asset Caching and Security Headers
     @app.after_request
     def add_header(response):
         if 'Cache-Control' not in response.headers:
@@ -75,6 +75,13 @@ def create_app():
                response.mimetype.startswith('text/css') or \
                response.mimetype.startswith('application/javascript'):
                 response.headers['Cache-Control'] = 'public, max-age=31536000'
+
+        # Security Headers
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+
         return response
 
     from . import db
