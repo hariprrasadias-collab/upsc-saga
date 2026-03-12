@@ -224,43 +224,23 @@ def get_streak_days(conn, user_id):
     Calculate consecutive days with activity
     """
     try:
-        # Get all activity dates
+        # Get all activity dates using a single optimized query
         dates = set()
 
-        # Mock tests
-        mock_dates = conn.execute('''
-            SELECT DATE(submitted_at) as date FROM test_attempts
-            WHERE user_id = ?
-        ''', (user_id,)).fetchall()
-        dates.update([r['date'] for r in mock_dates])
+        # Combine all activity tables via UNION ALL to drastically reduce latency
+        all_dates = conn.execute('''
+            SELECT DATE(submitted_at) as date FROM test_attempts WHERE user_id = ?
+            UNION ALL
+            SELECT DATE(submitted_at) as date FROM user_answers WHERE user_id = ?
+            UNION ALL
+            SELECT DATE(reviewed_at) as date FROM review_sessions WHERE user_id = ?
+            UNION ALL
+            SELECT DATE(timestamp) as date FROM pomodoro_sessions WHERE user_id = ?
+            UNION ALL
+            SELECT DATE(updated_at) as date FROM calendar_event_metadata WHERE user_id = ? AND is_completed = 1
+        ''', (user_id, user_id, user_id, user_id, user_id)).fetchall()
 
-        # Answer writing
-        answer_dates = conn.execute('''
-            SELECT DATE(submitted_at) as date FROM user_answers
-            WHERE user_id = ?
-        ''', (user_id,)).fetchall()
-        dates.update([r['date'] for r in answer_dates])
-
-        # Flashcards
-        review_dates = conn.execute('''
-            SELECT DATE(reviewed_at) as date FROM review_sessions
-            WHERE user_id = ?
-        ''', (user_id,)).fetchall()
-        dates.update([r['date'] for r in review_dates])
-
-        # Pomodoro Sessions
-        pomodoro_dates = conn.execute('''
-            SELECT DATE(timestamp) as date FROM pomodoro_sessions
-            WHERE user_id = ?
-        ''', (user_id,)).fetchall()
-        dates.update([r['date'] for r in pomodoro_dates])
-
-        # War Map (Calendar Events) Completed
-        warmap_dates = conn.execute('''
-            SELECT DATE(updated_at) as date FROM calendar_event_metadata
-            WHERE user_id = ? AND is_completed = 1
-        ''', (user_id,)).fetchall()
-        dates.update([r['date'] for r in warmap_dates])
+        dates.update([r['date'] for r in all_dates])
         
         if not dates:
             return 0
