@@ -59,9 +59,9 @@ def calculate_study_hours(conn, user_id, start_date, end_date):
             return round(pomodoro_hours, 1)
 
         # Estimate: assume 30min per mock test, 20min per answer,
-        # 10min per review session.
-        # Or calculate gaps between activities
-        # (if < 2 hours, count as continuous)
+        # 10min per review session
+        # Or calculate gaps between activities (if < 2 hours,
+        # count as continuous)
 
         # Count unique days with activity and estimate
         unique_days = set(a.date() for a in activities)
@@ -121,8 +121,8 @@ def get_subject_performance(conn, user_id, subject):
             WHERE subject = ?
         ''', (subject,)).fetchone()
         if syllabus and syllabus['total'] > 0:
-            pct = syllabus['completed'] / syllabus['total']
-            result['syllabus_pct'] = round(pct * 100, 1)
+            pct = (syllabus['completed'] / syllabus['total']) * 100
+            result['syllabus_pct'] = round(pct, 1)
     except Exception:
         pass  # Return zeroed result on error
 
@@ -189,8 +189,8 @@ def identify_weak_areas(conn, user_id, limit=10):
 
             # Get last 5 scores for sparkline
             recent_scores = scores_list[-5:] if scores_list else []
-            last_atmpt = subject_scores[-1]['submitted_at'] if subject_scores \
-                else None
+            last_atmpt = subject_scores[-1]['submitted_at'] \
+                if subject_scores else None
 
             weak_areas.append({
                 'subject': subj['subject'],
@@ -301,10 +301,11 @@ def get_streak_days(conn, user_id):
         # Filter out None values and convert to set of date objects
         dates_objs = set()
         for d in dates:
-            try:
-                dates_objs.add(datetime.fromisoformat(d).date())
-            except ValueError:
-                pass  # Ignore invalid date formats
+            if d:
+                try:
+                    dates_objs.add(datetime.fromisoformat(d).date())
+                except ValueError:
+                    pass  # Ignore invalid date formats
 
         today = datetime.now().date()
         yesterday = today - timedelta(days=1)

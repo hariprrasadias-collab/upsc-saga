@@ -1,8 +1,11 @@
 {
   "scripts": {
-    "build": "cd frontend && pnpm install --frozen-lockfile && pnpm run build && cd .. && rm -rf dist && cp -r frontend/dist dist"
+    "build": "cd frontend && npm install --include=dev && npm run build && cd .. && rm -rf dist && cp -r frontend/dist dist"
   },
   "devDependencies": {
     "terser": "^5.44.1"
+  },
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build"
   }
 }
