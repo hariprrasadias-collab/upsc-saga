@@ -58,6 +58,11 @@ def calculate_study_hours(conn, user_id, start_date, end_date):
             # If date parsing fails, skip estimates and return just pomodoro
             return round(pomodoro_hours, 1)
 
+        # Estimate: assume 30min per mock test, 20min per answer,
+        # 10min per review session.
+        # Or calculate gaps between activities
+        # (if < 2 hours, count as continuous)
+
         # Count unique days with activity and estimate
         unique_days = set(a.date() for a in activities)
         # Conservative estimate: 2 hours per active day
@@ -195,7 +200,8 @@ def identify_weak_areas(conn, user_id, limit=10):
                 'action': f"Practice {subj['subject']} questions",
                 'trend': trend_direction,
                 'trend_value': abs(trend_val),
-                'impact': 'High' if (subj['avg_score'] or 0) < 40 else 'Medium',
+                'impact': 'High' if (subj['avg_score'] or 0) < 40
+                          else 'Medium',
                 'recent_scores': recent_scores,
                 'last_attempt': last_atmpt
             })
@@ -233,36 +239,61 @@ def get_streak_days(conn, user_id):
     """
     try:
         # Get all activity dates
-        # ⚡ Bolt: Single batched query using UNION ALL reduces latency by
-        # avoiding 5 sequential db roundtrips, extracting dates ~2x faster.
-        raw_dates = conn.execute('''
-            SELECT DATE(submitted_at) as date FROM test_attempts
-            WHERE user_id = ?
-            UNION ALL
-            SELECT DATE(submitted_at) as date FROM user_answers
-            WHERE user_id = ?
-            UNION ALL
-            SELECT DATE(reviewed_at) as date FROM review_sessions
-            WHERE user_id = ?
-            UNION ALL
-            SELECT DATE(timestamp) as date FROM pomodoro_sessions
-            WHERE user_id = ?
-            UNION ALL
-            SELECT DATE(updated_at) as date FROM calendar_event_metadata
-            WHERE user_id = ? AND is_completed = 1
-        ''', (user_id, user_id, user_id, user_id, user_id)).fetchall()
-
-        # Unpack the returned rows
-        # If the cursor uses sqlite3.Row, it's subscriptable by string.
-        # Otherwise, if it's a tuple, 'date' is at index 0.
         dates = set()
-        for r in raw_dates:
+
+        def add_dates(query, params):
             try:
-                val = r['date']
-            except (TypeError, IndexError):
-                val = r[0]
-            if val:
-                dates.add(val)
+                rows = conn.execute(query, params).fetchall()
+                for r in rows:
+                    try:
+                        val = r['date']
+                    except (TypeError, IndexError):
+                        val = r[0]
+                    if val:
+                        dates.add(val)
+            except Exception:
+                pass  # Gracefully skip if table missing
+
+        try:
+            # ⚡ Bolt: Single batched query using UNION ALL reduces latency by
+            # avoiding 5 sequential db roundtrips, extracting dates ~2x faster.
+            raw_dates = conn.execute('''
+                SELECT DATE(submitted_at) as date FROM test_attempts
+                WHERE user_id = ?
+                UNION ALL
+                SELECT DATE(submitted_at) as date FROM user_answers
+                WHERE user_id = ?
+                UNION ALL
+                SELECT DATE(reviewed_at) as date FROM review_sessions
+                WHERE user_id = ?
+                UNION ALL
+                SELECT DATE(timestamp) as date FROM pomodoro_sessions
+                WHERE user_id = ?
+                UNION ALL
+                SELECT DATE(updated_at) as date FROM calendar_event_metadata
+                WHERE user_id = ? AND is_completed = 1
+            ''', (user_id, user_id, user_id, user_id, user_id)).fetchall()
+            for r in raw_dates:
+                try:
+                    val = r['date']
+                except (TypeError, IndexError):
+                    val = r[0]
+                if val:
+                    dates.add(val)
+        except Exception:
+            # Fallback to individual queries if batched query fails
+            # (e.g. missing tables in fresh environments)
+            add_dates('''SELECT DATE(submitted_at) as date FROM test_attempts
+                         WHERE user_id = ?''', (user_id,))
+            add_dates('''SELECT DATE(submitted_at) as date FROM user_answers
+                         WHERE user_id = ?''', (user_id,))
+            add_dates('''SELECT DATE(reviewed_at) as date FROM review_sessions
+                         WHERE user_id = ?''', (user_id,))
+            add_dates('''SELECT DATE(timestamp) as date FROM pomodoro_sessions
+                         WHERE user_id = ?''', (user_id,))
+            add_dates('''SELECT DATE(updated_at) as date
+                         FROM calendar_event_metadata
+                         WHERE user_id = ? AND is_completed = 1''', (user_id,))
 
         if not dates:
             return 0
