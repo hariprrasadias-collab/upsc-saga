@@ -66,7 +66,8 @@ def get_history():
     try:
         from app.db import get_db
         conn = get_db()
-        limit = request.args.get('limit', 20)
+        # SECURITY: Explicitly cast 'limit' to int to prevent potential SQL injection or type confusion when passed to parameterized queries
+        limit = request.args.get('limit', 20, type=int)
         rows = conn.execute('SELECT * FROM socratic_conversations ORDER BY created_at DESC LIMIT ?', (limit,)).fetchall()
         return jsonify({'success': True, 'data': [dict(row) for row in rows]})
     except Exception as e:

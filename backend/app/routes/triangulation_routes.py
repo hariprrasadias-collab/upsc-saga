@@ -26,7 +26,8 @@ def get_history():
         conn = get_db()
 
         # Pagination & Filtering
-        limit = request.args.get('limit', 20)
+        # SECURITY: Explicitly cast 'limit' to int to prevent potential SQL injection or type confusion when passed to parameterized queries
+        limit = request.args.get('limit', 20, type=int)
         search = request.args.get('search', '')
 
         query = 'SELECT * FROM triangulation_reports'

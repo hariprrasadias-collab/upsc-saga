@@ -15,7 +15,8 @@ def get_content():
     """
     type_filter = request.args.get('type')
     topic_filter = request.args.get('topic')
-    limit = request.args.get('limit', 200)
+    # SECURITY: Explicitly cast 'limit' to int to prevent potential SQL injection or type confusion when passed to parameterized queries
+    limit = request.args.get('limit', 200, type=int)
     
     conn = get_db()
     
