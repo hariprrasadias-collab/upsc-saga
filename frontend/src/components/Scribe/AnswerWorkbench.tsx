@@ -193,7 +193,7 @@ const AnswerWorkbench: React.FC = () => {
                     <div className="modal-content history-modal" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2>Evaluation Details</h2>
-                            <button className="close-btn" onClick={() => setSelectedHistoryItem(null)}>×</button>
+                            <button aria-label="Close Evaluation Details" className="close-btn" onClick={() => setSelectedHistoryItem(null)}>×</button>
                         </div>
                         <div className="modal-body">
                             <div className="history-modal-section">
