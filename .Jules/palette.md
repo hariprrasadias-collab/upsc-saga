@@ -1,3 +1,3 @@
-## 2024-05-23 - Toast Notification Accessibility
-**Learning:** Notifications are often invisible to screen readers without proper roles. Using `role="alert"` for errors (assertive) and `role="status"` for info (polite) ensures users are notified at the right urgency level.
-**Action:** Always categorize toast notifications by urgency and apply corresponding `aria-live` regions, while ensuring close buttons have clear labels.
+## 2025-03-14 - Accessible Icon-Only Close Buttons
+**Learning:** The application uses bare Unicode multiplication/cross symbols (e.g., "✖", "✕") for modal close buttons rather than SVGs or font icons. Screen readers will confusingly read these out as "multiply" or "times" if not properly hidden.
+**Action:** When creating icon-only close buttons using text symbols, always wrap the symbol in `<span aria-hidden="true">` and apply `aria-label="Close"` directly to the `<button>` element to ensure proper screen reader announcement.
