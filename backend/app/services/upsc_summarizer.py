@@ -11,6 +11,7 @@ import time
 from dotenv import load_dotenv
 from google.api_core import exceptions as google_exceptions
 from app.services.model_manager import model_manager
+from app.utils.security import is_safe_url
 
 # Load environment variables
 load_dotenv()
@@ -263,6 +264,8 @@ def extract_image_from_article(link):
     try:
         import requests
         from bs4 import BeautifulSoup
+        if not is_safe_url(link):
+            raise ValueError("Unsafe URL detected for scrape_image. SSRF prevention blocked the request.")
         response = requests.get(link, timeout=10)
         soup = BeautifulSoup(response.content, 'html.parser')
         og_image = soup.find('meta', property='og:image')
@@ -291,6 +294,8 @@ def fetch_article_content(url):
             'Accept-Language': 'en-US,en;q=0.9',
             'Referer': 'https://www.google.com/'
         }
+        if not is_safe_url(url):
+            raise ValueError("Unsafe URL detected for scrape_article_text. SSRF prevention blocked the request.")
         response = requests.get(url, headers=headers, timeout=15)
         soup = BeautifulSoup(response.content, 'html.parser')
         
