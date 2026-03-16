@@ -11,6 +11,7 @@ import time
 from dotenv import load_dotenv
 from google.api_core import exceptions as google_exceptions
 from app.services.model_manager import model_manager
+from app.utils.security import is_safe_url
 
 # Load environment variables
 load_dotenv()
@@ -260,6 +261,9 @@ def extract_image_from_article(link):
     """Extract the main image URL from an article.
     Tries Open Graph, Twitter meta, then first <img> tag.
     """
+    if not is_safe_url(link):
+        return None
+
     try:
         import requests
         from bs4 import BeautifulSoup
@@ -281,6 +285,9 @@ def extract_image_from_article(link):
 
 def fetch_article_content(url):
     """Fetch full article content from URL."""
+    if not is_safe_url(url):
+        return ""
+
     try:
         import requests
         from bs4 import BeautifulSoup
