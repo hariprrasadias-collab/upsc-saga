@@ -37,3 +37,4 @@ backend/logs/
 backend/upsc_saga.db
 backend/*.db
 *.db
+backend/.venv
