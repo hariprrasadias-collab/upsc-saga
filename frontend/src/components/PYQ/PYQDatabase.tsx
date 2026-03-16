@@ -574,7 +574,7 @@ const PYQDatabase: React.FC = () => {
                                 gap: '6px'
                             }}>
                                 📅 {year}
-                                <span onClick={() => handleYearChange(year)} style={{ cursor: 'pointer', fontWeight: 'bold' }}>×</span>
+                                <span onClick={() => handleYearChange(year)} style={{ cursor: 'pointer', fontWeight: 'bold' }} role="button" aria-label={`Remove year ${year}`} tabIndex={0} onKeyDown={(e) => { if(e.key==='Enter' || e.key===' ') handleYearChange(year); }}><span aria-hidden="true">×</span></span>
                             </span>
                         ))}
                         {selectedSubjects.map(subject => (
@@ -589,7 +589,7 @@ const PYQDatabase: React.FC = () => {
                                 gap: '6px'
                             }}>
                                 📚 {subject}
-                                <span onClick={() => handleSubjectChange(subject)} style={{ cursor: 'pointer', fontWeight: 'bold' }}>×</span>
+                                <span onClick={() => handleSubjectChange(subject)} style={{ cursor: 'pointer', fontWeight: 'bold' }} role="button" aria-label={`Remove subject ${subject}`} tabIndex={0} onKeyDown={(e) => { if(e.key==='Enter' || e.key===' ') handleSubjectChange(subject); }}><span aria-hidden="true">×</span></span>
                             </span>
                         ))}
                         {selectedTopics.map(topic => (
@@ -604,7 +604,7 @@ const PYQDatabase: React.FC = () => {
                                 gap: '6px'
                             }}>
                                 🏷️ {topic}
-                                <span onClick={() => handleTopicChange(topic)} style={{ cursor: 'pointer', fontWeight: 'bold' }}>×</span>
+                                <span onClick={() => handleTopicChange(topic)} style={{ cursor: 'pointer', fontWeight: 'bold' }} role="button" aria-label={`Remove topic ${topic}`} tabIndex={0} onKeyDown={(e) => { if(e.key==='Enter' || e.key===' ') handleTopicChange(topic); }}><span aria-hidden="true">×</span></span>
                             </span>
                         ))}
                     </div>
