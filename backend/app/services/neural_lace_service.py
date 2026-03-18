@@ -4,6 +4,7 @@ Autonomously expands the Mind Palace from external sources.
 """
 from app.services.model_manager import model_manager
 from app.db import get_db
+from app.utils.security import is_safe_url, safe_requests_get
 import requests
 import json
 import re
@@ -20,13 +21,15 @@ class NeuralLaceService:
 
         content = text_content
         if url:
+            if not is_safe_url(url):
+                return {"success": False, "error": "Invalid or unsafe URL provided."}
             try:
                 # Basic Fetch
                 # In real prod, use a scraper service or headless browser
                 # For now, we simulate success or use a simple fetch if possible
                 # If running in a restricted env, this might fail.
                 # We'll wrap it safely.
-                resp = requests.get(url, timeout=10)
+                resp = safe_requests_get(url, timeout=10)
                 content = resp.text[:15000] # Limit size
 
                 # Simple HTML cleanup (strip tags)

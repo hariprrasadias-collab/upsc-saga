@@ -11,6 +11,7 @@ import time
 from dotenv import load_dotenv
 from google.api_core import exceptions as google_exceptions
 from app.services.model_manager import model_manager
+from app.utils.security import is_safe_url, safe_requests_get
 
 # Load environment variables
 load_dotenv()
@@ -260,10 +261,13 @@ def extract_image_from_article(link):
     """Extract the main image URL from an article.
     Tries Open Graph, Twitter meta, then first <img> tag.
     """
+    if not is_safe_url(link):
+        print(f"Unsafe URL for image extraction: {link}")
+        return None
     try:
         import requests
         from bs4 import BeautifulSoup
-        response = requests.get(link, timeout=10)
+        response = safe_requests_get(link, timeout=10)
         soup = BeautifulSoup(response.content, 'html.parser')
         og_image = soup.find('meta', property='og:image')
         if og_image and og_image.get('content'):
@@ -281,6 +285,9 @@ def extract_image_from_article(link):
 
 def fetch_article_content(url):
     """Fetch full article content from URL."""
+    if not is_safe_url(url):
+        print(f"Unsafe URL for fetching content: {url}")
+        return ""
     try:
         import requests
         from bs4 import BeautifulSoup
@@ -291,7 +298,7 @@ def fetch_article_content(url):
             'Accept-Language': 'en-US,en;q=0.9',
             'Referer': 'https://www.google.com/'
         }
-        response = requests.get(url, headers=headers, timeout=15)
+        response = safe_requests_get(url, headers=headers, timeout=15)
         soup = BeautifulSoup(response.content, 'html.parser')
         
         # Remove junk elements
