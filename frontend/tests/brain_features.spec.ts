@@ -53,7 +53,7 @@ test('BrainVault Displays New Futuristic Features', async ({ page }) => {
   });
 
   // Navigate to Brain Vault (assuming route, but we might need to click nav)
-  await page.goto('http://localhost:5174/brain-vault'); // Adjusted route
+  await page.goto('http://localhost:5173/brain-vault'); // Adjusted route
 
   // Check if items list loaded
   await expect(page.getByText('Economy of India')).toBeVisible();

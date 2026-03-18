@@ -78,211 +78,147 @@
             - heading "🎯 Daily Challenge" [level=3] [ref=e83]
             - generic [ref=e84]: 🔥 0 days
           - generic [ref=e85]:
-            - heading "Early Bird" [level=4] [ref=e86]
-            - paragraph [ref=e87]: Complete any activity before 6 AM
-            - generic [ref=e90]: 0 / 1
+            - heading "Master Reviewer" [level=4] [ref=e86]
+            - paragraph [ref=e87]: Review 25 flashcards
+            - generic [ref=e90]: 0 / 25
             - generic [ref=e91]:
               - generic [ref=e92]: +100 XP
               - button "Mark Complete" [ref=e93] [cursor=pointer]
         - generic [ref=e94]:
           - generic [ref=e95]:
             - heading "⚔️ REVISION TARGETS" [level=3] [ref=e96]
-            - generic [ref=e97]: 482 PENDING
+            - generic [ref=e97]: 1163 PENDING
           - generic [ref=e98]:
             - generic [ref=e99]:
               - generic [ref=e100]:
-                - generic [ref=e101]: Review
-                - generic [ref=e102]: Quick Recall of Morning Session Facts (Revise)
-                - generic [ref=e103]: Nov 28
+                - generic [ref=e101]: CA & Revision
+                - generic [ref=e102]: Daily News Analysis (Revise)
+                - generic [ref=e103]: Mar 4
               - generic [ref=e104]:
-                - button "👁️" [ref=e105]
-                - button "⚔️" [ref=e106] [cursor=pointer]
-            - generic [ref=e107]:
-              - generic [ref=e108]:
-                - generic [ref=e109]: Review
-                - generic [ref=e110]: "Day Review: Summarize Geo concepts learned (Revise)"
-                - generic [ref=e111]: Nov 28
-              - generic [ref=e112]:
-                - button "👁️" [ref=e113]
-                - button "⚔️" [ref=e114] [cursor=pointer]
-            - generic [ref=e115]:
-              - generic [ref=e116]:
-                - generic [ref=e117]: Revision
-                - generic [ref=e118]: "SRS Review: Rapidly scan headings of History Ch 1-3 (Studied Yesterday) (Revise)"
-                - generic [ref=e119]: Nov 29
-              - generic [ref=e120]:
-                - button "👁️" [ref=e121]
-                - button "⚔️" [ref=e122] [cursor=pointer]
-            - generic [ref=e123]:
-              - generic [ref=e124]:
-                - generic [ref=e125]: Flashcards
-                - generic [ref=e126]: "Review: Flashcards History Class 6 (Created Yesterday) (Flashcard Review)"
-                - generic [ref=e127]: Dec 1
-              - generic [ref=e128]:
-                - button "👁️" [ref=e129]
-                - button "⚔️" [ref=e130] [cursor=pointer]
-            - generic [ref=e131]:
-              - generic [ref=e132]:
-                - generic [ref=e133]: Flashcards
-                - generic [ref=e134]: "Review: Flashcards Geography Class 6 (Created Sunday) (Flashcard Review)"
-                - generic [ref=e135]: Dec 2
+                - button "Focus (Start Timer)" [ref=e105]: 👁️
+                - button "Mark Complete" [ref=e106] [cursor=pointer]:
+                  - generic [ref=e107]: ⚔️
+            - generic [ref=e108]:
+              - generic [ref=e109]:
+                - generic [ref=e110]: CA & Revision
+                - generic [ref=e111]: Daily News Analysis (Revise)
+                - generic [ref=e112]: Mar 5
+              - generic [ref=e113]:
+                - button "Focus (Start Timer)" [ref=e114]: 👁️
+                - button "Mark Complete" [ref=e115] [cursor=pointer]:
+                  - generic [ref=e116]: ⚔️
+            - generic [ref=e117]:
+              - generic [ref=e118]:
+                - generic [ref=e119]: CA & Revision
+                - generic [ref=e120]: Daily News Analysis (Revise)
+                - generic [ref=e121]: Mar 6
+              - generic [ref=e122]:
+                - button "Focus (Start Timer)" [ref=e123]: 👁️
+                - button "Mark Complete" [ref=e124] [cursor=pointer]:
+                  - generic [ref=e125]: ⚔️
+            - generic [ref=e126]:
+              - generic [ref=e127]:
+                - generic [ref=e128]: Revision
+                - generic [ref=e129]: Weekly Consolidation (Revise)
+                - generic [ref=e130]: Mar 7
+              - generic [ref=e131]:
+                - button "Focus (Start Timer)" [ref=e132]: 👁️
+                - button "Mark Complete" [ref=e133] [cursor=pointer]:
+                  - generic [ref=e134]: ⚔️
+            - generic [ref=e135]:
               - generic [ref=e136]:
-                - button "👁️" [ref=e137]
-                - button "⚔️" [ref=e138] [cursor=pointer]
-            - generic [ref=e139]: + 477 more battles awaiting
-      - generic [ref=e140]:
-        - heading "LEVEL 19" [level=3] [ref=e142]
-        - generic [ref=e144]: PROGRESS
-        - generic [ref=e148]: "XP: 229 / 2317"
-        - generic [ref=e149]:
-          - generic [ref=e150]:
-            - img "Strength" [ref=e151]
-            - generic [ref=e152]:
-              - generic [ref=e153]: STRENGTH
-              - generic [ref=e154]: GS-I
-            - generic [ref=e155]: "18"
-          - generic [ref=e156]:
-            - img "Runic" [ref=e157]
-            - generic [ref=e158]:
-              - generic [ref=e159]: RUNIC
-              - generic [ref=e160]: GS-II
-            - generic [ref=e161]: "18"
-          - generic [ref=e162]:
-            - img "Vitality" [ref=e163]
-            - generic [ref=e164]:
-              - generic [ref=e165]: VITALITY
-              - generic [ref=e166]: GS-III
-            - generic [ref=e167]: "18"
-          - generic [ref=e168]:
-            - img "Luck" [ref=e169]
-            - generic [ref=e170]:
-              - generic [ref=e171]: LUCK
-              - generic [ref=e172]: GS-IV
-            - generic [ref=e173]: "18"
-      - generic [ref=e174]:
-        - generic [ref=e175]:
-          - img [ref=e178]:
-            - generic [ref=e181]: 10%
-          - heading "UPSC ASPIRANT" [level=2] [ref=e182]
-        - generic [ref=e183]:
-          - generic [ref=e184]:
-            - heading "ACTIVE BOONS" [level=3] [ref=e185]
-            - paragraph [ref=e186]: (STRENGTHS)
-          - generic [ref=e187]:
-            - heading "CURSES" [level=3] [ref=e188]
-            - paragraph [ref=e189]: (WEAKNESSES)
-  - generic [ref=e191]:
-    - heading "TODAY'S RITUALS" [level=2] [ref=e193]
-    - generic [ref=e194]:
+                - generic [ref=e137]: Revision
+                - generic [ref=e138]: Weekly Consolidation (Revise)
+                - generic [ref=e139]: Mar 8
+              - generic [ref=e140]:
+                - button "Focus (Start Timer)" [ref=e141]: 👁️
+                - button "Mark Complete" [ref=e142] [cursor=pointer]:
+                  - generic [ref=e143]: ⚔️
+            - generic [ref=e144]: + 1158 more battles awaiting
+      - generic [ref=e145]:
+        - heading "LEVEL 19" [level=3] [ref=e147]
+        - generic [ref=e149]: PROGRESS
+        - generic [ref=e153]: "XP: 629 / 2317"
+        - generic [ref=e154]:
+          - generic [ref=e155]:
+            - img "Strength" [ref=e156]
+            - generic [ref=e157]:
+              - generic [ref=e158]: STRENGTH
+              - generic [ref=e159]: GS-I
+            - generic [ref=e160]: "18"
+          - generic [ref=e161]:
+            - img "Runic" [ref=e162]
+            - generic [ref=e163]:
+              - generic [ref=e164]: RUNIC
+              - generic [ref=e165]: GS-II
+            - generic [ref=e166]: "18"
+          - generic [ref=e167]:
+            - img "Vitality" [ref=e168]
+            - generic [ref=e169]:
+              - generic [ref=e170]: VITALITY
+              - generic [ref=e171]: GS-III
+            - generic [ref=e172]: "18"
+          - generic [ref=e173]:
+            - img "Luck" [ref=e174]
+            - generic [ref=e175]:
+              - generic [ref=e176]: LUCK
+              - generic [ref=e177]: GS-IV
+            - generic [ref=e178]: "18"
+      - generic [ref=e179]:
+        - generic [ref=e180]:
+          - img [ref=e183]:
+            - generic [ref=e186]: 27%
+          - heading "UPSC ASPIRANT" [level=2] [ref=e187]
+        - generic [ref=e188]:
+          - generic [ref=e189]:
+            - heading "ACTIVE BOONS" [level=3] [ref=e190]
+            - paragraph [ref=e191]: (STRENGTHS)
+            - generic [ref=e192]:
+              - generic [ref=e193]:
+                - generic [ref=e194]: ⚔️
+                - generic [ref=e195]:
+                  - generic [ref=e196]: strength (GS-I)
+                  - generic [ref=e197]: Level 18
+                - generic [ref=e198]: "18"
+              - generic [ref=e199]:
+                - generic [ref=e200]: 🔮
+                - generic [ref=e201]:
+                  - generic [ref=e202]: runic (GS-II)
+                  - generic [ref=e203]: Level 18
+                - generic [ref=e204]: "18"
+              - text: "0"
+          - generic [ref=e205]:
+            - heading "CURSES" [level=3] [ref=e206]
+            - paragraph [ref=e207]: (WEAKNESSES)
+            - generic [ref=e209]: 🎉 No major weaknesses detected
+  - generic [ref=e211]:
+    - heading "TODAY'S RITUALS" [level=2] [ref=e213]
+    - generic [ref=e214]:
       - region "Notifications"
-      - heading "⏱️ Focus Timer" [level=3] [ref=e195]
-      - generic [ref=e196]: 00:00:00
-      - button "Start study timer" [ref=e198] [cursor=pointer]: START
-    - list [ref=e199]:
-      - listitem [ref=e200]:
-        - generic [ref=e201] [cursor=pointer]:
+      - heading "⏱️ Focus Timer" [level=3] [ref=e215]
+      - generic [ref=e216]: 00:00:00
+      - button "Start study timer" [ref=e218] [cursor=pointer]: START
+    - list [ref=e219]:
+      - listitem [ref=e220]:
+        - generic [ref=e221] [cursor=pointer]:
           - checkbox
-        - generic [ref=e203]:
-          - generic [ref=e204]: "History - Spectrum: Ch 8 - Socio-Religious Reform Movements (General Features/Factors) (Read)"
-          - generic [ref=e205]: 09:00-09:50
-      - listitem [ref=e206]:
-        - generic [ref=e207] [cursor=pointer]:
+        - generic [ref=e223]:
+          - generic [ref=e224]: "Geography - NCERT Cl 6: The Earth Our Habitat - Ch 4: Maps (Read)"
+          - generic [ref=e225]: 04:00-07:00
+      - listitem [ref=e226]:
+        - generic [ref=e227] [cursor=pointer]:
           - checkbox
-        - generic [ref=e209]:
-          - generic [ref=e210]: Break - Hydrate (Break)
-          - generic [ref=e211]: 09:50-10:00
-      - listitem [ref=e212]:
-        - generic [ref=e213] [cursor=pointer]:
-          - checkbox
-        - generic [ref=e215]:
-          - generic [ref=e216]: "History - Spectrum: Ch 9 - Reform Movements (Raja Rammohan Roy/Brahmo Samaj) (Read)"
-          - generic [ref=e217]: 10:00-10:50
-      - listitem [ref=e218]:
-        - generic [ref=e219] [cursor=pointer]:
-          - checkbox
-        - generic [ref=e221]:
-          - generic [ref=e222]: Break - Walk (Break)
-          - generic [ref=e223]: 10:50-11:00
-      - listitem [ref=e224]:
-        - generic [ref=e225] [cursor=pointer]:
-          - checkbox
-        - generic [ref=e227]:
-          - generic [ref=e228]: "History - Spectrum: Ch 9 - Reform Movements (Prarthana Samaj/Young Bengal/Ishwar Chandra Vidyasagar) (Read)"
-          - generic [ref=e229]: 11:00-11:50
-      - listitem [ref=e230]:
-        - generic [ref=e231] [cursor=pointer]:
-          - checkbox
-        - generic [ref=e233]:
-          - generic [ref=e234]: "Polity - M. Laxmikanth: Ch 41 - Election Commission (Composition/Powers) (Read)"
-          - generic [ref=e235]: 13:00-13:50
-      - listitem [ref=e236]:
-        - generic [ref=e237] [cursor=pointer]:
-          - checkbox
-        - generic [ref=e239]:
-          - generic [ref=e240]: Break - Rest (Break)
-          - generic [ref=e241]: 13:50-14:00
-      - listitem [ref=e242]:
-        - generic [ref=e243] [cursor=pointer]:
-          - checkbox
-        - generic [ref=e245]:
-          - generic [ref=e246]: "Polity - M. Laxmikanth: Ch 42 - UPSC & Ch 43 - SPSC (Removal/Independence) (Read)"
-          - generic [ref=e247]: 14:00-14:50
-      - listitem [ref=e248]:
-        - generic [ref=e249] [cursor=pointer]:
-          - checkbox
-        - generic [ref=e251]:
-          - generic [ref=e252]: Break - Rest (Break)
-          - generic [ref=e253]: 14:50-15:00
-      - listitem [ref=e254]:
-        - generic [ref=e255] [cursor=pointer]:
-          - checkbox
-        - generic [ref=e257]:
-          - generic [ref=e258]: "Flashcards - Task: CREATE Flashcards for Reform Movements (Pt 1) & EC/UPSC (Flashcard Creation)"
-          - generic [ref=e259]: 15:00-16:00
-      - listitem [ref=e260]:
-        - generic [ref=e261] [cursor=pointer]:
-          - checkbox
-        - generic [ref=e263]:
-          - generic [ref=e264]: "CSAT - Quant: Permutation & Combination (Basics) (Practice)"
-          - generic [ref=e265]: 17:00-17:50
-      - listitem [ref=e266]:
-        - generic [ref=e267] [cursor=pointer]:
-          - checkbox
-        - generic [ref=e269]:
-          - generic [ref=e270]: Break - Eye Rest (Break)
-          - generic [ref=e271]: 17:50-18:00
-      - listitem [ref=e272]:
-        - generic [ref=e273] [cursor=pointer]:
-          - checkbox
-        - generic [ref=e275]:
-          - generic [ref=e276]: "CSAT - Quant: Probability (Practice)"
-          - generic [ref=e277]: 18:00-18:50
-      - listitem [ref=e278]:
-        - generic [ref=e279] [cursor=pointer]:
-          - checkbox
-        - generic [ref=e281]:
-          - generic [ref=e282]: Break - Snack (Break)
-          - generic [ref=e283]: 18:50-19:00
-      - listitem [ref=e284]:
-        - generic [ref=e285] [cursor=pointer]:
-          - checkbox
-        - generic [ref=e287]:
-          - generic [ref=e288]: "Current Affairs - Weekly Compilation: Pages 31-40 (Feb Wk 4) (Read)"
-          - generic [ref=e289]: 19:00-19:50
-      - listitem [ref=e290]:
-        - generic [ref=e291] [cursor=pointer]:
-          - checkbox
-        - generic [ref=e293]:
-          - generic [ref=e294]: "Revision - SRS Review: Polity State Leg/HC (Studied Feb 24) (Revise)"
-          - generic [ref=e295]: 21:00-22:00
-    - button "PLAN MORE RITUALS" [ref=e296] [cursor=pointer]
-  - button "L3 + R3 FOCUS" [ref=e298] [cursor=pointer]
-  - button "Mimir's Head" [ref=e299] [cursor=pointer]:
-    - img "Mimir's Head" [ref=e300]
-  - generic [ref=e301] [cursor=pointer]:
-    - generic [ref=e302]: ⚔️
-    - generic [ref=e303]: 25:00
-    - 'generic "Keyboard: Space=Play/Pause, R=Reset, 1/2/3=Modes, S=Settings" [ref=e304]': ⌨️
-  - button "Toggle Brain Interface" [ref=e306] [cursor=pointer]:
-    - img [ref=e307]
+        - generic [ref=e229]:
+          - generic [ref=e230]: "CA & Revision - Daily News Analysis + Revise: Ch 8: Vital Villages (Revise)"
+          - generic [ref=e231]: 20:00-23:00
+    - button "PLAN MORE RITUALS" [ref=e232] [cursor=pointer]
+  - button "L3 + R3 FOCUS" [ref=e234] [cursor=pointer]
+  - button "Mimir's Head" [ref=e235] [cursor=pointer]:
+    - img "Mimir's Head" [ref=e236]
+  - generic [ref=e237] [cursor=pointer]:
+    - generic [ref=e238]: ⚔️
+    - generic [ref=e239]: 25:00
+    - 'generic "Keyboard: Space=Play/Pause, R=Reset, 1/2/3=Modes, S=Settings" [ref=e240]': ⌨️
+  - button "Toggle Brain Interface" [ref=e242] [cursor=pointer]:
+    - img [ref=e243]
 ```
