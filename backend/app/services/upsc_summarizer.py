@@ -261,9 +261,9 @@ def extract_image_from_article(link):
     Tries Open Graph, Twitter meta, then first <img> tag.
     """
     try:
-        import requests
+        from app.utils.security import safe_get
         from bs4 import BeautifulSoup
-        response = requests.get(link, timeout=10)
+        response = safe_get(link, timeout=10)
         soup = BeautifulSoup(response.content, 'html.parser')
         og_image = soup.find('meta', property='og:image')
         if og_image and og_image.get('content'):
@@ -282,7 +282,7 @@ def extract_image_from_article(link):
 def fetch_article_content(url):
     """Fetch full article content from URL."""
     try:
-        import requests
+        from app.utils.security import safe_get
         from bs4 import BeautifulSoup
         
         headers = {
@@ -291,7 +291,7 @@ def fetch_article_content(url):
             'Accept-Language': 'en-US,en;q=0.9',
             'Referer': 'https://www.google.com/'
         }
-        response = requests.get(url, headers=headers, timeout=15)
+        response = safe_get(url, headers=headers, timeout=15)
         soup = BeautifulSoup(response.content, 'html.parser')
         
         # Remove junk elements
