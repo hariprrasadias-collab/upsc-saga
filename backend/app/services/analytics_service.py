@@ -184,17 +184,16 @@ def get_all_subject_performance(conn, user_id, subjects):
 
     # Syllabus completion
     try:
-        # Note: Added user_id filter to avoid cross-user data aggregation
         syllabus_query = f'''
             SELECT
                 subject,
                 COUNT(*) as total,
                 SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
             FROM syllabus_topics
-            WHERE user_id = ? AND subject IN ({placeholders})
+            WHERE subject IN ({placeholders})
             GROUP BY subject
         '''
-        syllabus_params = [user_id] + list(subjects)
+        syllabus_params = list(subjects)
         syllabus_rows = conn.execute(syllabus_query, syllabus_params).fetchall()
         for row in syllabus_rows:
             subj = row['subject']
