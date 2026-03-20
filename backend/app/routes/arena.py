@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify, session
 from app.db import get_db
-import random
 import json
 from app.services.xp_service import award_xp
 
@@ -90,13 +89,29 @@ def get_available_bosses():
     """Get list of available bosses (Years, Subjects, and Custom)"""
     conn = get_db()
     
-    # Year Bosses
-    years = conn.execute("SELECT DISTINCT year FROM pyq_questions ORDER BY year DESC").fetchall()
-    year_bosses = [get_boss_stats('YEAR', row['year']) for row in years]
+    # Year Bosses (Optimized: single query instead of N+1)
+    years_counts = conn.execute("SELECT year, COUNT(*) as count FROM pyq_questions GROUP BY year ORDER BY year DESC").fetchall()
+    year_bosses = [{
+        "id": row['year'],
+        "type": "YEAR",
+        "name": f"The {row['year']} Titan",
+        "hp": min(row['count'], 20),
+        "max_hp": row['count'],
+        "xp_reward": min(row['count'], 20) * 50,
+        "loot": ["Time Capsule", "Ancient Scroll"]
+    } for row in years_counts if row['year']]
     
-    # Subject Bosses
-    subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
-    subject_bosses = [get_boss_stats('SUBJECT', row['subject']) for row in subjects]
+    # Subject Bosses (Optimized: single query instead of N+1)
+    subject_counts = conn.execute("SELECT subject, COUNT(*) as count FROM pyq_questions GROUP BY subject ORDER BY subject").fetchall()
+    subject_bosses = [{
+        "id": row['subject'],
+        "type": "SUBJECT",
+        "name": f"The {row['subject']} Golem",
+        "hp": min(row['count'], 20),
+        "max_hp": row['count'],
+        "xp_reward": min(row['count'], 20) * 50,
+        "loot": ["Subject Mastery Token", "Skill Point"]
+    } for row in subject_counts if row['subject']]
     
     # Custom Bosses
     custom = conn.execute("SELECT id FROM custom_bosses WHERE is_active = 1 ORDER BY created_at DESC").fetchall()
