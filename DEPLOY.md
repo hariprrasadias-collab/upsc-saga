@@ -45,6 +45,9 @@ Render can build your Docker containers automatically.
     *   Add Environment Variables: `GEMINI_API_KEY` and `SECRET_KEY`.
 2.  **Frontend**:
     *   Create a new **Static Site** (if just static) or another **Web Service** (if using the Dockerfile).
+    *   If deploying directly without Docker, it is **CRITICAL** to configure your Build Command properly:
+        *   **Build Command**: `pnpm install && pnpm run build`
+        *   Do not use `npm` as it will fail on this project's dependency tree due to an internal bug (`Cannot destructure property 'package' of 'node.target' as it is null`).
     *   If using the Dockerfile: Select `frontend` as Root Directory, Runtime: Docker.
     *   **Important**: You will need to update the `vite.config.ts` in the frontend to point to your deployed Backend URL instead of `localhost`.
 

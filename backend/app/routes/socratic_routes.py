@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify
 from app.services.socratic_service import generate_debate_turn, continue_autonomous_debate
-from app.db_models.automation_storage import save_socratic_dialogue
 import json
 
 socratic_bp = Blueprint('socratic', __name__)
@@ -66,7 +65,7 @@ def get_history():
     try:
         from app.db import get_db
         conn = get_db()
-        limit = request.args.get('limit', 20)
+        limit = request.args.get('limit', 20, type=int)
         rows = conn.execute('SELECT * FROM socratic_conversations ORDER BY created_at DESC LIMIT ?', (limit,)).fetchall()
         return jsonify({'success': True, 'data': [dict(row) for row in rows]})
     except Exception as e:
