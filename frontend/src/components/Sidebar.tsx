@@ -117,7 +117,7 @@ const Sidebar: React.FC = memo(() => {
           aria-label="Close sidebar"
           type="button"
         >
-          ×
+          <span aria-hidden="true">×</span>
         </button>
       </div>
 
@@ -159,13 +159,14 @@ const Sidebar: React.FC = memo(() => {
             className="group-header"
             onClick={() => toggleGroup(groupKey)}
             aria-expanded={expandedGroups[groupKey]}
+            aria-controls={`group-items-${groupKey}`}
           >
             <span className="group-title">{group.title}</span>
             <span className="expand-icon" aria-hidden="true">{expandedGroups[groupKey] ? '▼' : '▶'}</span>
           </button>
 
           {expandedGroups[groupKey] && (
-            <div className="group-items">
+            <div id={`group-items-${groupKey}`} className="group-items">
               {group.items.map(item => (
                 <button
                   type="button"
