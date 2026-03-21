@@ -141,7 +141,7 @@ const IssueMappingViewer: React.FC<Props> = ({ articleId, articleTitle }) => {
                     {tags.map(tag => (
                         <span key={tag} className="tag-chip">
                             #{tag}
-                            <button onClick={() => handleRemoveTag(tag)} className="remove-tag-btn">×</button>
+                            <button onClick={() => handleRemoveTag(tag)} className="remove-tag-btn" aria-label="Close">×</button>
                         </span>
                     ))}
                 </div>

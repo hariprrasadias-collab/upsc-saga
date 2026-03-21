@@ -200,9 +200,7 @@ const BrainVault: React.FC = () => {
                                             className="delete-btn"
                                             onClick={(e) => handleDelete(item.id, e)}
                                             title="Delete Artifact"
-                                        >
-                                            ×
-                                        </button>
+                                         aria-label="Close">×</button>
                                     </div>
                                     <h4 className="item-topic">{item.topic}</h4>
                                     <span className="item-date">{new Date(item.created_at).toLocaleDateString()}</span>
