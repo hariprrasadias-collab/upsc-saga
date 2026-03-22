@@ -3,8 +3,7 @@ Analytics Service - Data aggregation and insights
 Consolidates data from all modules for comprehensive analytics
 """
 from datetime import datetime, timedelta
-from collections import defaultdict
-import sqlite3
+
 
 def calculate_study_hours(conn, user_id, start_date, end_date):
     """
@@ -53,7 +52,8 @@ def calculate_study_hours(conn, user_id, start_date, end_date):
 
         # Sort all activities
         try:
-            activities = sorted([datetime.fromisoformat(a) for a in activities])
+            activities = sorted([datetime.fromisoformat(a)
+                                for a in activities])
         except ValueError:
             # If date parsing fails, skip estimates and return just pomodoro
             return round(pomodoro_hours, 1)
@@ -118,11 +118,82 @@ def get_subject_performance(conn, user_id, subject):
             WHERE subject = ?
         ''', (subject,)).fetchone()
         if syllabus and syllabus['total'] > 0:
-            result['syllabus_pct'] = round((syllabus['completed'] / syllabus['total']) * 100, 1)
+            result['syllabus_pct'] = round(
+                (syllabus['completed'] / syllabus['total']) * 100, 1)
     except Exception:
-        pass # Return zeroed result on error
-    
+        pass  # Return zeroed result on error
+
     return result
+
+
+def get_all_subject_performance(conn, user_id, subjects):
+    """
+    Aggregate all metrics for multiple subjects efficiently using batched queries.
+    Prevents N+1 query loops.
+    """
+    results = {s: {
+        'subject': s,
+        'mock_avg': 0,
+        'answer_avg': 0,
+        'syllabus_pct': 0,
+        'pyq_attempted': 0,
+        'flashcard_mastered': 0
+    } for s in subjects}
+
+    if not subjects:
+        return []
+
+    placeholders = ','.join(['?'] * len(subjects))
+
+    # 1. Mock tests
+    try:
+        mock_data = conn.execute(f'''
+            SELECT mt.subject, AVG(mta.score) as avg_score
+            FROM test_attempts mta
+            JOIN mock_tests mt ON mta.test_id = mt.id
+            WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+            GROUP BY mt.subject
+        ''', [user_id] + subjects).fetchall()
+        for r in mock_data:
+            if r['avg_score'] is not None:
+                results[r['subject']]['mock_avg'] = round(r['avg_score'], 1)
+    except Exception as e:
+        print(f"Error fetching mock tests for subjects: {e}")
+
+    # 2. Answer writing
+    try:
+        answer_data = conn.execute(f'''
+            SELECT aq.subject, AVG(ae.overall_score) as avg_score
+            FROM answer_evaluations ae
+            JOIN user_answers ua ON ae.answer_id = ua.id
+            JOIN answer_questions aq ON ua.prompt_id = aq.id
+            WHERE ua.user_id = ? AND aq.subject IN ({placeholders})
+            GROUP BY aq.subject
+        ''', [user_id] + subjects).fetchall()
+        for r in answer_data:
+            if r['avg_score'] is not None:
+                results[r['subject']]['answer_avg'] = round(r['avg_score'], 1)
+    except Exception as e:
+        print(f"Error fetching answer evaluations for subjects: {e}")
+
+    # 3. Syllabus completion
+    try:
+        syllabus_data = conn.execute(f'''
+            SELECT subject,
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+            FROM syllabus_topics
+            WHERE subject IN ({placeholders})
+            GROUP BY subject
+        ''', subjects).fetchall()
+        for r in syllabus_data:
+            if r['total'] > 0:
+                results[r['subject']]['syllabus_pct'] = round(
+                    (r['completed'] / r['total']) * 100, 1)
+    except Exception as e:
+        print(f"Error fetching syllabus completion for subjects: {e}")
+
+    return list(results.values())
 
 
 def identify_weak_areas(conn, user_id, limit=10):
@@ -130,7 +201,7 @@ def identify_weak_areas(conn, user_id, limit=10):
     Identify topics needing attention based on performance
     """
     weak_areas = []
-    
+
     try:
         # Check syllabus topics not started or in progress
         syllabus_weak = conn.execute('''
@@ -140,7 +211,7 @@ def identify_weak_areas(conn, user_id, limit=10):
             ORDER BY subject, name
             LIMIT ?
         ''', (limit,)).fetchall()
-        
+
         for topic in syllabus_weak:
             weak_areas.append({
                 'subject': topic['subject'],
@@ -149,7 +220,7 @@ def identify_weak_areas(conn, user_id, limit=10):
                 'source': 'Syllabus',
                 'action': 'Start reading' if topic['status'] == 'Not Started' else 'Complete reading'
             })
-        
+
         # Check mock test subjects with low scores (get bottom performing ones)
         low_scores = conn.execute('''
             SELECT mt.subject, AVG(mta.score) as avg_score, COUNT(*) as attempts
@@ -160,7 +231,7 @@ def identify_weak_areas(conn, user_id, limit=10):
             ORDER BY avg_score ASC
             LIMIT ?
         ''', (user_id, limit)).fetchall()
-        
+
         for subj in low_scores:
             # Calculate trend for this subject
             subject_scores = conn.execute('''
@@ -193,7 +264,7 @@ def identify_weak_areas(conn, user_id, limit=10):
             })
     except Exception as e:
         print(f"Error identifying weak areas: {e}")
-    
+
     # Sort by weakness score and limit
     weak_areas.sort(key=lambda x: x['weakness_score'], reverse=True)
     return weak_areas[:limit]
@@ -205,16 +276,16 @@ def calculate_improvement_rate(scores):
     """
     if len(scores) < 2:
         return 0
-    
+
     first_half = scores[:len(scores)//2]
     second_half = scores[len(scores)//2:]
-    
+
     avg_first = sum(first_half) / len(first_half) if first_half else 0
     avg_second = sum(second_half) / len(second_half) if second_half else 0
-    
+
     if avg_first == 0:
         return 0
-    
+
     improvement = ((avg_second - avg_first) / avg_first) * 100
     return round(improvement, 1)
 
@@ -261,7 +332,7 @@ def get_streak_days(conn, user_id):
             WHERE user_id = ? AND is_completed = 1
         ''', (user_id,)).fetchall()
         dates.update([r['date'] for r in warmap_dates])
-        
+
         if not dates:
             return 0
 
@@ -272,7 +343,7 @@ def get_streak_days(conn, user_id):
                 try:
                     dates_objs.add(datetime.fromisoformat(d).date())
                 except ValueError:
-                    pass # Ignore invalid date formats
+                    pass  # Ignore invalid date formats
 
         today = datetime.now().date()
         yesterday = today - timedelta(days=1)
@@ -294,6 +365,7 @@ def get_streak_days(conn, user_id):
     except Exception as e:
         print(f"Error calculating streak: {e}")
         return 0
+
 
 def generate_weekly_performance_review(conn, user_id):
     """
