@@ -244,9 +244,7 @@ const TimeBoxing: React.FC = () => {
                                             <button className="focus-btn" onClick={() => handleStartFocus(box.subject)} title="Start Focus Session">
                                                 ▶
                                             </button>
-                                            <button className="delete-btn" onClick={() => handleDelete(box.subject)} title="Delete Timebox">
-                                                ×
-                                            </button>
+                                            <button className="delete-btn" onClick={() => handleDelete(box.subject)} title="Delete Timebox" aria-label="Close">×</button>
                                         </div>
                                     </motion.div>
                                 );

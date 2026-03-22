@@ -43,9 +43,7 @@ const RevisionCardItem: React.FC<{ card: RevisionCard, onDelete: (id: number) =>
                                     onDelete(card.id);
                                 }}
                                 title="Delete card"
-                            >
-                                ×
-                            </button>
+                             aria-label="Close">×</button>
                         </div>
                     </div>
                     <div className="card-content markdown-body">
