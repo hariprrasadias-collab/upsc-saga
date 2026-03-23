@@ -5,7 +5,6 @@ Database operations for UPSC Current Affairs
 from app.db import get_db
 import sqlite3
 import json
-from datetime import datetime
 
 def init_current_affairs_table():
     """Initialize the current_affairs table"""
@@ -293,9 +292,11 @@ def get_saved_articles(filters=None):
     query += ' ORDER BY fetch_date DESC'
     
     if filters and filters.get('limit'):
-        query += f' LIMIT {int(filters["limit"])}'
+        query += ' LIMIT ?'
+        params.append(int(filters["limit"]))
         if filters.get('offset'):
-            query += f' OFFSET {int(filters["offset"])}'
+            query += ' OFFSET ?'
+            params.append(int(filters["offset"]))
     
     rows = conn.execute(query, params).fetchall()
     
@@ -401,13 +402,6 @@ def update_user_notes(article_id, notes):
         SET user_notes = ?
         WHERE id = ?
     ''', (notes, article_id))
-    conn.commit()
-
-    conn.execute('''
-        UPDATE current_affairs 
-        SET anki_card_id = ?
-        WHERE id = ?
-    ''', (anki_card_id, article_id))
     conn.commit()
 
 def link_anki_card(article_id, anki_card_id):
