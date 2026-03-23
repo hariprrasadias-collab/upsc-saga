@@ -140,16 +140,74 @@ def analyze_all_performance() -> List[Dict]:
     conn = get_db()
     cursor = conn.cursor()
     
-    # Get all unique topics
-    cursor.execute('SELECT DISTINCT topic FROM performance_records WHERE topic IS NOT NULL')
-    topics = [row['topic'] for row in cursor.fetchall()]
-    conn.close()
+    # Get aggregated performance stats for all topics
+    cursor.execute('''
+        SELECT
+            topic,
+            COUNT(*) as total,
+            SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) as correct,
+            AVG(time_taken) as avg_time,
+            subject,
+            SUM(CASE WHEN is_correct = 0 AND attempted_at >= datetime('now', '-7 days') THEN 1 ELSE 0 END) as recent_failures
+        FROM performance_records
+        WHERE topic IS NOT NULL
+        GROUP BY topic, subject
+    ''')
+
+    rows = cursor.fetchall()
     
     results = []
-    for topic in topics:
-        result = analyze_topic_performance(topic)
-        if result:
-            results.append(result)
+    records_to_insert = []
+    now = datetime.now()
+
+    for row in rows:
+        topic = row['topic']
+        total = row['total']
+        correct = row['correct'] or 0
+        accuracy = correct / total if total > 0 else 0
+        avg_time = row['avg_time'] or 0
+        subject = row['subject']
+        recent_failures = row['recent_failures'] or 0
+
+        topic_data = {
+            'total_attempts': total,
+            'correct_attempts': correct,
+            'accuracy_rate': accuracy,
+            'avg_time_taken': avg_time,
+            'recent_failures': recent_failures
+        }
+
+        weakness_score = calculate_weakness_score(topic_data)
+
+        results.append({
+            'topic': topic,
+            'subject': subject,
+            'weakness_score': weakness_score,
+            **topic_data
+        })
+
+        records_to_insert.append((
+            topic, subject, total, correct, accuracy, avg_time, weakness_score, now
+        ))
+
+    # Update or insert into weak_areas in bulk
+    if records_to_insert:
+        cursor.executemany('''
+            INSERT INTO weak_areas
+            (topic, subject, total_attempts, correct_attempts, accuracy_rate, avg_time_taken, weakness_score, last_updated)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(topic) DO UPDATE SET
+                subject = excluded.subject,
+                total_attempts = excluded.total_attempts,
+                correct_attempts = excluded.correct_attempts,
+                accuracy_rate = excluded.accuracy_rate,
+                avg_time_taken = excluded.avg_time_taken,
+                weakness_score = excluded.weakness_score,
+                last_updated = excluded.last_updated
+        ''', records_to_insert)
+        conn.commit()
+
+    conn.close()
     
     return sorted(results, key=lambda x: x['weakness_score'], reverse=True)
 
