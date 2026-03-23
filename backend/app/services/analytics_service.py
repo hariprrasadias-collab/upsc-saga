@@ -125,6 +125,153 @@ def get_subject_performance(conn, user_id, subject):
     return result
 
 
+def get_all_subject_performance(conn, user_id, subjects):
+    """
+    Aggregate all metrics for multiple subjects efficiently using batched queries.
+    """
+    # Initialize results mapping
+    results = {
+        subject: {
+            'subject': subject,
+            'mock_avg': 0,
+            'answer_avg': 0,
+            'syllabus_pct': 0,
+            'pyq_attempted': 0,
+            'flashcard_mastered': 0
+        }
+        for subject in subjects
+    }
+
+    if not subjects:
+        return results
+
+    # Create parameter placeholders
+    placeholders = ','.join(['?'] * len(subjects))
+
+    # Mock tests
+    try:
+        mock_query = f'''
+            SELECT mt.subject, AVG(score) as avg_score
+            FROM test_attempts mta
+            JOIN mock_tests mt ON mta.test_id = mt.id
+            WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+            GROUP BY mt.subject
+        '''
+        params = [user_id] + subjects
+        mock_rows = conn.execute(mock_query, params).fetchall()
+        for row in mock_rows:
+            try:
+                subject = row['subject']
+                avg_score = row['avg_score']
+            except (TypeError, IndexError):
+                subject = row[0]
+                avg_score = row[1]
+            if subject in results and avg_score is not None:
+                results[subject]['mock_avg'] = round(avg_score, 1)
+    except Exception as e:
+        print(f"Error in mock tests batch query: {e}")
+
+    # Answer writing
+    try:
+        answer_query = f'''
+            SELECT aq.subject, AVG(ae.overall_score) as avg_score
+            FROM answer_evaluations ae
+            JOIN user_answers ua ON ae.answer_id = ua.id
+            JOIN answer_questions aq ON ua.prompt_id = aq.id
+            WHERE ua.user_id = ? AND aq.subject IN ({placeholders})
+            GROUP BY aq.subject
+        '''
+        params = [user_id] + subjects
+        answer_rows = conn.execute(answer_query, params).fetchall()
+        for row in answer_rows:
+            try:
+                subject = row['subject']
+                avg_score = row['avg_score']
+            except (TypeError, IndexError):
+                subject = row[0]
+                avg_score = row[1]
+            if subject in results and avg_score is not None:
+                results[subject]['answer_avg'] = round(avg_score, 1)
+    except Exception as e:
+        print(f"Error in answer writing batch query: {e}")
+
+    # Syllabus completion
+    try:
+        syllabus_query = f'''
+            SELECT
+                subject,
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+            FROM syllabus_topics
+            WHERE subject IN ({placeholders})
+            GROUP BY subject
+        '''
+        syllabus_rows = conn.execute(syllabus_query, subjects).fetchall()
+        for row in syllabus_rows:
+            try:
+                subject = row['subject']
+                total = row['total']
+                completed = row['completed']
+            except (TypeError, IndexError):
+                subject = row[0]
+                total = row[1]
+                completed = row[2]
+            if subject in results and total > 0:
+                results[subject]['syllabus_pct'] = round((completed / total) * 100, 1)
+    except Exception as e:
+        print(f"Error in syllabus batch query: {e}")
+
+    # PYQ Attempted
+    try:
+        pyq_query = f'''
+            SELECT pq.subject, COUNT(DISTINCT pqa.question_id) as attempted
+            FROM pyq_quiz_answers pqa
+            JOIN pyq_quiz_sessions pqs ON pqa.session_id = pqs.id
+            JOIN pyq_questions pq ON pqa.question_id = pq.id
+            WHERE pqs.user_id = ? AND pq.subject IN ({placeholders})
+            GROUP BY pq.subject
+        '''
+        params = [user_id] + subjects
+        pyq_rows = conn.execute(pyq_query, params).fetchall()
+        for row in pyq_rows:
+            try:
+                subject = row['subject']
+                attempted = row['attempted']
+            except (TypeError, IndexError):
+                subject = row[0]
+                attempted = row[1]
+            if subject in results and attempted is not None:
+                results[subject]['pyq_attempted'] = attempted
+    except Exception as e:
+        print(f"Error in pyq batch query: {e}")
+
+    # Flashcard Mastered (mastered is defined by halflife >= 180 in ebisu_srs)
+    try:
+        flashcard_query = f'''
+            SELECT d.subject, COUNT(DISTINCT rs.flashcard_id) as mastered
+            FROM review_sessions rs
+            JOIN flashcards f ON rs.flashcard_id = f.id
+            JOIN decks d ON f.deck_id = d.id
+            WHERE rs.user_id = ? AND rs.halflife >= 180 AND d.subject IN ({placeholders})
+            GROUP BY d.subject
+        '''
+        params = [user_id] + subjects
+        flashcard_rows = conn.execute(flashcard_query, params).fetchall()
+        for row in flashcard_rows:
+            try:
+                subject = row['subject']
+                mastered = row['mastered']
+            except (TypeError, IndexError):
+                subject = row[0]
+                mastered = row[1]
+            if subject in results and mastered is not None:
+                results[subject]['flashcard_mastered'] = mastered
+    except Exception as e:
+        print(f"Error in flashcard batch query: {e}")
+
+    return results
+
+
 def identify_weak_areas(conn, user_id, limit=10):
     """
     Identify topics needing attention based on performance
