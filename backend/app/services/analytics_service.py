@@ -3,8 +3,6 @@ Analytics Service - Data aggregation and insights
 Consolidates data from all modules for comprehensive analytics
 """
 from datetime import datetime, timedelta
-from collections import defaultdict
-import sqlite3
 
 def calculate_study_hours(conn, user_id, start_date, end_date):
     """
@@ -73,6 +71,111 @@ def calculate_study_hours(conn, user_id, start_date, end_date):
     except Exception as e:
         print(f"Error calculating study hours: {e}")
         return 0
+
+
+
+def get_all_subject_performance(conn, user_id, subjects):
+    """
+    Aggregate all metrics for a list of subjects in bulk to avoid N+1 queries.
+    """
+    results = {
+        subj: {
+            'subject': subj,
+            'mock_avg': 0,
+            'answer_avg': 0,
+            'syllabus_pct': 0,
+            'pyq_attempted': 0,
+            'flashcard_mastered': 0
+        } for subj in subjects
+    }
+
+    if not subjects:
+        return []
+
+    placeholders = ','.join(['?'] * len(subjects))
+
+    try:
+        # Mock tests
+        mock_params = [user_id] + subjects
+        mock_avg = conn.execute(f'''
+            SELECT mt.subject, AVG(score) as avg_score
+            FROM test_attempts mta
+            JOIN mock_tests mt ON mta.test_id = mt.id
+            WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+            GROUP BY mt.subject
+        ''', mock_params).fetchall()
+        for row in mock_avg:
+            if row['avg_score']:
+                results[row['subject']]['mock_avg'] = round(row['avg_score'], 1)
+    except Exception as e:
+        print(f"Error fetching mock tests for subjects: {e}")
+
+    try:
+        # Answer writing
+        answer_params = [user_id] + subjects
+        answer_avg = conn.execute(f'''
+            SELECT aq.subject, AVG(ae.overall_score) as avg_score
+            FROM answer_evaluations ae
+            JOIN user_answers ua ON ae.answer_id = ua.id
+            JOIN answer_questions aq ON ua.prompt_id = aq.id
+            WHERE ua.user_id = ? AND aq.subject IN ({placeholders})
+            GROUP BY aq.subject
+        ''', answer_params).fetchall()
+        for row in answer_avg:
+            if row['avg_score']:
+                results[row['subject']]['answer_avg'] = round(row['avg_score'], 1)
+    except Exception as e:
+        print(f"Error fetching answers for subjects: {e}")
+
+    try:
+        # Syllabus completion
+        syllabus_params = subjects
+        syllabus = conn.execute(f'''
+            SELECT
+                subject,
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+            FROM syllabus_topics
+            WHERE subject IN ({placeholders})
+            GROUP BY subject
+        ''', syllabus_params).fetchall()
+        for row in syllabus:
+            if row['total'] > 0:
+                results[row['subject']]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+    except Exception as e:
+        print(f"Error fetching syllabus for subjects: {e}")
+
+    try:
+        # PYQ Attempted
+        pyq_params = [user_id] + subjects
+        pyq = conn.execute(f'''
+            SELECT pq.subject, COUNT(DISTINCT pqa.question_id) as attempted
+            FROM pyq_quiz_answers pqa
+            JOIN pyq_questions pq ON pqa.question_id = pq.id
+            WHERE pqa.user_id = ? AND pq.subject IN ({placeholders})
+            GROUP BY pq.subject
+        ''', pyq_params).fetchall()
+        for row in pyq:
+            results[row['subject']]['pyq_attempted'] = row['attempted']
+    except Exception as e:
+        print(f"Error fetching PYQs for subjects: {e}")
+
+    try:
+        # Flashcard Mastered
+        flashcard_params = [user_id] + subjects
+        flashcard = conn.execute(f'''
+            SELECT f.subject, COUNT(DISTINCT f.id) as mastered
+            FROM review_sessions rs
+            JOIN flashcards f ON rs.flashcard_id = f.id
+            WHERE rs.user_id = ? AND f.subject IN ({placeholders}) AND rs.performance_rating IN (4, 5)
+            GROUP BY f.subject
+        ''', flashcard_params).fetchall()
+        for row in flashcard:
+            results[row['subject']]['flashcard_mastered'] = row['mastered']
+    except Exception as e:
+        print(f"Error fetching flashcards for subjects: {e}")
+
+    return [results[subj] for subj in subjects]
 
 
 def get_subject_performance(conn, user_id, subject):
