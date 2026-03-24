@@ -195,7 +195,19 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
 
     if (isMinimized) {
         return (
-            <div className={`pomodoro-minimized ${className || ''}`} onClick={() => setIsMinimized(false)}>
+            <div
+                className={`pomodoro-minimized ${className || ''}`}
+                onClick={() => setIsMinimized(false)}
+                role="button"
+                tabIndex={0}
+                aria-label="Expand Pomodoro Timer"
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setIsMinimized(false);
+                    }
+                }}
+            >
                 <div className={`pomodoro-orb ${isRunning ? 'pulsing' : ''}`}>
                     <span className="pomodoro-icon">{mode === 'work' ? '⚔️' : '🛡️'}</span>
                 </div>
@@ -222,15 +234,15 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
             <div className="pomodoro-header">
                 <h3>{mode === 'work' ? '⚔️ BATTLE TIME' : '🛡️ RESPITE'}</h3>
                 <div className="pomodoro-controls">
-                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
+                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen"} title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
                         {isFullscreen ? '↙️' : '⛶'}
                     </button>
                     {isFullscreen && (
-                        <button onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close">✕</button>
+                        <button onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" aria-label="Close Fullscreen" title="Close">✕</button>
                     )}
-                    <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" title="History">📊</button>
-                    <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" title="Settings">⚙️</button>
-                    <button onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize">−</button>
+                    <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" aria-label="History" title="History">📊</button>
+                    <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" aria-label="Settings" title="Settings">⚙️</button>
+                    <button onClick={() => setIsMinimized(true)} className="minimize-btn" aria-label="Minimize" title="Minimize">−</button>
                 </div>
             </div>
 
@@ -266,7 +278,7 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
             </div>
 
             <div className="pomodoro-timer-display">
-                <svg className={`progress-ring ${isRunning && timeLeft <= 60 ? 'urgent' : ''}`} width="320" height="320">
+                <svg className={`progress-ring ${isRunning && timeLeft <= 60 ? 'urgent' : ''}`} width="320" height="320" aria-hidden="true">
                     <defs>
                         <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                             <stop offset="0%" stopColor="#d4a574" />
@@ -329,7 +341,7 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
                                     <button className="edit-time-btn" onClick={() => {
                                         setEditMinutes(Math.floor(timeLeft / 60).toString());
                                         setIsEditing(true);
-                                    }} title="Edit Timer">✎</button>
+                                    }} aria-label="Edit Timer" title="Edit Timer">✎</button>
                                 )}
                             </>
                         )}
