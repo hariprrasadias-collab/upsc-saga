@@ -99,20 +99,28 @@ def get_available_bosses():
     # Year Bosses
     years = conn.execute(
         "SELECT year, COUNT(*) as count FROM pyq_questions GROUP BY year ORDER BY year DESC").fetchall()
-    year_bosses = [
-        get_boss_stats(
-            'YEAR',
-            row['year'],
-            precomputed_count=row['count']) for row in years]
+    year_bosses = []
+    for row in years:
+        try:
+            year_val = row['year']
+            count_val = row['count']
+        except (TypeError, IndexError):
+            year_val = row[0]
+            count_val = row[1]
+        year_bosses.append(get_boss_stats('YEAR', year_val, precomputed_count=count_val))
 
     # Subject Bosses
     subjects = conn.execute(
         "SELECT subject, COUNT(*) as count FROM pyq_questions GROUP BY subject ORDER BY subject").fetchall()
-    subject_bosses = [
-        get_boss_stats(
-            'SUBJECT',
-            row['subject'],
-            precomputed_count=row['count']) for row in subjects]
+    subject_bosses = []
+    for row in subjects:
+        try:
+            subject_val = row['subject']
+            count_val = row['count']
+        except (TypeError, IndexError):
+            subject_val = row[0]
+            count_val = row[1]
+        subject_bosses.append(get_boss_stats('SUBJECT', subject_val, precomputed_count=count_val))
 
     # Custom Bosses
     custom = conn.execute(
@@ -120,7 +128,11 @@ def get_available_bosses():
     custom_bosses = []
     for row in custom:
         try:
-            custom_bosses.append(get_boss_stats('CUSTOM', row['id']))
+            try:
+                id_val = row['id']
+            except (TypeError, IndexError):
+                id_val = row[0]
+            custom_bosses.append(get_boss_stats('CUSTOM', id_val))
         except Exception:
             continue
 
