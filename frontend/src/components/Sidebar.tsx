@@ -159,13 +159,14 @@ const Sidebar: React.FC = memo(() => {
             className="group-header"
             onClick={() => toggleGroup(groupKey)}
             aria-expanded={expandedGroups[groupKey]}
+            aria-controls={`sidebar-group-${groupKey}`}
           >
             <span className="group-title">{group.title}</span>
             <span className="expand-icon" aria-hidden="true">{expandedGroups[groupKey] ? '▼' : '▶'}</span>
           </button>
 
           {expandedGroups[groupKey] && (
-            <div className="group-items">
+            <div className="group-items" id={`sidebar-group-${groupKey}`}>
               {group.items.map(item => (
                 <button
                   type="button"
