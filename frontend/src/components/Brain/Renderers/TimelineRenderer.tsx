@@ -66,7 +66,7 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
 
             if (match) {
                 const yearStr = match[1].trim();
-                let rest = match[2].trim().replace(/^\*{1,2}/, '').replace(/\*{1,2}$/, '').trim();
+                const rest = match[2].trim().replace(/^\*{1,2}/, '').replace(/\*{1,2}$/, '').trim();
 
                 let title = rest;
                 let desc = '';
