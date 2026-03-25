@@ -11,38 +11,21 @@ def calculate_study_hours(conn, user_id, start_date, end_date):
     Estimate study hours based on activity timestamps
     """
     try:
-        # Get all activity timestamps across modules
-        activities = []
+        # Get all activity timestamps across modules using UNION ALL
+        all_activities = conn.execute('''
+            SELECT submitted_at as timestamp FROM test_attempts WHERE user_id = ? AND submitted_at BETWEEN ? AND ?
+            UNION ALL
+            SELECT submitted_at as timestamp FROM user_answers WHERE user_id = ? AND submitted_at BETWEEN ? AND ?
+            UNION ALL
+            SELECT reviewed_at as timestamp FROM review_sessions WHERE user_id = ? AND reviewed_at BETWEEN ? AND ?
+        ''', (user_id, start_date, end_date, user_id, start_date, end_date, user_id, start_date, end_date)).fetchall()
 
-        # Mock tests
-        mock_tests = conn.execute('''
-            SELECT submitted_at FROM test_attempts
-            WHERE user_id = ? AND submitted_at BETWEEN ? AND ?
-            ORDER BY submitted_at
-        ''', (user_id, start_date, end_date)).fetchall()
-        activities.extend([r['submitted_at'] for r in mock_tests])
-
-        # Answer writing
-        answers = conn.execute('''
-            SELECT submitted_at FROM user_answers
-            WHERE user_id = ? AND submitted_at BETWEEN ? AND ?
-            ORDER BY submitted_at
-        ''', (user_id, start_date, end_date)).fetchall()
-        activities.extend([r['submitted_at'] for r in answers])
-
-        # Flashcard reviews
-        reviews = conn.execute('''
-            SELECT reviewed_at FROM review_sessions
-            WHERE user_id = ? AND reviewed_at BETWEEN ? AND ?
-            ORDER BY reviewed_at
-        ''', (user_id, start_date, end_date)).fetchall()
-        activities.extend([r['reviewed_at'] for r in reviews])
+        activities = [r['timestamp'] for r in all_activities]
 
         # Pomodoro Sessions
         pomodoros = conn.execute('''
-            SELECT timestamp, duration FROM pomodoro_sessions
+            SELECT duration FROM pomodoro_sessions
             WHERE user_id = ? AND timestamp BETWEEN ? AND ?
-            ORDER BY timestamp
         ''', (user_id, start_date, end_date)).fetchall()
         # For study hours, we can use the actual duration
         pomodoro_minutes = sum([r['duration'] for r in pomodoros])
@@ -134,10 +117,10 @@ def identify_weak_areas(conn, user_id, limit=10):
     try:
         # Check syllabus topics not started or in progress
         syllabus_weak = conn.execute('''
-            SELECT subject, name, status
+            SELECT subject, topic as name, status
             FROM syllabus_topics
             WHERE status IN ('Not Started', 'Reading')
-            ORDER BY subject, name
+            ORDER BY subject, topic
             LIMIT ?
         ''', (limit,)).fetchall()
         
@@ -164,7 +147,7 @@ def identify_weak_areas(conn, user_id, limit=10):
         for subj in low_scores:
             # Calculate trend for this subject
             subject_scores = conn.execute('''
-                SELECT mta.score
+                SELECT mta.score, mta.submitted_at
                 FROM test_attempts mta
                 JOIN mock_tests mt ON mta.test_id = mt.id
                 WHERE mta.user_id = ? AND mt.subject = ?
@@ -203,6 +186,9 @@ def calculate_improvement_rate(scores):
     """
     Calculate improvement rate percentage
     """
+    # Filter out None scores
+    scores = [s for s in scores if s is not None]
+
     if len(scores) < 2:
         return 0
     
@@ -224,44 +210,21 @@ def get_streak_days(conn, user_id):
     Calculate consecutive days with activity
     """
     try:
-        # Get all activity dates
-        dates = set()
-
-        # Mock tests
-        mock_dates = conn.execute('''
-            SELECT DATE(submitted_at) as date FROM test_attempts
-            WHERE user_id = ?
-        ''', (user_id,)).fetchall()
-        dates.update([r['date'] for r in mock_dates])
-
-        # Answer writing
-        answer_dates = conn.execute('''
-            SELECT DATE(submitted_at) as date FROM user_answers
-            WHERE user_id = ?
-        ''', (user_id,)).fetchall()
-        dates.update([r['date'] for r in answer_dates])
-
-        # Flashcards
-        review_dates = conn.execute('''
-            SELECT DATE(reviewed_at) as date FROM review_sessions
-            WHERE user_id = ?
-        ''', (user_id,)).fetchall()
-        dates.update([r['date'] for r in review_dates])
-
-        # Pomodoro Sessions
-        pomodoro_dates = conn.execute('''
-            SELECT DATE(timestamp) as date FROM pomodoro_sessions
-            WHERE user_id = ?
-        ''', (user_id,)).fetchall()
-        dates.update([r['date'] for r in pomodoro_dates])
-
-        # War Map (Calendar Events) Completed
-        warmap_dates = conn.execute('''
-            SELECT DATE(updated_at) as date FROM calendar_event_metadata
-            WHERE user_id = ? AND is_completed = 1
-        ''', (user_id,)).fetchall()
-        dates.update([r['date'] for r in warmap_dates])
+        # Get all activity dates using a single UNION query
+        all_dates = conn.execute('''
+            SELECT DATE(submitted_at) as date FROM test_attempts WHERE user_id = ?
+            UNION
+            SELECT DATE(submitted_at) as date FROM user_answers WHERE user_id = ?
+            UNION
+            SELECT DATE(reviewed_at) as date FROM review_sessions WHERE user_id = ?
+            UNION
+            SELECT DATE(timestamp) as date FROM pomodoro_sessions WHERE user_id = ?
+            UNION
+            SELECT DATE(updated_at) as date FROM calendar_event_metadata WHERE user_id = ? AND is_completed = 1
+        ''', (user_id, user_id, user_id, user_id, user_id)).fetchall()
         
+        dates = set([r['date'] for r in all_dates])
+
         if not dates:
             return 0
 
