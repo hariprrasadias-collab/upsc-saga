@@ -4,7 +4,7 @@ Autonomously expands the Mind Palace from external sources.
 """
 from app.services.model_manager import model_manager
 from app.db import get_db
-import requests
+from app.utils.security import safe_requests_get
 import json
 import re
 
@@ -26,7 +26,7 @@ class NeuralLaceService:
                 # For now, we simulate success or use a simple fetch if possible
                 # If running in a restricted env, this might fail.
                 # We'll wrap it safely.
-                resp = requests.get(url, timeout=10)
+                resp = safe_requests_get(url, timeout=10)
                 content = resp.text[:15000] # Limit size
 
                 # Simple HTML cleanup (strip tags)
@@ -64,7 +64,8 @@ class NeuralLaceService:
 
             response = model_manager.generate_content(prompt, model_type='fast')
             text = response.text.strip()
-            if text.startswith("```"): text = text.replace("```json", "").replace("```", "").strip()
+            if text.startswith("```"):
+                text = text.replace("```json", "").replace("```", "").strip()
 
             data = json.loads(text)
 

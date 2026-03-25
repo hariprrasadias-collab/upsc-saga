@@ -261,9 +261,9 @@ def extract_image_from_article(link):
     Tries Open Graph, Twitter meta, then first <img> tag.
     """
     try:
-        import requests
+        from app.utils.security import safe_requests_get
         from bs4 import BeautifulSoup
-        response = requests.get(link, timeout=10)
+        response = safe_requests_get(link, timeout=10)
         soup = BeautifulSoup(response.content, 'html.parser')
         og_image = soup.find('meta', property='og:image')
         if og_image and og_image.get('content'):
@@ -282,7 +282,7 @@ def extract_image_from_article(link):
 def fetch_article_content(url):
     """Fetch full article content from URL."""
     try:
-        import requests
+        from app.utils.security import safe_requests_get
         from bs4 import BeautifulSoup
         
         headers = {
@@ -291,7 +291,7 @@ def fetch_article_content(url):
             'Accept-Language': 'en-US,en;q=0.9',
             'Referer': 'https://www.google.com/'
         }
-        response = requests.get(url, headers=headers, timeout=15)
+        response = safe_requests_get(url, headers=headers, timeout=15)
         soup = BeautifulSoup(response.content, 'html.parser')
         
         # Remove junk elements
@@ -330,7 +330,6 @@ def fetch_article_content(url):
              max_p = 0
              for c in candidates:
                  # Check direct children paragraphs
-                 p_count = len(c.find_all('p', recursive=False))
                  # Bonus for long paragraphs (likely content)
                  score = 0
                  for p in c.find_all('p', recursive=False):
@@ -440,7 +439,7 @@ SUMMARY:"""
     try:
         if not GEMINI_API_KEY:
             print("ERROR: GEMINI_API_KEY not configured in environment")
-            return f"⚠️ AI service not configured. Please add GEMINI_API_KEY to backend/.env file."
+            return "⚠️ AI service not configured. Please add GEMINI_API_KEY to backend/.env file."
         
         # model = genai.GenerativeModel('gemini-2.0-flash-001')  # Using stable latest version
         # response = model.generate_content(prompt)
