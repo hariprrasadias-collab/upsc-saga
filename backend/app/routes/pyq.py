@@ -3,6 +3,7 @@ from app.db import get_db
 import json
 from datetime import datetime
 from app.validators import parse_pagination
+from app.utils.session import get_current_user_id
 
 bp = Blueprint('pyq', __name__, url_prefix='/api/pyq')
 
@@ -454,12 +455,14 @@ def start_quiz():
         
         if not questions:
             return jsonify({'error': 'No questions found matching filters'}), 400
+
+        user_id = get_current_user_id()
         
         # Create quiz session
         cursor = conn.execute('''
             INSERT INTO pyq_quiz_sessions (title, total_questions, filters, status, user_id)
-            VALUES (?, ?, ?, ?, 1)
-        ''', (title, len(questions), json.dumps(filters), 'in_progress'))
+            VALUES (?, ?, ?, ?, ?)
+        ''', (title, len(questions), json.dumps(filters), 'in_progress', user_id))
         
         session_id = cursor.lastrowid
         
@@ -495,6 +498,17 @@ def save_answer(session_id):
         
         conn = get_db()
         
+        user_id = get_current_user_id()
+
+        # Verify ownership
+        session_check = conn.execute(
+            "SELECT id FROM pyq_quiz_sessions WHERE id = ? AND user_id = ?",
+            (session_id, user_id)
+        ).fetchone()
+
+        if not session_check:
+            return jsonify({'error': 'Session not found or Unauthorized'}), 403
+
         # Get correct answer
         question = conn.execute(
             "SELECT correct_option FROM pyq_questions WHERE id = ?",
@@ -527,6 +541,17 @@ def submit_quiz(session_id):
     try:
         conn = get_db()
         
+        user_id = get_current_user_id()
+
+        # Verify ownership
+        session_check = conn.execute(
+            "SELECT id FROM pyq_quiz_sessions WHERE id = ? AND user_id = ?",
+            (session_id, user_id)
+        ).fetchone()
+
+        if not session_check:
+            return jsonify({'error': 'Session not found or Unauthorized'}), 403
+
         # Get all answers for this session
         answers = conn.execute('''
             SELECT * FROM pyq_quiz_answers WHERE session_id = ?
@@ -579,13 +604,15 @@ def get_quiz_session(session_id):
     try:
         conn = get_db()
         
+        user_id = get_current_user_id()
+
         session = conn.execute(
-            "SELECT * FROM pyq_quiz_sessions WHERE id = ?",
-            (session_id,)
+            "SELECT * FROM pyq_quiz_sessions WHERE id = ? AND user_id = ?",
+            (session_id, user_id)
         ).fetchone()
         
         if not session:
-            return jsonify({'error': 'Session not found'}), 404
+            return jsonify({'error': 'Session not found or Unauthorized'}), 404
         
         answers = conn.execute('''
             SELECT qa.*, q.question_text, q.option_a, q.option_b, q.option_c, q.option_d,
@@ -611,11 +638,13 @@ def get_quiz_history():
     try:
         conn = get_db()
         
+        user_id = get_current_user_id()
+
         sessions = conn.execute('''
             SELECT * FROM pyq_quiz_sessions 
-            WHERE user_id = 1
+            WHERE user_id = ?
             ORDER BY started_at DESC
-        ''').fetchall()
+        ''', (user_id,)).fetchall()
         
         return jsonify([dict(s) for s in sessions])
         
@@ -629,6 +658,8 @@ def get_quiz_stats():
     try:
         conn = get_db()
         
+        user_id = get_current_user_id()
+
         # Overall stats
         overall = conn.execute('''
             SELECT 
@@ -637,8 +668,8 @@ def get_quiz_stats():
                 MAX(score) as best_score,
                 SUM(total_questions) as total_questions_attempted
             FROM pyq_quiz_sessions
-            WHERE user_id = 1 AND status = 'completed'
-        ''').fetchone()
+            WHERE user_id = ? AND status = 'completed'
+        ''', (user_id,)).fetchone()
         
         # Subject-wise accuracy
         subject_stats = conn.execute('''
@@ -650,19 +681,19 @@ def get_quiz_stats():
             FROM pyq_quiz_answers qa
             JOIN pyq_questions q ON qa.question_id = q.id
             JOIN pyq_quiz_sessions qs ON qa.session_id = qs.id
-            WHERE qs.user_id = 1 AND qs.status = 'completed' AND qa.selected_answer IS NOT NULL
+            WHERE qs.user_id = ? AND qs.status = 'completed' AND qa.selected_answer IS NOT NULL
             GROUP BY q.subject
             ORDER BY accuracy DESC
-        ''').fetchall()
+        ''', (user_id,)).fetchall()
         
         # Recent improvement trend (last 10 quizzes)
         trend = conn.execute('''
             SELECT score, started_at
             FROM pyq_quiz_sessions
-            WHERE user_id = 1 AND status = 'completed'
+            WHERE user_id = ? AND status = 'completed'
             ORDER BY started_at DESC
             LIMIT 10
-        ''').fetchall()
+        ''', (user_id,)).fetchall()
         
         return jsonify({
             'overall': dict(overall) if overall else {},
