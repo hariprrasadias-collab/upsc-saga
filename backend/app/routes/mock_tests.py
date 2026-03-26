@@ -196,23 +196,24 @@ def submit_attempt(attempt_id):
         incorrect = 0
         unattempted = 0
         
+        updates = []
+
         for q in questions:
             selected = answer_map.get(q['id'])
             if not selected:
                 unattempted += 1
             elif selected.upper() == q['correct_answer'].upper():
                 correct += 1
-                # Mark answer as correct
-                conn.execute(
-                    'UPDATE test_answers SET is_correct = 1 WHERE attempt_id = ? AND question_id = ?',
-                    (attempt_id, q['id'])
-                )
+                updates.append((1, attempt_id, q['id']))
             else:
                 incorrect += 1
-                conn.execute(
-                    'UPDATE test_answers SET is_correct = 0 WHERE attempt_id = ? AND question_id = ?',
-                    (attempt_id, q['id'])
-                )
+                updates.append((0, attempt_id, q['id']))
+
+        if updates:
+            conn.executemany(
+                'UPDATE test_answers SET is_correct = ? WHERE attempt_id = ? AND question_id = ?',
+                updates
+            )
         
         marks_per_q = 2.0
         negative_mark = 0.66  # 1/3 negative marking
@@ -332,11 +333,9 @@ def create_test():
         ))
         test_id = cursor.lastrowid
         
+        question_params = []
         for i, q in enumerate(questions, 1):
-            conn.execute('''
-                INSERT INTO test_questions (test_id, question_number, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation, subject)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
+            question_params.append((
                 test_id, i,
                 q['question_text'],
                 q.get('option_a', ''),
@@ -347,6 +346,12 @@ def create_test():
                 q.get('explanation', ''),
                 q.get('subject', data.get('subject', 'General'))
             ))
+
+        if question_params:
+            conn.executemany('''
+                INSERT INTO test_questions (test_id, question_number, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation, subject)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', question_params)
         
         conn.commit()
         return jsonify({'success': True, 'test_id': test_id}), 201
