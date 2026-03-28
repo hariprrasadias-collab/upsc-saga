@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app.db import get_db
 import json
+from app.utils.session import get_current_user_id
 from datetime import datetime
 from app.validators import parse_pagination
 
@@ -456,10 +457,11 @@ def start_quiz():
             return jsonify({'error': 'No questions found matching filters'}), 400
         
         # Create quiz session
+        user_id = get_current_user_id()
         cursor = conn.execute('''
             INSERT INTO pyq_quiz_sessions (title, total_questions, filters, status, user_id)
-            VALUES (?, ?, ?, ?, 1)
-        ''', (title, len(questions), json.dumps(filters), 'in_progress'))
+            VALUES (?, ?, ?, ?, ?)
+        ''', (title, len(questions), json.dumps(filters), 'in_progress', user_id))
         
         session_id = cursor.lastrowid
         
@@ -609,13 +611,14 @@ def get_quiz_session(session_id):
 def get_quiz_history():
     """Get all quiz sessions for user"""
     try:
+        user_id = get_current_user_id()
         conn = get_db()
         
         sessions = conn.execute('''
             SELECT * FROM pyq_quiz_sessions 
-            WHERE user_id = 1
+            WHERE user_id = ?
             ORDER BY started_at DESC
-        ''').fetchall()
+        ''', (user_id,)).fetchall()
         
         return jsonify([dict(s) for s in sessions])
         
@@ -627,6 +630,7 @@ def get_quiz_history():
 def get_quiz_stats():
     """Get overall quiz performance statistics"""
     try:
+        user_id = get_current_user_id()
         conn = get_db()
         
         # Overall stats
@@ -637,8 +641,8 @@ def get_quiz_stats():
                 MAX(score) as best_score,
                 SUM(total_questions) as total_questions_attempted
             FROM pyq_quiz_sessions
-            WHERE user_id = 1 AND status = 'completed'
-        ''').fetchone()
+            WHERE user_id = ? AND status = 'completed'
+        ''', (user_id,)).fetchone()
         
         # Subject-wise accuracy
         subject_stats = conn.execute('''
@@ -650,19 +654,19 @@ def get_quiz_stats():
             FROM pyq_quiz_answers qa
             JOIN pyq_questions q ON qa.question_id = q.id
             JOIN pyq_quiz_sessions qs ON qa.session_id = qs.id
-            WHERE qs.user_id = 1 AND qs.status = 'completed' AND qa.selected_answer IS NOT NULL
+            WHERE qs.user_id = ? AND qs.status = 'completed' AND qa.selected_answer IS NOT NULL
             GROUP BY q.subject
             ORDER BY accuracy DESC
-        ''').fetchall()
+        ''', (user_id,)).fetchall()
         
         # Recent improvement trend (last 10 quizzes)
         trend = conn.execute('''
             SELECT score, started_at
             FROM pyq_quiz_sessions
-            WHERE user_id = 1 AND status = 'completed'
+            WHERE user_id = ? AND status = 'completed'
             ORDER BY started_at DESC
             LIMIT 10
-        ''').fetchall()
+        ''', (user_id,)).fetchall()
         
         return jsonify({
             'overall': dict(overall) if overall else {},
