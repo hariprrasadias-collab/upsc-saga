@@ -1,0 +1,4 @@
+## 2024-05-24 - Hardcoded API Key Vulnerability in External Provider Client
+**Vulnerability:** A hardcoded API key fallback ('d25c95eccbc569b1bc0d65699c5af9e39cea03ed39d728223f783dccf45616e0') was used as a default value for the OpenClaw AI model provider in `backend/app/services/model_manager.py`.
+**Learning:** Hardcoded credentials in source code pose a critical security risk as they can easily be leaked in version control. External AI provider services should only be initialized if their required keys are strictly provided through environment variables.
+**Prevention:** Always rely strictly on environment variables (e.g., `os.environ.get('OPENCLAW_API_KEY')`) for sensitive credentials and conditionally initialize services only if their required keys are present. Never use hardcoded fallbacks for API keys in the source code.
