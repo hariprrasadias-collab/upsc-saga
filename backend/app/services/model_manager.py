@@ -13,11 +13,14 @@ from openai import OpenAI
 
 load_dotenv()
 
+
 class FallbackResponse:
     """A safe, mock response object mimicking genai.GenerateContentResponse"""
+
     def __init__(self, text, candidates=None):
         self.text = text
         self.candidates = candidates or []
+
 
 class ModelManager:
     """
@@ -75,10 +78,10 @@ class ModelManager:
         # 1. Google Setup
         self.google_api_key = os.environ.get('GEMINI_API_KEY')
         self.google_configured = False
-        
+
         # 2. OpenAI-Compatible Providers Setup
         self.clients = {}
-        
+
         # OpenRouter
         or_key = os.environ.get('OPENROUTER_API_KEY')
         if or_key:
@@ -90,37 +93,41 @@ class ModelManager:
                     "X-Title": "UPSC Second Brain"
                 }
             )
-            
+
         # Nvidia NIM
         nv_key = os.environ.get('NVIDIA_API_KEY')
         if nv_key:
-             self.clients['nvidia'] = openai.OpenAI(
+            self.clients['nvidia'] = openai.OpenAI(
                 base_url="https://integrate.api.nvidia.com/v1",
                 api_key=nv_key
             )
-            
+
         # 3. OpenClaw Local Gateway (Primary Local Fallback/Alternative)
-        openclaw_key = os.environ.get('OPENCLAW_API_KEY', 'd25c95eccbc569b1bc0d65699c5af9e39cea03ed39d728223f783dccf45616e0')
-        openclaw_base_url = os.environ.get('OPENCLAW_BASE_URL', 'http://localhost:18789/v1')
-        self.openclaw_model = os.environ.get('OPENCLAW_MODEL', 'ollama/qwen3:14b')
-        
-        try:
-            self.clients['openclaw'] = openai.OpenAI(
-                base_url=openclaw_base_url,
-                api_key=openclaw_key,
-                default_headers={
-                    "X-Title": "UPSC Second Brain Local"
-                }
-            )
-        except Exception as e:
-            print(f"⚠️ OpenClaw initialization soft-failed: {e}")
+        openclaw_key = os.environ.get('OPENCLAW_API_KEY')
+        openclaw_base_url = os.environ.get(
+            'OPENCLAW_BASE_URL', 'http://localhost:18789/v1')
+        self.openclaw_model = os.environ.get(
+            'OPENCLAW_MODEL', 'ollama/qwen3:14b')
+
+        if openclaw_key:
+            try:
+                self.clients['openclaw'] = openai.OpenAI(
+                    base_url=openclaw_base_url,
+                    api_key=openclaw_key,
+                    default_headers={
+                        "X-Title": "UPSC Second Brain Local"
+                    }
+                )
+            except Exception as e:
+                print(f"⚠️ OpenClaw initialization soft-failed: {e}")
 
         # State Management
         self.response_cache = TTLCache(maxsize=200, ttl=3600)
         self._panic_mode_until = None
 
         # Quota Persistence
-        self.quota_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'services', 'quota_status.json')
+        self.quota_file = os.path.join(os.path.dirname(
+            os.path.dirname(__file__)), 'services', 'quota_status.json')
         self.quota_status = self._load_quota_status()
 
         if self.google_api_key:
@@ -128,7 +135,8 @@ class ModelManager:
         else:
             print("⚠️ ModelManager Warning: GEMINI_API_KEY not found.")
 
-        print(f"✨ ModelManager Ready. Active Providers: {list(self.clients.keys()) + (['google'] if self.google_configured else [])}")
+        print(
+            f"✨ ModelManager Ready. Active Providers: {list(self.clients.keys()) + (['google'] if self.google_configured else [])}")
 
     @property
     def is_configured(self):
@@ -157,7 +165,8 @@ class ModelManager:
         try:
             # Clean up expired entries before saving
             now = datetime.now().isoformat()
-            self.quota_status = {k: v for k, v in self.quota_status.items() if v > now}
+            self.quota_status = {k: v for k,
+                                 v in self.quota_status.items() if v > now}
 
             with open(self.quota_file, 'w') as f:
                 json.dump(self.quota_status, f)
@@ -204,12 +213,12 @@ class ModelManager:
         # A. Explicit Request
         if provider and model_name:
             add_candidate(provider, model_name)
-        
+
         # B. Automatic Strategy based on Type
         elif model_type == 'pro':
             # Priority 0: OpenClaw Local (User Priority)
             add_candidate('openclaw', self.openclaw_model)
-            
+
             # Priority 1: Nvidia High-End (Complex Tasks)
             for m in self.NVIDIA_MODELS_PRO:
                 add_candidate('nvidia', m)
@@ -219,23 +228,23 @@ class ModelManager:
                 add_candidate('google', m)
 
             # Priority 3: OpenRouter Premium/Free Top Tier
-            for m in self.OPENROUTER_PREMIUM: # Only if user pays, but list exists
-                 add_candidate('openrouter', m)
+            for m in self.OPENROUTER_PREMIUM:  # Only if user pays, but list exists
+                add_candidate('openrouter', m)
             for m in self.OPENROUTER_FREE:
-                if '405b' in m or 'deepseek-r1' in m: # Prioritize smarter free models
+                if '405b' in m or 'deepseek-r1' in m:  # Prioritize smarter free models
                     add_candidate('openrouter', m)
-            
-        else: # 'fast'
+
+        else:  # 'fast'
             # Priority 0: OpenClaw Local (User Priority)
             add_candidate('openclaw', self.openclaw_model)
-            
+
             # Priority 1: Nvidia Fast
             for m in self.NVIDIA_MODELS_FAST:
                 add_candidate('nvidia', m)
 
             # Priority 2: OpenRouter Free (Top ones)
             for m in self.OPENROUTER_FREE:
-                 add_candidate('openrouter', m)
+                add_candidate('openrouter', m)
 
             # Priority 3: Google Fast
             for m in self.GEMINI_FAST_MODELS:
@@ -243,10 +252,13 @@ class ModelManager:
 
         # Fallback: Always ensure at least some models are in the list if everything else is exhausted
         if not candidates:
-             # Force add base models even if "quota exceeded" check failed (desperate measure) or just add if list empty
-             print("⚠️ Warning: All preferred models seem exhausted. Attempting Hail Mary.")
-             candidates.append({'provider': 'google', 'model': 'gemini-2.0-flash'})
-             candidates.append({'provider': 'openrouter', 'model': 'google/gemini-2.0-flash-exp:free'})
+            # Force add base models even if "quota exceeded" check failed (desperate measure) or just add if list empty
+            print(
+                "⚠️ Warning: All preferred models seem exhausted. Attempting Hail Mary.")
+            candidates.append(
+                {'provider': 'google', 'model': 'gemini-2.0-flash'})
+            candidates.append(
+                {'provider': 'openrouter', 'model': 'google/gemini-2.0-flash-exp:free'})
 
         # Deduplicate candidates while preserving order
         seen = set()
@@ -260,16 +272,17 @@ class ModelManager:
         # 2. Execution Loop
         # Check cache for the primary candidate (best effort cache key)
         if unique_candidates:
-             cache_key = self._get_cache_key(prompt, unique_candidates[0]['model'], kwargs)
-             if cache_key in self.response_cache:
-                 print("⚡ Returning cached response.")
-                 return self.response_cache[cache_key]
+            cache_key = self._get_cache_key(
+                prompt, unique_candidates[0]['model'], kwargs)
+            if cache_key in self.response_cache:
+                print("⚡ Returning cached response.")
+                return self.response_cache[cache_key]
 
         errors = []
         for candidate in unique_candidates:
             tgt_prov = candidate['provider']
             tgt_model = candidate['model']
-            
+
             # Skip if provider not configured
             if tgt_prov != 'google' and tgt_prov not in self.clients:
                 continue
@@ -283,21 +296,24 @@ class ModelManager:
                 start_time = time.time()
 
                 if tgt_prov == 'google':
-                     response = self._generate_google(prompt, tgt_model, **kwargs)
+                    response = self._generate_google(
+                        prompt, tgt_model, **kwargs)
                 elif tgt_prov in self.clients:
-                     response = self._generate_openai_compat(prompt, tgt_model, tgt_prov, **kwargs)
-                
+                    response = self._generate_openai_compat(
+                        prompt, tgt_model, tgt_prov, **kwargs)
+
                 if response:
                     duration = time.time() - start_time
                     print(f"✅ Success with {tgt_prov} ({duration:.2f}s)")
 
                     # Cache successful response
                     if unique_candidates:
-                         cache_key = self._get_cache_key(prompt, unique_candidates[0]['model'], kwargs)
-                         self.response_cache[cache_key] = response
+                        cache_key = self._get_cache_key(
+                            prompt, unique_candidates[0]['model'], kwargs)
+                        self.response_cache[cache_key] = response
 
                     return response
-            
+
             except Exception as e:
                 err_str = str(e).lower()
                 print(f"⚠️ {tgt_prov} ({tgt_model}) failed: {str(e)}")
@@ -307,29 +323,31 @@ class ModelManager:
                     self._mark_quota_exceeded(tgt_prov, tgt_model)
 
                 errors.append(f"{tgt_prov}:{tgt_model} -> {str(e)}")
-                continue # Try next candidate
+                continue  # Try next candidate
 
         # 3. Final Failure
         print("❌ All Fallbacks Failed.")
         return FallbackResponse(f"Oracle is silent. All providers failed. Errors: {'; '.join(errors)}")
 
     def _generate_google(self, prompt, model_name, **kwargs):
-        if not self.google_configured: raise Exception("Google not configured")
-        
+        if not self.google_configured:
+            raise Exception("Google not configured")
+
         # Map generic kwargs to Gemini specific if needed
         gen_config = genai.types.GenerationConfig(
             temperature=kwargs.get('temperature', 0.7),
             max_output_tokens=kwargs.get('max_output_tokens', 2048)
         )
-        
+
         model = genai.GenerativeModel(model_name)
         response = model.generate_content(prompt, generation_config=gen_config)
         return FallbackResponse(response.text)
 
     def _generate_openai_compat(self, prompt, model_name, provider_key, **kwargs):
         client = self.clients.get(provider_key)
-        if not client: raise Exception(f"Client for {provider_key} not ready")
-        
+        if not client:
+            raise Exception(f"Client for {provider_key} not ready")
+
         completion = client.chat.completions.create(
             model=model_name,
             messages=[
@@ -338,7 +356,7 @@ class ModelManager:
             temperature=kwargs.get('temperature', 0.7),
             max_tokens=kwargs.get('max_output_tokens', 2048)
         )
-        
+
         text_content = completion.choices[0].message.content
         return FallbackResponse(text_content)
 
@@ -391,12 +409,14 @@ class ModelManager:
             The final, polished content only.
             """
 
-            final_response = self.generate_content(judge_prompt, model_type='pro')
+            final_response = self.generate_content(
+                judge_prompt, model_type='pro')
             print("🐍 HYDRA: Consensus Achieved.")
             return final_response
 
         except Exception as e:
             print(f"🐍 HYDRA Failed: {e}. Fallback to standard generation.")
             return self.generate_content(prompt, model_type='pro')
+
 
 model_manager = ModelManager()
