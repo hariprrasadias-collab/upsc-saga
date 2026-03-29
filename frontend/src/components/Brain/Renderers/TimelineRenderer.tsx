@@ -312,8 +312,8 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <button className="icon-btn" onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')} title="Sort Date">
-                        {sortOrder === 'asc' ? <FaSortAlphaDown /> : <FaSortAlphaUp />}
+                    <button className="icon-btn" onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')} title="Sort Date" aria-label={`Sort by date ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}>
+                        <span aria-hidden="true">{sortOrder === 'asc' ? <FaSortAlphaDown /> : <FaSortAlphaUp />}</span>
                     </button>
 
                     {/* Zoom Control */}
@@ -342,15 +342,22 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
                             setIsPlaying(!isPlaying);
                         }}
                         title={isPlaying ? "Pause Presentation" : "Start Presentation"}
+                        aria-label={isPlaying ? "Pause Presentation" : "Start Presentation"}
                     >
-                        {isPlaying ? <FaPause /> : <FaPlay />}
+                        <span aria-hidden="true">{isPlaying ? <FaPause /> : <FaPlay />}</span>
                     </button>
 
                     <div className="divider-v"></div>
 
-                    <button className={`view-btn ${viewMode === 'vertical' ? 'active' : ''}`} onClick={() => setViewMode('vertical')} title="Vertical View"><FaStream /></button>
-                    <button className={`view-btn ${viewMode === 'horizontal' ? 'active' : ''}`} onClick={() => setViewMode('horizontal')} title="Horizontal View"><FaExpandAlt /></button>
-                    <button className={`view-btn ${viewMode === 'compact' ? 'active' : ''}`} onClick={() => setViewMode('compact')} title="Compact List"><FaList /></button>
+                    <button className={`view-btn ${viewMode === 'vertical' ? 'active' : ''}`} onClick={() => setViewMode('vertical')} title="Vertical View" aria-label="Switch to Vertical View">
+                        <span aria-hidden="true"><FaStream /></span>
+                    </button>
+                    <button className={`view-btn ${viewMode === 'horizontal' ? 'active' : ''}`} onClick={() => setViewMode('horizontal')} title="Horizontal View" aria-label="Switch to Horizontal View">
+                        <span aria-hidden="true"><FaExpandAlt /></span>
+                    </button>
+                    <button className={`view-btn ${viewMode === 'compact' ? 'active' : ''}`} onClick={() => setViewMode('compact')} title="Compact List" aria-label="Switch to Compact List">
+                        <span aria-hidden="true"><FaList /></span>
+                    </button>
                 </div>
             </div>
 
@@ -400,7 +407,9 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
                             onClick={e => e.stopPropagation()}
                         >
                             {!isPlaying && (
-                                <button className="close-modal-btn" onClick={() => setSelectedEvent(null)}>×</button>
+                                <button className="close-modal-btn" onClick={() => setSelectedEvent(null)} aria-label="Close event details">
+                                    <span aria-hidden="true">×</span>
+                                </button>
                             )}
 
                             {isPlaying && (
