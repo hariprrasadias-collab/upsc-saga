@@ -161,7 +161,7 @@ const MindMapCreator: React.FC = () => {
                         return true;
                     }
                     if (currentNode.children) {
-                        for (let child of currentNode.children) {
+                        for (const child of currentNode.children) {
                             if (appendChildren(child, targetName, newChildren)) return true;
                         }
                     }
