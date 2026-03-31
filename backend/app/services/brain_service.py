@@ -1,17 +1,14 @@
 import os
 import json
-import traceback
 from datetime import datetime
 from dotenv import load_dotenv
 from app.services.model_manager import model_manager
 from app.services.synapse_registry import SynapseRegistry
 from app.services.autonomy_manager import autonomy_manager
-from app.services.syllabus_tracker import SyllabusTracker
 from app.services.psychometric_service import psychometric_service
-from app.services.ab_tester import ab_tester
 from app.db_models.automation_storage import (
     save_socratic_dialogue, save_triangulation, 
-    save_foresight_prediction, save_ai_content
+    save_ai_content
 )
 from app.db_models.neural_hash import save_neural_hash_log
 
@@ -273,13 +270,12 @@ class BrainService:
             conn = get_db()
 
             if isinstance(predictions, list):
-                for p in predictions:
-                    question = p.get('question', 'Unknown Question')
-                    p_type = p.get('type', 'MCQ')
-                    conn.execute('''
-                        INSERT INTO foresight_predictions (question, subject, topic, type, probability, created_at)
-                        VALUES (?, ?, ?, ?, 0.85, datetime('now'))
-                    ''', (question, subject, topic, p_type))
+                # ⚡ Bolt: Replace iterative inserts with executemany for bulk performance
+                params = [(p.get('question', 'Unknown Question'), subject, topic, p.get('type', 'MCQ')) for p in predictions]
+                conn.executemany('''
+                    INSERT INTO foresight_predictions (question, subject, topic, type, probability, created_at)
+                    VALUES (?, ?, ?, ?, 0.85, datetime('now'))
+                ''', params)
                 conn.commit()
                 print(f"Brain: Saved {len(predictions)} predictions for {topic}")
         except Exception as e:
@@ -319,7 +315,7 @@ class BrainService:
                 (f"%{topic}%", subject)
             ).fetchall()
             pyq_context = "\n".join([f"[{q['year']}] {q['question_text']}" for q in questions])
-        except Exception as e:
+        except Exception:
             pyq_context = "No PYQ data available."
 
         recent_topics = []
@@ -590,12 +586,13 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     ''', (data.get('title', f"Test: {topic}"), topic, len(data.get('questions', [])), len(data.get('questions', []))*2, len(data.get('questions', []))*2))
                     test_id = cursor.lastrowid
 
-                    for i, q in enumerate(data.get('questions', []), 1):
-                        conn.execute('''
-                            INSERT INTO test_questions
-                            (test_id, question_number, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        ''', (test_id, i, q['question_text'], q['option_a'], q['option_b'], q['option_c'], q['option_d'], q['correct_answer'], q['explanation']))
+                    # ⚡ Bolt: Replace iterative inserts with executemany for bulk performance
+                    params = [(test_id, i, q['question_text'], q['option_a'], q['option_b'], q['option_c'], q['option_d'], q['correct_answer'], q['explanation']) for i, q in enumerate(data.get('questions', []), 1)]
+                    conn.executemany('''
+                        INSERT INTO test_questions
+                        (test_id, question_number, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ''', params)
                     conn.commit()
                 except Exception as e:
                     print(f"Ingest Error (MockTest): {e}")
@@ -860,9 +857,9 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                                 data = result.get('data', [])
                                 if data:
                                     print(f"Brain: Saving {len(data)} predictions...")
-                                    for p in data:
-                                        conn.execute('INSERT INTO foresight_predictions (topic, question, type, probability, reasoning) VALUES (?, ?, ?, ?, ?)',
-                                                    (topic, p.get('question'), p.get('type'), p.get('probability'), p.get('reasoning')))
+                                    # ⚡ Bolt: Replace iterative inserts with executemany for bulk performance
+                                    params = [(topic, p.get('question'), p.get('type'), p.get('probability'), p.get('reasoning')) for p in data]
+                                    conn.executemany('INSERT INTO foresight_predictions (topic, question, type, probability, reasoning) VALUES (?, ?, ?, ?, ?)', params)
                                     conn.commit()
                             
                             elif action == "GENERATE_SOCRATIC_DIALOGUE":
@@ -870,7 +867,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                                 dialogue = result.get('dialogue')
                                 verdict = result.get('verdict')
                                 if dialogue:
-                                    print(f"Brain: Saving Socratic Dialogue...")
+                                    print("Brain: Saving Socratic Dialogue...")
                                     cursor = conn.execute('INSERT INTO socratic_conversations (topic, user_id, dialogue, insight) VALUES (?, ?, ?, ?)',
                                                 (topic, 1, dialogue, json.dumps(verdict)))
                                     conn.commit()
@@ -879,7 +876,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                                 # Save Linkages (Neural Hash)
                                 linkages_data = result.get('data') # It returns {'success': True, 'data': {...}}
                                 if linkages_data:
-                                    print(f"Brain: Saving Neural Linkages...")
+                                    print("Brain: Saving Neural Linkages...")
                                     # We need to extract fields safely
                                     core_themes = json.dumps(linkages_data.get('core_themes', []))
                                     examiner_pattern = linkages_data.get('examiner_pattern', '')
@@ -893,7 +890,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                                 # Save Podcast Script
                                 script = result.get('script')
                                 if script:
-                                    print(f"Brain: Saving Podcast Script...")
+                                    print("Brain: Saving Podcast Script...")
                                     conn.execute('INSERT INTO ai_generated_content (content_type, topic, content, metadata) VALUES (?, ?, ?, ?)',
                                                 ('podcast', topic, script, json.dumps({'style': payload.get('style')})))
                                     conn.commit()
@@ -901,7 +898,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                             elif action == "GENERATE_SUBJECT_BOOK":
                                 book_data = result.get('book')
                                 if book_data:
-                                    print(f"Brain: Saving Subject Book...")
+                                    print("Brain: Saving Subject Book...")
                                     conn.execute('INSERT INTO ai_generated_content (content_type, topic, content, metadata) VALUES (?, ?, ?, ?)',
                                                 ('subject_book', topic, json.dumps(book_data), json.dumps({'subject': payload.get('subject')})))
                                     conn.commit()
@@ -909,7 +906,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                             elif action == "GENERATE_INTERVIEW_SIM":
                                 interview_data = result.get('interview')
                                 if interview_data:
-                                    print(f"Brain: Saving Interview Simulator...")
+                                    print("Brain: Saving Interview Simulator...")
                                     conn.execute('INSERT INTO ai_generated_content (content_type, topic, content, metadata) VALUES (?, ?, ?, ?)',
                                                 ('interview_sim', topic, json.dumps(interview_data), json.dumps({})))
                                     conn.commit()
@@ -917,7 +914,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                             elif action == "GENERATE_HEATMAP":
                                 heatmap_data = result.get('heatmap')
                                 if heatmap_data:
-                                    print(f"Brain: Saving Heatmap...")
+                                    print("Brain: Saving Heatmap...")
                                     conn.execute('INSERT INTO ai_generated_content (content_type, topic, content, metadata) VALUES (?, ?, ?, ?)',
                                                 ('heatmap', topic, json.dumps(heatmap_data), json.dumps({'subject': payload.get('subject')})))
                                     conn.commit()
@@ -925,7 +922,7 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                             elif action == "GENERATE_SELF_REVIEW":
                                 review_data = result.get('review')
                                 if review_data:
-                                    print(f"Brain: Saving Self Review...")
+                                    print("Brain: Saving Self Review...")
                                     conn.execute('INSERT INTO ai_generated_content (content_type, topic, content, metadata) VALUES (?, ?, ?, ?)',
                                                 ('self_review', topic, json.dumps(review_data), json.dumps({})))
                                     conn.commit()
@@ -933,71 +930,71 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                             elif action == "GENERATE_MNEMONICS":
                                 mnemonic_text = result.get('mnemonic')
                                 if mnemonic_text:
-                                    print(f"Brain: Saving Mnemonics...")
+                                    print("Brain: Saving Mnemonics...")
                                     self._save_mnemonic(topic, mnemonic_text, payload.get('type', 'facts'))
                             
                             elif action == "TRIANGULATE_TOPIC":
                                 data = result.get('data', {})
                                 synthesis = data.get('synthesis', '')
                                 if synthesis:
-                                    print(f"Brain: Saving Triangulation...")
+                                    print("Brain: Saving Triangulation...")
                                     save_triangulation(topic, synthesis, data)
                             
                             elif action == "GENERATE_ESSAY_PROMPT":
                                 prompt = result.get('prompt')
                                 if prompt:
-                                    print(f"Brain: Saving Essay Prompt...")
+                                    print("Brain: Saving Essay Prompt...")
                                     self._save_essay_prompt(topic, subject, prompt)
                                     save_ai_content('essay', topic, prompt, {'subject': subject})
 
                             elif action == "GENERATE_MAP_WORK":
                                 locations = result.get('locations')
                                 if locations:
-                                    print(f"Brain: Saving Map Work...")
+                                    print("Brain: Saving Map Work...")
                                     save_ai_content('map_work', topic, json.dumps(locations), {'locations': locations})
                             
                             elif action == "GENERATE_CHEAT_SHEET":
                                 content = result.get('content')
                                 if content:
-                                    print(f"Brain: Saving Cheat Sheet...")
+                                    print("Brain: Saving Cheat Sheet...")
                                     save_ai_content('cheat_sheet', topic, content)
 
                             elif action == "GENERATE_QUOTE_BANK":
                                 quotes = result.get('quotes')
                                 data_pts = result.get('data')
                                 if quotes or data_pts:
-                                    print(f"Brain: Saving Quote Bank...")
+                                    print("Brain: Saving Quote Bank...")
                                     content = f"Quotes:\n{quotes}\n\nData:\n{data_pts}"
                                     save_ai_content('quote_bank', topic, content)
 
                             elif action == "GENERATE_TIMELINE":
                                 timeline = result.get('timeline')
                                 if timeline:
-                                    print(f"Brain: Saving Timeline...")
+                                    print("Brain: Saving Timeline...")
                                     save_ai_content('timeline', topic, timeline)
 
                             elif action == "GENERATE_ETHICS_DILEMMA":
                                 dilemma = result.get('dilemma')
                                 if dilemma:
-                                    print(f"Brain: Saving Ethics Dilemma...")
+                                    print("Brain: Saving Ethics Dilemma...")
                                     save_ai_content('ethics_dilemma', topic, dilemma)
 
                             elif action == "GENERATE_ELI5":
                                 eli5_data = result.get('data')
                                 if eli5_data:
-                                    print(f"Brain: Saving ELI5...")
+                                    print("Brain: Saving ELI5...")
                                     save_ai_content('eli5', topic, json.dumps(eli5_data))
 
                             elif action == "GENERATE_ROLEPLAY_SCENARIO":
                                 scenario = result.get('scenario')
                                 if scenario:
-                                    print(f"Brain: Saving Roleplay Scenario...")
+                                    print("Brain: Saving Roleplay Scenario...")
                                     save_ai_content('roleplay', topic, scenario)
 
                             elif action == "GENERATE_VISUAL_PROMPT":
                                 visual_prompt = result.get('prompt')
                                 if visual_prompt:
-                                    print(f"Brain: Saving Visual Prompt...")
+                                    print("Brain: Saving Visual Prompt...")
                                     self._save_mnemonic(topic, visual_prompt, 'visual')
                                     save_ai_content('visual_prompt', topic, visual_prompt)
 
@@ -1273,7 +1270,6 @@ Your output must be structurally perfect, intellectually dense, and strictly com
 
             elif action_type == "UPDATE_TIMEBOXES":
                 try:
-                    from app.services.time_boxing_service import time_boxing_service
                     # Logic to re-optimize schedule
                     result = {"success": True, "message": "Schedule optimized based on energy levels."}
                 except Exception as e:
@@ -1389,13 +1385,15 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                         import random
                         neon_colors = ['#3498db', '#9b59b6', '#2ecc71', '#e74c3c', '#f1c40f', '#00f3ff', '#ff00ff']
                         
+                        # ⚡ Bolt: Replace iterative inserts with executemany for bulk performance
+                        params = []
                         for art in artifacts_data:
                             x = random.randint(10, 80)
                             y = random.randint(10, 80)
                             color = random.choice(neon_colors)
+                            params.append((location_id, art.get('title', 'Unknown'), art.get('content', ''), 'concept', x, y, art.get('icon', '📦'), color))
                             
-                            conn.execute('INSERT INTO mind_palace_artifacts (location_id, title, content, type, x_position, y_position, icon, color) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', 
-                                       (location_id, art.get('title', 'Unknown'), art.get('content', ''), 'concept', x, y, art.get('icon', '📦'), color))
+                        conn.executemany('INSERT INTO mind_palace_artifacts (location_id, title, content, type, x_position, y_position, icon, color) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', params)
                             
                     conn.commit()
                     result = {"success": True, "message": f"Constructed 'The Hall of {topic}' with {len(artifacts_data) if isinstance(artifacts_data, list) else 0} memories."}
@@ -1590,10 +1588,10 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     count = 0
                     today_str = datetime.now().date().isoformat()
 
-                    for q in new_quests:
-                        conn.execute('INSERT INTO tasks (user_id, title, xp_reward, associated_stat, isCompleted, is_quest, due_date) VALUES (?, ?, ?, ?, 0, 1, ?)',
-                                     (user_id, q['title'], q['xp_reward'], q['type'], today_str))
-                        count += 1
+                    # ⚡ Bolt: Replace iterative inserts with executemany for bulk performance
+                    params = [(user_id, q['title'], q['xp_reward'], q['type'], today_str) for q in new_quests]
+                    conn.executemany('INSERT INTO tasks (user_id, title, xp_reward, associated_stat, isCompleted, is_quest, due_date) VALUES (?, ?, ?, ?, 0, 1, ?)', params)
+                    count = len(new_quests)
 
                     conn.commit()
 
