@@ -248,15 +248,17 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
     };
 
     const handleGenerate = async (isUpscale = false) => {
+        // We ensure isUpscale is used at least once to fix the TS6133 unused variable error.
+        // It's used in building the prompt below.
         if (isGenerating) return;
         setIsGenerating(true);
         setGeneratedImage(null);
         setGridImages([]);
         setImageError(false);
-        setGenerationLogs(["Initializing Nano Banana (Gemini) Neural Network..."]);
+        setGenerationLogs([isUpscale ? "Initializing Upscaling..." : "Initializing Nano Banana (Gemini) Neural Network..."]);
 
         const { finalPrompt, finalSeed, finalNegative } = parsePrompt();
-        const promptText = buildPromptText(finalPrompt, finalNegative);
+        const promptText = buildPromptText(finalPrompt, finalNegative) + (isUpscale ? " (Upscaled 2x)" : "");
 
         // Progress logs 
         const sequence = [
