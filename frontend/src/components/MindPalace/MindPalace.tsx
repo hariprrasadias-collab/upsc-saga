@@ -117,7 +117,7 @@ const MindPalace: React.FC = () => {
         }
     };
 
-    const handleCreateArtifact = async () => {
+    const handleCreateArtifact = async (_e: React.MouseEvent) => {
         // Create artifact at click position if in room view
         if (!currentLocation) return;
 
@@ -185,7 +185,7 @@ const MindPalace: React.FC = () => {
             <div className="palace-header">
                 <h1>
                     {view === 'room' && (
-                        <button aria-label="Back to map" className="palace-btn" onClick={() => setView('map')} style={{ marginRight: '1rem' }}>
+                        <button className="palace-btn" onClick={() => setView('map')} style={{ marginRight: '1rem' }}>
                             <FaArrowLeft />
                         </button>
                     )}
@@ -256,7 +256,7 @@ const MindPalace: React.FC = () => {
                     <div className="palace-modal" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2>Construct New Location</h2>
-                            <button aria-label="Close" className="close-btn" onClick={() => setShowLocationModal(false)}><span aria-hidden="true">×</span></button>
+                            <button className="close-btn" onClick={() => setShowLocationModal(false)}>×</button>
                         </div>
                         <div className="form-group">
                             <label>Name</label>
@@ -272,7 +272,6 @@ const MindPalace: React.FC = () => {
                                 className="save-btn"
                                 onClick={handleBrainConstruct}
                                 disabled={isConstructing}
-                                aria-busy={isConstructing}
                                 style={{ background: 'linear-gradient(135deg, #8e44ad, #3498db)', marginLeft: '10px' }}
                             >
                                 {isConstructing ? 'Architecting...' : '🧠 Construct with Brain'}
@@ -288,7 +287,7 @@ const MindPalace: React.FC = () => {
                     <div className="palace-modal" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2>{editingArtifact ? 'Recall Memory' : 'Place New Memory'}</h2>
-                            <button aria-label="Close" className="close-btn" onClick={() => { setShowArtifactModal(false); setEditingArtifact(null); }}><span aria-hidden="true">×</span></button>
+                            <button className="close-btn" onClick={() => { setShowArtifactModal(false); setEditingArtifact(null); }}>×</button>
                         </div>
                         <div className="form-group">
                             <label>Title</label>
