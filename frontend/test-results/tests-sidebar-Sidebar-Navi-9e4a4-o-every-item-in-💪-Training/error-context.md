@@ -1,159 +1,288 @@
-# Instructions
-
-- Following Playwright test failed.
-- Explain why, be concise, respect Playwright best practices.
-- Provide a snippet of code with the fix, if possible.
-
-# Test info
-
-- Name: tests/sidebar.spec.ts >> Sidebar Navigation E2E Tests >> should navigate to every item in 💪 Training
-- Location: tests/sidebar.spec.ts:89:9
-
-# Error details
-
-```
-Test timeout of 30000ms exceeded.
-```
-
-```
-Error: locator.getAttribute: Test timeout of 30000ms exceeded.
-Call log:
-  - waiting for locator('button.group-header:has-text("💪 Training")')
-
-```
-
 # Page snapshot
 
 ```yaml
-- 'status "Error: Failed to fetch dashboard data" [ref=e3]':
-  - generic [ref=e4]:
-    - img [ref=e5]
-    - img [ref=e8]
-  - generic [ref=e11]: "Error: Failed to fetch dashboard data"
-```
-
-# Test source
-
-```ts
-  1   | import { test, expect } from '@playwright/test';
-  2   |
-  3   | test.describe('Sidebar Navigation E2E Tests', () => {
-  4   |     // Test standalone menus
-  5   |     test('should navigate to standalone menus', async ({ page }) => {
-  6   |         await page.goto('http://localhost:5173');
-  7   |
-  8   |         // Wait for sidebar to be ready
-  9   |         const sidebar = page.locator('.sidebar');
-  10  |         await expect(sidebar).toBeVisible();
-  11  |
-  12  |         // Analytics
-  13  |         await page.click('button:has-text("Analytics")');
-  14  |         // Wait for Analytics component to render
-  15  |         await expect(page.locator('.analytics-container, text="Analytics Dashboard", text="Study Stats"').first()).toBeVisible({ timeout: 5000 });
-  16  |
-  17  |         // Weak Areas
-  18  |         await page.click('button:has-text("Weak Areas")');
-  19  |         await expect(page.locator('.weak-areas-container, text="Weak Areas", text="Critical Gaps"').first()).toBeVisible({ timeout: 5000 });
-  20  |     });
-  21  |
-  22  |     // Test expanding groups and nested items
-  23  |     const menuGroups = [
-  24  |         {
-  25  |             groupName: '🗺️ Planning',
-  26  |             items: [
-  27  |                 { name: 'Study Plan', url: '/study-plan' },
-  28  |                 { name: 'War Map', url: '/war-map' },
-  29  |                 { name: 'War Room Archives', url: '/triangulation-history' },
-  30  |                 { name: 'Syllabus', url: '/syllabus' },
-  31  |                 { name: 'Quests', url: '/quests' },
-  32  |                 { name: 'Revision Cards', url: '/revision-cards' },
-  33  |                 { name: 'Mnemonics', url: '/mnemonics' },
-  34  |                 { name: 'Mind Map', url: '/mindmap' },
-  35  |                 { name: 'Mind Palace', url: '/mind-palace' },
-  36  |                 { name: 'Revision Center', url: '/revision-center' },
-  37  |                 { name: 'Time Boxing', url: '/timebox' },
-  38  |                 { name: 'The Golden Path', url: '/golden-path' }
-  39  |             ]
-  40  |         },
-  41  |         {
-  42  |             groupName: '💪 Training',
-  43  |             items: [
-  44  |                 { name: 'Anki Dojo', url: '/dojo' },
-  45  |                 { name: 'Answer Writing', url: '/answer-writing' },
-  46  |                 { name: 'The Scribe (AI)', url: '/scribe' },
-  47  |                 { name: 'Socratic Archives', url: '/socratic-history' },
-  48  |                 { name: 'Mock Tests', url: '/mock-tests' },
-  49  |                 { name: 'Boss Arena', url: '/arena' },
-  50  |                 { name: 'Essay Workshop', url: '/essay' },
-  51  |                 { name: 'CSAT Prep', url: '/csat' },
-  52  |                 { name: 'Project Foresight', url: '/foresight' }
-  53  |             ]
-  54  |         },
-  55  |         {
-  56  |             groupName: '📚 Knowledge',
-  57  |             items: [
-  58  |                 { name: 'Mimir (AI)', isModal: true },
-  59  |                 { name: 'Brain Vault', url: '/brain-vault' },
-  60  |                 { name: 'Flashcards', url: '/flashcards' },
-  61  |                 { name: 'The Seer', url: '/seer' },
-  62  |                 { name: 'The Ravens', url: '/ravens' },
-  63  |                 { name: 'Monthly Compilation', url: '/compilation' },
-  64  |                 { name: 'The Archives', url: '/pyq' },
-  65  |                 { name: 'PYQ Heatmap', url: '/heatmap' },
-  66  |                 { name: 'Model Answers', url: '/model-answers' },
-  67  |                 { name: 'Yggdrasil', url: '/codex' },
-  68  |                 { name: 'Lore Tablets', url: '/lore-tablets' },
-  69  |                 { name: 'Night Watchman', url: '/watchman' }
-  70  |             ]
-  71  |         },
-  72  |         {
-  73  |             groupName: '⚡ Enhancement',
-  74  |             items: [
-  75  |                 { name: 'Armory', url: '/armory' },
-  76  |                 { name: 'The Panopticon', url: '/panopticon' },
-  77  |                 { name: 'The Neural Hash', url: '/neural-hash' }
-  78  |             ]
-  79  |         },
-  80  |         {
-  81  |             groupName: '🛡️ Admin',
-  82  |             items: [
-  83  |                 { name: 'Control Panel', url: '/admin' }
-  84  |             ]
-  85  |         }
-  86  |     ];
-  87  |
-  88  |     for (const group of menuGroups) {
-  89  |         test(`should navigate to every item in ${group.groupName}`, async ({ page }) => {
-  90  |             await page.goto('http://localhost:5173');
-  91  |
-  92  |             // Expand the group if not already expanded (planning is expanded by default)
-  93  |             if (group.groupName !== '🗺️ Planning') {
-  94  |                 const groupButton = page.locator(`button.group-header:has-text("${group.groupName}")`);
-> 95  |                 const isExpanded = await groupButton.getAttribute('aria-expanded');
-      |                                                      ^ Error: locator.getAttribute: Test timeout of 30000ms exceeded.
-  96  |                 if (isExpanded === 'false') {
-  97  |                     await groupButton.click();
-  98  |                 }
-  99  |             }
-  100 |
-  101 |             // Check each item
-  102 |             for (const item of group.items) {
-  103 |                 const itemButton = page.locator(`.group-items button:has-text("${item.name}")`);
-  104 |                 await expect(itemButton).toBeVisible();
-  105 |                 await itemButton.click();
-  106 |
-  107 |                 if (item.isModal) {
-  108 |                     // Verify modal opens
-  109 |                     const mimirModal = page.locator('.mimir-modal-backdrop, .mimir-chat-window');
-  110 |                     await expect(mimirModal.first()).toBeVisible({ timeout: 5000 });
-  111 |                     await page.click('.close-btn, .mimir-modal-backdrop'); // Close it back to prevent blocking
-  112 |                 } else {
-  113 |                     // Make sure Vite syntax error overlay is NOT visible
-  114 |                     await expect(page.locator('vite-error-overlay')).toHaveCount(0);
-  115 |                 }
-  116 |             }
-  117 |         });
-  118 |     }
-  119 | });
-  120 |
+- generic [ref=e3]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - heading "UPSC SAGA" [level=2] [ref=e7]
+      - button "Close sidebar" [ref=e8] [cursor=pointer]: ×
+    - button "Dashboard" [ref=e9] [cursor=pointer]:
+      - generic [ref=e10]: 🏠
+      - generic [ref=e11]: Dashboard
+    - button "Analytics" [ref=e12] [cursor=pointer]:
+      - generic [ref=e13]: 📊
+      - generic [ref=e14]: Analytics
+    - button "Weak Areas" [ref=e15] [cursor=pointer]:
+      - generic [ref=e16]: 🎯
+      - generic [ref=e17]: Weak Areas
+    - generic [ref=e18]:
+      - button "🗺️ Planning" [expanded] [ref=e19] [cursor=pointer]:
+        - generic [ref=e20]: 🗺️ Planning
+        - generic [ref=e21]: ▼
+      - generic [ref=e22]:
+        - button "Study Plan" [ref=e23] [cursor=pointer]:
+          - generic [ref=e24]: 📅
+          - generic [ref=e25]: Study Plan
+        - button "War Map" [ref=e26] [cursor=pointer]:
+          - generic [ref=e27]: 🗓️
+          - generic [ref=e28]: War Map
+        - button "War Room Archives" [ref=e29] [cursor=pointer]:
+          - generic [ref=e30]: ⚔️
+          - generic [ref=e31]: War Room Archives
+        - button "Syllabus" [ref=e32] [cursor=pointer]:
+          - generic [ref=e33]: 🧭
+          - generic [ref=e34]: Syllabus
+        - button "Quests" [ref=e35] [cursor=pointer]:
+          - generic [ref=e36]: 📜
+          - generic [ref=e37]: Quests
+        - button "Revision Cards" [ref=e38] [cursor=pointer]:
+          - generic [ref=e39]: ⚡
+          - generic [ref=e40]: Revision Cards
+        - button "Mnemonics" [ref=e41] [cursor=pointer]:
+          - generic [ref=e42]: 🧠
+          - generic [ref=e43]: Mnemonics
+        - button "Mind Map" [ref=e44] [cursor=pointer]:
+          - generic [ref=e45]: 🕸️
+          - generic [ref=e46]: Mind Map
+        - button "Mind Palace" [ref=e47] [cursor=pointer]:
+          - generic [ref=e48]: 🏰
+          - generic [ref=e49]: Mind Palace
+        - button "Revision Center" [ref=e50] [cursor=pointer]:
+          - generic [ref=e51]: 🔄
+          - generic [ref=e52]: Revision Center
+        - button "Time Boxing" [ref=e53] [cursor=pointer]:
+          - generic [ref=e54]: ⏳
+          - generic [ref=e55]: Time Boxing
+        - button "The Golden Path" [ref=e56] [cursor=pointer]:
+          - generic [ref=e57]: 🌟
+          - generic [ref=e58]: The Golden Path
+    - button "💪 Training" [ref=e60] [cursor=pointer]:
+      - generic [ref=e61]: 💪 Training
+      - generic [ref=e62]: ▶
+    - button "📚 Knowledge" [ref=e64] [cursor=pointer]:
+      - generic [ref=e65]: 📚 Knowledge
+      - generic [ref=e66]: ▶
+    - button "⚡ Enhancement" [ref=e68] [cursor=pointer]:
+      - generic [ref=e69]: ⚡ Enhancement
+      - generic [ref=e70]: ▶
+    - button "🛡️ Admin" [ref=e72] [cursor=pointer]:
+      - generic [ref=e73]: 🛡️ Admin
+      - generic [ref=e74]: ▶
+  - button "Toggle Sidebar" [ref=e75] [cursor=pointer]: ☰
+  - button "Toggle Rituals" [ref=e76] [cursor=pointer]: ☰
+  - main [ref=e77]:
+    - generic [ref=e79]:
+      - generic [ref=e80]:
+        - generic [ref=e81]:
+          - generic [ref=e82]:
+            - heading "🎯 Daily Challenge" [level=3] [ref=e83]
+            - generic [ref=e84]: 🔥 0 days
+          - generic [ref=e85]:
+            - heading "Early Bird" [level=4] [ref=e86]
+            - paragraph [ref=e87]: Complete any activity before 6 AM
+            - generic [ref=e90]: 0 / 1
+            - generic [ref=e91]:
+              - generic [ref=e92]: +100 XP
+              - button "Mark Complete" [ref=e93] [cursor=pointer]
+        - generic [ref=e94]:
+          - generic [ref=e95]:
+            - heading "⚔️ REVISION TARGETS" [level=3] [ref=e96]
+            - generic [ref=e97]: 482 PENDING
+          - generic [ref=e98]:
+            - generic [ref=e99]:
+              - generic [ref=e100]:
+                - generic [ref=e101]: Review
+                - generic [ref=e102]: Quick Recall of Morning Session Facts (Revise)
+                - generic [ref=e103]: Nov 28
+              - generic [ref=e104]:
+                - button "👁️" [ref=e105]
+                - button "⚔️" [ref=e106] [cursor=pointer]
+            - generic [ref=e107]:
+              - generic [ref=e108]:
+                - generic [ref=e109]: Review
+                - generic [ref=e110]: "Day Review: Summarize Geo concepts learned (Revise)"
+                - generic [ref=e111]: Nov 28
+              - generic [ref=e112]:
+                - button "👁️" [ref=e113]
+                - button "⚔️" [ref=e114] [cursor=pointer]
+            - generic [ref=e115]:
+              - generic [ref=e116]:
+                - generic [ref=e117]: Revision
+                - generic [ref=e118]: "SRS Review: Rapidly scan headings of History Ch 1-3 (Studied Yesterday) (Revise)"
+                - generic [ref=e119]: Nov 29
+              - generic [ref=e120]:
+                - button "👁️" [ref=e121]
+                - button "⚔️" [ref=e122] [cursor=pointer]
+            - generic [ref=e123]:
+              - generic [ref=e124]:
+                - generic [ref=e125]: Flashcards
+                - generic [ref=e126]: "Review: Flashcards History Class 6 (Created Yesterday) (Flashcard Review)"
+                - generic [ref=e127]: Dec 1
+              - generic [ref=e128]:
+                - button "👁️" [ref=e129]
+                - button "⚔️" [ref=e130] [cursor=pointer]
+            - generic [ref=e131]:
+              - generic [ref=e132]:
+                - generic [ref=e133]: Flashcards
+                - generic [ref=e134]: "Review: Flashcards Geography Class 6 (Created Sunday) (Flashcard Review)"
+                - generic [ref=e135]: Dec 2
+              - generic [ref=e136]:
+                - button "👁️" [ref=e137]
+                - button "⚔️" [ref=e138] [cursor=pointer]
+            - generic [ref=e139]: + 477 more battles awaiting
+      - generic [ref=e140]:
+        - heading "LEVEL 19" [level=3] [ref=e142]
+        - generic [ref=e144]: PROGRESS
+        - generic [ref=e148]: "XP: 229 / 2317"
+        - generic [ref=e149]:
+          - generic [ref=e150]:
+            - img "Strength" [ref=e151]
+            - generic [ref=e152]:
+              - generic [ref=e153]: STRENGTH
+              - generic [ref=e154]: GS-I
+            - generic [ref=e155]: "18"
+          - generic [ref=e156]:
+            - img "Runic" [ref=e157]
+            - generic [ref=e158]:
+              - generic [ref=e159]: RUNIC
+              - generic [ref=e160]: GS-II
+            - generic [ref=e161]: "18"
+          - generic [ref=e162]:
+            - img "Vitality" [ref=e163]
+            - generic [ref=e164]:
+              - generic [ref=e165]: VITALITY
+              - generic [ref=e166]: GS-III
+            - generic [ref=e167]: "18"
+          - generic [ref=e168]:
+            - img "Luck" [ref=e169]
+            - generic [ref=e170]:
+              - generic [ref=e171]: LUCK
+              - generic [ref=e172]: GS-IV
+            - generic [ref=e173]: "18"
+      - generic [ref=e174]:
+        - generic [ref=e175]:
+          - img [ref=e178]:
+            - generic [ref=e181]: 10%
+          - heading "UPSC ASPIRANT" [level=2] [ref=e182]
+        - generic [ref=e183]:
+          - generic [ref=e184]:
+            - heading "ACTIVE BOONS" [level=3] [ref=e185]
+            - paragraph [ref=e186]: (STRENGTHS)
+          - generic [ref=e187]:
+            - heading "CURSES" [level=3] [ref=e188]
+            - paragraph [ref=e189]: (WEAKNESSES)
+  - generic [ref=e191]:
+    - heading "TODAY'S RITUALS" [level=2] [ref=e193]
+    - generic [ref=e194]:
+      - region "Notifications"
+      - heading "⏱️ Focus Timer" [level=3] [ref=e195]
+      - generic [ref=e196]: 00:00:00
+      - button "Start study timer" [ref=e198] [cursor=pointer]: START
+    - list [ref=e199]:
+      - listitem [ref=e200]:
+        - generic [ref=e201] [cursor=pointer]:
+          - checkbox
+        - generic [ref=e203]:
+          - generic [ref=e204]: "History - Spectrum: Ch 8 - Socio-Religious Reform Movements (General Features/Factors) (Read)"
+          - generic [ref=e205]: 09:00-09:50
+      - listitem [ref=e206]:
+        - generic [ref=e207] [cursor=pointer]:
+          - checkbox
+        - generic [ref=e209]:
+          - generic [ref=e210]: Break - Hydrate (Break)
+          - generic [ref=e211]: 09:50-10:00
+      - listitem [ref=e212]:
+        - generic [ref=e213] [cursor=pointer]:
+          - checkbox
+        - generic [ref=e215]:
+          - generic [ref=e216]: "History - Spectrum: Ch 9 - Reform Movements (Raja Rammohan Roy/Brahmo Samaj) (Read)"
+          - generic [ref=e217]: 10:00-10:50
+      - listitem [ref=e218]:
+        - generic [ref=e219] [cursor=pointer]:
+          - checkbox
+        - generic [ref=e221]:
+          - generic [ref=e222]: Break - Walk (Break)
+          - generic [ref=e223]: 10:50-11:00
+      - listitem [ref=e224]:
+        - generic [ref=e225] [cursor=pointer]:
+          - checkbox
+        - generic [ref=e227]:
+          - generic [ref=e228]: "History - Spectrum: Ch 9 - Reform Movements (Prarthana Samaj/Young Bengal/Ishwar Chandra Vidyasagar) (Read)"
+          - generic [ref=e229]: 11:00-11:50
+      - listitem [ref=e230]:
+        - generic [ref=e231] [cursor=pointer]:
+          - checkbox
+        - generic [ref=e233]:
+          - generic [ref=e234]: "Polity - M. Laxmikanth: Ch 41 - Election Commission (Composition/Powers) (Read)"
+          - generic [ref=e235]: 13:00-13:50
+      - listitem [ref=e236]:
+        - generic [ref=e237] [cursor=pointer]:
+          - checkbox
+        - generic [ref=e239]:
+          - generic [ref=e240]: Break - Rest (Break)
+          - generic [ref=e241]: 13:50-14:00
+      - listitem [ref=e242]:
+        - generic [ref=e243] [cursor=pointer]:
+          - checkbox
+        - generic [ref=e245]:
+          - generic [ref=e246]: "Polity - M. Laxmikanth: Ch 42 - UPSC & Ch 43 - SPSC (Removal/Independence) (Read)"
+          - generic [ref=e247]: 14:00-14:50
+      - listitem [ref=e248]:
+        - generic [ref=e249] [cursor=pointer]:
+          - checkbox
+        - generic [ref=e251]:
+          - generic [ref=e252]: Break - Rest (Break)
+          - generic [ref=e253]: 14:50-15:00
+      - listitem [ref=e254]:
+        - generic [ref=e255] [cursor=pointer]:
+          - checkbox
+        - generic [ref=e257]:
+          - generic [ref=e258]: "Flashcards - Task: CREATE Flashcards for Reform Movements (Pt 1) & EC/UPSC (Flashcard Creation)"
+          - generic [ref=e259]: 15:00-16:00
+      - listitem [ref=e260]:
+        - generic [ref=e261] [cursor=pointer]:
+          - checkbox
+        - generic [ref=e263]:
+          - generic [ref=e264]: "CSAT - Quant: Permutation & Combination (Basics) (Practice)"
+          - generic [ref=e265]: 17:00-17:50
+      - listitem [ref=e266]:
+        - generic [ref=e267] [cursor=pointer]:
+          - checkbox
+        - generic [ref=e269]:
+          - generic [ref=e270]: Break - Eye Rest (Break)
+          - generic [ref=e271]: 17:50-18:00
+      - listitem [ref=e272]:
+        - generic [ref=e273] [cursor=pointer]:
+          - checkbox
+        - generic [ref=e275]:
+          - generic [ref=e276]: "CSAT - Quant: Probability (Practice)"
+          - generic [ref=e277]: 18:00-18:50
+      - listitem [ref=e278]:
+        - generic [ref=e279] [cursor=pointer]:
+          - checkbox
+        - generic [ref=e281]:
+          - generic [ref=e282]: Break - Snack (Break)
+          - generic [ref=e283]: 18:50-19:00
+      - listitem [ref=e284]:
+        - generic [ref=e285] [cursor=pointer]:
+          - checkbox
+        - generic [ref=e287]:
+          - generic [ref=e288]: "Current Affairs - Weekly Compilation: Pages 31-40 (Feb Wk 4) (Read)"
+          - generic [ref=e289]: 19:00-19:50
+      - listitem [ref=e290]:
+        - generic [ref=e291] [cursor=pointer]:
+          - checkbox
+        - generic [ref=e293]:
+          - generic [ref=e294]: "Revision - SRS Review: Polity State Leg/HC (Studied Feb 24) (Revise)"
+          - generic [ref=e295]: 21:00-22:00
+    - button "PLAN MORE RITUALS" [ref=e296] [cursor=pointer]
+  - button "L3 + R3 FOCUS" [ref=e298] [cursor=pointer]
+  - button "Mimir's Head" [ref=e299] [cursor=pointer]:
+    - img "Mimir's Head" [ref=e300]
+  - generic [ref=e301] [cursor=pointer]:
+    - generic [ref=e302]: ⚔️
+    - generic [ref=e303]: 25:00
+    - 'generic "Keyboard: Space=Play/Pause, R=Reset, 1/2/3=Modes, S=Settings" [ref=e304]': ⌨️
+  - button "Toggle Brain Interface" [ref=e306] [cursor=pointer]:
+    - img [ref=e307]
 ```
