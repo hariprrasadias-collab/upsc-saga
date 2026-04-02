@@ -256,11 +256,12 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         setGenerationLogs(["Initializing Nano Banana (Gemini) Neural Network..."]);
 
         const { finalPrompt, finalSeed, finalNegative } = parsePrompt();
-        const promptText = buildPromptText(finalPrompt, finalNegative);
+        const effectivePrompt = isUpscale ? `${finalPrompt}, 8k resolution, highly detailed, masterwork` : finalPrompt;
+        const promptText = buildPromptText(effectivePrompt, finalNegative);
 
         // Progress logs 
         const sequence = [
-            { text: `Parsing semantics...`, delay: 800 },
+            { text: `Parsing semantics${isUpscale ? ' (Upscale Mode)' : ''}...`, delay: 800 },
             { text: `Sending to Gemini Image Generator (Seed: ${finalSeed})...`, delay: 1500 },
             { text: "Generating image via Nano Banana...", delay: 3000 },
         ];
