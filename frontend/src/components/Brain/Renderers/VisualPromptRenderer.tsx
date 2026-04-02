@@ -253,7 +253,11 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         setGeneratedImage(null);
         setGridImages([]);
         setImageError(false);
-        setGenerationLogs(["Initializing Nano Banana (Gemini) Neural Network..."]);
+
+        const logInitMessage = isUpscale
+            ? "Initializing Upscale Neural Network..."
+            : "Initializing Nano Banana (Gemini) Neural Network...";
+        setGenerationLogs([logInitMessage]);
 
         const { finalPrompt, finalSeed, finalNegative } = parsePrompt();
         const promptText = buildPromptText(finalPrompt, finalNegative);
