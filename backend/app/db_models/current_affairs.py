@@ -405,13 +405,6 @@ def update_user_notes(article_id, notes):
     ''', (notes, article_id))
     conn.commit()
 
-    conn.execute('''
-        UPDATE current_affairs 
-        SET anki_card_id = ?
-        WHERE id = ?
-    ''', (anki_card_id, article_id))
-    conn.commit()
-
 def link_anki_card(article_id, anki_card_id):
     """Link article to Anki card"""
     conn = get_db()
