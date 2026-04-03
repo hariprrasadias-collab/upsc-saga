@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Sidebar Navigation E2E Tests', () => {
     // Test standalone menus
     test('should navigate to standalone menus', async ({ page }) => {
-        await page.goto('http://localhost:5174');
+        await page.goto('http://localhost:5173');
 
         // Wait for sidebar to be ready
         const sidebar = page.locator('.sidebar');
@@ -87,7 +87,7 @@ test.describe('Sidebar Navigation E2E Tests', () => {
 
     for (const group of menuGroups) {
         test(`should navigate to every item in ${group.groupName}`, async ({ page }) => {
-            await page.goto('http://localhost:5174');
+            await page.goto('http://localhost:5173');
 
             // Expand the group if not already expanded (planning is expanded by default)
             if (group.groupName !== '🗺️ Planning') {
