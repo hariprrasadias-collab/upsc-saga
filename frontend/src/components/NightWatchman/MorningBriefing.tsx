@@ -302,7 +302,7 @@ const MorningBriefing: React.FC = () => {
                             {quizMode && briefing.quiz && (
                                 <div className="quiz-overlay">
                                     <div className="quiz-modal">
-                                        <button className="close-quiz-btn" onClick={closeQuiz}>×</button>
+                                        <button className="close-quiz-btn" onClick={closeQuiz} aria-label="Close">✕</button>
 
                                         {!showResults ? (
                                             <>

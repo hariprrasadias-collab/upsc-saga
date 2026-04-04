@@ -153,7 +153,7 @@ const IssueMappingViewer: React.FC<Props> = ({ articleId, articleTitle }) => {
                         placeholder="Add tag..."
                         onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
                     />
-                    <button onClick={handleAddTag}>+</button>
+                    <button onClick={handleAddTag} aria-label="Add tag">+</button>
                 </div>
             </div>
 

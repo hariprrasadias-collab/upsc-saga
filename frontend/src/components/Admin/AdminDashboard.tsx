@@ -219,7 +219,7 @@ const AdminDashboard: React.FC = () => {
                                                 </span>
                                             </td>
                                             <td>
-                                                <button className="action-btn edit">✏️</button>
+                                                <button className="action-btn edit" aria-label="Edit">✏️</button>
                                                 <button
                                                     className="action-btn delete"
                                                     onClick={() => handleDeleteQuestion(q.id)}
@@ -288,7 +288,7 @@ const AdminDashboard: React.FC = () => {
                                                 </span>
                                             </td>
                                             <td>
-                                                <button className="action-btn edit">✏️</button>
+                                                <button className="action-btn edit" aria-label="Edit">✏️</button>
                                                 <button
                                                     className="action-btn delete"
                                                     onClick={() => handleDeleteArticle(a.id)}

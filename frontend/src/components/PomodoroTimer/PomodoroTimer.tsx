@@ -296,7 +296,7 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
                         <input type="number" value={editMinutes} onChange={(e) => setEditMinutes(e.target.value)}
                             className="timer-edit-input" min="1" max="120" />
                         <div className="timer-edit-actions">
-                            <button onClick={handleEditSave} className="save-btn">✓</button>
+                            <button onClick={handleEditSave} className="save-btn" aria-label="Save">✓</button>
                             <button onClick={() => setIsEditing(false)} className="cancel-btn">✕</button>
                         </div>
                     </div>
