@@ -262,7 +262,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         const sequence = [
             { text: `Parsing semantics...`, delay: 800 },
             { text: `Sending to Gemini Image Generator (Seed: ${finalSeed})...`, delay: 1500 },
-            { text: "Generating image via Nano Banana...", delay: 3000 },
+            { text: isUpscale ? "Upscaling image via Nano Banana..." : "Generating image via Nano Banana...", delay: 3000 },
         ];
         sequence.forEach(({ text, delay }) => {
             setTimeout(() => setGenerationLogs(prev => [...prev, text]), delay);
