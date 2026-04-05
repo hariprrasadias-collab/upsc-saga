@@ -7,6 +7,7 @@ import sqlite3
 import json
 from datetime import datetime
 
+
 def init_current_affairs_table():
     """Initialize the current_affairs table"""
     conn = get_db()
@@ -63,19 +64,23 @@ def init_current_affairs_table():
     # Attempt to add new columns for existing databases
     # Enhanced Metadata v1
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN prelims_pointers TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN prelims_pointers TEXT')
     except sqlite3.OperationalError:
         pass
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN mains_dimensions TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN mains_dimensions TEXT')
     except sqlite3.OperationalError:
         pass
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN steeple_analysis TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN steeple_analysis TEXT')
     except sqlite3.OperationalError:
         pass
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN inter_linkages TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN inter_linkages TEXT')
     except sqlite3.OperationalError:
         pass
 
@@ -89,11 +94,13 @@ def init_current_affairs_table():
     except sqlite3.OperationalError:
         pass
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN answer_framework TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN answer_framework TEXT')
     except sqlite3.OperationalError:
         pass
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN essay_fodder TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN essay_fodder TEXT')
     except sqlite3.OperationalError:
         pass
 
@@ -103,29 +110,35 @@ def init_current_affairs_table():
     except sqlite3.OperationalError:
         pass
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN data_visualization TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN data_visualization TEXT')
     except sqlite3.OperationalError:
         pass
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN podcast_script TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN podcast_script TEXT')
     except sqlite3.OperationalError:
         pass
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN interview_questions TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN interview_questions TEXT')
     except sqlite3.OperationalError:
         pass
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN simulation_scenario TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN simulation_scenario TEXT')
     except sqlite3.OperationalError:
         pass
 
     # Omniverse Mode Metadata v4
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN future_scenarios TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN future_scenarios TEXT')
     except sqlite3.OperationalError:
         pass
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN historical_analogies TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN historical_analogies TEXT')
     except sqlite3.OperationalError:
         pass
     try:
@@ -133,7 +146,8 @@ def init_current_affairs_table():
     except sqlite3.OperationalError:
         pass
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN socratic_clash TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN socratic_clash TEXT')
     except sqlite3.OperationalError:
         pass
     try:
@@ -143,55 +157,68 @@ def init_current_affairs_table():
 
     # Singularity Mode Metadata v5
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN systemic_bias TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN systemic_bias TEXT')
     except sqlite3.OperationalError:
         pass
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN butterfly_effect TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN butterfly_effect TEXT')
     except sqlite3.OperationalError:
         pass
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN polymath_angle TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN polymath_angle TEXT')
     except sqlite3.OperationalError:
         pass
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN quote_injection TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN quote_injection TEXT')
     except sqlite3.OperationalError:
         pass
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN roleplay_persona TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN roleplay_persona TEXT')
     except sqlite3.OperationalError:
         pass
 
     # Akaashic Mode Metadata v6
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN systems_loops TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN systems_loops TEXT')
     except sqlite3.OperationalError:
         pass
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN counter_factuals TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN counter_factuals TEXT')
     except sqlite3.OperationalError:
         pass
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN civilizational_parallels TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN civilizational_parallels TEXT')
     except sqlite3.OperationalError:
         pass
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN fermi_estimates TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN fermi_estimates TEXT')
     except sqlite3.OperationalError:
         pass
     try:
-        conn.execute('ALTER TABLE current_affairs ADD COLUMN global_context TEXT')
+        conn.execute(
+            'ALTER TABLE current_affairs ADD COLUMN global_context TEXT')
     except sqlite3.OperationalError:
         pass
 
     conn.commit()
 
+
 def article_exists(link):
     """Check if article with link already exists"""
     conn = get_db()
-    cursor = conn.execute('SELECT id FROM current_affairs WHERE original_link = ?', (link,))
+    cursor = conn.execute(
+        'SELECT id FROM current_affairs WHERE original_link = ?', (link,))
     return cursor.fetchone() is not None
+
 
 def save_article(article_data):
     """Save a new article to database"""
@@ -259,46 +286,49 @@ def save_article(article_data):
         # Article already exists (caught by UNIQUE index)
         return None
 
+
 def get_saved_articles(filters=None):
     """Get saved articles with optional filters"""
     conn = get_db()
     query = 'SELECT * FROM current_affairs WHERE 1=1'
     params = []
-    
+
     if filters:
         if filters.get('paper'):
             query += ' AND papers LIKE ?'
             params.append(f'%{filters["paper"]}%')
-        
+
         if filters.get('subject'):
             query += ' AND subjects LIKE ?'
             params.append(f'%{filters["subject"]}%')
-        
+
         if filters.get('importance'):
             query += ' AND importance = ?'
             params.append(filters['importance'])
-        
+
         if filters.get('bookmarked'):
             query += ' AND is_bookmarked = 1'
-        
+
         if filters.get('search'):
             query += ' AND (title LIKE ? OR upsc_summary LIKE ?)'
             search_term = f'%{filters["search"]}%'
             params.extend([search_term, search_term])
-        
+
         if filters.get('source'):
             query += ' AND source LIKE ?'
             params.append(f'%{filters["source"]}%')
-    
+
     query += ' ORDER BY fetch_date DESC'
-    
+
     if filters and filters.get('limit'):
-        query += f' LIMIT {int(filters["limit"])}'
+        query += ' LIMIT ?'
+        params.append(int(filters['limit']))
         if filters.get('offset'):
-            query += f' OFFSET {int(filters["offset"])}'
-    
+            query += ' OFFSET ?'
+            params.append(int(filters['offset']))
+
     rows = conn.execute(query, params).fetchall()
-    
+
     articles = []
     for row in rows:
         articles.append({
@@ -353,8 +383,9 @@ def get_saved_articles(filters=None):
             'fermiEstimates': json.loads(row['fermi_estimates'] or '{}') if 'fermi_estimates' in row.keys() else {},
             'globalContext': json.loads(row['global_context'] or '[]') if 'global_context' in row.keys() else []
         })
-    
+
     return articles
+
 
 def update_article_tags(article_id, papers, subjects):
     """Update article tags"""
@@ -366,6 +397,7 @@ def update_article_tags(article_id, papers, subjects):
     ''', (json.dumps(papers), json.dumps(subjects), article_id))
     conn.commit()
 
+
 def update_article_importance(article_id, importance):
     """Update article importance"""
     conn = get_db()
@@ -376,6 +408,7 @@ def update_article_importance(article_id, importance):
     ''', (importance, article_id))
     conn.commit()
 
+
 def toggle_bookmark(article_id):
     """Toggle bookmark status"""
     conn = get_db()
@@ -383,7 +416,7 @@ def toggle_bookmark(article_id):
         'SELECT is_bookmarked FROM current_affairs WHERE id = ?',
         (article_id,)
     ).fetchone()
-    
+
     new_status = 0 if current['is_bookmarked'] else 1
     conn.execute('''
         UPDATE current_affairs 
@@ -392,6 +425,7 @@ def toggle_bookmark(article_id):
     ''', (new_status, article_id))
     conn.commit()
     return bool(new_status)
+
 
 def update_user_notes(article_id, notes):
     """Update user notes"""
@@ -403,12 +437,6 @@ def update_user_notes(article_id, notes):
     ''', (notes, article_id))
     conn.commit()
 
-    conn.execute('''
-        UPDATE current_affairs 
-        SET anki_card_id = ?
-        WHERE id = ?
-    ''', (anki_card_id, article_id))
-    conn.commit()
 
 def link_anki_card(article_id, anki_card_id):
     """Link article to Anki card"""
@@ -419,6 +447,7 @@ def link_anki_card(article_id, anki_card_id):
         WHERE id = ?
     ''', (anki_card_id, article_id))
     conn.commit()
+
 
 def update_article_content_by_link(link, article_data):
     """Update article content by link (for re-processing)"""
@@ -501,8 +530,9 @@ def update_article_content_by_link(link, article_data):
         link
     ))
     conn.commit()
-    
+
     # Return the ID
-    cursor = conn.execute('SELECT id FROM current_affairs WHERE original_link = ?', (link,))
+    cursor = conn.execute(
+        'SELECT id FROM current_affairs WHERE original_link = ?', (link,))
     row = cursor.fetchone()
     return row['id'] if row else None
