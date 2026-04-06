@@ -87,24 +87,46 @@ def get_year_trends():
         years = conn.execute("SELECT DISTINCT year FROM pyq_questions ORDER BY year").fetchall()
         subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
         
+        # Get all counts grouped by year and subject
+        all_counts = conn.execute('''
+            SELECT year, subject, COUNT(*) as count
+            FROM pyq_questions
+            GROUP BY year, subject
+        ''').fetchall()
+
+        # Create a dictionary for O(1) lookups
+        counts_dict = {}
+        for row in all_counts:
+            # Handle tuple or sqlite3.Row
+            try:
+                year = row['year']
+                subject = row['subject']
+                count = row['count']
+            except (TypeError, IndexError):
+                year = row[0]
+                subject = row[1]
+                count = row[2]
+
+            if year not in counts_dict:
+                counts_dict[year] = {}
+            counts_dict[year][subject] = count
+
         data = []
         for year_row in years:
-            year = year_row['year']
+            try:
+                year = year_row['year']
+            except (TypeError, IndexError):
+                year = year_row[0]
+
             year_data = {"year": year}
             
-            # Get counts for this year
-            counts = conn.execute('''
-                SELECT subject, COUNT(*) as count 
-                FROM pyq_questions 
-                WHERE year = ? 
-                GROUP BY subject
-            ''', (year,)).fetchall()
-            
-            count_map = {row['subject']: row['count'] for row in counts}
-            
             for sub_row in subjects:
-                subject = sub_row['subject']
-                year_data[subject] = count_map.get(subject, 0)
+                try:
+                    subject = sub_row['subject']
+                except (TypeError, IndexError):
+                    subject = sub_row[0]
+
+                year_data[subject] = counts_dict.get(year, {}).get(subject, 0)
                 
             data.append(year_data)
             
