@@ -83,30 +83,28 @@ def get_year_trends():
     """Get year-wise subject distribution for Stacked Bar Chart"""
     conn = get_db()
     try:
-        # Get all years and subjects
-        years = conn.execute("SELECT DISTINCT year FROM pyq_questions ORDER BY year").fetchall()
-        subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
+        # ⚡ Bolt Optimization: Replace N+1 queries in loop with single aggregated query
+        counts = conn.execute('''
+            SELECT year, subject, COUNT(*) as count
+            FROM pyq_questions
+            GROUP BY year, subject
+        ''').fetchall()
         
-        data = []
-        for year_row in years:
-            year = year_row['year']
-            year_data = {"year": year}
-            
-            # Get counts for this year
-            counts = conn.execute('''
-                SELECT subject, COUNT(*) as count 
-                FROM pyq_questions 
-                WHERE year = ? 
-                GROUP BY subject
-            ''', (year,)).fetchall()
-            
-            count_map = {row['subject']: row['count'] for row in counts}
-            
-            for sub_row in subjects:
-                subject = sub_row['subject']
-                year_data[subject] = count_map.get(subject, 0)
+        # Extract unique, sorted years and subjects in Python to build pivot structure
+        years = sorted(list(set(row['year'] for row in counts if row['year'] is not None)))
+        subjects = sorted(list(set(row['subject'] for row in counts if row['subject'] is not None)))
+
+        year_data_map = {}
+        for y in years:
+            year_data_map[y] = {"year": y}
+            for s in subjects:
+                year_data_map[y][s] = 0
+
+        for row in counts:
+            if row['year'] is not None and row['subject'] is not None:
+                year_data_map[row['year']][row['subject']] = row['count']
                 
-            data.append(year_data)
+        data = [year_data_map[y] for y in years]
             
         return jsonify(data)
     except Exception as e:
