@@ -15,7 +15,7 @@ def get_content():
     """
     type_filter = request.args.get('type')
     topic_filter = request.args.get('topic')
-    limit = request.args.get('limit', 200)
+    limit = request.args.get('limit', 200, type=int)
     
     conn = get_db()
     
