@@ -1,0 +1,3 @@
+## 2024-05-18 - Replacing SQLite N+1 loop with Python Pivot
+**Learning:** SQLite doesn't natively support dynamic pivot statements. When converting an N+1 loop (like fetching distinct groups and querying per group) to a single `GROUP BY` query, you often have to manually build the pivoted/stacked format in Python using dictionaries.
+**Action:** Use a single `SELECT A, B, COUNT(*) GROUP BY A, B`, then use Python set comprehensions to find unique keys, pre-initialize nested dicts, and populate them iteratively to simulate a cross-tabulated dataset. Be careful not to use generic truthiness `if row['A']` as it could filter out valid 0 values - explicitly use `is not None` instead.
