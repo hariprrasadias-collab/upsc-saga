@@ -1,20 +1,52 @@
+/app/backend/app/services/model_manager.py:7: FutureWarning:
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
 Autonomous Brain tables initialized
 ✅ Automation tables initialized.
 Optimization: Checking indexes...
-SUCCESS: GEMINI_API_KEY loaded (length: 39)
-SUCCESS: Gemini model initialized (using gemini-flash-latest)
-✨ ModelManager Configured. Fast: gemini-2.0-flash-001, Pro: gemini-2.0-pro-exp-02-05
-BrainService Online: Connected to Gemini Cortex via ModelManager.
-Brain: Loaded persisted strategy with 100 steps.
-🦉 Night Watchman: Vision Online (Model Loaded)
+⚠️ ModelManager Warning: GEMINI_API_KEY not found.
+✨ ModelManager Ready. Active Providers: ['openclaw']
+🧠 Synapse Connected: [ASSESSMENT] mock_tests
+🕵️ Hephaestus: Scanning logs at logs/app.log...
+✅ No tracebacks found in logs.
+⚠️ BrainService Warning: GEMINI_API_KEY not found. The Brain will be lobotomized (Mock Mode).
+Brain: Loaded persisted strategy with 2 steps.
 🦉 Night Watchman Routes Imported
 🦉 Registering Night Watchman Blueprint...
-🔮 ForesightEngine Online: Oracle Activated via ModelManager
  * Serving Flask app 'app'
  * Debug mode: on
 [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
  * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.2:5000
 [33mPress CTRL+C to quit[0m
  * Restarting with stat
+/app/backend/app/services/model_manager.py:7: FutureWarning:
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+Autonomous Brain tables initialized
+✅ Automation tables initialized.
+Optimization: Checking indexes...
+⚠️ ModelManager Warning: GEMINI_API_KEY not found.
+✨ ModelManager Ready. Active Providers: ['openclaw']
+🧠 Synapse Connected: [ASSESSMENT] mock_tests
+🕵️ Hephaestus: Scanning logs at logs/app.log...
+✅ No tracebacks found in logs.
  * Debugger is active!
- * Debugger PIN: 132-491-319
+ * Debugger PIN: 631-326-424
+127.0.0.1 - - [07/Apr/2026 11:01:06] "GET /api/dashboard-data HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 11:01:06] "GET /api/dashboard-data HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 11:01:06] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 11:01:06] "GET /api/analytics/overview?timeframe=all HTTP/1.1" 200 -

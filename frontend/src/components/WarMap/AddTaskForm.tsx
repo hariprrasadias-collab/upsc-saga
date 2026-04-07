@@ -151,7 +151,7 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ selectedDateStr, onTaskCreate
           <button type="button" onClick={onCancel} disabled={submitting}>
             Cancel
           </button>
-          <button type="submit" disabled={submitting}>
+          <button type="submit" disabled={submitting} aria-busy={submitting}>
             {submitting ? 'Forging...' : 'Forge Ritual'}
           </button>
         </div>
