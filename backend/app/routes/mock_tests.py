@@ -196,23 +196,26 @@ def submit_attempt(attempt_id):
         incorrect = 0
         unattempted = 0
         
+        update_data = []
         for q in questions:
             selected = answer_map.get(q['id'])
             if not selected:
                 unattempted += 1
             elif selected.upper() == q['correct_answer'].upper():
                 correct += 1
-                # Mark answer as correct
-                conn.execute(
-                    'UPDATE test_answers SET is_correct = 1 WHERE attempt_id = ? AND question_id = ?',
-                    (attempt_id, q['id'])
-                )
+                update_data.append((1, attempt_id, q['id']))
             else:
                 incorrect += 1
-                conn.execute(
-                    'UPDATE test_answers SET is_correct = 0 WHERE attempt_id = ? AND question_id = ?',
-                    (attempt_id, q['id'])
-                )
+                update_data.append((0, attempt_id, q['id']))
+
+        if update_data:
+            # ⚡ Bolt Optimization: Batch update answers in a single query
+            # instead of executing an UPDATE query per question (N+1 bottleneck).
+            # Expected Impact: Reduces DB write overhead significantly for 100-question tests.
+            conn.executemany(
+                'UPDATE test_answers SET is_correct = ? WHERE attempt_id = ? AND question_id = ?',
+                update_data
+            )
         
         marks_per_q = 2.0
         negative_mark = 0.66  # 1/3 negative marking
@@ -312,7 +315,6 @@ def delete_test(test_id):
 @mock_tests_bp.route('/api/mock-tests', methods=['POST'])
 def create_test():
     """Create a new test with questions"""
-    import json as json_mod
     try:
         data = request.json
         conn = get_db()
@@ -332,11 +334,8 @@ def create_test():
         ))
         test_id = cursor.lastrowid
         
-        for i, q in enumerate(questions, 1):
-            conn.execute('''
-                INSERT INTO test_questions (test_id, question_number, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation, subject)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
+        question_data = [
+            (
                 test_id, i,
                 q['question_text'],
                 q.get('option_a', ''),
@@ -346,7 +345,17 @@ def create_test():
                 q.get('correct_answer', 'A'),
                 q.get('explanation', ''),
                 q.get('subject', data.get('subject', 'General'))
-            ))
+            )
+            for i, q in enumerate(questions, 1)
+        ]
+        if question_data:
+            # ⚡ Bolt Optimization: Batch insert test questions instead of
+            # looping iterative inserts (N+1 query bottleneck).
+            # Expected Impact: Significant reduction in time taken to create tests.
+            conn.executemany('''
+                INSERT INTO test_questions (test_id, question_number, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation, subject)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', question_data)
         
         conn.commit()
         return jsonify({'success': True, 'test_id': test_id}), 201
