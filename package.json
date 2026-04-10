@@ -4,5 +4,8 @@
   },
   "devDependencies": {
     "terser": "^5.44.1"
+  },
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build"
   }
 }
