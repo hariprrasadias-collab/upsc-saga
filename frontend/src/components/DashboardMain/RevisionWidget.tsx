@@ -138,17 +138,19 @@ const RevisionWidget: React.FC = () => {
                                         startTask(task.id, task.activity, 25, isBreak);
                                     }}
                                     title="Focus (Start Timer)"
+                                    aria-label="Start Focus Timer"
                                     disabled={completingId === task.id}
                                 >
-                                    👁️
+                                    <span aria-hidden="true">👁️</span>
                                 </button>
                                 <button
                                     className="quick-revise-btn"
                                     onClick={() => handleComplete(task)}
                                     title="Mark Complete"
+                                    aria-label="Mark Task Complete"
                                     disabled={completingId === task.id}
                                 >
-                                    ⚔️
+                                    <span aria-hidden="true">⚔️</span>
                                 </button>
                             </div>
                         </div>
