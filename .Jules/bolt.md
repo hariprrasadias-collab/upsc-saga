@@ -13,3 +13,6 @@
 ## 2026-04-13 - Resolve Arena Boss N+1 Query Bottleneck
 **Learning:** In endpoints that aggregate dynamically generated stats for multiple objects (like available years or subjects for boss fights), executing a SELECT COUNT(*) iteratively per object creates a severe N+1 query bottleneck.
 **Action:** Replaced iterative loops containing SELECT COUNT(*) with a single bulk query using GROUP BY to fetch all keys and their corresponding counts at once. Updated the signature of the underlying utility function (get_boss_stats) to accept a precomputed_count parameter.
+## 2026-04-13 - Fix unused variable breaking build
+**Learning:** Strict TypeScript setups (like in this Vite project) treat unused variables as fatal errors during the build step (`tsc -b`), causing deployment failures.
+**Action:** Prefix unused function parameters with an underscore (e.g., `_isUpscale`) instead of removing them, maintaining the function signature while satisfying strict compiler rules.
