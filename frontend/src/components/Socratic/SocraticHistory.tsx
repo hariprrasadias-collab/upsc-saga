@@ -296,10 +296,10 @@ const SocraticHistory: React.FC = () => {
                                             {isPlaying ? "⏹️ Stop" : "▶️ Listen"}
                                         </button>
                                     )}
-                                    <button className="copy-btn" onClick={handleDownload} title="Download">
+                                    <button className="copy-btn" onClick={handleDownload} title="Download" aria-label="Download session">
                                         📥
                                     </button>
-                                    <button className="copy-btn" onClick={handleCopy} title="Copy">
+                                    <button className="copy-btn" onClick={handleCopy} title="Copy" aria-label="Copy session">
                                         📋
                                     </button>
                                 </div>
