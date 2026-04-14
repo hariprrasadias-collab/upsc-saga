@@ -11,3 +11,7 @@
 ## 2025-03-03 - [Optimized arena boss listing to eliminate N+1 queries]
 **Learning:** The `get_available_bosses` route fetched a list of distinct years and subjects, and then executed a separate `COUNT(*)` query for each in `get_boss_stats`. This resulted in N+1 queries when building the boss lists.
 **Action:** Group iterative queries using `GROUP BY` to fetch counts in a single database round trip, and pass the count as a `precomputed_count` argument to helper functions to avoid redundant queries.
+
+## 2025-03-03 - [Fix frontend TS unused variable breaking Render build]
+**Learning:** Render deployment failed with a TypeScript TS6133 error (`isUpscale` is declared but its value is never read) in a frontend component during `tsc -b`.
+**Action:** Safely renamed the unused parameter to `_isUpscale` to satisfy the strict TypeScript checks and fix the CI pipeline without changing runtime behavior.
