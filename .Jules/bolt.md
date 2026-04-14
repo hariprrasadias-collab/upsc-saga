@@ -7,3 +7,15 @@
 ## 2025-03-03 - [Optimized syllabus progress trend to eliminate N+1 queries]
 **Learning:** The `get_progress_trend` function in `backend/app/routes/analytics.py` iteratively fetched `syllabus_topics` data `days + 1` times (via `SELECT COUNT(*)` queries). However, because the `syllabus_topics` table only tracks current topic status and lacks a historical tracking mechanism, these inner-loop queries always returned the same value.
 **Action:** Lift repeated logic out of loops when the underlying data tables do not support historical/time-series filters, calculating the value once beforehand to transform an O(N) database query scenario into O(1).
+
+## 2025-03-03 - [Optimized arena boss listing to eliminate N+1 queries]
+**Learning:** The `get_available_bosses` route fetched a list of distinct years and subjects, and then executed a separate `COUNT(*)` query for each in `get_boss_stats`. This resulted in N+1 queries when building the boss lists.
+**Action:** Group iterative queries using `GROUP BY` to fetch counts in a single database round trip, and pass the count as a `precomputed_count` argument to helper functions to avoid redundant queries.
+
+## 2025-03-03 - [Fix frontend TS unused variable breaking Render build]
+**Learning:** Render deployment failed with a TypeScript TS6133 error (`isUpscale` is declared but its value is never read) in a frontend component during `tsc -b`.
+**Action:** Safely renamed the unused parameter to `_isUpscale` to satisfy the strict TypeScript checks and fix the CI pipeline without changing runtime behavior.
+
+## 2025-03-03 - [Fix frontend Recharts TS errors breaking Render build]
+**Learning:** Render deployment failed with TypeScript TS2322 errors (`Type is not assignable to type Formatter...`) in Recharts `Tooltip` `formatter` callbacks during `tsc -b`.
+**Action:** Safely changed the strict type signatures to `any` for the `value` and `name` parameters to satisfy the underlying `ValueType` and `NameType` interface definitions and fix the CI pipeline without changing runtime behavior.
