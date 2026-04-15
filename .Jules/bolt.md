@@ -7,3 +7,7 @@
 ## 2025-03-03 - [Optimized syllabus progress trend to eliminate N+1 queries]
 **Learning:** The `get_progress_trend` function in `backend/app/routes/analytics.py` iteratively fetched `syllabus_topics` data `days + 1` times (via `SELECT COUNT(*)` queries). However, because the `syllabus_topics` table only tracks current topic status and lacks a historical tracking mechanism, these inner-loop queries always returned the same value.
 **Action:** Lift repeated logic out of loops when the underlying data tables do not support historical/time-series filters, calculating the value once beforehand to transform an O(N) database query scenario into O(1).
+
+## 2025-04-14 - [Optimized boss list endpoint to eliminate N+1 queries]
+**Learning:** The `/bosses` endpoint in `backend/app/routes/arena.py` used to fetch counts individually for each year and subject by executing a `SELECT COUNT(*)` query inside a loop (via the `get_boss_stats` function), which caused an N+1 query bottleneck.
+**Action:** Lift repeated aggregation queries out of loops by using a single `GROUP BY` SQL query, and pass the precomputed counts into the downstream functions to transform O(N) database operations into O(1).
