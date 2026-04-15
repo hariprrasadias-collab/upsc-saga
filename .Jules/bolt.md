@@ -15,3 +15,7 @@
 ## 2025-04-15 - Unused Variables breaking Production Builds
 **Learning:** In strict TypeScript configurations (like Vite React templates), an unused variable (TS6133) will completely halt the build phase during `tsc -b`.
 **Action:** When working on unused variable errors, especially in shared components, prefixing the variable with an underscore (e.g. `_isUpscale`) safely satisfies strict TypeScript checks without having to refactor consuming interfaces or run the risk of breaking runtime logic.
+
+## 2025-04-15 - Duplicate Scripts Block and Missing Artifacts
+**Learning:** Duplicate keys in a `package.json` file (e.g., having two `"scripts"` blocks) will cause the JSON parser or package manager to silently override the first key with the last.
+**Action:** When troubleshooting missing build artifacts (like `Publish directory dist does not exist!`), carefully inspect the root `package.json` for duplicate script blocks that might be silently overriding the intended build command and depositing artifacts in the wrong directory.
