@@ -3,8 +3,6 @@ Analytics Service - Data aggregation and insights
 Consolidates data from all modules for comprehensive analytics
 """
 from datetime import datetime, timedelta
-from collections import defaultdict
-import sqlite3
 
 def calculate_study_hours(conn, user_id, start_date, end_date):
     """
@@ -134,7 +132,7 @@ def identify_weak_areas(conn, user_id, limit=10):
     try:
         # Check syllabus topics not started or in progress
         syllabus_weak = conn.execute('''
-            SELECT subject, name, status
+            SELECT subject, topic as name, status
             FROM syllabus_topics
             WHERE status IN ('Not Started', 'Reading')
             ORDER BY subject, name
@@ -161,17 +159,37 @@ def identify_weak_areas(conn, user_id, limit=10):
             LIMIT ?
         ''', (user_id, limit)).fetchall()
         
-        for subj in low_scores:
-            # Calculate trend for this subject
-            subject_scores = conn.execute('''
-                SELECT mta.score
-                FROM test_attempts mta
-                JOIN mock_tests mt ON mta.test_id = mt.id
-                WHERE mta.user_id = ? AND mt.subject = ?
-                ORDER BY mta.submitted_at ASC
-            ''', (user_id, subj['subject'])).fetchall()
+        if not low_scores:
+            return weak_areas
 
-            scores_list = [s['score'] for s in subject_scores]
+        subjects = [row['subject'] for row in low_scores]
+        placeholders = ','.join(['?'] * len(subjects))
+
+        query_params = [user_id] + subjects
+        all_subject_scores = conn.execute(f'''
+            SELECT mt.subject, mta.score, mta.submitted_at
+            FROM test_attempts mta
+            JOIN mock_tests mt ON mta.test_id = mt.id
+            WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+            ORDER BY mta.submitted_at ASC
+        ''', query_params).fetchall()
+
+        scores_by_subject = {}
+        for row in all_subject_scores:
+            subj = row['subject']
+            if subj not in scores_by_subject:
+                scores_by_subject[subj] = []
+            scores_by_subject[subj].append({
+                'score': row['score'],
+                'submitted_at': row['submitted_at']
+            })
+
+        for subj in low_scores:
+            subj_name = subj['subject']
+            subject_scores = scores_by_subject.get(subj_name, [])
+
+            # Filter out None scores to avoid TypeError
+            scores_list = [s['score'] for s in subject_scores if s['score'] is not None]
             trend_val = calculate_improvement_rate(scores_list)
             trend_direction = 'improving' if trend_val > 0 else 'declining' if trend_val < 0 else 'stable'
 
@@ -180,11 +198,11 @@ def identify_weak_areas(conn, user_id, limit=10):
             last_attempt = subject_scores[-1]['submitted_at'] if subject_scores else None
 
             weak_areas.append({
-                'subject': subj['subject'],
-                'topic': f"{subj['subject']} (Mock Tests)",
+                'subject': subj_name,
+                'topic': f"{subj_name} (Mock Tests)",
                 'weakness_score': max(0, 100 - (subj['avg_score'] or 0)),
                 'source': 'Mock Tests',
-                'action': f"Practice {subj['subject']} questions",
+                'action': f"Practice {subj_name} questions",
                 'trend': trend_direction,
                 'trend_value': abs(trend_val),
                 'impact': 'High' if (subj['avg_score'] or 0) < 40 else 'Medium',
