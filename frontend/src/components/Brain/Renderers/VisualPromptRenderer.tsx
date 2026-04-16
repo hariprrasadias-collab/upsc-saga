@@ -247,6 +247,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         }
     };
 
+    // @ts-expect-error isUpscale parameter is intended for future use but causes unused variable linting errors
     const handleGenerate = async (isUpscale = false) => {
         if (isGenerating) return;
         setIsGenerating(true);
