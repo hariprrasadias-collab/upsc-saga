@@ -231,7 +231,7 @@ def get_analytics():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-from app import cache
+from app import cache # noqa: E402
 
 @bp.route('/strategos/<int:question_id>', methods=['POST'])
 def ask_strategos(question_id):
@@ -253,7 +253,6 @@ def ask_strategos(question_id):
         if not question:
             return jsonify({'error': 'Question not found'}), 404
 
-        from app.services.brain_service import brain_service
 
         # Prepare payload
         # PHASE 7: STRATEGOS UPGRADE (REAL-TIME TACTICAL ADVICE)
@@ -278,10 +277,6 @@ def ask_strategos(question_id):
 
         # We invoke ModelManager directly for speed/custom prompt here, or use BrainService with a new action.
         # Let's stick to BrainService for consistency but upgrade the payload intent.
-        payload = {
-            "question": prompt_text,
-            "reasoning": "Strategos Tactical Intercept"
-        }
 
         # Execute Action
         # We reuse ANALYZE_QUESTION but the prompt injected above overrides standard analysis effectively
@@ -373,21 +368,23 @@ def create_mock_from_filters():
         test_id = cursor.lastrowid
         
         # 3. Insert Questions into test_questions
-        for idx, q in enumerate(questions):
-            conn.execute('''
-                INSERT INTO test_questions (
-                    test_id, question_number, question_text, 
-                    option_a, option_b, option_c, option_d, 
-                    correct_answer, explanation, subject, topic, difficulty, year
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
+        questions_data = [
+            (
                 test_id, 
                 idx + 1, 
                 q['question_text'],
                 q['option_a'], q['option_b'], q['option_c'], q['option_d'],
                 q['correct_option'], q['explanation'],
                 q['subject'], q['topic'], q['difficulty'], q['year']
-            ))
+            ) for idx, q in enumerate(questions)
+        ]
+        conn.executemany('''
+            INSERT INTO test_questions (
+                test_id, question_number, question_text,
+                option_a, option_b, option_c, option_d,
+                correct_answer, explanation, subject, topic, difficulty, year
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', questions_data)
             
         conn.commit()
         
@@ -464,11 +461,11 @@ def start_quiz():
         session_id = cursor.lastrowid
         
         # Initialize answer records
-        for q in questions:
-            conn.execute('''
-                INSERT INTO pyq_quiz_answers (session_id, question_id)
-                VALUES (?, ?)
-            ''', (session_id, q['id']))
+        answers_data = [(session_id, q['id']) for q in questions]
+        conn.executemany('''
+            INSERT INTO pyq_quiz_answers (session_id, question_id)
+            VALUES (?, ?)
+        ''', answers_data)
         
         conn.commit()
         
@@ -713,7 +710,7 @@ def get_similar_questions(question_id):
         similar = conn.execute(query, (search_query, question_id)).fetchall()
         return jsonify([dict(q) for q in similar])
 
-    except Exception as e:
+    except Exception:
         # Fallback to subject-based random
         try:
              conn = get_db()
