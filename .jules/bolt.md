@@ -1,0 +1,3 @@
+## 2024-04-21 - Resolving N+1 Database Querying Loops in Seer Analytics
+**Learning:** Found an N+1 query loop performance bottleneck in `backend/app/routes/seer.py` where SQL queries were repeatedly executed inside `for` loops to aggregate historical XP and subject counts per year. This codebase-specific pattern slowed down analytics data generation linearly based on dimension count (days or years).
+**Action:** When aggregating database historical statistics, replace repeated query loops with a single bounded query grouped by the required dimensions (e.g. `GROUP BY year, subject`), and then map the batch results into a local Python dictionary for fast O(1) loop-based retrieval to assemble JSON outputs.
