@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify, session
 from app.db import get_db
-import random
 import json
 from app.services.xp_service import award_xp
 
@@ -26,18 +25,24 @@ def create_custom_boss():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-def get_boss_stats(boss_type, boss_id):
+def get_boss_stats(boss_type, boss_id, precomputed_count=None):
     """Generate boss stats dynamically based on DB content"""
     conn = get_db()
     
     if boss_type == 'YEAR':
         # Boss ID is the Year (e.g., 2024)
-        count = conn.execute("SELECT COUNT(*) FROM pyq_questions WHERE year = ?", (boss_id,)).fetchone()[0]
+        if precomputed_count is not None:
+            count = precomputed_count
+        else:
+            count = conn.execute("SELECT COUNT(*) FROM pyq_questions WHERE year = ?", (boss_id,)).fetchone()[0]
         name = f"The {boss_id} Titan"
         loot = ["Time Capsule", "Ancient Scroll"]
     elif boss_type == 'SUBJECT':
         # Boss ID is the Subject Name (e.g., Geography)
-        count = conn.execute("SELECT COUNT(*) FROM pyq_questions WHERE subject = ?", (boss_id,)).fetchone()[0]
+        if precomputed_count is not None:
+            count = precomputed_count
+        else:
+            count = conn.execute("SELECT COUNT(*) FROM pyq_questions WHERE subject = ?", (boss_id,)).fetchone()[0]
         name = f"The {boss_id} Golem"
         loot = ["Subject Mastery Token", "Skill Point"]
     elif boss_type == 'CUSTOM':
@@ -51,20 +56,23 @@ def get_boss_stats(boss_type, boss_id):
         loot = ["Custom Reward", "Glory"]
         
         # Calculate count based on filters
-        query = "SELECT COUNT(*) FROM pyq_questions WHERE 1=1"
-        params = []
-        if filters.get('year'):
-            query += " AND year = ?"
-            params.append(filters['year'])
-        if filters.get('subject'):
-            query += " AND subject = ?"
-            params.append(filters['subject'])
-        if filters.get('search'):
-            query += " AND (question_text LIKE ? OR topic LIKE ?)"
-            term = f"%{filters['search']}%"
-            params.extend([term, term])
-            
-        count = conn.execute(query, params).fetchone()[0]
+        if precomputed_count is not None:
+            count = precomputed_count
+        else:
+            query = "SELECT COUNT(*) FROM pyq_questions WHERE 1=1"
+            params = []
+            if filters.get('year'):
+                query += " AND year = ?"
+                params.append(filters['year'])
+            if filters.get('subject'):
+                query += " AND subject = ?"
+                params.append(filters['subject'])
+            if filters.get('search'):
+                query += " AND (question_text LIKE ? OR topic LIKE ?)"
+                term = f"%{filters['search']}%"
+                params.extend([term, term])
+
+            count = conn.execute(query, params).fetchone()[0]
     else:
         # Default/Random Boss
         count = 10
@@ -90,13 +98,13 @@ def get_available_bosses():
     """Get list of available bosses (Years, Subjects, and Custom)"""
     conn = get_db()
     
-    # Year Bosses
-    years = conn.execute("SELECT DISTINCT year FROM pyq_questions ORDER BY year DESC").fetchall()
-    year_bosses = [get_boss_stats('YEAR', row['year']) for row in years]
+    # Year Bosses - optimized with GROUP BY to avoid N+1 queries
+    years = conn.execute("SELECT year, COUNT(*) as count FROM pyq_questions GROUP BY year ORDER BY year DESC").fetchall()
+    year_bosses = [get_boss_stats('YEAR', row['year'], precomputed_count=row['count']) for row in years]
     
-    # Subject Bosses
-    subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
-    subject_bosses = [get_boss_stats('SUBJECT', row['subject']) for row in subjects]
+    # Subject Bosses - optimized with GROUP BY to avoid N+1 queries
+    subjects = conn.execute("SELECT subject, COUNT(*) as count FROM pyq_questions GROUP BY subject ORDER BY subject").fetchall()
+    subject_bosses = [get_boss_stats('SUBJECT', row['subject'], precomputed_count=row['count']) for row in subjects]
     
     # Custom Bosses
     custom = conn.execute("SELECT id FROM custom_bosses WHERE is_active = 1 ORDER BY created_at DESC").fetchall()
