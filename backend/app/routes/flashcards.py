@@ -1,5 +1,4 @@
 # Flashcards API Routes
-from app import cache
 from flask import Blueprint, request, jsonify
 from app.db import get_db
 from datetime import datetime
@@ -15,6 +14,8 @@ from app.utils.session import get_current_user_id as get_user_id
 from app.validators import require_json_fields
 import json
 
+from app import cache
+
 flashcards = Blueprint('flashcards', __name__)
 
 
@@ -26,7 +27,7 @@ flashcards = Blueprint('flashcards', __name__)
 def get_decks():
     """Get all decks with card counts"""
     try:
-        user_id = get_user_id()
+        user_id = get_user_id()  # noqa: F841
         conn = get_db()
 
         decks = conn.execute('''
@@ -48,7 +49,7 @@ def get_decks():
 def create_deck():
     """Create a new deck"""
     try:
-        user_id = get_user_id()
+        user_id = get_user_id()  # noqa: F841
         data = request.get_json()
 
         conn = get_db()
@@ -71,7 +72,7 @@ def create_deck():
 def get_deck(deck_id):
     """Get deck with all its cards"""
     try:
-        user_id = get_user_id()
+        user_id = get_user_id()  # noqa: F841
         conn = get_db()
 
         deck = conn.execute(
@@ -107,7 +108,7 @@ def get_deck(deck_id):
 def delete_deck(deck_id):
     """Delete deck and all its cards"""
     try:
-        user_id = get_user_id()
+        user_id = get_user_id()  # noqa: F841
         conn = get_db()
 
         # Check ownership
@@ -135,7 +136,7 @@ def delete_deck(deck_id):
 def create_flashcard():
     """Create a new flashcard"""
     try:
-        user_id = get_user_id()
+        user_id = get_user_id()  # noqa: F841
         data = request.get_json()
 
         valid, err = require_json_fields(data, ['deck_id', 'front', 'back'])
@@ -176,7 +177,7 @@ def create_flashcard():
 def update_flashcard(card_id):
     """Update a flashcard"""
     try:
-        user_id = get_user_id()
+        user_id = get_user_id()  # noqa: F841
         data = request.get_json()
         conn = get_db()
 
@@ -207,7 +208,7 @@ def update_flashcard(card_id):
 def delete_flashcard(card_id):
     """Delete a flashcard"""
     try:
-        user_id = get_user_id()
+        user_id = get_user_id()  # noqa: F841
         conn = get_db()
 
         # Verify ownership via deck
@@ -234,7 +235,7 @@ def delete_flashcard(card_id):
 def get_due_cards():
     """Get cards due for review"""
     try:
-        _ = get_user_id()
+        user_id = get_user_id()  # noqa: F841
         deck_id = request.args.get('deck_id', type=int)
         limit = request.args.get('limit', 20, type=int)
 
@@ -296,7 +297,7 @@ def get_due_cards():
 def review_flashcard(card_id):
     """Record a review result"""
     try:
-        user_id = get_user_id()
+        user_id = get_user_id()  # noqa: F841
         data = request.get_json()
         rating = data['rating']  # 1=Again, 2=Hard, 3=Good, 4=Easy
         time_taken = data.get('time_taken', 0)
@@ -360,7 +361,7 @@ def review_flashcard(card_id):
 def award_review_xp():
     """Award XP after completing review session"""
     try:
-        user_id = get_user_id()
+        user_id = get_user_id()  # noqa: F841
         data = request.get_json()
         cards_reviewed = data.get('cards_reviewed', 0)
 
@@ -383,7 +384,7 @@ def award_review_xp():
 def get_analytics():
     """Get review statistics"""
     try:
-        user_id = get_user_id()
+        user_id = get_user_id()  # noqa: F841
         conn = get_db()
 
         # Total cards
