@@ -1,0 +1,3 @@
+## 2024-05-18 - SQLite Subquery Optimization for N+1 issues
+**Learning:** Using `WHERE (id, timestamp) IN (SELECT id, MAX(timestamp) GROUP BY id)` to get the latest row in SQLite is highly inefficient because it evaluates the subquery as a nested loop (O(n²)). SQLite supports bare columns, meaning you can simply `SELECT id, data, MAX(timestamp) GROUP BY id` and it will correctly return the `data` associated with the max timestamp.
+**Action:** Replace `WHERE (...) IN (SELECT ... MAX() GROUP BY ...)` subqueries with a simple `MAX()` projection and `GROUP BY` when fetching latest states (like latest review session per flashcard).

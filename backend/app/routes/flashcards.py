@@ -246,13 +246,9 @@ def get_due_cards():
                    rs.halflife, rs.alpha, rs.beta, rs.next_review, rs.reviewed_at
             FROM flashcards f
             LEFT JOIN (
-                SELECT flashcard_id, halflife, alpha, beta, next_review, reviewed_at
+                SELECT flashcard_id, halflife, alpha, beta, next_review, MAX(reviewed_at) as reviewed_at
                 FROM review_sessions
-                WHERE (flashcard_id, reviewed_at) IN (
-                    SELECT flashcard_id, MAX(reviewed_at)
-                    FROM review_sessions
-                    GROUP BY flashcard_id
-                )
+                GROUP BY flashcard_id
             ) rs ON f.id = rs.flashcard_id
             WHERE 1=1
         '''
@@ -398,13 +394,9 @@ def get_analytics():
             SELECT f.id, rs.halflife, rs.alpha, rs.beta
             FROM flashcards f
             LEFT JOIN (
-                SELECT flashcard_id, halflife, alpha, beta
+                SELECT flashcard_id, halflife, alpha, beta, MAX(reviewed_at) as reviewed_at
                 FROM review_sessions
-                WHERE (flashcard_id, reviewed_at) IN (
-                    SELECT flashcard_id, MAX(reviewed_at)
-                    FROM review_sessions
-                    GROUP BY flashcard_id
-                )
+                GROUP BY flashcard_id
             ) rs ON f.id = rs.flashcard_id
         ''').fetchall()
         
