@@ -312,7 +312,6 @@ def delete_test(test_id):
 @mock_tests_bp.route('/api/mock-tests', methods=['POST'])
 def create_test():
     """Create a new test with questions"""
-    import json as json_mod
     try:
         data = request.json
         conn = get_db()
@@ -332,21 +331,23 @@ def create_test():
         ))
         test_id = cursor.lastrowid
         
-        for i, q in enumerate(questions, 1):
-            conn.execute('''
-                INSERT INTO test_questions (test_id, question_number, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation, subject)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
-                test_id, i,
-                q['question_text'],
-                q.get('option_a', ''),
-                q.get('option_b', ''),
-                q.get('option_c', ''),
-                q.get('option_d', ''),
-                q.get('correct_answer', 'A'),
-                q.get('explanation', ''),
-                q.get('subject', data.get('subject', 'General'))
-            ))
+        # ⚡ Bolt: Batch database row insertions to prevent severe I/O bottleneck
+        question_params = [(
+            test_id, i,
+            q['question_text'],
+            q.get('option_a', ''),
+            q.get('option_b', ''),
+            q.get('option_c', ''),
+            q.get('option_d', ''),
+            q.get('correct_answer', 'A'),
+            q.get('explanation', ''),
+            q.get('subject', data.get('subject', 'General'))
+        ) for i, q in enumerate(questions, 1)]
+
+        conn.executemany('''
+            INSERT INTO test_questions (test_id, question_number, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation, subject)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', question_params)
         
         conn.commit()
         return jsonify({'success': True, 'test_id': test_id}), 201
