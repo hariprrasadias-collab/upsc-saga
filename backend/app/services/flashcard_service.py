@@ -115,10 +115,7 @@ class FlashcardService:
             if row:
                 deck_id = row[0]
             else:
-                cursor = conn.execute(
-                    "INSERT INTO decks (user_id, name, subject) VALUES (1, ?, 'General')",
-                    (deck_name,)
-                )
+                cursor = conn.execute("INSERT INTO decks (user_id, name, subject) VALUES (1, ?, 'General')", (deck_name,))
                 deck_id = cursor.lastrowid
 
             for card in cards:
