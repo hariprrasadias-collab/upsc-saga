@@ -47,7 +47,10 @@ const Toast: React.FC<ToastProps> = ({
             aria-live={isUrgent ? 'assertive' : 'polite'}
         >
             <div className="toast-icon" aria-hidden="true">{getIcon()}</div>
-            <div className="toast-message">{message}</div>
+            <div className="toast-body">
+                <div className="toast-type">{type}</div>
+                <div className="toast-message">{message}</div>
+            </div>
             <button
                 className="toast-close"
                 onClick={() => {
@@ -58,6 +61,12 @@ const Toast: React.FC<ToastProps> = ({
             >
                 <span aria-hidden="true">×</span>
             </button>
+            <div className="toast-progress" aria-hidden="true">
+                <div
+                    className="toast-progress-fill"
+                    style={{ animationDuration: `${duration}ms` }}
+                />
+            </div>
         </div>
     );
 };
