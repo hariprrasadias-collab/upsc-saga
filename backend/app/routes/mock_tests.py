@@ -332,11 +332,10 @@ def create_test():
         ))
         test_id = cursor.lastrowid
         
+        # ⚡ Bolt: Batch insertions using executemany to avoid SQLite I/O bottleneck
+        question_data = []
         for i, q in enumerate(questions, 1):
-            conn.execute('''
-                INSERT INTO test_questions (test_id, question_number, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation, subject)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
+            question_data.append((
                 test_id, i,
                 q['question_text'],
                 q.get('option_a', ''),
@@ -347,6 +346,12 @@ def create_test():
                 q.get('explanation', ''),
                 q.get('subject', data.get('subject', 'General'))
             ))
+
+        if question_data:
+            conn.executemany('''
+                INSERT INTO test_questions (test_id, question_number, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation, subject)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', question_data)
         
         conn.commit()
         return jsonify({'success': True, 'test_id': test_id}), 201
