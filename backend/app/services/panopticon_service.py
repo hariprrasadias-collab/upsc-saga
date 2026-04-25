@@ -12,6 +12,7 @@ from app.services.model_manager import model_manager
 # genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 # model = genai.GenerativeModel('gemini-pro')
 
+
 class PanopticonService:
     def __init__(self):
         pass
@@ -49,10 +50,11 @@ class PanopticonService:
         data: {date, sleep_hours, sleep_quality, mood_score, energy_level, diet_quality, exercise_minutes, notes}
         """
         conn = self.get_db_connection()
-        if not conn: return {"success": False, "message": "Database Unavailable"}
+        if not conn:
+            return {"success": False, "message": "Database Unavailable"}
 
         cursor = conn.cursor()
-        
+
         try:
             cursor.execute('''
                 INSERT INTO daily_biometrics (date, sleep_hours, sleep_quality, mood_score, energy_level, diet_quality, exercise_minutes, notes)
@@ -66,15 +68,15 @@ class PanopticonService:
                     exercise_minutes=excluded.exercise_minutes,
                     notes=excluded.notes
             ''', (
-                data['date'], data.get('sleep_hours'), data.get('sleep_quality'), 
-                data.get('mood_score'), data.get('energy_level'), data.get('diet_quality'), 
+                data['date'], data.get('sleep_hours'), data.get('sleep_quality'),
+                data.get('mood_score'), data.get('energy_level'), data.get('diet_quality'),
                 data.get('exercise_minutes'), data.get('notes')
             ))
             conn.commit()
-            
+
             # Trigger analysis after logging
             self.analyze_correlations()
-            
+
             return {"success": True, "message": "Bio-metrics logged successfully"}
         except Exception as e:
             return {"success": False, "message": str(e)}
@@ -86,19 +88,19 @@ class PanopticonService:
         n = len(x)
         if n != len(y) or n < 2:
             return 0
-        
+
         sum_x = sum(x)
         sum_y = sum(y)
         sum_x_sq = sum(xi*xi for xi in x)
         sum_y_sq = sum(yi*yi for yi in y)
         sum_xy = sum(xi*yi for xi, yi in zip(x, y))
-        
+
         numerator = n * sum_xy - sum_x * sum_y
         denominator = math.sqrt((n * sum_x_sq - sum_x**2) * (n * sum_y_sq - sum_y**2))
-        
+
         if denominator == 0:
             return 0
-            
+
         return numerator / denominator
 
     def get_current_status(self):
@@ -108,10 +110,11 @@ class PanopticonService:
         PHASE 16: SYSTEM METAPHOR
         """
         conn = self.get_db_connection()
-        if not conn: return {"status": "UNKNOWN", "energy": 50, "alert": "DB Error"}
+        if not conn:
+            return {"status": "UNKNOWN", "energy": 50, "alert": "DB Error"}
 
         cursor = conn.cursor()
-        
+
         try:
             # Fetch latest entry
             cursor.execute('''
@@ -119,18 +122,18 @@ class PanopticonService:
                 ORDER BY date DESC LIMIT 1
             ''')
             row = cursor.fetchone()
-            
+
             if not row:
                 return {"status": "UNKNOWN", "energy": 50, "alert": "No Data"}
-                
+
             data = dict(row)
             energy = data.get('energy_level', 50)
             sleep = data.get('sleep_hours', 7)
-            
+
             # Determine Status
             status = "OPTIMAL"
             alert = None
-            
+
             if energy < 40 or sleep < 5:
                 status = "CRITICAL"
                 alert = "High Fatigue Detected"
@@ -163,7 +166,7 @@ class PanopticonService:
                 "metaphor": metaphor,
                 "last_updated": data.get('date')
             }
-            
+
         except Exception as e:
             print(f"Panopticon Status Check Failed: {e}")
             return {"status": "ERROR", "energy": 0, "alert": str(e)}
@@ -175,9 +178,10 @@ class PanopticonService:
         Analyze correlations between bio-metrics and study performance.
         """
         conn = self.get_db_connection()
-        if not conn: return
+        if not conn:
+            return
         cursor = conn.cursor()
-        
+
         try:
             # 1. Fetch Bio-Metrics (Last 30 days)
             cursor.execute('''
@@ -186,7 +190,7 @@ class PanopticonService:
                 ORDER BY date DESC LIMIT 30
             ''')
             biometrics = {row['date']: dict(row) for row in cursor.fetchall()}
-            
+
             # 2. Fetch Study Performance (Quiz Scores)
             # Check if table exists first to avoid crash
             try:
@@ -203,21 +207,21 @@ class PanopticonService:
                 ORDER BY date DESC LIMIT 30
             ''')
             scores = {row['date']: row['avg_score'] for row in cursor.fetchall()}
-            
+
             # 3. Align Data
             dates = sorted(list(set(biometrics.keys()) & set(scores.keys())))
             if len(dates) < 3:
                 conn.close()
-                return # Not enough data
+                return  # Not enough data
 
             sleep_data = [biometrics[d]['sleep_hours'] for d in dates if biometrics[d]['sleep_hours'] is not None]
             mood_data = [biometrics[d]['mood_score'] for d in dates if biometrics[d]['mood_score'] is not None]
             score_data_sleep = [scores[d] for d in dates if biometrics[d]['sleep_hours'] is not None]
             score_data_mood = [scores[d] for d in dates if biometrics[d]['mood_score'] is not None]
-            
+
             # 4. Calculate Correlations
             correlations = []
-            
+
             if len(sleep_data) > 2:
                 r_sleep = self._calculate_pearson_correlation(sleep_data, score_data_sleep)
                 correlations.append(('sleep_hours', 'quiz_score', r_sleep))
@@ -264,20 +268,25 @@ class PanopticonService:
     def get_dashboard_data(self):
         """Get data for the frontend dashboard."""
         conn = self.get_db_connection()
-        if not conn: return {"recent_metrics": [], "correlations": []}
+        if not conn:
+            return {"recent_metrics": [], "correlations": []}
         cursor = conn.cursor()
-        
+
         try:
             # Get recent metrics
             cursor.execute('SELECT * FROM daily_biometrics ORDER BY date DESC LIMIT 7')
             recent_metrics = [dict(row) for row in cursor.fetchall()]
 
             # Get correlations
+            # Bolt Optimization: Avoid nested query using SQLite bare column feature
             cursor.execute('''
-                SELECT * FROM bio_correlations
-                WHERE id IN (SELECT MAX(id) FROM bio_correlations GROUP BY metric_name)
+                SELECT *, MAX(id) as max_id FROM bio_correlations GROUP BY metric_name
             ''')
-            correlations = [dict(row) for row in cursor.fetchall()]
+            correlations = []
+            for row in cursor.fetchall():
+                row_dict = dict(row)
+                row_dict.pop('max_id', None)
+                correlations.append(row_dict)
 
             return {
                 "recent_metrics": recent_metrics,
@@ -287,5 +296,6 @@ class PanopticonService:
             return {"recent_metrics": [], "correlations": []}
         finally:
             conn.close()
+
 
 panopticon = PanopticonService()
