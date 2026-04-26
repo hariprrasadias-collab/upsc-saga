@@ -226,11 +226,11 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
                         {isFullscreen ? '↙️' : '⛶'}
                     </button>
                     {isFullscreen && (
-                        <button onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close">✕</button>
+                        <button aria-label="Close Fullscreen" onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close">✕</button>
                     )}
                     <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" title="History">📊</button>
                     <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" title="Settings">⚙️</button>
-                    <button onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize">−</button>
+                    <button aria-label="Minimize Timer" onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize">−</button>
                 </div>
             </div>
 
@@ -296,8 +296,8 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
                         <input type="number" value={editMinutes} onChange={(e) => setEditMinutes(e.target.value)}
                             className="timer-edit-input" min="1" max="120" />
                         <div className="timer-edit-actions">
-                            <button onClick={handleEditSave} className="save-btn">✓</button>
-                            <button onClick={() => setIsEditing(false)} className="cancel-btn">✕</button>
+                            <button aria-label="Save Time" onClick={handleEditSave} className="save-btn">✓</button>
+                            <button aria-label="Cancel Edit" onClick={() => setIsEditing(false)} className="cancel-btn">✕</button>
                         </div>
                     </div>
                 ) : (
