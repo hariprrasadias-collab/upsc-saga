@@ -103,12 +103,16 @@ class DoppelgangerService:
             ''', ("⚔️ Shadow Duel", "Mixed", len(questions), 10, len(questions)*2))
             test_id = cursor.lastrowid
 
-            for i, q in enumerate(questions, 1):
-                conn.execute('''
-                    INSERT INTO test_questions
-                    (test_id, question_number, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (test_id, i, q['question'], q['options'][0], q['options'][1], q['options'][2], q['options'][3], q['correct_answer'], q['trap_explanation']))
+            # ⚡ Bolt Optimization: Use executemany for batch insertions to reduce database I/O and context-switching overhead
+            question_tuples = [
+                (test_id, i, q['question'], q['options'][0], q['options'][1], q['options'][2], q['options'][3], q['correct_answer'], q['trap_explanation'])
+                for i, q in enumerate(questions, 1)
+            ]
+            conn.executemany('''
+                INSERT INTO test_questions
+                (test_id, question_number, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', question_tuples)
             conn.commit()
 
             return {
