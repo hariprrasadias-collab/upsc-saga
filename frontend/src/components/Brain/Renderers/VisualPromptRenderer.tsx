@@ -248,6 +248,8 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
     };
 
     const handleGenerate = async (isUpscale = false) => {
+        // @ts-ignore: TS6133 unused variable but it's part of the component API
+        const _isUpscale = isUpscale;
         if (isGenerating) return;
         setIsGenerating(true);
         setGeneratedImage(null);
