@@ -5,8 +5,7 @@ Analyzes quiz/test performance to identify weak topics and generate targeted pra
 import sqlite3
 import os
 from typing import Dict, List, Optional
-from datetime import datetime, timedelta
-from collections import defaultdict
+from datetime import datetime
 
 DB_PATH = os.path.join(os.path.dirname(__file__), '..', '..', 'upsc_saga.db')
 
@@ -61,44 +60,56 @@ def calculate_weakness_score(topic_data: Dict) -> float:
     weakness_score = accuracy_score + time_score + recency_score + attempt_penalty
     return min(100, max(0, weakness_score))
 
-def analyze_topic_performance(topic: str) -> Dict:
+def analyze_topic_performance(topic: str, precomputed_stats: Optional[Dict] = None, skip_db_update: bool = False) -> Dict:
     """Analyze performance for a specific topic and update weak_areas table"""
-    conn = get_db()
-    cursor = conn.cursor()
+    conn = get_db() if not skip_db_update else None
+    cursor = conn.cursor() if conn else None
     
-    # Get performance stats for this topic
-    cursor.execute('''
-        SELECT 
-            COUNT(*) as total,
-            SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) as correct,
-            AVG(time_taken) as avg_time,
-            subject
-        FROM performance_records
-        WHERE topic = ?
-        GROUP BY subject
-    ''', (topic,))
-    
-    result = cursor.fetchone()
-    
-    if not result or result['total'] == 0:
-        conn.close()
-        return {}
-    
-    total = result['total']
-    correct = result['correct'] or 0
-    accuracy = correct / total if total > 0 else 0
-    avg_time = result['avg_time'] or 0
-    subject = result['subject']
-    
-    # Check recent failures (last 7 days)
-    cursor.execute('''
-        SELECT COUNT(*) as recent_failures
-        FROM performance_records
-        WHERE topic = ? AND is_correct = 0 
-        AND attempted_at >= datetime('now', '-7 days')
-    ''', (topic,))
-    
-    recent_failures = cursor.fetchone()['recent_failures']
+    if precomputed_stats:
+        total = precomputed_stats.get('total', 0)
+        correct = precomputed_stats.get('correct', 0)
+        accuracy = correct / total if total > 0 else 0
+        avg_time = precomputed_stats.get('avg_time', 0)
+        subject = precomputed_stats.get('subject', 'Unknown')
+        recent_failures = precomputed_stats.get('recent_failures', 0)
+
+        if total == 0:
+            return {}
+    else:
+        # Get performance stats for this topic
+        cursor.execute('''
+            SELECT
+                COUNT(*) as total,
+                SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) as correct,
+                AVG(time_taken) as avg_time,
+                subject
+            FROM performance_records
+            WHERE topic = ?
+            GROUP BY subject
+        ''', (topic,))
+
+        result = cursor.fetchone()
+
+        if not result or result['total'] == 0:
+            if conn:
+                conn.close()
+            return {}
+
+        total = result['total']
+        correct = result['correct'] or 0
+        accuracy = correct / total if total > 0 else 0
+        avg_time = result['avg_time'] or 0
+        subject = result['subject']
+
+        # Check recent failures (last 7 days)
+        cursor.execute('''
+            SELECT COUNT(*) as recent_failures
+            FROM performance_records
+            WHERE topic = ? AND is_correct = 0
+            AND attempted_at >= datetime('now', '-7 days')
+        ''', (topic,))
+
+        recent_failures = cursor.fetchone()['recent_failures']
     
     topic_data = {
         'total_attempts': total,
@@ -110,23 +121,24 @@ def analyze_topic_performance(topic: str) -> Dict:
     
     weakness_score = calculate_weakness_score(topic_data)
     
-    # Update or insert into weak_areas
-    cursor.execute('''
-        INSERT INTO weak_areas 
-        (topic, subject, total_attempts, correct_attempts, accuracy_rate, avg_time_taken, weakness_score, last_updated)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ON CONFLICT(topic) DO UPDATE SET
-            subject = excluded.subject,
-            total_attempts = excluded.total_attempts,
-            correct_attempts = excluded.correct_attempts,
-            accuracy_rate = excluded.accuracy_rate,
-            avg_time_taken = excluded.avg_time_taken,
-            weakness_score = excluded.weakness_score,
-            last_updated = excluded.last_updated
-    ''', (topic, subject, total, correct, accuracy, avg_time, weakness_score, datetime.now()))
-    
-    conn.commit()
-    conn.close()
+    if not skip_db_update and cursor and conn:
+        # Update or insert into weak_areas
+        cursor.execute('''
+            INSERT INTO weak_areas
+            (topic, subject, total_attempts, correct_attempts, accuracy_rate, avg_time_taken, weakness_score, last_updated)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(topic) DO UPDATE SET
+                subject = excluded.subject,
+                total_attempts = excluded.total_attempts,
+                correct_attempts = excluded.correct_attempts,
+                accuracy_rate = excluded.accuracy_rate,
+                avg_time_taken = excluded.avg_time_taken,
+                weakness_score = excluded.weakness_score,
+                last_updated = excluded.last_updated
+        ''', (topic, subject, total, correct, accuracy, avg_time, weakness_score, datetime.now()))
+
+        conn.commit()
+        conn.close()
     
     return {
         'topic': topic,
@@ -140,16 +152,77 @@ def analyze_all_performance() -> List[Dict]:
     conn = get_db()
     cursor = conn.cursor()
     
-    # Get all unique topics
-    cursor.execute('SELECT DISTINCT topic FROM performance_records WHERE topic IS NOT NULL')
-    topics = [row['topic'] for row in cursor.fetchall()]
-    conn.close()
+    # 1. Fetch all performance stats grouped by topic in a single query
+    cursor.execute('''
+        SELECT
+            topic,
+            subject,
+            COUNT(*) as total,
+            SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) as correct,
+            AVG(time_taken) as avg_time
+        FROM performance_records
+        WHERE topic IS NOT NULL
+        GROUP BY topic, subject
+    ''')
+
+    stats = cursor.fetchall()
+
+    # 2. Fetch recent failures grouped by topic in a single query
+    cursor.execute('''
+        SELECT topic, COUNT(*) as recent_failures
+        FROM performance_records
+        WHERE is_correct = 0 AND attempted_at >= datetime('now', '-7 days')
+        GROUP BY topic
+    ''')
+
+    recent_failures_dict = {row['topic']: row['recent_failures'] for row in cursor.fetchall()}
     
     results = []
-    for topic in topics:
-        result = analyze_topic_performance(topic)
+    updates = []
+
+    for row in stats:
+        topic = row['topic']
+        precomputed_stats = {
+            'total': row['total'],
+            'correct': row['correct'] or 0,
+            'avg_time': row['avg_time'] or 0,
+            'subject': row['subject'],
+            'recent_failures': recent_failures_dict.get(topic, 0)
+        }
+
+        result = analyze_topic_performance(topic, precomputed_stats=precomputed_stats, skip_db_update=True)
         if result:
             results.append(result)
+            updates.append((
+                topic,
+                result['subject'],
+                result['total_attempts'],
+                result['correct_attempts'],
+                result['accuracy_rate'],
+                result['avg_time_taken'],
+                result['weakness_score'],
+                datetime.now()
+            ))
+
+    # 3. Batch insert/update using executemany
+    if updates:
+        cursor.executemany('''
+            INSERT INTO weak_areas
+            (topic, subject, total_attempts, correct_attempts, accuracy_rate, avg_time_taken, weakness_score, last_updated)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(topic) DO UPDATE SET
+                subject = excluded.subject,
+                total_attempts = excluded.total_attempts,
+                correct_attempts = excluded.correct_attempts,
+                accuracy_rate = excluded.accuracy_rate,
+                avg_time_taken = excluded.avg_time_taken,
+                weakness_score = excluded.weakness_score,
+                last_updated = excluded.last_updated
+        ''', updates)
+
+        conn.commit()
+
+    conn.close()
     
     return sorted(results, key=lambda x: x['weakness_score'], reverse=True)
 
