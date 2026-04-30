@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify, session
 from app.db import get_db
-import random
 import json
 from app.services.xp_service import award_xp
 
@@ -90,13 +89,39 @@ def get_available_bosses():
     """Get list of available bosses (Years, Subjects, and Custom)"""
     conn = get_db()
     
-    # Year Bosses
-    years = conn.execute("SELECT DISTINCT year FROM pyq_questions ORDER BY year DESC").fetchall()
-    year_bosses = [get_boss_stats('YEAR', row['year']) for row in years]
+    # Year Bosses - optimized with GROUP BY
+    years_counts = conn.execute("SELECT year, COUNT(*) as count FROM pyq_questions GROUP BY year ORDER BY year DESC").fetchall()
+    year_bosses = []
+    for row in years_counts:
+        count = row['count']
+        year = row['year']
+        hp = min(count, 20)
+        year_bosses.append({
+            "id": year,
+            "type": "YEAR",
+            "name": f"The {year} Titan",
+            "hp": hp,
+            "max_hp": count,
+            "xp_reward": hp * 50,
+            "loot": ["Time Capsule", "Ancient Scroll"]
+        })
     
-    # Subject Bosses
-    subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
-    subject_bosses = [get_boss_stats('SUBJECT', row['subject']) for row in subjects]
+    # Subject Bosses - optimized with GROUP BY
+    subject_counts = conn.execute("SELECT subject, COUNT(*) as count FROM pyq_questions GROUP BY subject ORDER BY subject").fetchall()
+    subject_bosses = []
+    for row in subject_counts:
+        count = row['count']
+        subject = row['subject']
+        hp = min(count, 20)
+        subject_bosses.append({
+            "id": subject,
+            "type": "SUBJECT",
+            "name": f"The {subject} Golem",
+            "hp": hp,
+            "max_hp": count,
+            "xp_reward": hp * 50,
+            "loot": ["Subject Mastery Token", "Skill Point"]
+        })
     
     # Custom Bosses
     custom = conn.execute("SELECT id FROM custom_bosses WHERE is_active = 1 ORDER BY created_at DESC").fetchall()
