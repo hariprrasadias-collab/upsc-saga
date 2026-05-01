@@ -4,7 +4,7 @@ Consolidates data from all modules for comprehensive analytics
 """
 from datetime import datetime, timedelta
 from collections import defaultdict
-import sqlite3
+
 
 def calculate_study_hours(conn, user_id, start_date, end_date):
     """
@@ -120,8 +120,8 @@ def get_subject_performance(conn, user_id, subject):
         if syllabus and syllabus['total'] > 0:
             result['syllabus_pct'] = round((syllabus['completed'] / syllabus['total']) * 100, 1)
     except Exception:
-        pass # Return zeroed result on error
-    
+        pass  # Return zeroed result on error
+
     return result
 
 
@@ -130,7 +130,7 @@ def identify_weak_areas(conn, user_id, limit=10):
     Identify topics needing attention based on performance
     """
     weak_areas = []
-    
+
     try:
         # Check syllabus topics not started or in progress
         syllabus_weak = conn.execute('''
@@ -140,7 +140,7 @@ def identify_weak_areas(conn, user_id, limit=10):
             ORDER BY subject, name
             LIMIT ?
         ''', (limit,)).fetchall()
-        
+
         for topic in syllabus_weak:
             weak_areas.append({
                 'subject': topic['subject'],
@@ -149,7 +149,7 @@ def identify_weak_areas(conn, user_id, limit=10):
                 'source': 'Syllabus',
                 'action': 'Start reading' if topic['status'] == 'Not Started' else 'Complete reading'
             })
-        
+
         # Check mock test subjects with low scores (get bottom performing ones)
         low_scores = conn.execute('''
             SELECT mt.subject, AVG(mta.score) as avg_score, COUNT(*) as attempts
@@ -160,17 +160,28 @@ def identify_weak_areas(conn, user_id, limit=10):
             ORDER BY avg_score ASC
             LIMIT ?
         ''', (user_id, limit)).fetchall()
-        
-        for subj in low_scores:
-            # Calculate trend for this subject
-            subject_scores = conn.execute('''
-                SELECT mta.score
+
+        # ⚡ Bolt Optimization: Replaced N+1 subquery in loop with a single IN query and in-memory grouping
+        # Impact: Reduces DB queries from (1 + N) to 2, significantly improving response time for users with many subjects
+        scores_by_subject = defaultdict(list)
+
+        if low_scores:
+            subjects = [subj['subject'] for subj in low_scores]
+            placeholders = ', '.join(['?'] * len(subjects))
+
+            all_scores = conn.execute(f'''
+                SELECT mt.subject, mta.score, mta.submitted_at
                 FROM test_attempts mta
                 JOIN mock_tests mt ON mta.test_id = mt.id
-                WHERE mta.user_id = ? AND mt.subject = ?
+                WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
                 ORDER BY mta.submitted_at ASC
-            ''', (user_id, subj['subject'])).fetchall()
+            ''', [user_id] + subjects).fetchall()
 
+            for row in all_scores:
+                scores_by_subject[row['subject']].append(row)
+
+        for subj in low_scores:
+            subject_scores = scores_by_subject.get(subj['subject'], [])
             scores_list = [s['score'] for s in subject_scores]
             trend_val = calculate_improvement_rate(scores_list)
             trend_direction = 'improving' if trend_val > 0 else 'declining' if trend_val < 0 else 'stable'
@@ -193,7 +204,7 @@ def identify_weak_areas(conn, user_id, limit=10):
             })
     except Exception as e:
         print(f"Error identifying weak areas: {e}")
-    
+
     # Sort by weakness score and limit
     weak_areas.sort(key=lambda x: x['weakness_score'], reverse=True)
     return weak_areas[:limit]
@@ -205,16 +216,16 @@ def calculate_improvement_rate(scores):
     """
     if len(scores) < 2:
         return 0
-    
+
     first_half = scores[:len(scores)//2]
     second_half = scores[len(scores)//2:]
-    
+
     avg_first = sum(first_half) / len(first_half) if first_half else 0
     avg_second = sum(second_half) / len(second_half) if second_half else 0
-    
+
     if avg_first == 0:
         return 0
-    
+
     improvement = ((avg_second - avg_first) / avg_first) * 100
     return round(improvement, 1)
 
@@ -261,7 +272,7 @@ def get_streak_days(conn, user_id):
             WHERE user_id = ? AND is_completed = 1
         ''', (user_id,)).fetchall()
         dates.update([r['date'] for r in warmap_dates])
-        
+
         if not dates:
             return 0
 
@@ -272,7 +283,7 @@ def get_streak_days(conn, user_id):
                 try:
                     dates_objs.add(datetime.fromisoformat(d).date())
                 except ValueError:
-                    pass # Ignore invalid date formats
+                    pass  # Ignore invalid date formats
 
         today = datetime.now().date()
         yesterday = today - timedelta(days=1)
@@ -294,6 +305,7 @@ def get_streak_days(conn, user_id):
     except Exception as e:
         print(f"Error calculating streak: {e}")
         return 0
+
 
 def generate_weekly_performance_review(conn, user_id):
     """
