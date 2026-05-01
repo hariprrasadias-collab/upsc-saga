@@ -219,12 +219,13 @@ const AdminDashboard: React.FC = () => {
                                                 </span>
                                             </td>
                                             <td>
-                                                <button className="action-btn edit">✏️</button>
+                                                <button className="action-btn edit" aria-label="Edit question"><span aria-hidden="true">✏️</span></button>
                                                 <button
                                                     className="action-btn delete"
                                                     onClick={() => handleDeleteQuestion(q.id)}
+                                                    aria-label="Delete question"
                                                 >
-                                                    🗑️
+                                                    <span aria-hidden="true">🗑️</span>
                                                 </button>
                                             </td>
                                         </tr>
@@ -288,12 +289,13 @@ const AdminDashboard: React.FC = () => {
                                                 </span>
                                             </td>
                                             <td>
-                                                <button className="action-btn edit">✏️</button>
+                                                <button className="action-btn edit" aria-label="Edit article"><span aria-hidden="true">✏️</span></button>
                                                 <button
                                                     className="action-btn delete"
                                                     onClick={() => handleDeleteArticle(a.id)}
+                                                    aria-label="Delete article"
                                                 >
-                                                    🗑️
+                                                    <span aria-hidden="true">🗑️</span>
                                                 </button>
                                             </td>
                                         </tr>
