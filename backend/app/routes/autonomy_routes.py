@@ -9,7 +9,6 @@ from app.utils.session import get_current_user_id
 
 autonomy_bp = Blueprint('autonomy_core', __name__)
 
-
 @autonomy_bp.route('/settings', methods=['GET'])
 def get_autonomy_settings():
     """Get current autonomy settings for user"""
@@ -28,7 +27,6 @@ def get_autonomy_settings():
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @autonomy_bp.route('/settings', methods=['POST'])
 def update_autonomy_settings():
@@ -51,7 +49,6 @@ def update_autonomy_settings():
         return jsonify({'error': str(e)}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @autonomy_bp.route('/action_log', methods=['GET'])
 def get_action_log():
@@ -89,7 +86,6 @@ def get_action_log():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
 @autonomy_bp.route('/learned_patterns', methods=['GET'])
 def get_learned_patterns():
     """Get Brain's learned patterns"""
@@ -105,7 +101,6 @@ def get_learned_patterns():
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @autonomy_bp.route('/measure_impact/<int:action_id>', methods=['POST'])
 def measure_action_impact(action_id):
@@ -130,7 +125,6 @@ def measure_action_impact(action_id):
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @autonomy_bp.route('/stats/overview', methods=['GET'])
 def get_autonomy_overview():
@@ -182,7 +176,6 @@ def get_autonomy_overview():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
 @autonomy_bp.route('/mistakes', methods=['GET'])
 def get_detected_mistakes():
     """Get detected mistakes and correction loops"""
@@ -199,7 +192,6 @@ def get_detected_mistakes():
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @autonomy_bp.route('/blacklist', methods=['POST'])
 def blacklist_action_type():
@@ -224,7 +216,6 @@ def blacklist_action_type():
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @autonomy_bp.route('/correct/<int:mistake_action_id>', methods=['POST'])
 def trigger_correction(mistake_action_id):
@@ -252,7 +243,6 @@ def trigger_correction(mistake_action_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
 @autonomy_bp.route('/newsroom/sync', methods=['POST'])
 def trigger_newsroom():
     """Trigger The Newsroom to update static notes"""
@@ -265,7 +255,6 @@ def trigger_newsroom():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
 @autonomy_bp.route('/prometheus/forecast', methods=['GET'])
 def get_strategic_forecast():
     """Run Project Prometheus Strategy Simulation"""
@@ -275,7 +264,6 @@ def get_strategic_forecast():
         return jsonify(result)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @autonomy_bp.route('/evolve', methods=['POST'])
 def trigger_evolution():
@@ -299,7 +287,7 @@ def trigger_evolution():
                     target_file = os.path.join(services_dir, random.choice(files))
 
             if not target_file:
-                return jsonify({'error': 'No suitable candidate found for evolution'}), 404
+                 return jsonify({'error': 'No suitable candidate found for evolution'}), 404
         else:
             # Verify path safety (Simple check)
             if '..' in target_file or not target_file.endswith('.py'):
@@ -314,7 +302,6 @@ def trigger_evolution():
 
         # Trigger in background
         import threading
-
         def run_evolution():
             hephaestus.evolve_feature(target_file)
 
@@ -330,7 +317,6 @@ def trigger_evolution():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
 @autonomy_bp.route('/director/check', methods=['POST'])
 def check_director():
     """Trigger The Director to check user velocity"""
@@ -341,7 +327,6 @@ def check_director():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
 @autonomy_bp.route('/doppelganger/duel', methods=['POST'])
 def trigger_shadow_duel():
     """Trigger a Shadow Duel (Adversarial Quiz)"""
@@ -351,7 +336,6 @@ def trigger_shadow_duel():
         return jsonify(result)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @autonomy_bp.route('/neural_lace/ingest', methods=['POST'])
 def ingest_content():
@@ -368,7 +352,6 @@ def ingest_content():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
 @autonomy_bp.route('/review/now', methods=['POST'])
 def trigger_self_review():
     """Trigger an immediate self-review"""
@@ -384,7 +367,6 @@ def trigger_self_review():
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @autonomy_bp.route('/reviews/latest', methods=['GET'])
 def get_latest_review():
@@ -406,7 +388,6 @@ def get_latest_review():
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @autonomy_bp.route('/optimizations', methods=['GET'])
 def get_optimizations():
@@ -431,7 +412,6 @@ def get_optimizations():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
 @autonomy_bp.route('/optimizations/<int:opp_id>/accept', methods=['POST'])
 def accept_optimization(opp_id):
     """Accept an optimization suggestion"""
@@ -443,7 +423,6 @@ def accept_optimization(opp_id):
         return jsonify(result)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @autonomy_bp.route('/ab_tests', methods=['POST'])
 def create_ab_test():
@@ -462,7 +441,6 @@ def create_ab_test():
         return jsonify(result)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @autonomy_bp.route('/ab_tests/<test_name>', methods=['GET'])
 def get_ab_test_results(test_name):
