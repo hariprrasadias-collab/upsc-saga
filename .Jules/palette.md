@@ -1,3 +1,7 @@
 ## 2024-05-23 - Toast Notification Accessibility
 **Learning:** Notifications are often invisible to screen readers without proper roles. Using `role="alert"` for errors (assertive) and `role="status"` for info (polite) ensures users are notified at the right urgency level.
 **Action:** Always categorize toast notifications by urgency and apply corresponding `aria-live` regions, while ensuring close buttons have clear labels.
+
+## 2024-05-23 - Icon-Only Button Accessibility Pattern
+**Learning:** Icon-only buttons (using emojis or text symbols like ✕, ✓) are poorly handled by screen readers unless explicitly managed. Simply adding a title is insufficient.
+**Action:** Always add a descriptive `aria-label` to the parent `<button>` and wrap the visual icon/emoji inside a `<span aria-hidden="true">` to prevent the screen reader from reading out the raw symbol name (e.g. "times" or "check").

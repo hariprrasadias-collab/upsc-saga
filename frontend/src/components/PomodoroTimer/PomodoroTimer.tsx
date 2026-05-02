@@ -12,6 +12,8 @@ import { audioManager } from '../../util/AudioManager';
 import { AmbientSoundPlayer } from './AmbientSoundPlayer';
 
 import { SessionHistory } from './SessionHistory';
+import { generateConfettiStyles } from './confettiUtils';
+import { formatTime, formatTotalTime } from './timeUtils';
 
 // Internal FlipCard Component
 const FlipCard = ({ digit }: { digit: string }) => {
@@ -81,6 +83,7 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
     const [showHistory, setShowHistory] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
+    const [confettiStyles, setConfettiStyles] = useState<{left: string, animationDelay: string, backgroundColor: string}[]>([]);
     const [notifiedAt, setNotifiedAt] = useState<Set<number>>(new Set());
 
     const wasRunningRef = useRef(isRunning);
@@ -157,24 +160,13 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
         if (timeLeft === 0 && prevTimeRef.current > 0) {
             audioManager.play('success');
             if (mode === 'work') {
+                setConfettiStyles(generateConfettiStyles(50));
                 setShowConfetti(true);
                 setTimeout(() => setShowConfetti(false), 3000);
             }
         }
         prevTimeRef.current = timeLeft;
     }, [isRunning, timeLeft, mode]);
-
-    const formatTime = (seconds: number): string => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    };
-
-    const formatTotalTime = (seconds: number): string => {
-        const hours = Math.floor(seconds / 3600);
-        const mins = Math.floor((seconds % 3600) / 60);
-        return `${hours}h ${mins}m`;
-    };
 
     const getProgress = (): number => {
         let total = 25 * 60;
@@ -209,12 +201,8 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
         <div className={`pomodoro-widget ${className || ''} ${isFullscreen ? 'fullscreen' : ''}`}>
             {showConfetti && (
                 <div className="confetti-container">
-                    {[...Array(50)].map((_, i) => (
-                        <div key={i} className="confetti" style={{
-                            left: `${Math.random() * 100}%`,
-                            animationDelay: `${Math.random() * 0.5}s`,
-                            backgroundColor: ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6'][Math.floor(Math.random() * 5)]
-                        }} />
+                    {confettiStyles.map((style, i) => (
+                        <div key={i} className="confetti" style={style} />
                     ))}
                 </div>
             )}
@@ -222,15 +210,23 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
             <div className="pomodoro-header">
                 <h3>{mode === 'work' ? '⚔️ BATTLE TIME' : '🛡️ RESPITE'}</h3>
                 <div className="pomodoro-controls">
-                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
-                        {isFullscreen ? '↙️' : '⛶'}
+                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"} aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
+                        <span aria-hidden="true">{isFullscreen ? '↙️' : '⛶'}</span>
                     </button>
                     {isFullscreen && (
-                        <button onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close">✕</button>
+                        <button onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close" aria-label="Close Fullscreen">
+                            <span aria-hidden="true">✕</span>
+                        </button>
                     )}
-                    <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" title="History">📊</button>
-                    <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" title="Settings">⚙️</button>
-                    <button onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize">−</button>
+                    <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" title="History" aria-label="Toggle history">
+                        <span aria-hidden="true">📊</span>
+                    </button>
+                    <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" title="Settings" aria-label="Toggle settings">
+                        <span aria-hidden="true">⚙️</span>
+                    </button>
+                    <button onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize" aria-label="Minimize timer">
+                        <span aria-hidden="true">−</span>
+                    </button>
                 </div>
             </div>
 
@@ -296,8 +292,12 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
                         <input type="number" value={editMinutes} onChange={(e) => setEditMinutes(e.target.value)}
                             className="timer-edit-input" min="1" max="120" />
                         <div className="timer-edit-actions">
-                            <button onClick={handleEditSave} className="save-btn">✓</button>
-                            <button onClick={() => setIsEditing(false)} className="cancel-btn">✕</button>
+                            <button onClick={handleEditSave} className="save-btn" aria-label="Save timer edit">
+                                <span aria-hidden="true">✓</span>
+                            </button>
+                            <button onClick={() => setIsEditing(false)} className="cancel-btn" aria-label="Cancel timer edit">
+                                <span aria-hidden="true">✕</span>
+                            </button>
                         </div>
                     </div>
                 ) : (
@@ -329,7 +329,9 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
                                     <button className="edit-time-btn" onClick={() => {
                                         setEditMinutes(Math.floor(timeLeft / 60).toString());
                                         setIsEditing(true);
-                                    }} title="Edit Timer">✎</button>
+                                    }} title="Edit Timer" aria-label="Edit timer">
+                                        <span aria-hidden="true">✎</span>
+                                    </button>
                                 )}
                             </>
                         )}
