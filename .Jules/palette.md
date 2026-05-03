@@ -1,3 +1,3 @@
-## 2024-05-23 - Toast Notification Accessibility
-**Learning:** Notifications are often invisible to screen readers without proper roles. Using `role="alert"` for errors (assertive) and `role="status"` for info (polite) ensures users are notified at the right urgency level.
-**Action:** Always categorize toast notifications by urgency and apply corresponding `aria-live` regions, while ensuring close buttons have clear labels.
+## 2024-05-02 - Added `aria-label` to Close Buttons
+**Learning:** React buttons containing only symbols like `×` are a common pattern for dismissible dialogs, but they are inaccessible to screen readers as they are visually-reliant.
+**Action:** Always verify if a button has text content. If it relies purely on visual cues, ensure it has an `aria-label` to provide context (e.g., `aria-label="Close dialog"`).
