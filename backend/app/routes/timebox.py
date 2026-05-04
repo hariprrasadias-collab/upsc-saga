@@ -13,9 +13,9 @@ def get_timeboxes():
     try:
         conn = get_db()
         c = conn.cursor()
-        
+
         today = date.today().isoformat()
-        
+
         # Get time boxes
         c.execute('''
             SELECT subject, allocated_hours, 
@@ -24,10 +24,10 @@ def get_timeboxes():
             FROM time_boxes tb
             WHERE user_id = 1
         ''', (today,))
-        
+
         rows = c.fetchall()
         conn.close()
-        
+
         return jsonify([{
             'subject': row['subject'],
             'allocated_hours': row['allocated_hours'],
@@ -45,14 +45,14 @@ def add_timebox():
         data = request.get_json()
         subject = data.get('subject')
         allocated_hours = data.get('allocated_hours', 2)
-        
+
         conn = get_db()
         c = conn.cursor()
-        
+
         # Check if already exists
         c.execute('SELECT * FROM time_boxes WHERE user_id = 1 AND subject = ?', (subject,))
         exists = c.fetchone()
-        
+
         if exists:
             # Update
             c.execute('''
@@ -66,7 +66,7 @@ def add_timebox():
                 INSERT INTO time_boxes (user_id, subject, allocated_hours)
                 VALUES (1, ?, ?)
             ''', (subject, allocated_hours))
-        
+
         conn.commit()
         conn.close()
         return jsonify({'success': True})
@@ -81,7 +81,7 @@ def delete_timebox(subject):
     try:
         conn = get_db()
         c = conn.cursor()
-        
+
         c.execute('DELETE FROM time_boxes WHERE user_id = 1 AND subject = ?', (subject,))
         conn.commit()
         conn.close()
@@ -98,11 +98,11 @@ def get_suggestions():
         conn = get_db()
         # Import here to avoid circular imports if any, or just standard practice for service usage
         from app.services.analytics_service import identify_weak_areas
-        
+
         # Get top 3 weak areas
         weak_areas = identify_weak_areas(conn, 1, limit=3)
         conn.close()
-        
+
         suggestions = []
         for area in weak_areas:
             suggestions.append({
@@ -110,7 +110,7 @@ def get_suggestions():
                 'reason': f"Weakness Score: {area['weakness_score']}% - {area['action']}",
                 'recommended_hours': 2.0 # Default recommendation
             })
-            
+
         return jsonify(suggestions)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
