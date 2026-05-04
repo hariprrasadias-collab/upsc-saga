@@ -247,7 +247,8 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         }
     };
 
-    const handleGenerate = async (isUpscale = false) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const handleGenerate = async (_isUpscale = false) => {
         if (isGenerating) return;
         setIsGenerating(true);
         setGeneratedImage(null);
