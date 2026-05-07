@@ -83,29 +83,34 @@ def get_year_trends():
     """Get year-wise subject distribution for Stacked Bar Chart"""
     conn = get_db()
     try:
-        # Get all years and subjects
-        years = conn.execute("SELECT DISTINCT year FROM pyq_questions ORDER BY year").fetchall()
-        subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
+        # Fetch all counts grouped by year and subject in a single query
+        counts = conn.execute('''
+            SELECT year, subject, COUNT(*) as count
+            FROM pyq_questions
+            GROUP BY year, subject
+            ORDER BY year
+        ''').fetchall()
+
+        # Determine all unique subjects across the dataset
+        subjects = sorted(list({row['subject'] for row in counts}))
         
         data = []
-        for year_row in years:
-            year = year_row['year']
-            year_data = {"year": year}
+        current_year = None
+        year_data = None
+
+        for row in counts:
+            year = row['year']
+            if year != current_year:
+                if year_data is not None:
+                    data.append(year_data)
+                current_year = year
+                year_data = {"year": year}
+                for subject in subjects:
+                    year_data[subject] = 0
             
-            # Get counts for this year
-            counts = conn.execute('''
-                SELECT subject, COUNT(*) as count 
-                FROM pyq_questions 
-                WHERE year = ? 
-                GROUP BY subject
-            ''', (year,)).fetchall()
+            year_data[row['subject']] = row['count']
             
-            count_map = {row['subject']: row['count'] for row in counts}
-            
-            for sub_row in subjects:
-                subject = sub_row['subject']
-                year_data[subject] = count_map.get(subject, 0)
-                
+        if year_data is not None:
             data.append(year_data)
             
         return jsonify(data)
