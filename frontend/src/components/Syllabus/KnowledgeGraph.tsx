@@ -196,16 +196,20 @@ const KnowledgeGraph: React.FC = () => {
                 <h2>🧠 Knowledge Graph</h2>
                 <div className="subject-filter">
                     <button
+                        type="button"
                         className={selectedSubject === 'all' ? 'active' : ''}
                         onClick={() => setSelectedSubject('all')}
+                        aria-pressed={selectedSubject === 'all'}
                     >
                         All
                     </button>
                     {subjects.map(subject => (
                         <button
+                            type="button"
                             key={subject}
                             className={selectedSubject === subject ? 'active' : ''}
                             onClick={() => setSelectedSubject(subject)}
+                            aria-pressed={selectedSubject === subject}
                         >
                             {subject}
                         </button>
