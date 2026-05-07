@@ -5,11 +5,12 @@ import datetime
 
 bp = Blueprint('seer', __name__, url_prefix='/api/seer')
 
+
 @bp.route('', methods=['GET'])
 def consult_the_seer():
     user_id = get_current_user_id()
     conn = get_db()
-    
+
     # 1. STAT RADAR (Which subject is your strongest?)
     # We count completed tasks per associated_stat
     stats_query = '''
@@ -19,12 +20,12 @@ def consult_the_seer():
         GROUP BY associated_stat
     '''
     stat_rows = conn.execute(stats_query, (user_id,)).fetchall()
-    
+
     # Default map
     stat_map = {
-        'strength_stat': 0, # GS-I
+        'strength_stat': 0,  # GS-I
         'runic_stat': 0,    # GS-II
-        'vitality_stat': 0, # GS-III
+        'vitality_stat': 0,  # GS-III
         'luck_stat': 0      # GS-IV
     }
     for row in stat_rows:
@@ -35,20 +36,20 @@ def consult_the_seer():
     # We look at tasks completed in the last 7 days
     today = datetime.date.today()
     xp_history = []
-    
+
     for i in range(6, -1, -1):
         date_val = today - datetime.timedelta(days=i)
         date_str = date_val.isoformat()
-        
+
         # Sum XP of tasks completed on this due_date (Approximation)
         # Note: ideally we track 'completed_at' timestamp, but using due_date for now is a safe fallback
         xp_sum = conn.execute('''
             SELECT SUM(xp_reward) FROM tasks 
             WHERE user_id = ? AND due_date = ? AND isCompleted = 1
         ''', (user_id, date_str)).fetchone()[0]
-        
+
         xp_history.append({
-            "date": date_val.strftime('%d %b'), # e.g. "22 Nov"
+            "date": date_val.strftime('%d %b'),  # e.g. "22 Nov"
             "xp": xp_sum if xp_sum else 0
         })
 
@@ -62,6 +63,7 @@ def consult_the_seer():
         "xp_history": xp_history
     })
 
+
 @bp.route('/weightage', methods=['GET'])
 def get_subject_weightage():
     """Get subject-wise question distribution for Pie Chart"""
@@ -73,41 +75,45 @@ def get_subject_weightage():
             GROUP BY subject 
             ORDER BY count DESC
         ''').fetchall()
-        
+
         return jsonify([dict(row) for row in rows])
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @bp.route('/trends', methods=['GET'])
 def get_year_trends():
     """Get year-wise subject distribution for Stacked Bar Chart"""
     conn = get_db()
     try:
-        # Get all years and subjects
-        years = conn.execute("SELECT DISTINCT year FROM pyq_questions ORDER BY year").fetchall()
-        subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
-        
-        data = []
-        for year_row in years:
-            year = year_row['year']
-            year_data = {"year": year}
-            
-            # Get counts for this year
-            counts = conn.execute('''
-                SELECT subject, COUNT(*) as count 
-                FROM pyq_questions 
-                WHERE year = ? 
-                GROUP BY subject
-            ''', (year,)).fetchall()
-            
-            count_map = {row['subject']: row['count'] for row in counts}
-            
-            for sub_row in subjects:
-                subject = sub_row['subject']
-                year_data[subject] = count_map.get(subject, 0)
-                
-            data.append(year_data)
-            
+        # Get all counts across years and subjects in a single query
+        results = conn.execute('''
+            SELECT year, subject, COUNT(*) as count
+            FROM pyq_questions
+            GROUP BY year, subject
+            ORDER BY year, subject
+        ''').fetchall()
+
+        if not results:
+            return jsonify([])
+
+        # Gather all unique subjects to ensure uniform keys across years
+        unique_subjects = sorted({row['subject'] for row in results})
+
+        data_dict = {}
+        for row in results:
+            year = row['year']
+            if year not in data_dict:
+                data_dict[year] = {"year": year}
+                for subject in unique_subjects:
+                    data_dict[year][subject] = 0
+
+            data_dict[year][row['subject']] = row['count']
+
+        data = list(data_dict.values())
+        # Sort by year to maintain order
+        data.sort(key=lambda x: x['year'])
+
         return jsonify(data)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
