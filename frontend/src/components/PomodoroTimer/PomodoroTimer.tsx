@@ -222,11 +222,11 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
             <div className="pomodoro-header">
                 <h3>{mode === 'work' ? '⚔️ BATTLE TIME' : '🛡️ RESPITE'}</h3>
                 <div className="pomodoro-controls">
-                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
+                    <button aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen"} onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
                         {isFullscreen ? '↙️' : '⛶'}
                     </button>
                     {isFullscreen && (
-                        <button onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close">✕</button>
+                        <button aria-label="Close Fullscreen" onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close">✕</button>
                     )}
                     <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" title="History">📊</button>
                     <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" title="Settings">⚙️</button>
@@ -296,8 +296,8 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
                         <input type="number" value={editMinutes} onChange={(e) => setEditMinutes(e.target.value)}
                             className="timer-edit-input" min="1" max="120" />
                         <div className="timer-edit-actions">
-                            <button onClick={handleEditSave} className="save-btn">✓</button>
-                            <button onClick={() => setIsEditing(false)} className="cancel-btn">✕</button>
+                            <button aria-label="Save time" onClick={handleEditSave} className="save-btn">✓</button>
+                            <button aria-label="Cancel editing" onClick={() => setIsEditing(false)} className="cancel-btn">✕</button>
                         </div>
                     </div>
                 ) : (
