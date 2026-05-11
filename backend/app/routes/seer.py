@@ -87,27 +87,27 @@ def get_year_trends():
         years = conn.execute("SELECT DISTINCT year FROM pyq_questions ORDER BY year").fetchall()
         subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
         
-        data = []
+        # Optimized: Single query instead of N+1 loop
+        counts = conn.execute('''
+            SELECT year, subject, COUNT(*) as count
+            FROM pyq_questions
+            GROUP BY year, subject
+        ''').fetchall()
+
+        data_map = {}
         for year_row in years:
             year = year_row['year']
-            year_data = {"year": year}
-            
-            # Get counts for this year
-            counts = conn.execute('''
-                SELECT subject, COUNT(*) as count 
-                FROM pyq_questions 
-                WHERE year = ? 
-                GROUP BY subject
-            ''', (year,)).fetchall()
-            
-            count_map = {row['subject']: row['count'] for row in counts}
-            
+            data_map[year] = {"year": year}
             for sub_row in subjects:
                 subject = sub_row['subject']
-                year_data[subject] = count_map.get(subject, 0)
+                data_map[year][subject] = 0
+
+        for row in counts:
+            year = row['year']
+            subject = row['subject']
+            if year in data_map and subject in data_map[year]:
+                data_map[year][subject] = row['count']
                 
-            data.append(year_data)
-            
-        return jsonify(data)
+        return jsonify(list(data_map.values()))
     except Exception as e:
         return jsonify({'error': str(e)}), 500
