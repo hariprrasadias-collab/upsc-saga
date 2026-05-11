@@ -149,8 +149,8 @@ def get_all_subject_performances(conn, user_id, subjects):
 
     placeholders = ','.join(['?'] * len(subjects))
 
+    # Mock tests
     try:
-        # Mock tests
         mock_query = f'''
             SELECT mt.subject, AVG(score) as avg_score
             FROM test_attempts mta
@@ -163,8 +163,11 @@ def get_all_subject_performances(conn, user_id, subjects):
             if row['avg_score']:
                 results[row['subject']]['mock_avg'] = round(
                     row['avg_score'], 1)
+    except Exception as e:
+        print(f"Error in bulk mock performance: {e}")
 
-        # Answer writing
+    # Answer writing
+    try:
         answer_query = f'''
             SELECT aq.subject, AVG(ae.overall_score) as avg_score
             FROM answer_evaluations ae
@@ -178,8 +181,11 @@ def get_all_subject_performances(conn, user_id, subjects):
             if row['avg_score']:
                 results[row['subject']]['answer_avg'] = round(
                     row['avg_score'], 1)
+    except Exception as e:
+        print(f"Error in bulk answer performance: {e}")
 
-        # Syllabus completion
+    # Syllabus completion
+    try:
         syllabus_query = f'''
             SELECT
                 subject,
@@ -194,9 +200,8 @@ def get_all_subject_performances(conn, user_id, subjects):
             if row['total'] > 0:
                 results[row['subject']]['syllabus_pct'] = round(
                     (row['completed'] / row['total']) * 100, 1)
-
     except Exception as e:
-        print(f"Error in bulk subject performance: {e}")
+        print(f"Error in bulk syllabus performance: {e}")
 
     return [results[subject] for subject in subjects]
 
