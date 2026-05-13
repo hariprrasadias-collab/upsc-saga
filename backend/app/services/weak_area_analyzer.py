@@ -150,7 +150,7 @@ def analyze_all_performance() -> List[Dict]:
             subject
         FROM performance_records
         WHERE topic IS NOT NULL
-        GROUP BY topic, subject
+        GROUP BY topic
     ''')
     stats_rows = cursor.fetchall()
 
