@@ -87,24 +87,33 @@ def get_year_trends():
         years = conn.execute("SELECT DISTINCT year FROM pyq_questions ORDER BY year").fetchall()
         subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
         
+        # ⚡ Bolt: Optimize N+1 query bottleneck
+        # Fetch all counts grouped by year and subject in a single query
+        all_counts = conn.execute('''
+            SELECT year, subject, COUNT(*) as count
+            FROM pyq_questions
+            GROUP BY year, subject
+        ''').fetchall()
+
+        # Map counts efficiently
+        count_map = {}
+        for row in all_counts:
+            year = row['year']
+            subject = row['subject']
+            if year not in count_map:
+                count_map[year] = {}
+            count_map[year][subject] = row['count']
+
         data = []
         for year_row in years:
             year = year_row['year']
             year_data = {"year": year}
             
-            # Get counts for this year
-            counts = conn.execute('''
-                SELECT subject, COUNT(*) as count 
-                FROM pyq_questions 
-                WHERE year = ? 
-                GROUP BY subject
-            ''', (year,)).fetchall()
-            
-            count_map = {row['subject']: row['count'] for row in counts}
+            year_counts = count_map.get(year, {})
             
             for sub_row in subjects:
                 subject = sub_row['subject']
-                year_data[subject] = count_map.get(subject, 0)
+                year_data[subject] = year_counts.get(subject, 0)
                 
             data.append(year_data)
             
