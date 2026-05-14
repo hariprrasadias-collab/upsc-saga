@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, session
 from app.db import get_db
+import random
 import json
 from app.services.xp_service import award_xp
 
