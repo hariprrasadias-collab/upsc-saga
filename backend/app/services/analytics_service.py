@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 import sqlite3
 
-
 def calculate_study_hours(conn, user_id, start_date, end_date):
     """
     Estimate study hours based on activity timestamps
@@ -54,8 +53,7 @@ def calculate_study_hours(conn, user_id, start_date, end_date):
 
         # Sort all activities
         try:
-            activities = sorted([datetime.fromisoformat(a)
-                                for a in activities])
+            activities = sorted([datetime.fromisoformat(a) for a in activities])
         except ValueError:
             # If date parsing fails, skip estimates and return just pomodoro
             return round(pomodoro_hours, 1)
@@ -120,10 +118,9 @@ def get_subject_performance(conn, user_id, subject):
             WHERE subject = ?
         ''', (subject,)).fetchone()
         if syllabus and syllabus['total'] > 0:
-            result['syllabus_pct'] = round(
-                (syllabus['completed'] / syllabus['total']) * 100, 1)
+            result['syllabus_pct'] = round((syllabus['completed'] / syllabus['total']) * 100, 1)
     except Exception:
-        pass  # Return zeroed result on error
+        pass # Return zeroed result on error
 
     return result
 
@@ -164,51 +161,36 @@ def identify_weak_areas(conn, user_id, limit=10):
             LIMIT ?
         ''', (user_id, limit)).fetchall()
 
-        if low_scores:
-            subjects = [s['subject'] for s in low_scores]
-            placeholders = ','.join(['?'] * len(subjects))
-
-            # Fetch all historical scores for these subjects in one query
-            all_scores = conn.execute(f'''
-                SELECT mt.subject, mta.score, mta.submitted_at
+        for subj in low_scores:
+            # Calculate trend for this subject
+            subject_scores = conn.execute('''
+                SELECT mta.score
                 FROM test_attempts mta
                 JOIN mock_tests mt ON mta.test_id = mt.id
-                WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+                WHERE mta.user_id = ? AND mt.subject = ?
                 ORDER BY mta.submitted_at ASC
-            ''', [user_id] + subjects).fetchall()
+            ''', (user_id, subj['subject'])).fetchall()
 
-            # Group scores by subject locally
-            subject_history = {}
-            for row in all_scores:
-                subj = row['subject']
-                if subj not in subject_history:
-                    subject_history[subj] = []
-                subject_history[subj].append(row)
+            scores_list = [s['score'] for s in subject_scores]
+            trend_val = calculate_improvement_rate(scores_list)
+            trend_direction = 'improving' if trend_val > 0 else 'declining' if trend_val < 0 else 'stable'
 
-            for subj in low_scores:
-                subject = subj['subject']
-                history = subject_history.get(subject, [])
+            # Get last 5 scores for sparkline
+            recent_scores = scores_list[-5:] if scores_list else []
+            last_attempt = subject_scores[-1]['submitted_at'] if subject_scores else None
 
-                scores_list = [s['score'] for s in history]
-                trend_val = calculate_improvement_rate(scores_list)
-                trend_direction = 'improving' if trend_val > 0 else 'declining' if trend_val < 0 else 'stable'
-
-                # Get last 5 scores for sparkline
-                recent_scores = scores_list[-5:] if scores_list else []
-                last_attempt = history[-1]['submitted_at'] if history else None
-
-                weak_areas.append({
-                    'subject': subject,
-                    'topic': f"{subject} (Mock Tests)",
-                    'weakness_score': max(0, 100 - (subj['avg_score'] or 0)),
-                    'source': 'Mock Tests',
-                    'action': f"Practice {subject} questions",
-                    'trend': trend_direction,
-                    'trend_value': abs(trend_val),
-                    'impact': 'High' if (subj['avg_score'] or 0) < 40 else 'Medium',
-                    'recent_scores': recent_scores,
-                    'last_attempt': last_attempt
-                })
+            weak_areas.append({
+                'subject': subj['subject'],
+                'topic': f"{subj['subject']} (Mock Tests)",
+                'weakness_score': max(0, 100 - (subj['avg_score'] or 0)),
+                'source': 'Mock Tests',
+                'action': f"Practice {subj['subject']} questions",
+                'trend': trend_direction,
+                'trend_value': abs(trend_val),
+                'impact': 'High' if (subj['avg_score'] or 0) < 40 else 'Medium',
+                'recent_scores': recent_scores,
+                'last_attempt': last_attempt
+            })
     except Exception as e:
         print(f"Error identifying weak areas: {e}")
 
@@ -290,7 +272,7 @@ def get_streak_days(conn, user_id):
                 try:
                     dates_objs.add(datetime.fromisoformat(d).date())
                 except ValueError:
-                    pass  # Ignore invalid date formats
+                    pass # Ignore invalid date formats
 
         today = datetime.now().date()
         yesterday = today - timedelta(days=1)
@@ -312,7 +294,6 @@ def get_streak_days(conn, user_id):
     except Exception as e:
         print(f"Error calculating streak: {e}")
         return 0
-
 
 def generate_weekly_performance_review(conn, user_id):
     """
