@@ -1327,7 +1327,7 @@ const StudyPlanDashboard: React.FC = () => {
                         completedItems={plan.flatMap(d => d.slots)
                             .filter(s => s.status === 'completed')
                             .map(s => ({ subject: s.subject, topic: s.activity }))}
-                        onDebateClick={(_topic: string) => console.log("Debate disabled")}
+                        onDebateClick={() => console.log("Debate disabled")}
                         onNodeClick={(node: GraphNode) => {
                             setFilterTopic(node.label);
                             setViewMode('daily'); // Switch to daily view to see filtered tasks
