@@ -10,7 +10,7 @@ interface HistoryItem {
     question_text: string;
     answer_text: string;
     score: number;
-    feedback_json: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    feedback_json: any;
     created_at: string;
 }
 
@@ -19,7 +19,7 @@ const AnswerWorkbench: React.FC = () => {
     const [question, setQuestion] = useState('');
     const [answer, setAnswer] = useState('');
     const [loading, setLoading] = useState(false);
-    const [evaluation, setEvaluation] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
+    const [evaluation, setEvaluation] = useState<any>(null);
     const [history, setHistory] = useState<HistoryItem[]>([]);
     const [historyLoading, setHistoryLoading] = useState(false);
     const [selectedHistoryItem, setSelectedHistoryItem] = useState<HistoryItem | null>(null);
@@ -193,9 +193,7 @@ const AnswerWorkbench: React.FC = () => {
                     <div className="modal-content history-modal" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2>Evaluation Details</h2>
-                            <button className="close-btn" onClick={() => setSelectedHistoryItem(null)} aria-label="Close history details">
-                                <span aria-hidden="true">×</span>
-                            </button>
+                            <button className="close-btn" onClick={() => setSelectedHistoryItem(null)}>×</button>
                         </div>
                         <div className="modal-body">
                             <div className="history-modal-section">
