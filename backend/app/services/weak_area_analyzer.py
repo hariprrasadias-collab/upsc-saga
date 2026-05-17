@@ -10,12 +10,10 @@ from collections import defaultdict
 
 DB_PATH = os.path.join(os.path.dirname(__file__), '..', '..', 'upsc_saga.db')
 
-
 def get_db():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
-
 
 def record_attempt(question_id: int, topic: str, subject: str, is_correct: bool, time_taken: int = 0) -> None:
     """Record a question attempt for performance tracking"""
@@ -33,7 +31,6 @@ def record_attempt(question_id: int, topic: str, subject: str, is_correct: bool,
 
     # Trigger weak area analysis for this topic
     analyze_topic_performance(topic)
-
 
 def calculate_weakness_score(topic_data: Dict) -> float:
     """
@@ -63,7 +60,6 @@ def calculate_weakness_score(topic_data: Dict) -> float:
 
     weakness_score = accuracy_score + time_score + recency_score + attempt_penalty
     return min(100, max(0, weakness_score))
-
 
 def analyze_topic_performance(topic: str) -> Dict:
     """Analyze performance for a specific topic and update weak_areas table"""
@@ -139,94 +135,23 @@ def analyze_topic_performance(topic: str) -> Dict:
         **topic_data
     }
 
-
 def analyze_all_performance() -> List[Dict]:
     """Analyze performance for all topics with attempts"""
     conn = get_db()
-    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    # 1. Get stats for ALL topics at once
-    cursor.execute('''
-        SELECT
-            topic,
-            COUNT(*) as total,
-            SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) as correct,
-            AVG(time_taken) as avg_time,
-            subject
-        FROM performance_records
-        WHERE topic IS NOT NULL
-        GROUP BY topic
-    ''')
-    stats_rows = cursor.fetchall()
-
-    # 2. Get recent failures for ALL topics at once
-    cursor.execute('''
-        SELECT topic, COUNT(*) as recent_failures
-        FROM performance_records
-        WHERE is_correct = 0
-        AND attempted_at >= datetime('now', '-7 days')
-        AND topic IS NOT NULL
-        GROUP BY topic
-    ''')
-    recent_failure_map = {row['topic']: row['recent_failures']
-                          for row in cursor.fetchall()}
-
-    results = []
-    updates = []
-    now = datetime.now()
-
-    for row in stats_rows:
-        topic = row['topic']
-        total = row['total']
-        correct = row['correct'] or 0
-        accuracy = correct / total if total > 0 else 0
-        avg_time = row['avg_time'] or 0
-        subject = row['subject']
-        recent_failures = recent_failure_map.get(topic, 0)
-
-        topic_data = {
-            'total_attempts': total,
-            'correct_attempts': correct,
-            'accuracy_rate': accuracy,
-            'avg_time_taken': avg_time,
-            'recent_failures': recent_failures
-        }
-
-        weakness_score = calculate_weakness_score(topic_data)
-
-        updates.append((
-            topic, subject, total, correct, accuracy, avg_time, weakness_score, now.strftime(
-                '%Y-%m-%d %H:%M:%S')
-        ))
-
-        results.append({
-            'topic': topic,
-            'subject': subject,
-            'weakness_score': weakness_score,
-            **topic_data
-        })
-
-    if updates:
-        cursor.executemany('''
-            INSERT INTO weak_areas
-            (topic, subject, total_attempts, correct_attempts, accuracy_rate, avg_time_taken, weakness_score, last_updated)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT(topic) DO UPDATE SET
-                subject = excluded.subject,
-                total_attempts = excluded.total_attempts,
-                correct_attempts = excluded.correct_attempts,
-                accuracy_rate = excluded.accuracy_rate,
-                avg_time_taken = excluded.avg_time_taken,
-                weakness_score = excluded.weakness_score,
-                last_updated = excluded.last_updated
-        ''', updates)
-        conn.commit()
-
+    # Get all unique topics
+    cursor.execute('SELECT DISTINCT topic FROM performance_records WHERE topic IS NOT NULL')
+    topics = [row['topic'] for row in cursor.fetchall()]
     conn.close()
 
-    return sorted(results, key=lambda x: x['weakness_score'], reverse=True)
+    results = []
+    for topic in topics:
+        result = analyze_topic_performance(topic)
+        if result:
+            results.append(result)
 
+    return sorted(results, key=lambda x: x['weakness_score'], reverse=True)
 
 def get_weak_areas(limit: int = 10) -> List[Dict]:
     """Get top weak areas sorted by weakness score"""
@@ -243,7 +168,6 @@ def get_weak_areas(limit: int = 10) -> List[Dict]:
     conn.close()
 
     return weak_areas
-
 
 def get_dashboard_stats() -> Dict:
     """Get statistics for weak areas dashboard"""
@@ -274,8 +198,7 @@ def get_dashboard_stats() -> Dict:
     subject_breakdown = [dict(row) for row in cursor.fetchall()]
 
     # Weak topics count
-    cursor.execute(
-        'SELECT COUNT(*) as count FROM weak_areas WHERE weakness_score > 50')
+    cursor.execute('SELECT COUNT(*) as count FROM weak_areas WHERE weakness_score > 50')
     weak_topics_count = cursor.fetchone()['count']
 
     conn.close()
@@ -286,7 +209,6 @@ def get_dashboard_stats() -> Dict:
         'subject_breakdown': subject_breakdown,
         'weak_topics_count': weak_topics_count
     }
-
 
 def generate_practice_set(weak_topics: List[str], count: int = 10) -> List[Dict]:
     """Generate targeted practice questions from weak topics"""
@@ -307,7 +229,6 @@ def generate_practice_set(weak_topics: List[str], count: int = 10) -> List[Dict]
     conn.close()
 
     return questions
-
 
 def track_improvement(topic: str, days: int = 30) -> List[Dict]:
     """Track performance improvement for a topic over time"""
