@@ -253,6 +253,7 @@ def ask_strategos(question_id):
         if not question:
             return jsonify({'error': 'Question not found'}), 404
 
+        from app.services.brain_service import brain_service
 
         # Prepare payload
         # PHASE 7: STRATEGOS UPGRADE (REAL-TIME TACTICAL ADVICE)
@@ -713,7 +714,7 @@ def get_similar_questions(question_id):
         similar = conn.execute(query, (search_query, question_id)).fetchall()
         return jsonify([dict(q) for q in similar])
 
-    except Exception:
+    except Exception as e:
         # Fallback to subject-based random
         try:
              conn = get_db()
