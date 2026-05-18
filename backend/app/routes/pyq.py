@@ -253,7 +253,6 @@ def ask_strategos(question_id):
         if not question:
             return jsonify({'error': 'Question not found'}), 404
 
-        from app.services.brain_service import brain_service
 
         # Prepare payload
         # PHASE 7: STRATEGOS UPGRADE (REAL-TIME TACTICAL ADVICE)
@@ -464,11 +463,12 @@ def start_quiz():
         session_id = cursor.lastrowid
         
         # Initialize answer records
-        for q in questions:
-            conn.execute('''
-                INSERT INTO pyq_quiz_answers (session_id, question_id)
-                VALUES (?, ?)
-            ''', (session_id, q['id']))
+        # ⚡ Bolt optimization: Use executemany to avoid N+1 query bottleneck
+        answers_data = [(session_id, q['id']) for q in questions]
+        conn.executemany('''
+            INSERT INTO pyq_quiz_answers (session_id, question_id)
+            VALUES (?, ?)
+        ''', answers_data)
         
         conn.commit()
         
@@ -713,7 +713,7 @@ def get_similar_questions(question_id):
         similar = conn.execute(query, (search_query, question_id)).fetchall()
         return jsonify([dict(q) for q in similar])
 
-    except Exception as e:
+    except Exception:
         # Fallback to subject-based random
         try:
              conn = get_db()
