@@ -125,6 +125,76 @@ def get_subject_performance(conn, user_id, subject):
     return result
 
 
+def get_all_subject_performances(conn, user_id, subjects):
+    """
+    Aggregate all metrics for multiple subjects in a single query
+    """
+    results = {
+        subject: {
+            'subject': subject,
+            'mock_avg': 0,
+            'answer_avg': 0,
+            'syllabus_pct': 0,
+            'pyq_attempted': 0,
+            'flashcard_mastered': 0
+        } for subject in subjects
+    }
+
+    placeholders = ','.join(['?'] * len(subjects))
+    params = [user_id] + subjects
+
+    try:
+        # Mock tests
+        mock_avg = conn.execute(f'''
+            SELECT mt.subject, AVG(score) as avg_score
+            FROM test_attempts mta
+            JOIN mock_tests mt ON mta.test_id = mt.id
+            WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+            GROUP BY mt.subject
+        ''', params).fetchall()
+        for row in mock_avg:
+            if row['avg_score']:
+                results[row['subject']]['mock_avg'] = round(row['avg_score'], 1)
+    except Exception as e:
+        print(f"Error fetching bulk mock tests performance: {e}")
+
+    try:
+        # Answer writing
+        answer_avg = conn.execute(f'''
+            SELECT aq.subject, AVG(ae.overall_score) as avg_score
+            FROM answer_evaluations ae
+            JOIN user_answers ua ON ae.answer_id = ua.id
+            JOIN answer_questions aq ON ua.prompt_id = aq.id
+            WHERE ua.user_id = ? AND aq.subject IN ({placeholders})
+            GROUP BY aq.subject
+        ''', params).fetchall()
+        for row in answer_avg:
+            if row['avg_score']:
+                results[row['subject']]['answer_avg'] = round(row['avg_score'], 1)
+    except Exception as e:
+        print(f"Error fetching bulk answer writing performance: {e}")
+
+    try:
+        # Syllabus completion
+        syllabus_params = subjects
+        syllabus = conn.execute(f'''
+            SELECT
+                subject,
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+            FROM syllabus_topics
+            WHERE subject IN ({placeholders})
+            GROUP BY subject
+        ''', syllabus_params).fetchall()
+        for row in syllabus:
+            if row['total'] > 0:
+                results[row['subject']]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+    except Exception as e:
+        print(f"Error fetching bulk syllabus performance: {e}")
+
+    return list(results.values())
+
+
 def identify_weak_areas(conn, user_id, limit=10):
     """
     Identify topics needing attention based on performance
