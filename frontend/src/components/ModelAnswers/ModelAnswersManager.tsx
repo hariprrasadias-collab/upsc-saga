@@ -207,10 +207,12 @@ const ModelAnswersManager: React.FC = () => {
             {/* View/Edit Modal */}
             {selectedAnswer && !showEditor && (
                 <div className="modal-overlay" onClick={() => setSelectedAnswer(null)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="modal-title">
                         <div className="modal-header">
-                            <h2>{selectedAnswer.title}</h2>
-                            <button className="close-btn" onClick={() => setSelectedAnswer(null)}>×</button>
+                            <h2 id="modal-title">{selectedAnswer.title}</h2>
+                            <button className="close-btn" onClick={() => setSelectedAnswer(null)} aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
                         </div>
 
                         <div className="modal-body">
