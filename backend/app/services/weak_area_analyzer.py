@@ -137,19 +137,97 @@ def analyze_topic_performance(topic: str) -> Dict:
 
 def analyze_all_performance() -> List[Dict]:
     """Analyze performance for all topics with attempts"""
+    # ⚡ Bolt: Fixed N+1 query bottleneck by fetching all topics performance stats and recent failures
+    # via bulk GROUP BY queries and using executemany for UPSERTs, turning O(N) DB calls into O(1).
     conn = get_db()
     cursor = conn.cursor()
     
-    # Get all unique topics
-    cursor.execute('SELECT DISTINCT topic FROM performance_records WHERE topic IS NOT NULL')
-    topics = [row['topic'] for row in cursor.fetchall()]
-    conn.close()
+    # 1. Fetch base performance stats for all topics
+    cursor.execute('''
+        SELECT
+            topic,
+            subject,
+            COUNT(*) as total,
+            SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) as correct,
+            AVG(time_taken) as avg_time
+        FROM performance_records
+        WHERE topic IS NOT NULL
+        GROUP BY topic, subject
+    ''')
+    stats_rows = cursor.fetchall()
+
+    if not stats_rows:
+        conn.close()
+        return []
+
+    # 2. Fetch recent failures for all topics
+    cursor.execute('''
+        SELECT
+            topic,
+            COUNT(*) as recent_failures
+        FROM performance_records
+        WHERE topic IS NOT NULL AND is_correct = 0
+        AND attempted_at >= datetime('now', '-7 days')
+        GROUP BY topic
+    ''')
+    failures_rows = cursor.fetchall()
+
+    # Correlate recent failures locally
+    recent_failures_map = {row['topic']: row['recent_failures'] for row in failures_rows}
     
     results = []
-    for topic in topics:
-        result = analyze_topic_performance(topic)
-        if result:
-            results.append(result)
+    upsert_data = []
+    now = datetime.now()
+
+    # Process each topic locally
+    for row in stats_rows:
+        topic = row['topic']
+        subject = row['subject']
+        total = row['total']
+        correct = row['correct'] or 0
+        accuracy = correct / total if total > 0 else 0
+        avg_time = row['avg_time'] or 0
+
+        recent_failures = recent_failures_map.get(topic, 0)
+
+        topic_data = {
+            'total_attempts': total,
+            'correct_attempts': correct,
+            'accuracy_rate': accuracy,
+            'avg_time_taken': avg_time,
+            'recent_failures': recent_failures
+        }
+
+        weakness_score = calculate_weakness_score(topic_data)
+
+        results.append({
+            'topic': topic,
+            'subject': subject,
+            'weakness_score': weakness_score,
+            **topic_data
+        })
+
+        upsert_data.append((
+            topic, subject, total, correct, accuracy, avg_time, weakness_score, now
+        ))
+
+    # 3. Bulk UPSERT to weak_areas table
+    cursor.executemany('''
+        INSERT INTO weak_areas
+        (topic, subject, total_attempts, correct_attempts, accuracy_rate, avg_time_taken, weakness_score, last_updated)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(topic) DO UPDATE SET
+            subject = excluded.subject,
+            total_attempts = excluded.total_attempts,
+            correct_attempts = excluded.correct_attempts,
+            accuracy_rate = excluded.accuracy_rate,
+            avg_time_taken = excluded.avg_time_taken,
+            weakness_score = excluded.weakness_score,
+            last_updated = excluded.last_updated
+    ''', upsert_data)
+
+    conn.commit()
+    conn.close()
     
     return sorted(results, key=lambda x: x['weakness_score'], reverse=True)
 
