@@ -83,24 +83,32 @@ def get_year_trends():
     """Get year-wise subject distribution for Stacked Bar Chart"""
     conn = get_db()
     try:
+        # Bolt optimization: Replaced N+1 queries in loop with a single GROUP BY query
         # Get all years and subjects
         years = conn.execute("SELECT DISTINCT year FROM pyq_questions ORDER BY year").fetchall()
         subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
         
+        # Get all counts grouped by year and subject in one query
+        counts = conn.execute('''
+            SELECT year, subject, COUNT(*) as count
+            FROM pyq_questions
+            GROUP BY year, subject
+        ''').fetchall()
+
+        # Group the data in memory
+        year_counts = {}
+        for row in counts:
+            year = row['year']
+            if year not in year_counts:
+                year_counts[year] = {}
+            year_counts[year][row['subject']] = row['count']
+
         data = []
         for year_row in years:
             year = year_row['year']
             year_data = {"year": year}
             
-            # Get counts for this year
-            counts = conn.execute('''
-                SELECT subject, COUNT(*) as count 
-                FROM pyq_questions 
-                WHERE year = ? 
-                GROUP BY subject
-            ''', (year,)).fetchall()
-            
-            count_map = {row['subject']: row['count'] for row in counts}
+            count_map = year_counts.get(year, {})
             
             for sub_row in subjects:
                 subject = sub_row['subject']
