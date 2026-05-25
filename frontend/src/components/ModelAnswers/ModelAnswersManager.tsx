@@ -210,7 +210,9 @@ const ModelAnswersManager: React.FC = () => {
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2>{selectedAnswer.title}</h2>
-                            <button className="close-btn" onClick={() => setSelectedAnswer(null)}>×</button>
+                            <button className="close-btn" onClick={() => setSelectedAnswer(null)} aria-label="Close answer details">
+                                <span aria-hidden="true">×</span>
+                            </button>
                         </div>
 
                         <div className="modal-body">
