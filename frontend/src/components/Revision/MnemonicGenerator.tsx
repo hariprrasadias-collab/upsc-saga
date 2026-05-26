@@ -198,7 +198,7 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
             {selectedMnemonic && (
                 <div className="mnemonic-modal-overlay" onClick={() => setSelectedMnemonic(null)}>
                     <div className="mnemonic-modal-content" onClick={e => e.stopPropagation()}>
-                        <button className="modal-close-btn" onClick={() => setSelectedMnemonic(null)}>×</button>
+                        <button aria-label="Close" className="modal-close-btn" onClick={() => setSelectedMnemonic(null)}><span aria-hidden="true">×</span></button>
                         <div className="modal-scroll-area">
                             {renderMnemonicContent(selectedMnemonic, 'full')}
                         </div>
