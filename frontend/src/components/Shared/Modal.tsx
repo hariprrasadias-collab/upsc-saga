@@ -41,8 +41,8 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, classNa
             >
                 <div className="shared-modal-header">
                     {title && <h2 className="shared-modal-title">{title}</h2>}
-                    <button className="shared-modal-close" onClick={onClose} aria-label="Close">
-                        &times;
+                    <button className="shared-modal-close" onClick={onClose} aria-label="Close dialog">
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div className="shared-modal-body">
