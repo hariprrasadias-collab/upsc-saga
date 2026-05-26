@@ -400,7 +400,7 @@ const TimelineRenderer: React.FC<TimelineRendererProps> = ({ content, metadata }
                             onClick={e => e.stopPropagation()}
                         >
                             {!isPlaying && (
-                                <button className="close-modal-btn" onClick={() => setSelectedEvent(null)}>×</button>
+                                <button aria-label="Close" className="close-modal-btn" onClick={() => setSelectedEvent(null)}><span aria-hidden="true">×</span></button>
                             )}
 
                             {isPlaying && (
