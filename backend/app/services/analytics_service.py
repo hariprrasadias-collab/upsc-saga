@@ -173,7 +173,7 @@ def get_all_subjects_performance(conn, user_id, subjects):
             if row['subject'] in results and row['avg_score'] is not None:
                 results[row['subject']]['answer_avg'] = round(row['avg_score'], 1)
 
-        # Syllabus completion
+        # Syllabus completion (Universal topic tracking)
         syllabus_data = conn.execute(f'''
             SELECT
                 subject,
