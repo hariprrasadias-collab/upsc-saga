@@ -58,7 +58,9 @@ def get_questions():
                 fts_rows = conn.execute(fts_query, (search,)).fetchall()
                 if fts_rows:
                     ids = [str(r['rowid']) for r in fts_rows]
-                    query += f" AND id IN ({','.join(ids)})"
+                    placeholders = ','.join(['?'] * len(ids))
+                    query += f" AND id IN ({placeholders})"
+                    params.extend(ids)
                 else:
                     # No matches found in FTS
                     query += " AND 1=0"
