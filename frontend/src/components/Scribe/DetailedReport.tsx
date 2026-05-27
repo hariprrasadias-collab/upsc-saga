@@ -26,17 +26,10 @@ const DetailedReport: React.FC<DetailedReportProps> = ({ data, onClose }) => {
 
     return (
         <div className="report-overlay">
-            <div
-                className="report-modal"
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="report-modal-title"
-            >
+            <div className="report-modal">
                 <div className="report-header">
-                    <h2 id="report-modal-title">Examiner's Evaluation</h2>
-                    <button className="close-btn" onClick={onClose} aria-label="Close report">
-                        <span aria-hidden="true">×</span>
-                    </button>
+                    <h2>Examiner's Evaluation</h2>
+                    <button className="close-btn" onClick={onClose}>×</button>
                 </div>
 
                 <div className="report-content">
