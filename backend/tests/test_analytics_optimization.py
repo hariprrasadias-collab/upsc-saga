@@ -28,7 +28,7 @@ def test_progress_trend_optimization():
                         topic TEXT NOT NULL,
                         status TEXT NOT NULL,
                         paper TEXT,
-                        source TEXT,
+                        subject TEXT,
                         user_id INTEGER
                     )
                 ''')
@@ -38,9 +38,9 @@ def test_progress_trend_optimization():
             conn.execute("DELETE FROM syllabus_topics")
 
             # Insert test data: 2 completed, 1 pending = 3 total (66.7% completion)
-            conn.execute("INSERT INTO syllabus_topics (topic, status, paper, source, user_id) VALUES ('T1', 'Completed', 'GS1', 'Manual', 1)")
-            conn.execute("INSERT INTO syllabus_topics (topic, status, paper, source, user_id) VALUES ('T2', 'Completed', 'GS1', 'Manual', 1)")
-            conn.execute("INSERT INTO syllabus_topics (topic, status, paper, source, user_id) VALUES ('T3', 'Pending', 'GS1', 'Manual', 1)")
+            conn.execute("INSERT INTO syllabus_topics (topic, status, paper, subject, user_id) VALUES ('T1', 'Completed', 'GS1', 'Manual', 1)")
+            conn.execute("INSERT INTO syllabus_topics (topic, status, paper, subject, user_id) VALUES ('T2', 'Completed', 'GS1', 'Manual', 1)")
+            conn.execute("INSERT INTO syllabus_topics (topic, status, paper, subject, user_id) VALUES ('T3', 'Pending', 'GS1', 'Manual', 1)")
             conn.commit()
 
             count_completed = conn.execute("SELECT COUNT(*) FROM syllabus_topics WHERE status='Completed'").fetchone()[0]
