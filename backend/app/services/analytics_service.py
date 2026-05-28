@@ -4,7 +4,6 @@ Consolidates data from all modules for comprehensive analytics
 """
 from datetime import datetime, timedelta
 from collections import defaultdict
-import sqlite3
 
 
 def calculate_study_hours(conn, user_id, start_date, end_date):
