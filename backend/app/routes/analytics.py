@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from app.services.analytics_service import (
     calculate_study_hours,
     get_subject_performance,
+    get_all_subject_performances,
     identify_weak_areas,
     calculate_improvement_rate,
     get_streak_days
@@ -111,12 +112,13 @@ def get_subject_wise():
         subjects = ['GS1', 'GS2', 'GS3', 'GS4', 'Prelims', 'Optional']
         results = []
         
-        for subject in subjects:
-            try:
-                perf = get_subject_performance(conn, user_id, subject)
-                results.append(perf)
-            except Exception:
-                # Return empty data for missing tables
+        try:
+            # ⚡ Bolt Optimization: Use batched query instead of N+1
+            perf_dict = get_all_subject_performances(conn, user_id, subjects)
+            results = [perf_dict[subj] for subj in subjects]
+        except Exception:
+            # Fallback if batched query fails
+            for subject in subjects:
                 results.append({
                     'subject': subject,
                     'mock_avg': 0,
