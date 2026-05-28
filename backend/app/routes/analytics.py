@@ -157,7 +157,6 @@ def get_time_distribution():
 
         conn = get_db()
         start_date = (datetime.now() - timedelta(days=days)).isoformat()
-        end_date = datetime.now().isoformat()
 
         # Get all activity dates
         activities = {}
@@ -379,8 +378,6 @@ def get_progress_trend():
 def get_performance_scatter():
     """Get speed vs accuracy data for scatter plot"""
     try:
-        user_id = session.get('user_id') or 1
-
         conn = get_db()
 
         # Group by time spent (bucketed by 10 seconds)

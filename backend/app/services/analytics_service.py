@@ -3,7 +3,6 @@ Analytics Service - Data aggregation and insights
 Consolidates data from all modules for comprehensive analytics
 """
 from datetime import datetime, timedelta
-from collections import defaultdict
 
 
 def calculate_study_hours(conn, user_id, start_date, end_date):
