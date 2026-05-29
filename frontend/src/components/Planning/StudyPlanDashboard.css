@@ -2878,83 +2878,6 @@
     transform: translateY(-2px);
 }
 
-.debate-btn {
-    background: transparent;
-    border: 1px solid #9b59b6;
-    color: #9b59b6;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-
-    .strategos-content p {
-        margin: 0;
-        font-size: 0.95rem;
-        color: #ecf0f1;
-    }
-
-    .strategos-action-btn {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 0.85rem;
-        transition: all 0.2s;
-    }
-
-    .strategos-action-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateY(-1px);
-    }
-
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    /* Market Watch Ticker */
-    .market-ticker {
-        display: flex;
-        gap: 1rem;
-        overflow: hidden;
-    }
-
-    .ticker-item {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        background: rgba(46, 204, 113, 0.1);
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-        border: 1px solid rgba(46, 204, 113, 0.3);
-    }
-
-    .ticker-symbol {
-        font-family: 'JetBrains Mono', monospace;
-        font-weight: bold;
-        color: #2ecc71;
-        font-size: 0.8rem;
-    }
-
-    .ticker-price {
-        font-family: 'Roboto Mono', monospace;
-        color: #ecf0f1;
-        font-size: 0.8rem;
-        max-width: 90%;
-        max-height: 80vh;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 0 0 30px rgba(52, 152, 219, 0.3);
-        animation: slideIn 0.3s ease-out;
-        z-index: 1001;
-    }
 
     .debate-header {
         padding: 1rem;
@@ -3098,7 +3021,6 @@
     .add-opp-btn:hover {
         background: #2ecc71;
         color: #000;
-    }
 }
 
 /* Socratic Debate Styles */
@@ -3360,17 +3282,6 @@
     font-size: 1.1rem;
 }
 
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
 .dqn-stats {
     display: flex;
@@ -3594,32 +3505,6 @@
     }
 }
 
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* --- Socratic Arena Enhancements --- */
-.agent-thought {
-    font-size: 0.85rem;
-    color: #bdc3c7;
-    font-style: italic;
-    margin-bottom: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 6px 10px;
-    border-radius: 6px;
-    border-left: 2px solid #f1c40f;
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-}
 
 .thought-icon {
     font-size: 1rem;
