@@ -14,6 +14,7 @@ def init_indexes():
         'CREATE INDEX IF NOT EXISTS idx_test_attempts_user_date ON test_attempts (user_id, submitted_at)',
         'CREATE INDEX IF NOT EXISTS idx_user_answers_user_date ON user_answers (user_id, submitted_at)',
         'CREATE INDEX IF NOT EXISTS idx_review_sessions_user_date ON review_sessions (user_id, reviewed_at)',
+        'CREATE INDEX IF NOT EXISTS idx_review_sessions_flashcard_id_reviewed_at ON review_sessions (flashcard_id, reviewed_at DESC)',
         'CREATE INDEX IF NOT EXISTS idx_pomodoro_sessions_user_date ON pomodoro_sessions (user_id, timestamp)',
 
         # Study Tasks Optimization
