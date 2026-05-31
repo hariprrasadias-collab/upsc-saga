@@ -34,22 +34,25 @@ def consult_the_seer():
     # 2. XP HISTORY (Last 7 Days)
     # We look at tasks completed in the last 7 days
     today = datetime.date.today()
-    xp_history = []
+    start_date_str = (today - datetime.timedelta(days=6)).isoformat()
+    end_date_str = today.isoformat()
+
+    rows = conn.execute('''
+        SELECT due_date, SUM(xp_reward) as total_xp
+        FROM tasks
+        WHERE user_id = ? AND due_date BETWEEN ? AND ? AND isCompleted = 1
+        GROUP BY due_date
+    ''', (user_id, start_date_str, end_date_str)).fetchall()
     
+    xp_dict = {row['due_date']: row['total_xp'] for row in rows}
+
+    xp_history = []
     for i in range(6, -1, -1):
         date_val = today - datetime.timedelta(days=i)
         date_str = date_val.isoformat()
-        
-        # Sum XP of tasks completed on this due_date (Approximation)
-        # Note: ideally we track 'completed_at' timestamp, but using due_date for now is a safe fallback
-        xp_sum = conn.execute('''
-            SELECT SUM(xp_reward) FROM tasks 
-            WHERE user_id = ? AND due_date = ? AND isCompleted = 1
-        ''', (user_id, date_str)).fetchone()[0]
-        
         xp_history.append({
             "date": date_val.strftime('%d %b'), # e.g. "22 Nov"
-            "xp": xp_sum if xp_sum else 0
+            "xp": xp_dict.get(date_str, 0)
         })
 
     return jsonify({
@@ -83,30 +86,31 @@ def get_year_trends():
     """Get year-wise subject distribution for Stacked Bar Chart"""
     conn = get_db()
     try:
-        # Get all years and subjects
-        years = conn.execute("SELECT DISTINCT year FROM pyq_questions ORDER BY year").fetchall()
+        # Fetch all counts grouped by year and subject in a single query
+        years_subjects = conn.execute('''
+            SELECT year, subject, COUNT(*) as count
+            FROM pyq_questions
+            GROUP BY year, subject
+            ORDER BY year, subject
+        ''').fetchall()
+
         subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
+        sub_list = [row['subject'] for row in subjects]
         
-        data = []
-        for year_row in years:
-            year = year_row['year']
-            year_data = {"year": year}
+        data_dict = {}
+        for row in years_subjects:
+            y = row['year']
+            s = row['subject']
+            c = row['count']
             
-            # Get counts for this year
-            counts = conn.execute('''
-                SELECT subject, COUNT(*) as count 
-                FROM pyq_questions 
-                WHERE year = ? 
-                GROUP BY subject
-            ''', (year,)).fetchall()
+            if y not in data_dict:
+                data_dict[y] = {"year": y}
+                for sub in sub_list:
+                    data_dict[y][sub] = 0
             
-            count_map = {row['subject']: row['count'] for row in counts}
+            data_dict[y][s] = c
             
-            for sub_row in subjects:
-                subject = sub_row['subject']
-                year_data[subject] = count_map.get(subject, 0)
-                
-            data.append(year_data)
+        data = [data_dict[y] for y in sorted(data_dict.keys())]
             
         return jsonify(data)
     except Exception as e:
