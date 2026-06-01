@@ -8,6 +8,8 @@ export default defineConfig({
     splitVendorChunkPlugin()
   ],
   build: {
+    outDir: '../dist',
+    emptyOutDir: true,
     rollupOptions: {
       output: {
         manualChunks: {
