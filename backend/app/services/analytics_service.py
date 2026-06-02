@@ -146,11 +146,6 @@ def get_all_subjects_performance(conn, user_id, subjects):
     except Exception as e:
         print(f"Error fetching bulk syllabus performance: {e}")
 
-    # Attempt individual queries for missing/unsupported metrics as a fallback
-    # While mock_avg, answer_avg, and syllabus_pct are optimized, we still need to populate
-    # pyq_attempted and flashcard_mastered if they were implemented in the original code,
-    # although in the original get_subject_performance they are always 0 as they weren't implemented.
-    # We maintain exact backward compatibility.
     return list(results.values())
 
 
