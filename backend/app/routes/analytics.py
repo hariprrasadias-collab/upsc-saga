@@ -4,7 +4,6 @@ from app.db import get_db
 from datetime import datetime, timedelta
 from app.services.analytics_service import (
     calculate_study_hours,
-    get_subject_performance,
     get_all_subjects_performance,
     identify_weak_areas,
     calculate_improvement_rate,
