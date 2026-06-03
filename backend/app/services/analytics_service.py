@@ -125,6 +125,77 @@ def get_subject_performance(conn, user_id, subject):
     return result
 
 
+def get_all_subject_performances(conn, user_id, subjects):
+    """
+    Batched alternative to get_subject_performance for resolving N+1 queries.
+    Aggregates all metrics for multiple subjects at once.
+    """
+    if not subjects:
+        return []
+
+    placeholders = ','.join(['?'] * len(subjects))
+
+    mock_avg = {}
+    answer_avg = {}
+    syllabus = {}
+
+    try:
+        mock_res = conn.execute(f'''
+            SELECT mt.subject, AVG(score) as avg_score
+            FROM test_attempts mta
+            JOIN mock_tests mt ON mta.test_id = mt.id
+            WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+            GROUP BY mt.subject
+        ''', (user_id, *subjects)).fetchall()
+        mock_avg = {row['subject']: row['avg_score'] for row in mock_res}
+    except Exception:
+        pass
+
+    try:
+        answer_res = conn.execute(f'''
+            SELECT aq.subject, AVG(ae.overall_score) as avg_score
+            FROM answer_evaluations ae
+            JOIN user_answers ua ON ae.answer_id = ua.id
+            JOIN answer_questions aq ON ua.prompt_id = aq.id
+            WHERE ua.user_id = ? AND aq.subject IN ({placeholders})
+            GROUP BY aq.subject
+        ''', (user_id, *subjects)).fetchall()
+        answer_avg = {row['subject']: row['avg_score'] for row in answer_res}
+    except Exception:
+        pass
+
+    try:
+        syllabus_res = conn.execute(f'''
+            SELECT subject,
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+            FROM syllabus_topics
+            WHERE user_id = ? AND subject IN ({placeholders})
+            GROUP BY subject
+        ''', (user_id, *subjects)).fetchall()
+        syllabus = {row['subject']: {'completed': row['completed'], 'total': row['total']} for row in syllabus_res}
+    except Exception:
+        pass
+
+    results = []
+    for subject in subjects:
+        s_mock = mock_avg.get(subject, 0)
+        s_ans = answer_avg.get(subject, 0)
+        s_syl = syllabus.get(subject, {'total': 0, 'completed': 0})
+        syl_pct = (s_syl['completed'] / s_syl['total'] * 100) if s_syl['total'] > 0 else 0
+
+        results.append({
+            'subject': subject,
+            'mock_avg': round(s_mock, 1) if s_mock else 0,
+            'answer_avg': round(s_ans, 1) if s_ans else 0,
+            'syllabus_pct': round(syl_pct, 1),
+            'pyq_attempted': 0,
+            'flashcard_mastered': 0
+        })
+
+    return results
+
+
 def identify_weak_areas(conn, user_id, limit=10):
     """
     Identify topics needing attention based on performance
