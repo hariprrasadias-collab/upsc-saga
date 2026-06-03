@@ -75,54 +75,75 @@ def calculate_study_hours(conn, user_id, start_date, end_date):
         return 0
 
 
-def get_subject_performance(conn, user_id, subject):
+def get_all_subjects_performance(conn, user_id, subjects):
     """
-    Aggregate all metrics for a specific subject
+    Aggregate metrics for all subjects in 3 batched queries to avoid N+1 bottleneck
     """
-    result = {
-        'subject': subject,
-        'mock_avg': 0,
-        'answer_avg': 0,
-        'syllabus_pct': 0,
-        'pyq_attempted': 0,
-        'flashcard_mastered': 0
+    results_map = {
+        subject: {
+            'subject': subject,
+            'mock_avg': 0,
+            'answer_avg': 0,
+            'syllabus_pct': 0,
+            'pyq_attempted': 0,
+            'flashcard_mastered': 0
+        }
+        for subject in subjects
     }
+
+    if not subjects:
+        return []
+
+    placeholders = ','.join(['?'] * len(subjects))
+
     try:
-        # Mock tests
-        mock_avg = conn.execute('''
-            SELECT AVG(score) as avg_score
+        # 1. Batched Mock Tests
+        query_args = [user_id] + subjects
+        mock_avgs = conn.execute(f'''
+            SELECT mt.subject, AVG(mta.score) as avg_score
             FROM test_attempts mta
             JOIN mock_tests mt ON mta.test_id = mt.id
-            WHERE mta.user_id = ? AND mt.subject = ?
-        ''', (user_id, subject)).fetchone()
-        if mock_avg and mock_avg['avg_score']:
-            result['mock_avg'] = round(mock_avg['avg_score'], 1)
+            WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+            GROUP BY mt.subject
+        ''', query_args).fetchall()
 
-        # Answer writing
-        answer_avg = conn.execute('''
-            SELECT AVG(ae.overall_score) as avg_score
+        for row in mock_avgs:
+            if row['avg_score']:
+                results_map[row['subject']]['mock_avg'] = round(row['avg_score'], 1)
+
+        # 2. Batched Answer Writing
+        answer_avgs = conn.execute(f'''
+            SELECT aq.subject, AVG(ae.overall_score) as avg_score
             FROM answer_evaluations ae
             JOIN user_answers ua ON ae.answer_id = ua.id
             JOIN answer_questions aq ON ua.prompt_id = aq.id
-            WHERE ua.user_id = ? AND aq.subject = ?
-        ''', (user_id, subject)).fetchone()
-        if answer_avg and answer_avg['avg_score']:
-            result['answer_avg'] = round(answer_avg['avg_score'], 1)
+            WHERE ua.user_id = ? AND aq.subject IN ({placeholders})
+            GROUP BY aq.subject
+        ''', query_args).fetchall()
 
-        # Syllabus completion
-        syllabus = conn.execute('''
+        for row in answer_avgs:
+            if row['avg_score']:
+                results_map[row['subject']]['answer_avg'] = round(row['avg_score'], 1)
+
+        # 3. Batched Syllabus Completion
+        syllabus_stats = conn.execute(f'''
             SELECT
+                subject,
                 COUNT(*) as total,
                 SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
             FROM syllabus_topics
-            WHERE subject = ?
-        ''', (subject,)).fetchone()
-        if syllabus and syllabus['total'] > 0:
-            result['syllabus_pct'] = round((syllabus['completed'] / syllabus['total']) * 100, 1)
-    except Exception:
-        pass # Return zeroed result on error
-    
-    return result
+            WHERE subject IN ({placeholders})
+            GROUP BY subject
+        ''', subjects).fetchall()
+
+        for row in syllabus_stats:
+            if row['total'] > 0:
+                results_map[row['subject']]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+
+    except Exception as e:
+        print(f"Error in batched performance metrics: {e}")
+
+    return list(results_map.values())
 
 
 def identify_weak_areas(conn, user_id, limit=10):
