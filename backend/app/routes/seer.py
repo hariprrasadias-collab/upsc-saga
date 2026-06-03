@@ -34,18 +34,23 @@ def consult_the_seer():
     # 2. XP HISTORY (Last 7 Days)
     # We look at tasks completed in the last 7 days
     today = datetime.date.today()
-    xp_history = []
+    start_date = today - datetime.timedelta(days=6)
+
+    # Pre-fetch all XP data for the last 7 days in a single query
+    xp_sums = conn.execute('''
+        SELECT due_date, SUM(xp_reward) as total_xp FROM tasks
+        WHERE user_id = ? AND due_date BETWEEN ? AND ? AND isCompleted = 1
+        GROUP BY due_date
+    ''', (user_id, start_date.isoformat(), today.isoformat())).fetchall()
+
+    xp_map = {row['due_date']: row['total_xp'] for row in xp_sums}
     
+    xp_history = []
     for i in range(6, -1, -1):
         date_val = today - datetime.timedelta(days=i)
         date_str = date_val.isoformat()
         
-        # Sum XP of tasks completed on this due_date (Approximation)
-        # Note: ideally we track 'completed_at' timestamp, but using due_date for now is a safe fallback
-        xp_sum = conn.execute('''
-            SELECT SUM(xp_reward) FROM tasks 
-            WHERE user_id = ? AND due_date = ? AND isCompleted = 1
-        ''', (user_id, date_str)).fetchone()[0]
+        xp_sum = xp_map.get(date_str, 0)
         
         xp_history.append({
             "date": date_val.strftime('%d %b'), # e.g. "22 Nov"
@@ -87,20 +92,29 @@ def get_year_trends():
         years = conn.execute("SELECT DISTINCT year FROM pyq_questions ORDER BY year").fetchall()
         subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
         
+        # Pre-fetch all counts in a single query
+        all_counts = conn.execute('''
+            SELECT year, subject, COUNT(*) as count
+            FROM pyq_questions
+            GROUP BY year, subject
+        ''').fetchall()
+
+        # Build a nested dictionary: {year: {subject: count}}
+        year_map = {}
+        for row in all_counts:
+            yr = row['year']
+            sub = row['subject']
+            cnt = row['count']
+            if yr not in year_map:
+                year_map[yr] = {}
+            year_map[yr][sub] = cnt
+
         data = []
         for year_row in years:
             year = year_row['year']
             year_data = {"year": year}
             
-            # Get counts for this year
-            counts = conn.execute('''
-                SELECT subject, COUNT(*) as count 
-                FROM pyq_questions 
-                WHERE year = ? 
-                GROUP BY subject
-            ''', (year,)).fetchall()
-            
-            count_map = {row['subject']: row['count'] for row in counts}
+            count_map = year_map.get(year, {})
             
             for sub_row in subjects:
                 subject = sub_row['subject']
