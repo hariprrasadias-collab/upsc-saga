@@ -349,7 +349,7 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
                         <div className="modal-content">
                             <div className="modal-header">
                                 <h2>Create New Mock Test</h2>
-                                <button className="close-modal-btn" onClick={() => setIsAddModalOpen(false)}>×</button>
+                                <button className="close-modal-btn" onClick={() => setIsAddModalOpen(false)} aria-label="Close"><span aria-hidden="true">×</span></button>
                             </div>
                             <div className="modal-body">
                                 <div className="form-group">
