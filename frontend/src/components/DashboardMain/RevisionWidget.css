@@ -122,7 +122,7 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
-    animation: slideIn 0.5s ease-out backwards;
+    animation: slideInRevision 0.5s ease-out backwards;
 }
 
 /* Completion Animation (Burn Away) */
@@ -174,7 +174,7 @@
     animation-delay: 0.5s;
 }
 
-@keyframes slideIn {
+@keyframes slideInRevision {
     from {
         opacity: 0;
         transform: translateX(-10px);
@@ -317,7 +317,7 @@
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         overflow: hidden;
-        animation: slideIn 0.5s ease-out backwards;
+        animation: slideInRevision 0.5s ease-out backwards;
     }
 
     /* Completion Animation (Burn Away) */
@@ -369,17 +369,6 @@
         animation-delay: 0.5s;
     }
 
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateX(-10px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
 
     .due-item::before {
         content: '';

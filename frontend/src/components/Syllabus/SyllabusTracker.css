@@ -377,10 +377,10 @@
     max-width: 90%;
     padding: 2rem;
     box-shadow: 0 0 40px rgba(0, 168, 255, 0.2);
-    animation: slideIn 0.3s ease-out;
+    animation: slideInSyllabus 0.3s ease-out;
 }
 
-@keyframes slideIn {
+@keyframes slideInSyllabus {
     from {
         transform: translateY(20px);
         opacity: 0;
