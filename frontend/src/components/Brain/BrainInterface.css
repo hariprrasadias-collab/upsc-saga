@@ -97,14 +97,14 @@
     flex-direction: column;
     overflow: hidden;
     transform-origin: top right;
-    animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: slideInBrain 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .brain-interface-container.minimized .brain-window {
     display: none;
 }
 
-@keyframes slideIn {
+@keyframes slideInBrain {
     from {
         opacity: 0;
         transform: scale(0.95) translateY(-10px);
