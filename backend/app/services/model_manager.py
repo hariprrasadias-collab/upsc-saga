@@ -104,16 +104,17 @@ class ModelManager:
         openclaw_base_url = os.environ.get('OPENCLAW_BASE_URL', 'http://localhost:18789/v1')
         self.openclaw_model = os.environ.get('OPENCLAW_MODEL', 'ollama/qwen3:14b')
         
-        try:
-            self.clients['openclaw'] = openai.OpenAI(
-                base_url=openclaw_base_url,
-                api_key=openclaw_key,
-                default_headers={
-                    "X-Title": "UPSC Second Brain Local"
-                }
-            )
-        except Exception as e:
-            print(f"⚠️ OpenClaw initialization soft-failed: {e}")
+        if openclaw_key:
+            try:
+                self.clients['openclaw'] = openai.OpenAI(
+                    base_url=openclaw_base_url,
+                    api_key=openclaw_key,
+                    default_headers={
+                        "X-Title": "UPSC Second Brain Local"
+                    }
+                )
+            except Exception as e:
+                print(f"⚠️ OpenClaw initialization soft-failed: {e}")
 
         # State Management
         self.response_cache = TTLCache(maxsize=200, ttl=3600)
