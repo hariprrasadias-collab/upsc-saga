@@ -10,3 +10,7 @@
 **Vulnerability:** Unused parameter `isUpscale` caused strict TypeScript compilation failures during Render production deployments.
 **Learning:** The build step `tsc -b` runs strictly; unused parameters fail the build and block deployments. Prefixing unused parameters with an underscore (`_isUpscale`) satisfies strict configurations.
 **Prevention:** Always run `NODE_ENV=production npm run build` locally to verify typescript compilation before committing.
+## 2026-06-04 - Fix duplicate build script overriding package.json dependencies
+**Vulnerability:** A duplicate `scripts` block in the root `package.json` overrode the primary build configuration, silently stripping out the `--include=dev` flag during production builds.
+**Learning:** JSON parses the last occurrence of a key. Duplicate keys in configuration files can cause critical CI/CD build scripts to fail silently by executing unintended or incomplete commands, leading to missing dependencies in production environments.
+**Prevention:** Validate JSON configuration files to ensure no duplicate keys exist, and consolidate related configurations (like `scripts`) into a single object block.
