@@ -6,3 +6,7 @@
 **Vulnerability:** Hardcoded API key for OpenClaw found as a fallback in `os.environ.get`.
 **Learning:** Hardcoding credentials as fallbacks exposes them to version control, undermining environment variable protections.
 **Prevention:** Always rely strictly on environment variables for sensitive credentials, ensuring no fallback values are hardcoded in the source code.
+## 2026-06-04 - Fix TS6133 frontend build failure
+**Vulnerability:** Unused parameter `isUpscale` caused strict TypeScript compilation failures during Render production deployments.
+**Learning:** The build step `tsc -b` runs strictly; unused parameters fail the build and block deployments. Prefixing unused parameters with an underscore (`_isUpscale`) satisfies strict configurations.
+**Prevention:** Always run `NODE_ENV=production npm run build` locally to verify typescript compilation before committing.
