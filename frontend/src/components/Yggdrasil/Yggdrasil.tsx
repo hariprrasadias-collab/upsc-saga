@@ -79,7 +79,7 @@ const TabletModal: React.FC<TabletModalProps> = ({ node, onClose, onUpdateStatus
             <div className="tablet-stone" onClick={(e) => e.stopPropagation()}>
                 <div className="tablet-header">
                     <h2>{node.title}</h2>
-                    <button className="close-btn" onClick={onClose}>✕</button>
+                    <button className="close-btn" onClick={onClose} aria-label="Close dialog"><span aria-hidden="true">✕</span></button>
                 </div>
 
                 <div className="tablet-body">
