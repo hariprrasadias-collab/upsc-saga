@@ -1,3 +1,6 @@
 ## 2024-05-23 - Toast Notification Accessibility
 **Learning:** Notifications are often invisible to screen readers without proper roles. Using `role="alert"` for errors (assertive) and `role="status"` for info (polite) ensures users are notified at the right urgency level.
 **Action:** Always categorize toast notifications by urgency and apply corresponding `aria-live` regions, while ensuring close buttons have clear labels.
+## 2026-06-05 - Modal Dialog Accessibility Context
+**Learning:** While `aria-label` on close buttons provides the action context (e.g., 'Close'), visible decorative text like '&times;' must still be hidden from screen readers using `<span aria-hidden="true">`. Otherwise, assistive technologies may redundantly announce 'Close, multiplication X'. Furthermore, dialog modals require an explicit `aria-labelledby` linking to their generated title ID via `useId()` to provide immediate context when focus moves into the modal.
+**Action:** When auditing or building custom modals, always pair `aria-modal="true"` and `role="dialog"` with a dynamically generated `aria-labelledby` ID, and aggressively apply `aria-hidden="true"` to any visible icon-text inside an already labeled button.
