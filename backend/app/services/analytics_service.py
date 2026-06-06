@@ -125,6 +125,81 @@ def get_subject_performance(conn, user_id, subject):
     return result
 
 
+def get_all_subjects_performance(conn, user_id, subjects):
+    """
+    Bolt Optimization: Batch query performance metrics for all subjects
+    to avoid N+1 queries. Runs exactly 3 queries instead of 3*N.
+    Impact: O(N) to O(1) queries.
+    """
+    results = {
+        subj: {
+            'subject': subj,
+            'mock_avg': 0,
+            'answer_avg': 0,
+            'syllabus_pct': 0,
+            'pyq_attempted': 0,
+            'flashcard_mastered': 0
+        } for subj in subjects
+    }
+
+    if not subjects:
+        return list(results.values())
+
+    placeholders = ','.join(['?'] * len(subjects))
+
+    # Mock tests
+    try:
+        mock_query = f'''
+            SELECT mt.subject, AVG(score) as avg_score
+            FROM test_attempts mta
+            JOIN mock_tests mt ON mta.test_id = mt.id
+            WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+            GROUP BY mt.subject
+        '''
+        mock_params = [user_id] + subjects
+        for row in conn.execute(mock_query, mock_params).fetchall():
+            if row['avg_score']:
+                results[row['subject']]['mock_avg'] = round(row['avg_score'], 1)
+    except Exception as e:
+        print(f"Error in mock tests query for subjects: {e}")
+
+    # Answer writing
+    try:
+        ans_query = f'''
+            SELECT aq.subject, AVG(ae.overall_score) as avg_score
+            FROM answer_evaluations ae
+            JOIN user_answers ua ON ae.answer_id = ua.id
+            JOIN answer_questions aq ON ua.prompt_id = aq.id
+            WHERE ua.user_id = ? AND aq.subject IN ({placeholders})
+            GROUP BY aq.subject
+        '''
+        ans_params = [user_id] + subjects
+        for row in conn.execute(ans_query, ans_params).fetchall():
+            if row['avg_score']:
+                results[row['subject']]['answer_avg'] = round(row['avg_score'], 1)
+    except Exception as e:
+        print(f"Error in answer writing query for subjects: {e}")
+
+    # Syllabus completion
+    try:
+        syl_query = f'''
+            SELECT subject,
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+            FROM syllabus_topics
+            WHERE subject IN ({placeholders})
+            GROUP BY subject
+        '''
+        syl_params = subjects
+        for row in conn.execute(syl_query, syl_params).fetchall():
+            if row['total'] > 0:
+                results[row['subject']]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+    except Exception as e:
+        print(f"Error in syllabus query for subjects: {e}")
+
+    return list(results.values())
+
+
 def identify_weak_areas(conn, user_id, limit=10):
     """
     Identify topics needing attention based on performance
