@@ -67,7 +67,7 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onSelectTemplate })
                     <div className="template-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="template-modal-header">
                             <h2>Answer Templates</h2>
-                            <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
+                            <button className="close-btn" onClick={() => setIsOpen(false)} aria-label="Close dialog"><span aria-hidden="true">✕</span></button>
                         </div>
 
                         <div className="template-modal-body">
