@@ -50,10 +50,17 @@ const ArticleEditor: React.FC<ArticleEditorProps> = ({ onClose, onSave }) => {
 
     return (
         <div className="modal-overlay">
-            <div className="modal-content animate-scale-in">
+            <div
+                className="modal-content animate-scale-in"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="article-editor-title"
+            >
                 <div className="modal-header">
-                    <h2>New Article</h2>
-                    <button className="close-btn" onClick={onClose}>×</button>
+                    <h2 id="article-editor-title">New Article</h2>
+                    <button className="close-btn" onClick={onClose} aria-label="Close modal">
+                        <span aria-hidden="true">×</span>
+                    </button>
                 </div>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
