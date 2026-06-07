@@ -344,3 +344,76 @@ def generate_weekly_performance_review(conn, user_id):
         return json.loads(text)
     except Exception as e:
         return {"error": str(e)}
+
+def get_all_subject_performances(conn, user_id, subjects):
+    results = {
+        subject: {
+            'subject': subject,
+            'mock_avg': 0,
+            'answer_avg': 0,
+            'syllabus_pct': 0,
+            'pyq_attempted': 0,
+            'flashcard_mastered': 0
+        } for subject in subjects
+    }
+
+    if not subjects:
+        return list(results.values())
+
+    placeholders = ','.join(['?'] * len(subjects))
+
+    # Mock tests
+    try:
+        mock_avg_query = f'''
+            SELECT mt.subject, AVG(mta.score) as avg_score
+            FROM test_attempts mta
+            JOIN mock_tests mt ON mta.test_id = mt.id
+            WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+            GROUP BY mt.subject
+        '''
+        params = [user_id] + subjects
+        mock_rows = conn.execute(mock_avg_query, params).fetchall()
+        for row in mock_rows:
+            if row['subject'] in results and row['avg_score'] is not None:
+                results[row['subject']]['mock_avg'] = round(row['avg_score'], 1)
+    except Exception as e:
+        pass
+
+    # Answer writing
+    try:
+        answer_avg_query = f'''
+            SELECT aq.subject, AVG(ae.overall_score) as avg_score
+            FROM answer_evaluations ae
+            JOIN user_answers ua ON ae.answer_id = ua.id
+            JOIN answer_questions aq ON ua.prompt_id = aq.id
+            WHERE ua.user_id = ? AND aq.subject IN ({placeholders})
+            GROUP BY aq.subject
+        '''
+        params = [user_id] + subjects
+        answer_rows = conn.execute(answer_avg_query, params).fetchall()
+        for row in answer_rows:
+            if row['subject'] in results and row['avg_score'] is not None:
+                results[row['subject']]['answer_avg'] = round(row['avg_score'], 1)
+    except Exception as e:
+        pass
+
+    # Syllabus completion
+    try:
+        syllabus_query = f'''
+            SELECT
+                subject,
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+            FROM syllabus_topics
+            WHERE subject IN ({placeholders})
+            GROUP BY subject
+        '''
+        params = subjects
+        syllabus_rows = conn.execute(syllabus_query, params).fetchall()
+        for row in syllabus_rows:
+            if row['subject'] in results and row['total'] > 0:
+                results[row['subject']]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+    except Exception as e:
+        pass
+
+    return [results[sub] for sub in subjects]
