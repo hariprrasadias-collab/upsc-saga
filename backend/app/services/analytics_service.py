@@ -125,6 +125,112 @@ def get_subject_performance(conn, user_id, subject):
     return result
 
 
+
+def get_all_subjects_performance(conn, user_id, subjects):
+    """
+    Bolt Optimization: Batch performance metrics for all subjects
+    to avoid N+1 query bottlenecks.
+    Impact: O(N) to O(1) queries.
+    """
+    results = {
+        subj: {
+            'subject': subj,
+            'mock_avg': 0,
+            'answer_avg': 0,
+            'syllabus_pct': 0,
+            'pyq_attempted': 0,
+            'flashcard_mastered': 0
+        } for subj in subjects
+    }
+
+    if not subjects:
+        return list(results.values())
+
+    placeholders = ','.join('?' * len(subjects))
+
+    # Mock tests
+    try:
+        mock_params = [user_id] + subjects
+        mock_avgs = conn.execute(f'''
+            SELECT mt.subject, AVG(score) as avg_score
+            FROM test_attempts mta
+            JOIN mock_tests mt ON mta.test_id = mt.id
+            WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+            GROUP BY mt.subject
+        ''', mock_params).fetchall()
+        for row in mock_avgs:
+            if row['avg_score']:
+                results[row['subject']]['mock_avg'] = round(row['avg_score'], 1)
+    except Exception as e:
+        pass
+
+    # Answer writing
+    try:
+        answer_params = [user_id] + subjects
+        answer_avgs = conn.execute(f'''
+            SELECT aq.subject, AVG(ae.overall_score) as avg_score
+            FROM answer_evaluations ae
+            JOIN user_answers ua ON ae.answer_id = ua.id
+            JOIN answer_questions aq ON ua.prompt_id = aq.id
+            WHERE ua.user_id = ? AND aq.subject IN ({placeholders})
+            GROUP BY aq.subject
+        ''', answer_params).fetchall()
+        for row in answer_avgs:
+            if row['avg_score']:
+                results[row['subject']]['answer_avg'] = round(row['avg_score'], 1)
+    except Exception as e:
+        pass
+
+    # Syllabus completion
+    try:
+        # User ID is not used here because syllabus_topics represents the universal syllabus
+        syllabus_stats = conn.execute(f'''
+            SELECT
+                subject,
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+            FROM syllabus_topics
+            WHERE subject IN ({placeholders})
+            GROUP BY subject
+        ''', subjects).fetchall()
+        for row in syllabus_stats:
+            if row['total'] > 0:
+                results[row['subject']]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+    except Exception as e:
+        pass
+
+    # PYQ attempted
+    try:
+        pyq_params = [user_id] + subjects
+        pyq_stats = conn.execute(f'''
+            SELECT pq.subject, COUNT(DISTINCT pqa.question_id) as count
+            FROM pyq_quiz_answers pqa
+            JOIN pyq_questions pq ON pqa.question_id = pq.id
+            WHERE pqa.user_id = ? AND pq.subject IN ({placeholders})
+            GROUP BY pq.subject
+        ''', pyq_params).fetchall()
+        for row in pyq_stats:
+            results[row['subject']]['pyq_attempted'] = row['count']
+    except Exception as e:
+        pass
+
+    # Flashcard mastered
+    try:
+        flashcard_params = [user_id] + subjects
+        flashcard_stats = conn.execute(f'''
+            SELECT fd.subject, COUNT(*) as count
+            FROM flashcards f
+            JOIN flashcard_decks fd ON f.deck_id = fd.id
+            WHERE f.user_id = ? AND f.status = 'Mastered' AND fd.subject IN ({placeholders})
+            GROUP BY fd.subject
+        ''', flashcard_params).fetchall()
+        for row in flashcard_stats:
+            results[row['subject']]['flashcard_mastered'] = row['count']
+    except Exception as e:
+        pass
+
+    return list(results.values())
+
 def identify_weak_areas(conn, user_id, limit=10):
     """
     Identify topics needing attention based on performance
