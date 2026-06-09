@@ -198,13 +198,15 @@ const EssayEditor: React.FC<EssayEditorProps> = ({ onSubmitSuccess }) => {
                         {showTips ? '✕ Hide Tips' : '💡 Tips'}
                     </button>
                     <button onClick={saveDraft}
+                        aria-label="Save Draft"
                         style={{ background: 'none', border: '1px solid #334155', color: '#94a3b8', padding: '2px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>
-                        💾 Save
+                        <span aria-hidden="true">💾</span> Save
                     </button>
                     {content.trim() && (
                         <button onClick={clearDraft}
+                            aria-label="Clear Draft"
                             style={{ background: 'none', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', padding: '2px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>
-                            🗑️ Clear
+                            <span aria-hidden="true">🗑️</span> Clear
                         </button>
                     )}
                 </div>
