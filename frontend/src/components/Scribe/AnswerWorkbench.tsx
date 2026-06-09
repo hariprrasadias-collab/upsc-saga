@@ -190,10 +190,18 @@ const AnswerWorkbench: React.FC = () => {
             {/* History Detail Modal */}
             {selectedHistoryItem && (
                 <div className="modal-overlay" onClick={() => setSelectedHistoryItem(null)}>
-                    <div className="modal-content history-modal" onClick={e => e.stopPropagation()}>
+                    <div
+                        className="modal-content history-modal"
+                        onClick={e => e.stopPropagation()}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="history-modal-title"
+                    >
                         <div className="modal-header">
-                            <h2>Evaluation Details</h2>
-                            <button className="close-btn" onClick={() => setSelectedHistoryItem(null)}>×</button>
+                            <h2 id="history-modal-title">Evaluation Details</h2>
+                            <button className="close-btn" onClick={() => setSelectedHistoryItem(null)} aria-label="Close modal">
+                                <span aria-hidden="true">×</span>
+                            </button>
                         </div>
                         <div className="modal-body">
                             <div className="history-modal-section">
