@@ -11,3 +11,7 @@
 ## 2024-06-10 - Refactor database updates in loops to executemany
 **Learning:** Database updates inside iterative loops, such as scoring test answers where `UPDATE` is called for every individual question, can cause severe N+1 bottlenecks.
 **Action:** Lift the `UPDATE` logic out of loops by accumulating target IDs or parameters into a list, and then executing a single `executemany` statement at the end of the loop to process all updates in bulk.
+
+## 2024-06-10 - Fix TypeScript Error TS6133 for Unused Variables in Production
+**Learning:** Strict TypeScript compilation fails Render production builds on unused variables (error TS6133) because it sets `NODE_ENV=production`.
+**Action:** When a variable is intentionally unused, prefix it with an underscore (e.g., `_isUpscale`) to bypass the TS6133 compilation error.
