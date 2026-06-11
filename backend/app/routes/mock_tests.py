@@ -196,23 +196,31 @@ def submit_attempt(attempt_id):
         incorrect = 0
         unattempted = 0
         
+        correct_updates = []
+        incorrect_updates = []
+
         for q in questions:
             selected = answer_map.get(q['id'])
             if not selected:
                 unattempted += 1
             elif selected.upper() == q['correct_answer'].upper():
                 correct += 1
-                # Mark answer as correct
-                conn.execute(
-                    'UPDATE test_answers SET is_correct = 1 WHERE attempt_id = ? AND question_id = ?',
-                    (attempt_id, q['id'])
-                )
+                correct_updates.append((attempt_id, q['id']))
             else:
                 incorrect += 1
-                conn.execute(
-                    'UPDATE test_answers SET is_correct = 0 WHERE attempt_id = ? AND question_id = ?',
-                    (attempt_id, q['id'])
-                )
+                incorrect_updates.append((attempt_id, q['id']))
+
+        # Bulk update answers to avoid N+1 queries
+        if correct_updates:
+            conn.executemany(
+                'UPDATE test_answers SET is_correct = 1 WHERE attempt_id = ? AND question_id = ?',
+                correct_updates
+            )
+        if incorrect_updates:
+            conn.executemany(
+                'UPDATE test_answers SET is_correct = 0 WHERE attempt_id = ? AND question_id = ?',
+                incorrect_updates
+            )
         
         marks_per_q = 2.0
         negative_mark = 0.66  # 1/3 negative marking
