@@ -332,11 +332,12 @@ def create_test():
         ))
         test_id = cursor.lastrowid
         
-        for i, q in enumerate(questions, 1):
-            conn.execute('''
+        # Bolt Optimization: Batch question insertions using executemany to avoid N+1 query bottlenecks. Impact: O(N) to O(1)
+        if questions:
+            conn.executemany('''
                 INSERT INTO test_questions (test_id, question_number, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation, subject)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
+            ''', [(
                 test_id, i,
                 q['question_text'],
                 q.get('option_a', ''),
@@ -346,7 +347,7 @@ def create_test():
                 q.get('correct_answer', 'A'),
                 q.get('explanation', ''),
                 q.get('subject', data.get('subject', 'General'))
-            ))
+            ) for i, q in enumerate(questions, 1)])
         
         conn.commit()
         return jsonify({'success': True, 'test_id': test_id}), 201
