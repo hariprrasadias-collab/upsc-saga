@@ -15,3 +15,7 @@
 ## 2024-06-12 - [TS6133 Unused Variable Compilation Error]
 **Learning:** During strict TypeScript builds, variables defined but not used (e.g. `isUpscale` in a React component) will cause `error TS6133` which fails the production build process.
 **Action:** Always rename unused parameters by prepending an underscore (e.g. `_isUpscale`) to safely bypass the compiler error and unblock the build without altering logic.
+
+## 2024-06-12 - [Render Deployment: Duplicate scripts in package.json]
+**Learning:** If a Render deployment fails with 'Publish directory dist does not exist!' despite the frontend build succeeding, it might be due to a duplicate `scripts` block in the root `package.json` that overrides the correct build script (which properly copies the artifacts).
+**Action:** Remove the duplicate/incorrect `scripts` block in `package.json` so the correct build command executes.
