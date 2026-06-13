@@ -463,12 +463,11 @@ def start_quiz():
         
         session_id = cursor.lastrowid
         
-        # Initialize answer records
-        for q in questions:
-            conn.execute('''
-                INSERT INTO pyq_quiz_answers (session_id, question_id)
-                VALUES (?, ?)
-            ''', (session_id, q['id']))
+        # Bolt Optimization: Batch question insertions to avoid N+1 queries. Impact: O(N) to O(1) query.
+        conn.executemany('''
+            INSERT INTO pyq_quiz_answers (session_id, question_id)
+            VALUES (?, ?)
+        ''', [(session_id, q['id']) for q in questions])
         
         conn.commit()
         
