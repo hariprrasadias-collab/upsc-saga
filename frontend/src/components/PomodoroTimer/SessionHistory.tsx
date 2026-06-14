@@ -133,9 +133,9 @@ export const SessionHistory: React.FC = () => {
             <div className="history-header">
                 <h3>📊 SESSION HISTORY</h3>
                 <div className="history-actions">
-                    <button onClick={exportToCSV} className="export-btn csv">CSV</button>
-                    <button onClick={exportToJSON} className="export-btn json">JSON</button>
-                    <button onClick={clearHistory} className="clear-btn">Clear</button>
+                    <button onClick={exportToCSV} className="export-btn csv" aria-label="Export to CSV">CSV</button>
+                    <button onClick={exportToJSON} className="export-btn json" aria-label="Export to JSON">JSON</button>
+                    <button onClick={clearHistory} className="clear-btn" aria-label="Clear history">Clear</button>
                 </div>
             </div>
 

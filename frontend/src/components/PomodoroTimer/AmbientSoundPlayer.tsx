@@ -92,7 +92,7 @@ export const AmbientSoundPlayer: React.FC = () => {
             <div className="sound-header">
                 <span className="sound-title">🎵 AMBIENT SOUNDS</span>
                 {activeSounds.size > 0 && (
-                    <button onClick={stopAll} className="stop-all-btn">Stop All</button>
+                    <button onClick={stopAll} className="stop-all-btn" aria-label="Stop all sounds">Stop All</button>
                 )}
             </div>
 
@@ -121,6 +121,7 @@ export const AmbientSoundPlayer: React.FC = () => {
                         <div key={sound.id} className={`sound-card ${isActive ? 'active' : ''}`}>
                             <button
                                 className="sound-toggle"
+                                aria-label={`Toggle ${sound.name} sound`}
                                 onClick={() => toggleSound(sound.id)}
                             >
                                 <span className="sound-icon">{sound.icon}</span>
