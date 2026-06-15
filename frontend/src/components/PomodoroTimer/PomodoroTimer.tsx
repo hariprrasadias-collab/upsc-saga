@@ -195,12 +195,24 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
 
     if (isMinimized) {
         return (
-            <div className={`pomodoro-minimized ${className || ''}`} onClick={() => setIsMinimized(false)}>
+            <div
+                className={`pomodoro-minimized ${className || ''}`}
+                onClick={() => setIsMinimized(false)}
+                role="button"
+                tabIndex={0}
+                aria-label={`Pomodoro Timer Minimized, ${mode === 'work' ? 'Work' : 'Break'} Mode, ${formatTime(timeLeft)} remaining. Press Enter to expand.`}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setIsMinimized(false);
+                    }
+                }}
+            >
                 <div className={`pomodoro-orb ${isRunning ? 'pulsing' : ''}`}>
-                    <span className="pomodoro-icon">{mode === 'work' ? '⚔️' : '🛡️'}</span>
+                    <span className="pomodoro-icon" aria-hidden="true">{mode === 'work' ? '⚔️' : '🛡️'}</span>
                 </div>
                 <span className="pomodoro-time">{formatTime(timeLeft)}</span>
-                <span className="keyboard-hint" title="Keyboard: Space=Play/Pause, R=Reset, 1/2/3=Modes, S=Settings">⌨️</span>
+                <span className="keyboard-hint" title="Keyboard: Space=Play/Pause, R=Reset, 1/2/3=Modes, S=Settings" aria-hidden="true">⌨️</span>
             </div>
         );
     }
@@ -222,15 +234,15 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
             <div className="pomodoro-header">
                 <h3>{mode === 'work' ? '⚔️ BATTLE TIME' : '🛡️ RESPITE'}</h3>
                 <div className="pomodoro-controls">
-                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
-                        {isFullscreen ? '↙️' : '⛶'}
+                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"} aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
+                        <span aria-hidden="true">{isFullscreen ? '↙️' : '⛶'}</span>
                     </button>
                     {isFullscreen && (
-                        <button onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close">✕</button>
+                        <button onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close" aria-label="Close Fullscreen"><span aria-hidden="true">✕</span></button>
                     )}
-                    <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" title="History">📊</button>
-                    <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" title="Settings">⚙️</button>
-                    <button onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize">−</button>
+                    <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" title="History" aria-label="Toggle Session History"><span aria-hidden="true">📊</span></button>
+                    <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" title="Settings" aria-label="Toggle Settings"><span aria-hidden="true">⚙️</span></button>
+                    <button onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize" aria-label="Minimize Timer"><span aria-hidden="true">−</span></button>
                 </div>
             </div>
 
@@ -329,7 +341,9 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
                                     <button className="edit-time-btn" onClick={() => {
                                         setEditMinutes(Math.floor(timeLeft / 60).toString());
                                         setIsEditing(true);
-                                    }} title="Edit Timer">✎</button>
+                                    }} title="Edit Timer" aria-label="Edit Timer">
+                                        <span aria-hidden="true">✎</span>
+                                    </button>
                                 )}
                             </>
                         )}
