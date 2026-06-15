@@ -4,6 +4,7 @@ backend/upsc_saga.db
 **/.env
 **/credentials.json
 **/token.json
+backend/token.json
 
 # Python
 **/__pycache__/
