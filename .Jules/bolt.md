@@ -11,3 +11,7 @@
 ## 2025-03-03 - [Arena Bosses N+1 Optimization]
 **Learning:** Generating dynamic frontend components (like Boss lists) that require counting associated child records (like pyq_questions) will trigger N+1 queries if the counting logic remains isolated inside a component factory function called in a loop.
 **Action:** Prefetch grouped counts (via `GROUP BY`) at the top level and pass the counts down into the factory function to avoid repeated database hits.
+
+## 2025-03-03 - [Strict TypeScript & Deployment]
+**Learning:** During Render deployments, if unused variables are left in the frontend TypeScript files, strict typing via `tsc -b` will fail with an error (`TS6133`). Prefixing unused parameters with an underscore (`_`) bypasses these compilation blocks.
+**Action:** Always ensure code successfully builds with `tsc -b` and `vite build` prior to submission.
