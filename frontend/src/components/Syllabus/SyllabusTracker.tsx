@@ -328,8 +328,8 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
             {/* NOTES MODAL */}
             {showNotesModal && (
                 <div className="notes-modal-overlay">
-                    <div className="notes-modal">
-                        <h3>Topic Notes</h3>
+                    <div className="notes-modal" role="dialog" aria-modal="true" aria-labelledby="notes-modal-title">
+                        <h3 id="notes-modal-title">Topic Notes</h3>
                         <textarea
                             className="notes-textarea"
                             value={notesText}
@@ -347,8 +347,8 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
             {/* BRAIN INSIGHT MODAL */}
             {(brainInsight || isBrainLoading) && (
                 <div className="notes-modal-overlay" onClick={() => !isBrainLoading && setBrainInsight(null)}>
-                    <div className="notes-modal brain-modal" onClick={e => e.stopPropagation()}>
-                        <h3>Strategos Strategic Audit</h3>
+                    <div className="notes-modal brain-modal" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="brain-modal-title">
+                        <h3 id="brain-modal-title">Strategos Strategic Audit</h3>
                         {isBrainLoading ? (
                             <div className="loading-spinner">Analyzing Syllabus Matrix...</div>
                         ) : (
