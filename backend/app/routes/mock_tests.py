@@ -196,6 +196,7 @@ def submit_attempt(attempt_id):
         incorrect = 0
         unattempted = 0
         
+        # Gather updates and execute as a single batch to avoid N+1 queries.
         updates = []
         for q in questions:
             selected = answer_map.get(q['id'])
