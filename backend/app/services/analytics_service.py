@@ -125,6 +125,128 @@ def get_subject_performance(conn, user_id, subject):
     return result
 
 
+def get_all_subjects_performance(conn, user_id, subjects):
+    """
+    ⚡ Bolt Optimization: Batch subject performance aggregation to avoid N+1 queries.
+    Instead of making 5 queries per subject (5 * 6 = 30 queries),
+    this function executes 5 queries total using GROUP BY and IN clauses.
+    """
+    results = {
+        subject: {
+            'subject': subject,
+            'mock_avg': 0,
+            'answer_avg': 0,
+            'syllabus_pct': 0,
+            'pyq_attempted': 0,
+            'flashcard_mastered': 0
+        } for subject in subjects
+    }
+
+    if not subjects:
+        return list(results.values())
+
+    placeholders = ','.join(['?'] * len(subjects))
+
+    # 1. Mock tests
+    try:
+        query_params = [user_id] + subjects
+        mock_data = conn.execute(f'''
+            SELECT mt.subject, AVG(mta.score) as avg_score
+            FROM test_attempts mta
+            JOIN mock_tests mt ON mta.test_id = mt.id
+            WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+            GROUP BY mt.subject
+        ''', query_params).fetchall()
+        for row in mock_data:
+            subj = row['subject']
+            if subj in results and row['avg_score'] is not None:
+                results[subj]['mock_avg'] = round(row['avg_score'], 1)
+    except Exception as e:
+        pass
+
+    # 2. Answer writing
+    try:
+        query_params = [user_id] + subjects
+        answer_data = conn.execute(f'''
+            SELECT aq.subject, AVG(ae.overall_score) as avg_score
+            FROM answer_evaluations ae
+            JOIN user_answers ua ON ae.answer_id = ua.id
+            JOIN answer_questions aq ON ua.prompt_id = aq.id
+            WHERE ua.user_id = ? AND aq.subject IN ({placeholders})
+            GROUP BY aq.subject
+        ''', query_params).fetchall()
+        for row in answer_data:
+            subj = row['subject']
+            if subj in results and row['avg_score'] is not None:
+                results[subj]['answer_avg'] = round(row['avg_score'], 1)
+    except Exception as e:
+        pass # Ignore table not found
+
+    # 3. Syllabus completion
+    try:
+        syllabus_data = conn.execute(f'''
+            SELECT
+                subject,
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+            FROM syllabus_topics
+            WHERE subject IN ({placeholders})
+            GROUP BY subject
+        ''', subjects).fetchall()
+        for row in syllabus_data:
+            subj = row['subject']
+            if subj in results and row['total'] > 0:
+                results[subj]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+    except Exception as e:
+        pass
+
+    # 4. PYQ attempted
+    try:
+        query_params = [user_id] + subjects
+        pyq_data = conn.execute(f'''
+            SELECT q.subject, COUNT(DISTINCT q.id) as pyq_attempted
+            FROM pyq_quiz_answers a
+            JOIN pyq_quiz_sessions s ON a.session_id = s.id
+            JOIN pyq_questions q ON a.question_id = q.id
+            WHERE s.user_id = ? AND q.subject IN ({placeholders})
+            GROUP BY q.subject
+        ''', query_params).fetchall()
+        for row in pyq_data:
+            subj = row['subject']
+            if subj in results:
+                results[subj]['pyq_attempted'] = row['pyq_attempted']
+    except Exception as e:
+        pass
+
+    # 5. Flashcard mastered
+    try:
+        query_params = [user_id] + subjects
+        flashcard_data = conn.execute(f'''
+            SELECT d.subject, COUNT(DISTINCT f.id) as flashcard_mastered
+            FROM flashcards f
+            JOIN decks d ON f.deck_id = d.id
+            JOIN (
+                SELECT flashcard_id, halflife
+                FROM review_sessions
+                WHERE (flashcard_id, reviewed_at) IN (
+                    SELECT flashcard_id, MAX(reviewed_at)
+                    FROM review_sessions
+                    GROUP BY flashcard_id
+                )
+            ) rs ON f.id = rs.flashcard_id
+            WHERE d.user_id = ? AND rs.halflife >= 180 AND d.subject IN ({placeholders})
+            GROUP BY d.subject
+        ''', query_params).fetchall()
+        for row in flashcard_data:
+            subj = row['subject']
+            if subj in results:
+                results[subj]['flashcard_mastered'] = row['flashcard_mastered']
+    except Exception as e:
+        pass
+
+    return [results[subject] for subject in subjects]
+
+
 def identify_weak_areas(conn, user_id, limit=10):
     """
     Identify topics needing attention based on performance
