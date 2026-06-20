@@ -53,11 +53,26 @@ def google_status():
 
 @warmap.route('/api/warmap/google-auth')
 def google_auth():
-    if not os.path.exists(CREDENTIALS_FILE):
-        return jsonify({"error": "credentials.json not found. Please configure Google Cloud credentials."}), 404
+    client_id = os.environ.get('GOOGLE_CLIENT_ID')
+    client_secret = os.environ.get('GOOGLE_CLIENT_SECRET')
 
-    flow = Flow.from_client_secrets_file(
-        CREDENTIALS_FILE,
+    if not client_id or not client_secret:
+        return jsonify({"error": "Google Cloud credentials not configured in environment variables."}), 404
+
+    client_config = {
+        "installed": {
+            "client_id": client_id,
+            "project_id": "gen-lang-client-0168569830",
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_secret": client_secret,
+            "redirect_uris": ["http://localhost"]
+        }
+    }
+
+    flow = Flow.from_client_config(
+        client_config,
         scopes=SCOPES,
         redirect_uri=url_for('warmap.google_callback', _external=True)
     )
@@ -75,8 +90,26 @@ def google_callback():
         return jsonify({"error": "Invalid state parameter"}), 400
 
     try:
-        flow = Flow.from_client_secrets_file(
-            CREDENTIALS_FILE,
+        client_id = os.environ.get('GOOGLE_CLIENT_ID')
+        client_secret = os.environ.get('GOOGLE_CLIENT_SECRET')
+
+        if not client_id or not client_secret:
+            return jsonify({"error": "Google Cloud credentials not configured in environment variables."}), 404
+
+        client_config = {
+            "installed": {
+                "client_id": client_id,
+                "project_id": "gen-lang-client-0168569830",
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                "client_secret": client_secret,
+                "redirect_uris": ["http://localhost"]
+            }
+        }
+
+        flow = Flow.from_client_config(
+            client_config,
             scopes=SCOPES,
             state=state,
             redirect_uri=url_for('warmap.google_callback', _external=True)
