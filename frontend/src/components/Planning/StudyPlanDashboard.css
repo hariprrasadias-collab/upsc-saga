@@ -2908,19 +2908,6 @@
     transform: translateY(-1px);
 }
 
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-
 /* Socratic Debate Styles */
 .debate-turn {
     animation: fadeIn 0.3s ease-in-out;
