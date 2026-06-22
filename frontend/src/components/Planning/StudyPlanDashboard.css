@@ -2884,221 +2884,28 @@
     color: #9b59b6;
     padding: 0.5rem 1rem;
     border-radius: 6px;
+}
 
-    .strategos-content p {
-        margin: 0;
-        font-size: 0.95rem;
-        color: #ecf0f1;
-    }
+.strategos-content p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #ecf0f1;
+}
 
-    .strategos-action-btn {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 0.85rem;
-        transition: all 0.2s;
-    }
+.strategos-action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
 
-    .strategos-action-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateY(-1px);
-    }
-
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    /* Market Watch Ticker */
-    .market-ticker {
-        display: flex;
-        gap: 1rem;
-        overflow: hidden;
-    }
-
-    .ticker-item {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        background: rgba(46, 204, 113, 0.1);
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-        border: 1px solid rgba(46, 204, 113, 0.3);
-    }
-
-    .ticker-symbol {
-        font-family: 'JetBrains Mono', monospace;
-        font-weight: bold;
-        color: #2ecc71;
-        font-size: 0.8rem;
-    }
-
-    .ticker-price {
-        font-family: 'Roboto Mono', monospace;
-        color: #ecf0f1;
-        font-size: 0.8rem;
-        max-width: 90%;
-        max-height: 80vh;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 0 0 30px rgba(52, 152, 219, 0.3);
-        animation: slideIn 0.3s ease-out;
-        z-index: 1001;
-    }
-
-    .debate-header {
-        padding: 1rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: rgba(52, 152, 219, 0.1);
-    }
-
-    .debate-header h2 {
-        font-family: 'Orbitron', sans-serif;
-        color: #3498db;
-        margin: 0;
-        font-size: 1.2rem;
-    }
-
-    .debate-topic {
-        font-family: 'JetBrains Mono', monospace;
-        color: #bdc3c7;
-        font-size: 0.9rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 300px;
-    }
-
-    .debate-body {
-        flex: 1;
-        overflow-y: auto;
-        padding: 1rem;
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .debate-turn {
-        display: flex;
-        gap: 1rem;
-        animation: fadeIn 0.3s ease-out;
-    }
-
-    .debate-turn.skeptic {
-        flex-direction: row-reverse;
-    }
-
-    .debate-turn.realist {
-        flex-direction: row-reverse;
-    }
-
-    .agent-avatar {
-        font-size: 2rem;
-        background: rgba(255, 255, 255, 0.05);
-        width: 50px;
-        height: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        flex-shrink: 0;
-    }
-
-    .turn-content {
-        background: rgba(255, 255, 255, 0.05);
-        padding: 0.8rem;
-        border-radius: 8px;
-        max-width: 80%;
-    }
-
-    .agent-name {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 0.75rem;
-        display: block;
-        margin-bottom: 0.3rem;
-        font-weight: bold;
-    }
-
-    .turn-content p {
-        margin: 0;
-        font-size: 0.9rem;
-        color: #ecf0f1;
-        line-height: 1.4;
-    }
-
-    .debate-footer {
-        padding: 1rem;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        display: flex;
-        justify-content: center;
-    }
-
-    .next-turn-btn {
-        background: #3498db;
-        color: white;
-        border: none;
-        padding: 0.5rem 1.5rem;
-        border-radius: 6px;
-        cursor: pointer;
-        font-family: 'Orbitron', sans-serif;
-        transition: all 0.2s;
-    }
-
-    .next-turn-btn:hover {
-        background: #2980b9;
-        transform: translateY(-2px);
-    }
-
-    .debate-btn {
-        background: transparent;
-        border: 1px solid #9b59b6;
-        color: #9b59b6;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        cursor: pointer;
-        margin-right: 1rem;
-        transition: all 0.2s;
-    }
-
-    .debate-btn:hover {
-        background: rgba(155, 89, 182, 0.1);
-        box-shadow: 0 0 10px rgba(155, 89, 182, 0.3);
-    }
-
-    /* Arbitrage Add Button */
-    .add-opp-btn {
-        background: none;
-        border: 1px solid #2ecc71;
-        color: #2ecc71;
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 12px;
-        margin-left: 5px;
-        padding: 0;
-    }
-
-    .add-opp-btn:hover {
-        background: #2ecc71;
-        color: #000;
-    }
+.strategos-action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
 }
 
 /* Socratic Debate Styles */
