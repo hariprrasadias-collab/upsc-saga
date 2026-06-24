@@ -14,15 +14,15 @@ interface EvaluationReportProps {
 
 const EvaluationReport: React.FC<EvaluationReportProps> = ({ data, onClose }) => {
     return (
-        <div className="evaluation-overlay open">
-            <button className="close-report-btn" onClick={onClose}>×</button>
+        <div className="evaluation-overlay open" role="dialog" aria-modal="true" aria-labelledby="evaluation-title">
+            <button className="close-report-btn" onClick={onClose} aria-label="Close report"><span aria-hidden="true">×</span></button>
 
             <div className="report-header">
                 <div className="score-circle">
                     {data.score}
                 </div>
                 <div className="report-title">
-                    <h2>EVALUATION REPORT</h2>
+                    <h2 id="evaluation-title">EVALUATION REPORT</h2>
                     <span>AI-Powered Assessment</span>
                 </div>
             </div>
