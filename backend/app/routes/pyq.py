@@ -373,14 +373,9 @@ def create_mock_from_filters():
         test_id = cursor.lastrowid
         
         # 3. Insert Questions into test_questions
+        insert_data = []
         for idx, q in enumerate(questions):
-            conn.execute('''
-                INSERT INTO test_questions (
-                    test_id, question_number, question_text, 
-                    option_a, option_b, option_c, option_d, 
-                    correct_answer, explanation, subject, topic, difficulty, year
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
+            insert_data.append((
                 test_id, 
                 idx + 1, 
                 q['question_text'],
@@ -388,6 +383,13 @@ def create_mock_from_filters():
                 q['correct_option'], q['explanation'],
                 q['subject'], q['topic'], q['difficulty'], q['year']
             ))
+        conn.executemany('''
+            INSERT INTO test_questions (
+                test_id, question_number, question_text,
+                option_a, option_b, option_c, option_d,
+                correct_answer, explanation, subject, topic, difficulty, year
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', insert_data)
             
         conn.commit()
         
@@ -464,11 +466,11 @@ def start_quiz():
         session_id = cursor.lastrowid
         
         # Initialize answer records
-        for q in questions:
-            conn.execute('''
-                INSERT INTO pyq_quiz_answers (session_id, question_id)
-                VALUES (?, ?)
-            ''', (session_id, q['id']))
+        insert_data = [(session_id, q['id']) for q in questions]
+        conn.executemany('''
+            INSERT INTO pyq_quiz_answers (session_id, question_id)
+            VALUES (?, ?)
+        ''', insert_data)
         
         conn.commit()
         
