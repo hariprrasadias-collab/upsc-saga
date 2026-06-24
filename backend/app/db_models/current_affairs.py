@@ -293,11 +293,9 @@ def get_saved_articles(filters=None):
     query += ' ORDER BY fetch_date DESC'
     
     if filters and filters.get('limit'):
-        query += ' LIMIT ?'
-        params.append(int(filters["limit"]))
+        query += f' LIMIT {int(filters["limit"])}'
         if filters.get('offset'):
-            query += ' OFFSET ?'
-            params.append(int(filters["offset"]))
+            query += f' OFFSET {int(filters["offset"])}'
     
     rows = conn.execute(query, params).fetchall()
     
