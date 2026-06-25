@@ -148,7 +148,7 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
                                 <h3>MIMIR'S WISDOM</h3>
                                 <div className="header-actions">
                                     <button className="clear-chat-btn" onClick={handleClear}>Clear</button>
-                                    <button className="close-btn" onClick={() => toggleMimir(false)}>✕</button>
+                                    <button className="close-btn" onClick={() => toggleMimir(false)} aria-label="Close"><span aria-hidden="true">✕</span></button>
                                 </div>
                             </div>
 
