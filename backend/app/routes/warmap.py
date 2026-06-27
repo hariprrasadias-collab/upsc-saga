@@ -51,13 +51,37 @@ def google_status():
     creds = get_credentials()
     return jsonify({"connected": creds is not None and creds.valid})
 
+def get_client_config():
+    """Get Google OAuth config from environment variables or fallback to file."""
+    # Priority 1: Environment variable mapping (secure way)
+    if os.environ.get('GOOGLE_CLIENT_ID') and os.environ.get('GOOGLE_CLIENT_SECRET'):
+        return {
+            "installed": {
+                "client_id": os.environ.get('GOOGLE_CLIENT_ID'),
+                "project_id": os.environ.get('GOOGLE_PROJECT_ID', 'gen-lang-client-0168569830'),
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                "client_secret": os.environ.get('GOOGLE_CLIENT_SECRET'),
+                "redirect_uris": ["http://localhost"]
+            }
+        }
+
+    # Priority 2: Fallback to local file for development if it exists
+    if os.path.exists(CREDENTIALS_FILE):
+        with open(CREDENTIALS_FILE, 'r') as f:
+            return json.load(f)
+
+    return None
+
 @warmap.route('/api/warmap/google-auth')
 def google_auth():
-    if not os.path.exists(CREDENTIALS_FILE):
-        return jsonify({"error": "credentials.json not found. Please configure Google Cloud credentials."}), 404
+    client_config = get_client_config()
+    if not client_config:
+        return jsonify({"error": "Google Cloud credentials not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables."}), 404
 
-    flow = Flow.from_client_secrets_file(
-        CREDENTIALS_FILE,
+    flow = Flow.from_client_config(
+        client_config,
         scopes=SCOPES,
         redirect_uri=url_for('warmap.google_callback', _external=True)
     )
@@ -75,8 +99,12 @@ def google_callback():
         return jsonify({"error": "Invalid state parameter"}), 400
 
     try:
-        flow = Flow.from_client_secrets_file(
-            CREDENTIALS_FILE,
+        client_config = get_client_config()
+        if not client_config:
+            return jsonify({"error": "Google Cloud credentials not configured."}), 404
+
+        flow = Flow.from_client_config(
+            client_config,
             scopes=SCOPES,
             state=state,
             redirect_uri=url_for('warmap.google_callback', _external=True)
