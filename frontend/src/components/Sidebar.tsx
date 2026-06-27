@@ -159,6 +159,7 @@ const Sidebar: React.FC = memo(() => {
             className="group-header"
             onClick={() => toggleGroup(groupKey)}
             aria-expanded={expandedGroups[groupKey]}
+            aria-label={`Toggle ${group.title.replace(/[^\w\s-]/g, '').trim()} group`}
           >
             <span className="group-title">{group.title}</span>
             <span className="expand-icon" aria-hidden="true">{expandedGroups[groupKey] ? '▼' : '▶'}</span>
