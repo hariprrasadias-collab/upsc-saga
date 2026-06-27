@@ -1,5 +1,5 @@
 // /frontend/src/components/AshParticles.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 interface Particle {
   id: number;
@@ -66,6 +66,6 @@ const AshParticles: React.FC<AshParticlesProps> = React.memo(({ isRageMode }) =>
       ))}
     </div>
   );
-};
+});
 
 export default AshParticles;
