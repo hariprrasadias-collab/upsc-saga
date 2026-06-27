@@ -1,5 +1,5 @@
 // /frontend/src/components/AshParticles.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 interface Particle {
   id: number;
@@ -13,10 +13,11 @@ interface AshParticlesProps {
   isRageMode: boolean;
 }
 
-const AshParticles: React.FC<AshParticlesProps> = ({ isRageMode }) => {
-  const [particles, setParticles] = useState<Particle[]>([]);
-
-  useEffect(() => {
+// ⚡ Bolt: Wrapped in React.memo to prevent 50 animated DOM nodes from re-rendering
+// when App state (like currentTab) changes. Also used lazy initialization to avoid
+// a second render cycle on mount.
+const AshParticles: React.FC<AshParticlesProps> = React.memo(({ isRageMode }) => {
+  const [particles] = useState<Particle[]>(() => {
     const count = 50; // Number of particles
     const newParticles: Particle[] = [];
     for (let i = 0; i < count; i++) {
@@ -28,9 +29,8 @@ const AshParticles: React.FC<AshParticlesProps> = ({ isRageMode }) => {
         size: `${Math.random() * 3 + 2}px`,
       });
     }
-     
-    setParticles(newParticles);
-  }, []);
+    return newParticles;
+  });
 
   return (
     <div style={{
@@ -66,6 +66,6 @@ const AshParticles: React.FC<AshParticlesProps> = ({ isRageMode }) => {
       ))}
     </div>
   );
-};
+});
 
 export default AshParticles;
