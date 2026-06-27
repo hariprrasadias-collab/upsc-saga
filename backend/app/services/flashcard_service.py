@@ -121,11 +121,12 @@ class FlashcardService:
                 cursor = conn.execute("INSERT INTO decks (user_id, name, subject) VALUES (1, ?, 'General')", (deck_name,))
                 deck_id = cursor.lastrowid
                 
-            for card in cards:
-                conn.execute('''
-                    INSERT INTO flashcards (deck_id, front, back, source)
-                    VALUES (?, ?, ?, 'ai_generated')
-                ''', (deck_id, card['front'], card['back']))
+            # Optimization: Use executemany for bulk insert to avoid N+1 query overhead
+            card_values = [(deck_id, card['front'], card['back']) for card in cards]
+            conn.executemany('''
+                INSERT INTO flashcards (deck_id, front, back, source)
+                VALUES (?, ?, ?, 'ai_generated')
+            ''', card_values)
                 
             conn.commit()
             return {"success": True, "message": f"Created {len(cards)} flashcards in deck '{deck_name}'"}
