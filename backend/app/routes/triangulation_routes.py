@@ -95,14 +95,19 @@ def extract_actionables():
             actions = [way_forward]
             
         inserted = 0
+        task_params = []
         for action in actions:
             action_str = str(action)
             title = f"Tactical Payload ({topic}): {action_str[:80]}..."
-            conn.execute('''
+            task_params.append((1, title, 30, 'intelligence', tomorrow))
+            inserted += 1
+
+        if task_params:
+            # ⚡ Bolt: Use executemany to fix N+1 query pattern during bulk task creation
+            conn.executemany('''
                 INSERT INTO tasks (user_id, title, xp_reward, associated_stat, due_date, isCompleted, is_quest)
                 VALUES (?, ?, ?, ?, ?, 0, 0)
-            ''', (1, title, 30, 'intelligence', tomorrow))
-            inserted += 1
+            ''', task_params)
             
         conn.commit()
         return jsonify({'success': True, 'inserted': inserted})
