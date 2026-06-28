@@ -91,20 +91,30 @@ def auto_forge_weakness_cards():
         
         # 3. Save the new cards to the DB
         saved_cards = []
-        for card in cards_data:
-            cursor.execute('''
+        if cards_data:
+            placeholders = ", ".join(["(?, ?, ?, ?, datetime('now'))"] * len(cards_data))
+            params = []
+            for card in cards_data:
+                params.extend(['auto-forged', card['title'], card['one_liner'], "Auto-forged from weakness scan"])
+
+            cursor.execute(f'''
                 INSERT INTO revision_cards (topic_id, title, one_liner, full_content, created_at)
-                VALUES (?, ?, ?, ?, datetime('now'))
-            ''', ('auto-forged', card['title'], card['one_liner'], "Auto-forged from weakness scan"))
+                VALUES {placeholders}
+            ''', params)
             
-            card_id = cursor.lastrowid
-            saved_cards.append({
-                'id': card_id,
-                'topic_id': 'auto-forged',
-                'title': card['title'],
-                'one_liner': card['one_liner'],
-                'created_at': "Just now" # Frontend will fix the date
-            })
+            # Fetch the inserted cards to get their IDs
+            last_n_ids = cursor.execute(f'SELECT id FROM revision_cards ORDER BY id DESC LIMIT {len(cards_data)}').fetchall()
+            # IDs are returned in descending order, we reverse them to match the insertion order
+            inserted_ids = [row['id'] for row in reversed(last_n_ids)]
+
+            for i, card in enumerate(cards_data):
+                saved_cards.append({
+                    'id': inserted_ids[i] if i < len(inserted_ids) else None,
+                    'topic_id': 'auto-forged',
+                    'title': card['title'],
+                    'one_liner': card['one_liner'],
+                    'created_at': "Just now" # Frontend will fix the date
+                })
             
         conn.commit()
         conn.close()

@@ -95,14 +95,18 @@ def extract_actionables():
             actions = [way_forward]
             
         inserted = 0
+        action_params = []
         for action in actions:
             action_str = str(action)
             title = f"Tactical Payload ({topic}): {action_str[:80]}..."
-            conn.execute('''
+            action_params.append((1, title, 30, 'intelligence', tomorrow))
+            inserted += 1
+
+        if action_params:
+            conn.executemany('''
                 INSERT INTO tasks (user_id, title, xp_reward, associated_stat, due_date, isCompleted, is_quest)
                 VALUES (?, ?, ?, ?, ?, 0, 0)
-            ''', (1, title, 30, 'intelligence', tomorrow))
-            inserted += 1
+            ''', action_params)
             
         conn.commit()
         return jsonify({'success': True, 'inserted': inserted})
