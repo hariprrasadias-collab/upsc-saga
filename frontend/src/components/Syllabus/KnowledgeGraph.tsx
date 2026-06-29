@@ -1,6 +1,6 @@
 import { API_BASE_URL } from '../../config';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import * as d3 from 'd3';
 import './KnowledgeGraph.css';
 
@@ -186,7 +186,11 @@ const KnowledgeGraph: React.FC = () => {
         }
     };
 
-    const subjects = graphData ? [...new Set(graphData.nodes.map(n => n.subject))] : [];
+    // Memoize subjects calculation to prevent unnecessary recalculations
+    // when component re-renders (e.g. when selectedSubject changes)
+    const subjects = useMemo(() => {
+        return graphData ? [...new Set(graphData.nodes.map(n => n.subject))] : [];
+    }, [graphData]);
 
     if (loading) return <div className="graph-loading">Loading Knowledge Graph...</div>;
 
