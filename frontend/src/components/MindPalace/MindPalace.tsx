@@ -256,7 +256,7 @@ const MindPalace: React.FC = () => {
                     <div className="palace-modal" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2>Construct New Location</h2>
-                            <button className="close-btn" onClick={() => setShowLocationModal(false)}>×</button>
+                            <button className="close-btn" aria-label="Close modal" onClick={() => setShowLocationModal(false)}><span aria-hidden="true">×</span></button>
                         </div>
                         <div className="form-group">
                             <label>Name</label>
@@ -287,7 +287,7 @@ const MindPalace: React.FC = () => {
                     <div className="palace-modal" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2>{editingArtifact ? 'Recall Memory' : 'Place New Memory'}</h2>
-                            <button className="close-btn" onClick={() => { setShowArtifactModal(false); setEditingArtifact(null); }}>×</button>
+                            <button className="close-btn" aria-label="Close modal" onClick={() => { setShowArtifactModal(false); setEditingArtifact(null); }}><span aria-hidden="true">×</span></button>
                         </div>
                         <div className="form-group">
                             <label>Title</label>
