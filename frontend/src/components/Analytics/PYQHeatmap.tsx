@@ -291,7 +291,7 @@ const PYQHeatmap: React.FC = () => {
                     <div className="cell-modal" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2>📜 {modalData.topic} — {modalData.year}</h2>
-                            <button className="close-btn" onClick={() => setModalData(null)}>✕</button>
+                            <button className="close-btn" aria-label="Close modal" onClick={() => setModalData(null)}><span aria-hidden="true">✕</span></button>
                         </div>
                         <div className="modal-content">
                             {modalLoading ? (

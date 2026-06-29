@@ -116,9 +116,7 @@ const Sidebar: React.FC = memo(() => {
           onClick={toggleSidebar}
           aria-label="Close sidebar"
           type="button"
-        >
-          ×
-        </button>
+        ><span aria-hidden="true">×</span></button>
       </div>
 
       {/* Dashboard - Always Top */}

@@ -134,7 +134,7 @@ const LoreTablets: React.FC = () => {
                                 value={editTitle}
                                 onChange={e => setEditTitle(e.target.value)}
                             />
-                            <button className="close-btn" onClick={() => setIsEditing(false)}>✕</button>
+                            <button className="close-btn" aria-label="Close modal" onClick={() => setIsEditing(false)}><span aria-hidden="true">✕</span></button>
                         </div>
                         
                         <textarea 
