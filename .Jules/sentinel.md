@@ -1,4 +1,4 @@
-## 2024-05-24 - SQL Injection in Dynamic Limits
-**Vulnerability:** Found a SQL injection vulnerability where a `limit` parameter from JSON input was directly interpolated into a SQL query string (`query += f" LIMIT {limit}"`).
-**Learning:** Even simple integer parameters like `limit` or `offset` can be vectors for injection if not validated or parameterized. Developers often overlook these believing they will always be numbers.
-**Prevention:** Always cast numeric inputs to their respective types (int/float) and use parameterized queries (`LIMIT ?`) even for standard SQL clauses. Never trust input types from JSON.
+## 2026-06-28 - XSS in AnkiDojo via dangerouslySetInnerHTML
+**Vulnerability:** The AnkiDojo component used `dangerouslySetInnerHTML` to render un-sanitized flashcard questions and answers, exposing the application to Cross-Site Scripting (XSS).
+**Learning:** Even internal or trusted data sources (like flashcards) should be sanitized if rendered as raw HTML, as malicious payloads could be injected through the data ingestion pipeline or API manipulation. The risk is compounded by the fact that `dangerouslySetInnerHTML` executes scripts.
+**Prevention:** Always use a robust HTML sanitization library like `dompurify` (e.g., `DOMPurify.sanitize(input)`) before passing data to `dangerouslySetInnerHTML`.
