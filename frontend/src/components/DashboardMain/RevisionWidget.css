@@ -131,27 +131,7 @@
     pointer-events: none;
 }
 
-@keyframes burnAway {
-    0% {
-        opacity: 1;
-        transform: scale(1);
-        filter: brightness(1);
-    }
 
-    40% {
-        opacity: 0.8;
-        transform: scale(0.98);
-        filter: brightness(2) sepia(1) hue-rotate(-30deg) saturate(5);
-        /* Bright orange burn */
-        background: rgba(231, 76, 60, 0.4);
-    }
-
-    100% {
-        opacity: 0;
-        transform: scale(0.9) translateX(50px);
-        filter: brightness(0) blur(10px);
-    }
-}
 
 /* Staggered Animation */
 .due-item:nth-child(1) {
@@ -174,17 +154,7 @@
     animation-delay: 0.5s;
 }
 
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-10px);
-    }
 
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
 
 .due-item::before {
     content: '';
@@ -277,15 +247,7 @@
     animation: rotateSlow 10s linear infinite;
 }
 
-@keyframes rotateSlow {
-    from {
-        transform: rotate(0deg);
-    }
 
-    to {
-        transform: rotate(360deg);
-    }
-}
 
 .quick-revise-btn:hover {
     border-color: #d4a574;
@@ -326,27 +288,7 @@
         pointer-events: none;
     }
 
-    @keyframes burnAway {
-        0% {
-            opacity: 1;
-            transform: scale(1);
-            filter: brightness(1);
-        }
 
-        40% {
-            opacity: 0.8;
-            transform: scale(0.98);
-            filter: brightness(2) sepia(1) hue-rotate(-30deg) saturate(5);
-            /* Bright orange burn */
-            background: rgba(231, 76, 60, 0.4);
-        }
-
-        100% {
-            opacity: 0;
-            transform: scale(0.9) translateX(50px);
-            filter: brightness(0) blur(10px);
-        }
-    }
 
     /* Staggered Animation */
     .due-item:nth-child(1) {
@@ -369,17 +311,7 @@
         animation-delay: 0.5s;
     }
 
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateX(-10px);
-        }
 
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
 
     .due-item::before {
         content: '';
@@ -472,15 +404,7 @@
         animation: rotateSlow 10s linear infinite;
     }
 
-    @keyframes rotateSlow {
-        from {
-            transform: rotate(0deg);
-        }
 
-        to {
-            transform: rotate(360deg);
-        }
-    }
 
     .quick-revise-btn:hover {
         border-color: #d4a574;
@@ -522,4 +446,93 @@
         animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
         margin: auto;
         box-shadow: 0 0 20px rgba(212, 165, 116, 0.2);
+    }
+
+/* Moved Keyframes to top level for Vite Minifier */
+@keyframes burnAway {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+        filter: brightness(1);
+    }
+
+    40% {
+        opacity: 0.8;
+        transform: scale(0.98);
+        filter: brightness(2) sepia(1) hue-rotate(-30deg) saturate(5);
+        /* Bright orange burn */
+        background: rgba(231, 76, 60, 0.4);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.9) translateX(50px);
+        filter: brightness(0) blur(10px);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes rotateSlow {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes burnAway {
+        0% {
+            opacity: 1;
+            transform: scale(1);
+            filter: brightness(1);
+        }
+
+        40% {
+            opacity: 0.8;
+            transform: scale(0.98);
+            filter: brightness(2) sepia(1) hue-rotate(-30deg) saturate(5);
+            /* Bright orange burn */
+            background: rgba(231, 76, 60, 0.4);
+        }
+
+        100% {
+            opacity: 0;
+            transform: scale(0.9) translateX(50px);
+            filter: brightness(0) blur(10px);
+        }
+    }
+
+@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+@keyframes rotateSlow {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
     }
