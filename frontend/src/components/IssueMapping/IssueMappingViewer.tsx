@@ -141,7 +141,9 @@ const IssueMappingViewer: React.FC<Props> = ({ articleId, articleTitle }) => {
                     {tags.map(tag => (
                         <span key={tag} className="tag-chip">
                             #{tag}
-                            <button onClick={() => handleRemoveTag(tag)} className="remove-tag-btn">×</button>
+                            <button onClick={() => handleRemoveTag(tag)} className="remove-tag-btn" aria-label={`Remove tag ${tag}`}>
+                                <span aria-hidden="true">×</span>
+                            </button>
                         </span>
                     ))}
                 </div>
@@ -151,9 +153,12 @@ const IssueMappingViewer: React.FC<Props> = ({ articleId, articleTitle }) => {
                         value={newTag}
                         onChange={(e) => setNewTag(e.target.value)}
                         placeholder="Add tag..."
+                        aria-label="New tag name"
                         onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
                     />
-                    <button onClick={handleAddTag}>+</button>
+                    <button onClick={handleAddTag} aria-label="Add tag">
+                        <span aria-hidden="true">+</span>
+                    </button>
                 </div>
             </div>
 
