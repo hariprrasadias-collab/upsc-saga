@@ -2,3 +2,7 @@
 **Vulnerability:** Found a SQL injection vulnerability where a `limit` parameter from JSON input was directly interpolated into a SQL query string (`query += f" LIMIT {limit}"`).
 **Learning:** Even simple integer parameters like `limit` or `offset` can be vectors for injection if not validated or parameterized. Developers often overlook these believing they will always be numbers.
 **Prevention:** Always cast numeric inputs to their respective types (int/float) and use parameterized queries (`LIMIT ?`) even for standard SQL clauses. Never trust input types from JSON.
+## 2024-07-04 - Remove hardcoded API key from ModelManager
+**Vulnerability:** A hardcoded OpenClaw API key was found in `backend/app/services/model_manager.py`.
+**Learning:** Hardcoded secrets in the codebase are a critical security risk and can lead to unauthorized access and data breaches. Secrets should always be loaded from environment variables or secure credential stores.
+**Prevention:** Always use environment variables for sensitive configuration details. Do not use hardcoded default values for keys.
