@@ -156,10 +156,13 @@ def get_all_subject_performances(conn, user_id, subjects):
             GROUP BY mt.subject
         """
         mock_params = [user_id] + subjects
-        mock_avgs = conn.execute(mock_query, mock_params).fetchall()
-        for row in mock_avgs:
-            if row['subject'] in results and row['avg_score']:
-                results[row['subject']]['mock_avg'] = round(row['avg_score'], 1)
+        try:
+            mock_avgs = conn.execute(mock_query, mock_params).fetchall()
+            for row in mock_avgs:
+                if row['subject'] in results and row['avg_score']:
+                    results[row['subject']]['mock_avg'] = round(row['avg_score'], 1)
+        except Exception:
+            pass
 
         # Answer writing
         answer_query = f"""
