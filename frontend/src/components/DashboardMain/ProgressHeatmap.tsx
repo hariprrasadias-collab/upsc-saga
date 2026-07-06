@@ -56,9 +56,12 @@ const ProgressHeatmap: React.FC = () => {
         const today = new Date();
         const startDate = new Date(today.getTime() - (90 * 24 * 60 * 60 * 1000));
 
+        // Create O(1) lookup map to prevent O(N^2) array search in the loop
+        const dataMap = new Map(data.map(item => [item.date, item]));
+
         for (let d = new Date(startDate); d <= today; d.setDate(d.getDate() + 1)) {
             const dateStr = d.toISOString().split('T')[0];
-            const existing = data.find(item => item.date === dateStr);
+            const existing = dataMap.get(dateStr);
 
             if (existing) {
                 currentWeek.push(existing);
