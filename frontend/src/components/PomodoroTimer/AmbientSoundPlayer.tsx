@@ -122,7 +122,6 @@ export const AmbientSoundPlayer: React.FC = () => {
                             <button
                                 className="sound-toggle"
                                 onClick={() => toggleSound(sound.id)}
-                                aria-label={`Toggle ${sound.name} sound`}
                             >
                                 <span className="sound-icon">{sound.icon}</span>
                                 <span className="sound-name">{sound.name}</span>
