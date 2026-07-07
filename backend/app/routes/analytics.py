@@ -109,23 +109,65 @@ def get_subject_wise():
         conn = get_db()
         
         subjects = ['GS1', 'GS2', 'GS3', 'GS4', 'Prelims', 'Optional']
-        results = []
+        results_map = {
+            s: {
+                'subject': s, 'mock_avg': 0, 'answer_avg': 0,
+                'syllabus_pct': 0, 'pyq_attempted': 0, 'flashcard_mastered': 0
+            } for s in subjects
+        }
         
-        for subject in subjects:
-            try:
-                perf = get_subject_performance(conn, user_id, subject)
-                results.append(perf)
-            except Exception:
-                # Return empty data for missing tables
-                results.append({
-                    'subject': subject,
-                    'mock_avg': 0,
-                    'answer_avg': 0,
-                    'syllabus_pct': 0,
-                    'pyq_attempted': 0,
-                    'flashcard_mastered': 0
-                })
+        # Bolt optimization: Eliminate N+1 queries by bulk fetching all subjects
+        placeholders = ','.join(['?'] * len(subjects))
         
+        # Mock tests
+        try:
+            mock_data = conn.execute(f'''
+                SELECT mt.subject, AVG(mta.score) as avg_score
+                FROM test_attempts mta
+                JOIN mock_tests mt ON mta.test_id = mt.id
+                WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+                GROUP BY mt.subject
+            ''', [user_id] + subjects).fetchall()
+            for row in mock_data:
+                if row['subject'] in results_map and row['avg_score']:
+                    results_map[row['subject']]['mock_avg'] = round(row['avg_score'], 1)
+        except Exception as e:
+            print(f"Subject-wise mock tests bulk query error: {e}")
+
+        # Answer writing
+        try:
+            answer_data = conn.execute(f'''
+                SELECT aq.subject, AVG(ae.overall_score) as avg_score
+                FROM answer_evaluations ae
+                JOIN user_answers ua ON ae.answer_id = ua.id
+                JOIN answer_questions aq ON ua.prompt_id = aq.id
+                WHERE ua.user_id = ? AND aq.subject IN ({placeholders})
+                GROUP BY aq.subject
+            ''', [user_id] + subjects).fetchall()
+            for row in answer_data:
+                if row['subject'] in results_map and row['avg_score']:
+                    results_map[row['subject']]['answer_avg'] = round(row['avg_score'], 1)
+        except Exception as e:
+            print(f"Subject-wise answer writing bulk query error: {e}")
+
+        # Syllabus completion
+        # Note: syllabus_topics tracks global topics, lacks user_id
+        try:
+            syllabus_data = conn.execute(f'''
+                SELECT subject,
+                       COUNT(*) as total,
+                       SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+                FROM syllabus_topics
+                WHERE subject IN ({placeholders})
+                GROUP BY subject
+            ''', subjects).fetchall()
+            for row in syllabus_data:
+                if row['subject'] in results_map and row['total'] > 0:
+                    results_map[row['subject']]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+        except Exception as e:
+            print(f"Subject-wise syllabus bulk query error: {e}")
+
+        results = [results_map[s] for s in subjects]
         return jsonify(results)
     except Exception as e:
         print(f"Subject-wise analytics error: {e}")
