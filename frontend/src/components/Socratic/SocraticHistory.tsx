@@ -245,6 +245,7 @@ const SocraticHistory: React.FC = () => {
                         placeholder="Search archives..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        aria-label="Search archives"
                     />
                     <span className="search-icon">🔍</span>
                 </div>
