@@ -187,40 +187,28 @@ def get_analytics():
             params.extend(years)
 
         # Subject distribution (Filtered)
-        subject_counts = conn.execute(f'''
-            SELECT subject, COUNT(*) as count
-            FROM pyq_questions
-            {filters_sql}
-            GROUP BY subject
-        ''', params).fetchall()
+        subject_counts = conn.execute(
+            'SELECT subject, COUNT(*) as count FROM pyq_questions ' + filters_sql + ' GROUP BY subject',
+            params
+        ).fetchall()
 
         # Year-wise distribution (Filtered)
-        year_counts = conn.execute(f'''
-            SELECT year, COUNT(*) as count
-            FROM pyq_questions
-            {filters_sql}
-            GROUP BY year
-            ORDER BY year
-        ''', params).fetchall()
+        year_counts = conn.execute(
+            'SELECT year, COUNT(*) as count FROM pyq_questions ' + filters_sql + ' GROUP BY year ORDER BY year',
+            params
+        ).fetchall()
 
         # Topic distribution (Top 20 Filtered)
-        topic_counts = conn.execute(f'''
-            SELECT topic, COUNT(*) as count
-            FROM pyq_questions
-            {filters_sql} AND topic IS NOT NULL
-            GROUP BY topic
-            ORDER BY count DESC
-            LIMIT 20
-        ''', params).fetchall()
+        topic_counts = conn.execute(
+            'SELECT topic, COUNT(*) as count FROM pyq_questions ' + filters_sql + ' AND topic IS NOT NULL GROUP BY topic ORDER BY count DESC LIMIT 20',
+            params
+        ).fetchall()
 
         # Difficulty Trends (Filtered)
-        difficulty_trends = conn.execute(f'''
-            SELECT year, difficulty, COUNT(*) as count
-            FROM pyq_questions
-            {filters_sql}
-            GROUP BY year, difficulty
-            ORDER BY year
-        ''', params).fetchall()
+        difficulty_trends = conn.execute(
+            'SELECT year, difficulty, COUNT(*) as count FROM pyq_questions ' + filters_sql + ' GROUP BY year, difficulty ORDER BY year',
+            params
+        ).fetchall()
 
         return jsonify({
             'by_subject': [dict(row) for row in subject_counts],
