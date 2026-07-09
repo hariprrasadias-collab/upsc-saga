@@ -1,0 +1,3 @@
+## 2025-05-15 - Batched IN queries over N+1
+**Learning:** When fetching aggregates for a fixed set of subjects, calling a function inside a loop creates an N+1 query problem. This is especially impactful in analytics endpoints pulling from multiple tables. Also, we must wrap individual table queries in separate `try...except` blocks because some tables like `answer_questions` might not exist in all environments, and a missing table should not fail the entire batch.
+**Action:** Always prefer a single bulk query with an `IN` clause and `GROUP BY` to retrieve grouped statistics for multiple entities at once. Ensure to keep isolated `try...except` blocks for each table to handle missing ones safely.
