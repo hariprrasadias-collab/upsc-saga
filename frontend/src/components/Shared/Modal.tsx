@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useId } from 'react';
 import './Modal.css';
 
 interface ModalProps {
@@ -11,6 +11,7 @@ interface ModalProps {
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, className = '' }) => {
     const modalRef = useRef<HTMLDivElement>(null);
+    const titleId = useId();
 
     useEffect(() => {
         const handleEscape = (e: KeyboardEvent) => {
@@ -38,11 +39,12 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, classNa
                 ref={modalRef}
                 role="dialog"
                 aria-modal="true"
+            aria-labelledby={title ? titleId : undefined}
             >
                 <div className="shared-modal-header">
-                    {title && <h2 className="shared-modal-title">{title}</h2>}
+                {title && <h2 id={titleId} className="shared-modal-title">{title}</h2>}
                     <button className="shared-modal-close" onClick={onClose} aria-label="Close">
-                        &times;
+                    <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div className="shared-modal-body">

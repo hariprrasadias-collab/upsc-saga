@@ -26,8 +26,13 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({ newLevel, lore, onClose }) 
 
     return (
         <div className="levelup-overlay">
-            <div className="levelup-content">
-                <h1 className="levelup-title">LEVEL UP</h1>
+            <div
+                className="levelup-content"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="levelup-title"
+            >
+                <h1 id="levelup-title" className="levelup-title">LEVEL UP</h1>
                 <h2 className="levelup-sub">YOU ARE NOW LEVEL {newLevel}</h2>
                 
                 {lore && (
