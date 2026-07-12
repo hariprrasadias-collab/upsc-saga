@@ -273,13 +273,15 @@ class BrainService:
             conn = get_db()
 
             if isinstance(predictions, list):
-                for p in predictions:
-                    question = p.get('question', 'Unknown Question')
-                    p_type = p.get('type', 'MCQ')
-                    conn.execute('''
+                predictions_data = [
+                    (p.get('question', 'Unknown Question'), subject, topic, p.get('type', 'MCQ'))
+                    for p in predictions
+                ]
+                if predictions_data:
+                    conn.executemany('''
                         INSERT INTO foresight_predictions (question, subject, topic, type, probability, created_at)
                         VALUES (?, ?, ?, ?, 0.85, datetime('now'))
-                    ''', (question, subject, topic, p_type))
+                    ''', predictions_data)
                 conn.commit()
                 print(f"Brain: Saved {len(predictions)} predictions for {topic}")
         except Exception as e:
@@ -590,12 +592,16 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     ''', (data.get('title', f"Test: {topic}"), topic, len(data.get('questions', [])), len(data.get('questions', []))*2, len(data.get('questions', []))*2))
                     test_id = cursor.lastrowid
 
-                    for i, q in enumerate(data.get('questions', []), 1):
-                        conn.execute('''
+                    questions_data = [
+                        (test_id, i, q['question_text'], q['option_a'], q['option_b'], q['option_c'], q['option_d'], q['correct_answer'], q['explanation'])
+                        for i, q in enumerate(data.get('questions', []), 1)
+                    ]
+                    if questions_data:
+                        conn.executemany('''
                             INSERT INTO test_questions
                             (test_id, question_number, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        ''', (test_id, i, q['question_text'], q['option_a'], q['option_b'], q['option_c'], q['option_d'], q['correct_answer'], q['explanation']))
+                        ''', questions_data)
                     conn.commit()
                 except Exception as e:
                     print(f"Ingest Error (MockTest): {e}")
@@ -860,9 +866,12 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                                 data = result.get('data', [])
                                 if data:
                                     print(f"Brain: Saving {len(data)} predictions...")
-                                    for p in data:
-                                        conn.execute('INSERT INTO foresight_predictions (topic, question, type, probability, reasoning) VALUES (?, ?, ?, ?, ?)',
-                                                    (topic, p.get('question'), p.get('type'), p.get('probability'), p.get('reasoning')))
+                                    predictions_data = [
+                                        (topic, p.get('question'), p.get('type'), p.get('probability'), p.get('reasoning'))
+                                        for p in data
+                                    ]
+                                    if predictions_data:
+                                        conn.executemany('INSERT INTO foresight_predictions (topic, question, type, probability, reasoning) VALUES (?, ?, ?, ?, ?)', predictions_data)
                                     conn.commit()
                             
                             elif action == "GENERATE_SOCRATIC_DIALOGUE":
@@ -1389,13 +1398,15 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                         import random
                         neon_colors = ['#3498db', '#9b59b6', '#2ecc71', '#e74c3c', '#f1c40f', '#00f3ff', '#ff00ff']
                         
+                        artifacts_data_insert = []
                         for art in artifacts_data:
                             x = random.randint(10, 80)
                             y = random.randint(10, 80)
                             color = random.choice(neon_colors)
+                            artifacts_data_insert.append((location_id, art.get('title', 'Unknown'), art.get('content', ''), 'concept', x, y, art.get('icon', '📦'), color))
                             
-                            conn.execute('INSERT INTO mind_palace_artifacts (location_id, title, content, type, x_position, y_position, icon, color) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', 
-                                       (location_id, art.get('title', 'Unknown'), art.get('content', ''), 'concept', x, y, art.get('icon', '📦'), color))
+                        if artifacts_data_insert:
+                            conn.executemany('INSERT INTO mind_palace_artifacts (location_id, title, content, type, x_position, y_position, icon, color) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', artifacts_data_insert)
                             
                     conn.commit()
                     result = {"success": True, "message": f"Constructed 'The Hall of {topic}' with {len(artifacts_data) if isinstance(artifacts_data, list) else 0} memories."}
@@ -1590,10 +1601,13 @@ Your output must be structurally perfect, intellectually dense, and strictly com
                     count = 0
                     today_str = datetime.now().date().isoformat()
 
-                    for q in new_quests:
-                        conn.execute('INSERT INTO tasks (user_id, title, xp_reward, associated_stat, isCompleted, is_quest, due_date) VALUES (?, ?, ?, ?, 0, 1, ?)',
-                                     (user_id, q['title'], q['xp_reward'], q['type'], today_str))
-                        count += 1
+                    quests_data_insert = [
+                        (user_id, q['title'], q['xp_reward'], q['type'], today_str)
+                        for q in new_quests
+                    ]
+                    if quests_data_insert:
+                        conn.executemany('INSERT INTO tasks (user_id, title, xp_reward, associated_stat, isCompleted, is_quest, due_date) VALUES (?, ?, ?, ?, 0, 1, ?)', quests_data_insert)
+                        count += len(quests_data_insert)
 
                     conn.commit()
 
