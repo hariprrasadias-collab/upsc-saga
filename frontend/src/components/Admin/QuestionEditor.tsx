@@ -59,7 +59,9 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ onClose, onSave }) => {
             <div className="modal-content animate-scale-in" style={{ maxWidth: '800px' }}>
                 <div className="modal-header">
                     <h2>Add New Question</h2>
-                    <button className="close-btn" onClick={onClose}>×</button>
+                    <button className="close-btn" onClick={onClose} aria-label="Close modal">
+                        <span aria-hidden="true">×</span>
+                    </button>
                 </div>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
