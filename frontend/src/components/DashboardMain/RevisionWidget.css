@@ -305,10 +305,11 @@
     font-size: 0.8rem;
     color: #8b9bb4;
     margin-top: 12px;
+}
 
-    .due-item {
-        display: flex;
-        justify-content: space-between;
+.due-item {
+    display: flex;
+    justify-content: space-between;
         align-items: center;
         background: linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
         border: 1px solid rgba(255, 255, 255, 0.05);
@@ -504,7 +505,7 @@
         opacity: 0.6;
         font-family: 'Cinzel', serif;
     }
-}
+
     .revision-empty-state {
         text-align: center;
         padding: 50px 0;
