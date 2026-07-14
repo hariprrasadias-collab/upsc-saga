@@ -58,16 +58,20 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onSelectTemplate })
             <button
                 className="template-trigger-btn"
                 onClick={() => setIsOpen(!isOpen)}
+                aria-haspopup="dialog"
+                aria-expanded={isOpen}
             >
                 📝 Use Answer Template
             </button>
 
             {isOpen && (
                 <div className="template-modal-overlay" onClick={() => setIsOpen(false)}>
-                    <div className="template-modal" onClick={(e) => e.stopPropagation()}>
+                    <div className="template-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="template-modal-title">
                         <div className="template-modal-header">
-                            <h2>Answer Templates</h2>
-                            <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
+                            <h2 id="template-modal-title">Answer Templates</h2>
+                            <button className="close-btn" onClick={() => setIsOpen(false)} aria-label="Close templates">
+                                <span aria-hidden="true">✕</span>
+                            </button>
                         </div>
 
                         <div className="template-modal-body">
