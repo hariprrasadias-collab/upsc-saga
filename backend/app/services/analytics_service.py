@@ -161,15 +161,26 @@ def identify_weak_areas(conn, user_id, limit=10):
             LIMIT ?
         ''', (user_id, limit)).fetchall()
         
+        # Pre-fetch all scores for the user to avoid N+1 queries in the loop
+        all_scores = conn.execute('''
+            SELECT mt.subject, mta.score, mta.submitted_at
+            FROM test_attempts mta
+            JOIN mock_tests mt ON mta.test_id = mt.id
+            WHERE mta.user_id = ?
+            ORDER BY mt.subject, mta.submitted_at ASC
+        ''', (user_id,)).fetchall()
+
+        # Group scores by subject
+        scores_by_subject = {}
+        for row in all_scores:
+            subj_name = row['subject']
+            if subj_name not in scores_by_subject:
+                scores_by_subject[subj_name] = []
+            scores_by_subject[subj_name].append(row)
+
         for subj in low_scores:
-            # Calculate trend for this subject
-            subject_scores = conn.execute('''
-                SELECT mta.score
-                FROM test_attempts mta
-                JOIN mock_tests mt ON mta.test_id = mt.id
-                WHERE mta.user_id = ? AND mt.subject = ?
-                ORDER BY mta.submitted_at ASC
-            ''', (user_id, subj['subject'])).fetchall()
+            subject_name = subj['subject']
+            subject_scores = scores_by_subject.get(subject_name, [])
 
             scores_list = [s['score'] for s in subject_scores]
             trend_val = calculate_improvement_rate(scores_list)
@@ -180,11 +191,11 @@ def identify_weak_areas(conn, user_id, limit=10):
             last_attempt = subject_scores[-1]['submitted_at'] if subject_scores else None
 
             weak_areas.append({
-                'subject': subj['subject'],
-                'topic': f"{subj['subject']} (Mock Tests)",
+                'subject': subject_name,
+                'topic': f"{subject_name} (Mock Tests)",
                 'weakness_score': max(0, 100 - (subj['avg_score'] or 0)),
                 'source': 'Mock Tests',
-                'action': f"Practice {subj['subject']} questions",
+                'action': f"Practice {subject_name} questions",
                 'trend': trend_direction,
                 'trend_value': abs(trend_val),
                 'impact': 'High' if (subj['avg_score'] or 0) < 40 else 'Medium',
