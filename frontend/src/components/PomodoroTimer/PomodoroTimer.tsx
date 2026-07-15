@@ -222,15 +222,15 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
             <div className="pomodoro-header">
                 <h3>{mode === 'work' ? '⚔️ BATTLE TIME' : '🛡️ RESPITE'}</h3>
                 <div className="pomodoro-controls">
-                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
+                    <button aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen"} onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
                         {isFullscreen ? '↙️' : '⛶'}
                     </button>
                     {isFullscreen && (
-                        <button onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close">✕</button>
+                        <button aria-label="Close Fullscreen" onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close">✕</button>
                     )}
-                    <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" title="History">📊</button>
-                    <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" title="Settings">⚙️</button>
-                    <button onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize">−</button>
+                    <button aria-label="Toggle History" onClick={() => setShowHistory(!showHistory)} className="settings-btn" title="History">📊</button>
+                    <button aria-label="Toggle Settings" onClick={() => setShowSettings(!showSettings)} className="settings-btn" title="Settings">⚙️</button>
+                    <button aria-label="Minimize Timer" onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize">−</button>
                 </div>
             </div>
 
