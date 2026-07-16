@@ -4,7 +4,6 @@ from app.db import get_db
 from datetime import datetime, timedelta
 from app.services.analytics_service import (
     calculate_study_hours,
-    get_subject_performance,
     identify_weak_areas,
     calculate_improvement_rate,
     get_streak_days
@@ -109,23 +108,71 @@ def get_subject_wise():
         conn = get_db()
         
         subjects = ['GS1', 'GS2', 'GS3', 'GS4', 'Prelims', 'Optional']
-        results = []
         
-        for subject in subjects:
-            try:
-                perf = get_subject_performance(conn, user_id, subject)
-                results.append(perf)
-            except Exception:
-                # Return empty data for missing tables
-                results.append({
-                    'subject': subject,
-                    'mock_avg': 0,
-                    'answer_avg': 0,
-                    'syllabus_pct': 0,
-                    'pyq_attempted': 0,
-                    'flashcard_mastered': 0
-                })
+        # Bolt optimization: Refactored N+1 query problem into bulk grouping
+        # Initializes result dictionary with default values, including
+        # static 0s for pyq_attempted and flashcard_mastered (as in the original codebase)
+        results_dict = {
+            subject: {
+                'subject': subject,
+                'mock_avg': 0,
+                'answer_avg': 0,
+                'syllabus_pct': 0,
+                'pyq_attempted': 0,
+                'flashcard_mastered': 0
+            } for subject in subjects
+        }
+
+        placeholders = ','.join(['?'] * len(subjects))
         
+        # 1. Bulk fetch mock test averages
+        try:
+            mock_data = conn.execute(f'''
+                SELECT mt.subject, AVG(mta.score) as avg_score
+                FROM test_attempts mta
+                JOIN mock_tests mt ON mta.test_id = mt.id
+                WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+                GROUP BY mt.subject
+            ''', (user_id, *subjects)).fetchall()
+            for row in mock_data:
+                if row['avg_score'] is not None:
+                    results_dict[row['subject']]['mock_avg'] = round(row['avg_score'], 1)
+        except Exception as e:
+            print(f"Mock test bulk fetch error: {e}")
+
+        # 2. Bulk fetch answer writing averages
+        try:
+            answer_data = conn.execute(f'''
+                SELECT aq.subject, AVG(ae.overall_score) as avg_score
+                FROM answer_evaluations ae
+                JOIN user_answers ua ON ae.answer_id = ua.id
+                JOIN answer_questions aq ON ua.prompt_id = aq.id
+                WHERE ua.user_id = ? AND aq.subject IN ({placeholders})
+                GROUP BY aq.subject
+            ''', (user_id, *subjects)).fetchall()
+            for row in answer_data:
+                if row['avg_score'] is not None:
+                    results_dict[row['subject']]['answer_avg'] = round(row['avg_score'], 1)
+        except Exception as e:
+            print(f"Answer writing bulk fetch error: {e}")
+
+        # 3. Bulk fetch syllabus completion percentages
+        try:
+            syllabus_data = conn.execute(f'''
+                SELECT subject,
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+                FROM syllabus_topics
+                WHERE subject IN ({placeholders})
+                GROUP BY subject
+            ''', (*subjects,)).fetchall()
+            for row in syllabus_data:
+                if row['total'] > 0:
+                    results_dict[row['subject']]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+        except Exception as e:
+            print(f"Syllabus bulk fetch error: {e}")
+
+        results = list(results_dict.values())
         return jsonify(results)
     except Exception as e:
         print(f"Subject-wise analytics error: {e}")
