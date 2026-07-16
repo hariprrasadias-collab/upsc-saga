@@ -1,3 +1,14 @@
+@keyframes slideInY {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .controls input {
     padding: 0.75rem;
     border-radius: 8px;
@@ -2768,7 +2779,7 @@
     display: flex;
     flex-direction: column;
     box-shadow: 0 0 30px rgba(52, 152, 219, 0.3);
-    animation: slideIn 0.3s ease-out;
+    animation: slideInY 0.3s ease-out;
     z-index: 1001;
 }
 
@@ -2907,18 +2918,6 @@
         transform: translateY(-1px);
     }
 
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
     /* Market Watch Ticker */
     .market-ticker {
         display: flex;
@@ -2952,7 +2951,7 @@
         display: flex;
         flex-direction: column;
         box-shadow: 0 0 30px rgba(52, 152, 219, 0.3);
-        animation: slideIn 0.3s ease-out;
+        animation: slideInY 0.3s ease-out;
         z-index: 1001;
     }
 
