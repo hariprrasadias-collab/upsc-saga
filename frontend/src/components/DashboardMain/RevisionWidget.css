@@ -1,16 +1,5 @@
 /* God of War / Kratos Theme for Revision Widget */
 
-@keyframes slideInX {
-    from {
-        opacity: 0;
-        transform: translateX(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
 .revision-widget {
     background: linear-gradient(145deg, rgba(18, 22, 31, 0.98), rgba(10, 12, 16, 0.99));
     border: 1px solid rgba(212, 165, 116, 0.2);
@@ -185,7 +174,7 @@
     animation-delay: 0.5s;
 }
 
-@keyframes slideIn {
+@keyframes slideInX {
     from {
         opacity: 0;
         transform: translateX(-10px);
@@ -378,6 +367,18 @@
 
     .due-item:nth-child(5) {
         animation-delay: 0.5s;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
     }
 
     .due-item::before {
