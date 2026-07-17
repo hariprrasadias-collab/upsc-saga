@@ -346,10 +346,21 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
                     <div className="modal-overlay" onClick={(e) => {
                         if (e.target === e.currentTarget) setIsAddModalOpen(false);
                     }}>
-                        <div className="modal-content">
+                        <div
+                            className="modal-content"
+                            role="dialog"
+                            aria-modal="true"
+                            aria-labelledby="mock-test-modal-title"
+                        >
                             <div className="modal-header">
-                                <h2>Create New Mock Test</h2>
-                                <button className="close-modal-btn" onClick={() => setIsAddModalOpen(false)}>×</button>
+                                <h2 id="mock-test-modal-title">Create New Mock Test</h2>
+                                <button
+                                    className="close-modal-btn"
+                                    onClick={() => setIsAddModalOpen(false)}
+                                    aria-label="Close modal"
+                                >
+                                    <span aria-hidden="true">×</span>
+                                </button>
                             </div>
                             <div className="modal-body">
                                 <div className="form-group">
