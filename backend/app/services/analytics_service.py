@@ -75,6 +75,83 @@ def calculate_study_hours(conn, user_id, start_date, end_date):
         return 0
 
 
+def get_all_subjects_performance(conn, user_id, subjects):
+    """
+    Aggregate all metrics for multiple subjects to avoid N+1 queries.
+    """
+    results = {
+        subject: {
+            'subject': subject,
+            'mock_avg': 0,
+            'answer_avg': 0,
+            'syllabus_pct': 0,
+            'pyq_attempted': 0,
+            'flashcard_mastered': 0
+        }
+        for subject in subjects
+    }
+
+    if not subjects:
+        return list(results.values())
+
+    placeholders = ','.join(['?'] * len(subjects))
+
+    try:
+        query = f'''
+            SELECT mt.subject, AVG(mta.score) as avg_score
+            FROM test_attempts mta
+            JOIN mock_tests mt ON mta.test_id = mt.id
+            WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+            GROUP BY mt.subject
+        '''
+        params = [user_id] + subjects
+        mock_data = conn.execute(query, params).fetchall()
+        for row in mock_data:
+            subj = row['subject']
+            if subj in results and row['avg_score'] is not None:
+                results[subj]['mock_avg'] = round(row['avg_score'], 1)
+    except Exception:
+        pass
+
+    try:
+        query = f'''
+            SELECT aq.subject, AVG(ae.overall_score) as avg_score
+            FROM answer_evaluations ae
+            JOIN user_answers ua ON ae.answer_id = ua.id
+            JOIN answer_questions aq ON ua.prompt_id = aq.id
+            WHERE ua.user_id = ? AND aq.subject IN ({placeholders})
+            GROUP BY aq.subject
+        '''
+        params = [user_id] + subjects
+        answer_data = conn.execute(query, params).fetchall()
+        for row in answer_data:
+            subj = row['subject']
+            if subj in results and row['avg_score'] is not None:
+                results[subj]['answer_avg'] = round(row['avg_score'], 1)
+    except Exception:
+        pass
+
+    try:
+        query = f'''
+            SELECT subject,
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+            FROM syllabus_topics
+            WHERE subject IN ({placeholders})
+            GROUP BY subject
+        '''
+        params = subjects
+        syllabus_data = conn.execute(query, params).fetchall()
+        for row in syllabus_data:
+            subj = row['subject']
+            if subj in results and row['total'] > 0:
+                results[subj]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+    except Exception:
+        pass
+
+    return list(results.values())
+
+
 def get_subject_performance(conn, user_id, subject):
     """
     Aggregate all metrics for a specific subject
