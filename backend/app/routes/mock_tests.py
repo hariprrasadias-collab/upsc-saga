@@ -196,23 +196,30 @@ def submit_attempt(attempt_id):
         incorrect = 0
         unattempted = 0
         
+        correct_params = []
+        incorrect_params = []
+
         for q in questions:
             selected = answer_map.get(q['id'])
             if not selected:
                 unattempted += 1
             elif selected.upper() == q['correct_answer'].upper():
                 correct += 1
-                # Mark answer as correct
-                conn.execute(
-                    'UPDATE test_answers SET is_correct = 1 WHERE attempt_id = ? AND question_id = ?',
-                    (attempt_id, q['id'])
-                )
+                correct_params.append((attempt_id, q['id']))
             else:
                 incorrect += 1
-                conn.execute(
-                    'UPDATE test_answers SET is_correct = 0 WHERE attempt_id = ? AND question_id = ?',
-                    (attempt_id, q['id'])
-                )
+                incorrect_params.append((attempt_id, q['id']))
+
+        if correct_params:
+            conn.executemany(
+                'UPDATE test_answers SET is_correct = 1 WHERE attempt_id = ? AND question_id = ?',
+                correct_params
+            )
+        if incorrect_params:
+            conn.executemany(
+                'UPDATE test_answers SET is_correct = 0 WHERE attempt_id = ? AND question_id = ?',
+                incorrect_params
+            )
         
         marks_per_q = 2.0
         negative_mark = 0.66  # 1/3 negative marking
