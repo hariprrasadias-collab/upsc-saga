@@ -174,7 +174,9 @@ ${result.predicted_question}
                                         <div className="quote">"{s.quote}"</div>
                                         <div className="author">— {s.name}</div>
                                         <div className="context">({s.context})</div>
-                                        <button className="copy-btn" onClick={() => copyToClipboard(`"${s.quote}" - ${s.name}`)}>📋</button>
+                                        <button className="copy-btn" onClick={() => copyToClipboard(`"${s.quote}" - ${s.name}`)} aria-label="Copy quote to clipboard" title="Copy">
+                                            <span aria-hidden="true">📋</span>
+                                        </button>
                                     </div>
                                 ))}
                             </div>
@@ -186,7 +188,9 @@ ${result.predicted_question}
                                             <div className="stat">{d.statistic}</div>
                                             <div className="source">Source: {d.source}</div>
                                         </div>
-                                        <button className="copy-btn" onClick={() => copyToClipboard(`${d.statistic} (${d.source})`)}>📋</button>
+                                        <button className="copy-btn" onClick={() => copyToClipboard(`${d.statistic} (${d.source})`)} aria-label="Copy statistic to clipboard" title="Copy">
+                                            <span aria-hidden="true">📋</span>
+                                        </button>
                                     </div>
                                 ))}
                             </div>
@@ -291,7 +295,9 @@ ${result.predicted_question}
                                 {saving ? '💾 Saving...' : '💾 Save to Lore'}
                             </button>
                         )}
-                        <button onClick={onClose} className="close-btn">×</button>
+                        <button onClick={onClose} className="close-btn" aria-label="Close dashboard" title="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
                     </div>
                 </div>
 

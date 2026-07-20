@@ -6,8 +6,8 @@
 
 # Test info
 
-- Name: tests/sidebar.spec.ts >> Sidebar Navigation E2E Tests >> should navigate to every item in 💪 Training
-- Location: tests/sidebar.spec.ts:89:9
+- Name: tests/brain_features.spec.ts >> BrainVault Displays New Futuristic Features
+- Location: tests/brain_features.spec.ts:3:1
 
 # Error details
 
