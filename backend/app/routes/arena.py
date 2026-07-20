@@ -26,23 +26,33 @@ def create_custom_boss():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-def get_boss_stats(boss_type, boss_id):
+def get_boss_stats(boss_type, boss_id, precalc_count=None, boss_row_data=None):
     """Generate boss stats dynamically based on DB content"""
     conn = get_db()
     
     if boss_type == 'YEAR':
         # Boss ID is the Year (e.g., 2024)
-        count = conn.execute("SELECT COUNT(*) FROM pyq_questions WHERE year = ?", (boss_id,)).fetchone()[0]
+        if precalc_count is not None:
+            count = precalc_count
+        else:
+            count = conn.execute("SELECT COUNT(*) FROM pyq_questions WHERE year = ?", (boss_id,)).fetchone()[0]
         name = f"The {boss_id} Titan"
         loot = ["Time Capsule", "Ancient Scroll"]
     elif boss_type == 'SUBJECT':
         # Boss ID is the Subject Name (e.g., Geography)
-        count = conn.execute("SELECT COUNT(*) FROM pyq_questions WHERE subject = ?", (boss_id,)).fetchone()[0]
+        if precalc_count is not None:
+            count = precalc_count
+        else:
+            count = conn.execute("SELECT COUNT(*) FROM pyq_questions WHERE subject = ?", (boss_id,)).fetchone()[0]
         name = f"The {boss_id} Golem"
         loot = ["Subject Mastery Token", "Skill Point"]
     elif boss_type == 'CUSTOM':
         # Boss ID is the Custom Boss ID
-        boss_row = conn.execute("SELECT * FROM custom_bosses WHERE id = ?", (boss_id,)).fetchone()
+        if boss_row_data is not None:
+            boss_row = boss_row_data
+        else:
+            boss_row = conn.execute("SELECT * FROM custom_bosses WHERE id = ?", (boss_id,)).fetchone()
+
         if not boss_row:
             raise ValueError("Custom Boss not found")
             
@@ -90,20 +100,22 @@ def get_available_bosses():
     """Get list of available bosses (Years, Subjects, and Custom)"""
     conn = get_db()
     
+    # ⚡ Bolt Optimization: Replace O(N) loop queries with a single GROUP BY
+
     # Year Bosses
-    years = conn.execute("SELECT DISTINCT year FROM pyq_questions ORDER BY year DESC").fetchall()
-    year_bosses = [get_boss_stats('YEAR', row['year']) for row in years]
+    years_data = conn.execute("SELECT year, COUNT(*) as count FROM pyq_questions GROUP BY year ORDER BY year DESC").fetchall()
+    year_bosses = [get_boss_stats('YEAR', row['year'], precalc_count=row['count']) for row in years_data if row['year']]
     
     # Subject Bosses
-    subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
-    subject_bosses = [get_boss_stats('SUBJECT', row['subject']) for row in subjects]
+    subjects_data = conn.execute("SELECT subject, COUNT(*) as count FROM pyq_questions GROUP BY subject ORDER BY subject").fetchall()
+    subject_bosses = [get_boss_stats('SUBJECT', row['subject'], precalc_count=row['count']) for row in subjects_data if row['subject']]
     
-    # Custom Bosses
-    custom = conn.execute("SELECT id FROM custom_bosses WHERE is_active = 1 ORDER BY created_at DESC").fetchall()
+    # Custom Bosses (fetch full row to avoid re-querying in get_boss_stats)
+    custom = conn.execute("SELECT * FROM custom_bosses WHERE is_active = 1 ORDER BY created_at DESC").fetchall()
     custom_bosses = []
     for row in custom:
         try:
-            custom_bosses.append(get_boss_stats('CUSTOM', row['id']))
+            custom_bosses.append(get_boss_stats('CUSTOM', row['id'], boss_row_data=row))
         except Exception:
             continue
     
