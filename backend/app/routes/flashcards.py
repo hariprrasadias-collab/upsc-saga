@@ -407,7 +407,7 @@ def get_analytics():
                 )
             ) rs ON f.id = rs.flashcard_id
         ''').fetchall()
-        
+
         maturity_counts = {'new': 0, 'learning': 0, 'young': 0, 'mature': 0, 'mastered': 0}
         for card in all_cards:
             if card['halflife'] is None:
