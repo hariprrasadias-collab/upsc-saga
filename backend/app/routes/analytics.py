@@ -4,7 +4,6 @@ from app.db import get_db
 from datetime import datetime, timedelta
 from app.services.analytics_service import (
     calculate_study_hours,
-    get_subject_performance,
     identify_weak_areas,
     calculate_improvement_rate,
     get_streak_days
@@ -111,22 +110,66 @@ def get_subject_wise():
         subjects = ['GS1', 'GS2', 'GS3', 'GS4', 'Prelims', 'Optional']
         results = []
         
-        for subject in subjects:
-            try:
-                perf = get_subject_performance(conn, user_id, subject)
-                results.append(perf)
-            except Exception:
-                # Return empty data for missing tables
-                results.append({
-                    'subject': subject,
-                    'mock_avg': 0,
-                    'answer_avg': 0,
-                    'syllabus_pct': 0,
-                    'pyq_attempted': 0,
-                    'flashcard_mastered': 0
-                })
-        
-        return jsonify(results)
+        results_map = {s: {
+            'subject': s,
+            'mock_avg': 0,
+            'answer_avg': 0,
+            'syllabus_pct': 0,
+            'pyq_attempted': 0,
+            'flashcard_mastered': 0
+        } for s in subjects}
+
+        # Bulk mock tests
+        try:
+            placeholders = ','.join(['?']*len(subjects))
+            mock_data = conn.execute(f'''
+                SELECT mt.subject, AVG(score) as avg_score
+                FROM test_attempts mta
+                JOIN mock_tests mt ON mta.test_id = mt.id
+                WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+                GROUP BY mt.subject
+            ''', [user_id] + subjects).fetchall()
+            for row in mock_data:
+                if row['subject'] in results_map and row['avg_score']:
+                    results_map[row['subject']]['mock_avg'] = round(row['avg_score'], 1)
+        except Exception:
+            pass
+
+        # Bulk answer writing
+        try:
+            placeholders = ','.join(['?']*len(subjects))
+            answer_data = conn.execute(f'''
+                SELECT aq.subject, AVG(ae.overall_score) as avg_score
+                FROM answer_evaluations ae
+                JOIN user_answers ua ON ae.answer_id = ua.id
+                JOIN answer_questions aq ON ua.prompt_id = aq.id
+                WHERE ua.user_id = ? AND aq.subject IN ({placeholders})
+                GROUP BY aq.subject
+            ''', [user_id] + subjects).fetchall()
+            for row in answer_data:
+                if row['subject'] in results_map and row['avg_score']:
+                    results_map[row['subject']]['answer_avg'] = round(row['avg_score'], 1)
+        except Exception:
+            pass
+
+        # Bulk syllabus completion
+        try:
+            placeholders = ','.join(['?']*len(subjects))
+            syllabus_data = conn.execute(f'''
+                SELECT subject,
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+                FROM syllabus_topics
+                WHERE subject IN ({placeholders})
+                GROUP BY subject
+            ''', subjects).fetchall()
+            for row in syllabus_data:
+                if row['subject'] in results_map and row['total'] > 0:
+                    results_map[row['subject']]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+        except Exception:
+            pass
+
+        return jsonify([results_map[s] for s in subjects])
     except Exception as e:
         print(f"Subject-wise analytics error: {e}")
         return jsonify([]), 200
