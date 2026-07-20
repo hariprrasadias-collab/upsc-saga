@@ -394,11 +394,18 @@ def get_analytics():
         total = conn.execute('SELECT COUNT(*) FROM flashcards').fetchone()[0]
         
         # Get maturity breakdown
-        all_cards = conn.execute('''
-            SELECT f.id, rs.halflife, rs.alpha, rs.beta
+        # Bolt Optimization: Shifted maturity bucket counting from O(N) Python loop
+        # to database level using SQL conditional aggregation for better memory scaling.
+        maturity_row = conn.execute('''
+            SELECT
+                SUM(CASE WHEN rs.halflife IS NULL OR rs.halflife < 1 THEN 1 ELSE 0 END) as new_count,
+                SUM(CASE WHEN rs.halflife >= 1 AND rs.halflife < 7 THEN 1 ELSE 0 END) as learning_count,
+                SUM(CASE WHEN rs.halflife >= 7 AND rs.halflife < 30 THEN 1 ELSE 0 END) as young_count,
+                SUM(CASE WHEN rs.halflife >= 30 AND rs.halflife < 180 THEN 1 ELSE 0 END) as mature_count,
+                SUM(CASE WHEN rs.halflife >= 180 THEN 1 ELSE 0 END) as mastered_count
             FROM flashcards f
             LEFT JOIN (
-                SELECT flashcard_id, halflife, alpha, beta
+                SELECT flashcard_id, halflife
                 FROM review_sessions
                 WHERE (flashcard_id, reviewed_at) IN (
                     SELECT flashcard_id, MAX(reviewed_at)
@@ -406,15 +413,15 @@ def get_analytics():
                     GROUP BY flashcard_id
                 )
             ) rs ON f.id = rs.flashcard_id
-        ''').fetchall()
+        ''').fetchone()
         
-        maturity_counts = {'new': 0, 'learning': 0, 'young': 0, 'mature': 0, 'mastered': 0}
-        for card in all_cards:
-            if card['halflife'] is None:
-                maturity_counts['new'] += 1
-            else:
-                maturity = get_card_maturity(card['alpha'], card['beta'], card['halflife'])
-                maturity_counts[maturity] += 1
+        maturity_counts = {
+            'new': maturity_row['new_count'] or 0,
+            'learning': maturity_row['learning_count'] or 0,
+            'young': maturity_row['young_count'] or 0,
+            'mature': maturity_row['mature_count'] or 0,
+            'mastered': maturity_row['mastered_count'] or 0
+        }
         
         # Review streak (days with at least one review)
         recent_days = conn.execute('''
