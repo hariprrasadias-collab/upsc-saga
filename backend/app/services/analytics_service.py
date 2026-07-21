@@ -161,23 +161,33 @@ def identify_weak_areas(conn, user_id, limit=10):
             LIMIT ?
         ''', (user_id, limit)).fetchall()
         
-        for subj in low_scores:
-            # Calculate trend for this subject
-            subject_scores = conn.execute('''
-                SELECT mta.score
+        if low_scores:
+            subjects = [s['subject'] for s in low_scores]
+            placeholders = ','.join(['?'] * len(subjects))
+            all_scores_query = f'''
+                SELECT mt.subject, mta.score, mta.submitted_at
                 FROM test_attempts mta
                 JOIN mock_tests mt ON mta.test_id = mt.id
-                WHERE mta.user_id = ? AND mt.subject = ?
+                WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
                 ORDER BY mta.submitted_at ASC
-            ''', (user_id, subj['subject'])).fetchall()
+            '''
+            all_scores = conn.execute(all_scores_query, [user_id] + subjects).fetchall()
 
-            scores_list = [s['score'] for s in subject_scores]
+            # Group scores by subject
+            scores_by_subject = {subj: [] for subj in subjects}
+            submitted_by_subject = {subj: [] for subj in subjects}
+            for row in all_scores:
+                scores_by_subject[row['subject']].append(row['score'])
+                submitted_by_subject[row['subject']].append(row['submitted_at'])
+
+        for subj in low_scores:
+            scores_list = scores_by_subject.get(subj['subject'], [])
             trend_val = calculate_improvement_rate(scores_list)
             trend_direction = 'improving' if trend_val > 0 else 'declining' if trend_val < 0 else 'stable'
 
             # Get last 5 scores for sparkline
             recent_scores = scores_list[-5:] if scores_list else []
-            last_attempt = subject_scores[-1]['submitted_at'] if subject_scores else None
+            last_attempt = submitted_by_subject.get(subj['subject'], [])[-1] if submitted_by_subject.get(subj['subject']) else None
 
             weak_areas.append({
                 'subject': subj['subject'],
