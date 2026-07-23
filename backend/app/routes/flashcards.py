@@ -394,8 +394,10 @@ def get_analytics():
         total = conn.execute('SELECT COUNT(*) FROM flashcards').fetchone()[0]
         
         # Get maturity breakdown
-        all_cards = conn.execute('''
-            SELECT f.id, rs.halflife, rs.alpha, rs.beta
+        # Pre-group by unique Ebisu parameter sets to minimize Python-side iteration
+        # and function calls (N+1 query pattern avoidance for large datasets)
+        grouped_cards = conn.execute('''
+            SELECT rs.halflife, rs.alpha, rs.beta, COUNT(f.id) as cnt
             FROM flashcards f
             LEFT JOIN (
                 SELECT flashcard_id, halflife, alpha, beta
@@ -406,15 +408,17 @@ def get_analytics():
                     GROUP BY flashcard_id
                 )
             ) rs ON f.id = rs.flashcard_id
+            GROUP BY rs.halflife, rs.alpha, rs.beta
         ''').fetchall()
         
         maturity_counts = {'new': 0, 'learning': 0, 'young': 0, 'mature': 0, 'mastered': 0}
-        for card in all_cards:
-            if card['halflife'] is None:
-                maturity_counts['new'] += 1
+        for row in grouped_cards:
+            if row['halflife'] is None:
+                maturity_counts['new'] += row['cnt']
             else:
-                maturity = get_card_maturity(card['alpha'], card['beta'], card['halflife'])
-                maturity_counts[maturity] += 1
+                # Still use domain logic function, but call it once per unique group
+                maturity = get_card_maturity(row['alpha'], row['beta'], row['halflife'])
+                maturity_counts[maturity] += row['cnt']
         
         # Review streak (days with at least one review)
         recent_days = conn.execute('''
