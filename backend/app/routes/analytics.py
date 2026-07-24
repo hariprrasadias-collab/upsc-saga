@@ -111,9 +111,56 @@ def get_subject_wise():
         subjects = ['GS1', 'GS2', 'GS3', 'GS4', 'Prelims', 'Optional']
         results = []
         
+        try:
+            # Precalculate data for all subjects to avoid N+1 queries
+            precalc_data = {
+                'mock_avg': {},
+                'answer_avg': {},
+                'syllabus': {}
+            }
+
+            # Bulk fetch mock averages
+            mock_rows = conn.execute('''
+                SELECT mt.subject, AVG(mta.score) as avg_score
+                FROM test_attempts mta
+                JOIN mock_tests mt ON mta.test_id = mt.id
+                WHERE mta.user_id = ?
+                GROUP BY mt.subject
+            ''', (user_id,)).fetchall()
+            for r in mock_rows:
+                precalc_data['mock_avg'][r['subject']] = r['avg_score']
+
+            # Bulk fetch answer averages
+            ans_rows = conn.execute('''
+                SELECT aq.subject, AVG(ae.overall_score) as avg_score
+                FROM answer_evaluations ae
+                JOIN user_answers ua ON ae.answer_id = ua.id
+                JOIN answer_questions aq ON ua.prompt_id = aq.id
+                WHERE ua.user_id = ?
+                GROUP BY aq.subject
+            ''', (user_id,)).fetchall()
+            for r in ans_rows:
+                precalc_data['answer_avg'][r['subject']] = r['avg_score']
+
+            # Bulk fetch syllabus completion
+            syl_rows = conn.execute('''
+                SELECT
+                    subject,
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+                FROM syllabus_topics
+                WHERE user_id = ?
+                GROUP BY subject
+            ''', (user_id,)).fetchall()
+            for r in syl_rows:
+                precalc_data['syllabus'][r['subject']] = {'total': r['total'], 'completed': r['completed']}
+        except Exception as e:
+            print(f"Error precalculating subject data: {e}")
+            precalc_data = None
+
         for subject in subjects:
             try:
-                perf = get_subject_performance(conn, user_id, subject)
+                perf = get_subject_performance(conn, user_id, subject, precalc_data)
                 results.append(perf)
             except Exception:
                 # Return empty data for missing tables
