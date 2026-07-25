@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 from app.services.analytics_service import (
     calculate_study_hours,
     get_subject_performance,
-    get_subjects_performance_batch,
     identify_weak_areas,
     calculate_improvement_rate,
     get_streak_days
@@ -110,20 +109,22 @@ def get_subject_wise():
         conn = get_db()
         
         subjects = ['GS1', 'GS2', 'GS3', 'GS4', 'Prelims', 'Optional']
-        
-        try:
-            results = get_subjects_performance_batch(conn, user_id, subjects)
-        except Exception as e:
-            # Fallback to zeroed results if something fails
-            print(f"Batch subject performance error: {e}")
-            results = [{
-                'subject': subject,
-                'mock_avg': 0,
-                'answer_avg': 0,
-                'syllabus_pct': 0,
-                'pyq_attempted': 0,
-                'flashcard_mastered': 0
-            } for subject in subjects]
+        results = []
+
+        for subject in subjects:
+            try:
+                perf = get_subject_performance(conn, user_id, subject)
+                results.append(perf)
+            except Exception:
+                # Return empty data for missing tables
+                results.append({
+                    'subject': subject,
+                    'mock_avg': 0,
+                    'answer_avg': 0,
+                    'syllabus_pct': 0,
+                    'pyq_attempted': 0,
+                    'flashcard_mastered': 0
+                })
         
         return jsonify(results)
     except Exception as e:
