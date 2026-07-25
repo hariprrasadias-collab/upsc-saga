@@ -394,8 +394,10 @@ def get_analytics():
         total = conn.execute('SELECT COUNT(*) FROM flashcards').fetchone()[0]
         
         # Get maturity breakdown
-        all_cards = conn.execute('''
-            SELECT f.id, rs.halflife, rs.alpha, rs.beta
+        # OPTIMIZATION: Use GROUP BY on the parameters needed for maturity calculation
+        # to prevent fetching all flashcards into memory simultaneously (O(N) data transfer/memory issue)
+        grouped_cards = conn.execute('''
+            SELECT rs.halflife, rs.alpha, rs.beta, COUNT(f.id) as count
             FROM flashcards f
             LEFT JOIN (
                 SELECT flashcard_id, halflife, alpha, beta
@@ -406,15 +408,17 @@ def get_analytics():
                     GROUP BY flashcard_id
                 )
             ) rs ON f.id = rs.flashcard_id
+            GROUP BY rs.halflife, rs.alpha, rs.beta
         ''').fetchall()
         
         maturity_counts = {'new': 0, 'learning': 0, 'young': 0, 'mature': 0, 'mastered': 0}
-        for card in all_cards:
-            if card['halflife'] is None:
-                maturity_counts['new'] += 1
+        for group in grouped_cards:
+            count = group['count']
+            if group['halflife'] is None:
+                maturity_counts['new'] += count
             else:
-                maturity = get_card_maturity(card['alpha'], card['beta'], card['halflife'])
-                maturity_counts[maturity] += 1
+                maturity = get_card_maturity(group['alpha'], group['beta'], group['halflife'])
+                maturity_counts[maturity] += count
         
         # Review streak (days with at least one review)
         recent_days = conn.execute('''
