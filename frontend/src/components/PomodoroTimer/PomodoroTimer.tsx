@@ -222,23 +222,15 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
             <div className="pomodoro-header">
                 <h3>{mode === 'work' ? '⚔️ BATTLE TIME' : '🛡️ RESPITE'}</h3>
                 <div className="pomodoro-controls">
-                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"} aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
-                        <span aria-hidden="true">{isFullscreen ? '↙️' : '⛶'}</span>
+                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
+                        {isFullscreen ? '↙️' : '⛶'}
                     </button>
                     {isFullscreen && (
-                        <button onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close" aria-label="Close Fullscreen">
-                            <span aria-hidden="true">✕</span>
-                        </button>
+                        <button onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close">✕</button>
                     )}
-                    <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" title="History" aria-label="Toggle Session History">
-                        <span aria-hidden="true">📊</span>
-                    </button>
-                    <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" title="Settings" aria-label="Toggle Settings">
-                        <span aria-hidden="true">⚙️</span>
-                    </button>
-                    <button onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize" aria-label="Minimize Timer">
-                        <span aria-hidden="true">−</span>
-                    </button>
+                    <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" title="History">📊</button>
+                    <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" title="Settings">⚙️</button>
+                    <button onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize">−</button>
                 </div>
             </div>
 
@@ -304,12 +296,8 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
                         <input type="number" value={editMinutes} onChange={(e) => setEditMinutes(e.target.value)}
                             className="timer-edit-input" min="1" max="120" />
                         <div className="timer-edit-actions">
-                            <button onClick={handleEditSave} className="save-btn" aria-label="Save timer edit">
-                                <span aria-hidden="true">✓</span>
-                            </button>
-                            <button onClick={() => setIsEditing(false)} className="cancel-btn" aria-label="Cancel timer edit">
-                                <span aria-hidden="true">✕</span>
-                            </button>
+                            <button onClick={handleEditSave} className="save-btn">✓</button>
+                            <button onClick={() => setIsEditing(false)} className="cancel-btn">✕</button>
                         </div>
                     </div>
                 ) : (
@@ -341,9 +329,7 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
                                     <button className="edit-time-btn" onClick={() => {
                                         setEditMinutes(Math.floor(timeLeft / 60).toString());
                                         setIsEditing(true);
-                                    }} title="Edit Timer" aria-label="Edit Timer Duration">
-                                        <span aria-hidden="true">✎</span>
-                                    </button>
+                                    }} title="Edit Timer">✎</button>
                                 )}
                             </>
                         )}
