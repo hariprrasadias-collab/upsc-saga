@@ -75,6 +75,80 @@ def calculate_study_hours(conn, user_id, start_date, end_date):
         return 0
 
 
+def get_subjects_performance_batch(conn, user_id, subjects):
+    """
+    ⚡ Bolt: Replaced O(N) database queries with O(1) bulk queries.
+    Instead of executing 3 queries per subject (3 * 6 = 18 queries),
+    we execute exactly 3 queries total using GROUP BY and IN clauses.
+    This significantly reduces database roundtrips and lock contention.
+    Expected impact: Reduces query count by 83% (18 -> 3) and improves endpoint latency.
+    """
+    results = {
+        subject: {
+            'subject': subject,
+            'mock_avg': 0,
+            'answer_avg': 0,
+            'syllabus_pct': 0,
+            'pyq_attempted': 0,
+            'flashcard_mastered': 0
+        }
+        for subject in subjects
+    }
+
+    if not subjects:
+        return []
+
+    placeholders = ','.join('?' * len(subjects))
+
+    try:
+        mock_params = [user_id] + subjects
+        mock_data = conn.execute(f'''
+            SELECT mt.subject, AVG(score) as avg_score
+            FROM test_attempts mta
+            JOIN mock_tests mt ON mta.test_id = mt.id
+            WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+            GROUP BY mt.subject
+        ''', mock_params).fetchall()
+        for row in mock_data:
+            if row['avg_score']:
+                results[row['subject']]['mock_avg'] = round(row['avg_score'], 1)
+    except Exception:
+        pass
+
+    try:
+        answer_params = [user_id] + subjects
+        answer_data = conn.execute(f'''
+            SELECT aq.subject, AVG(ae.overall_score) as avg_score
+            FROM answer_evaluations ae
+            JOIN user_answers ua ON ae.answer_id = ua.id
+            JOIN answer_questions aq ON ua.prompt_id = aq.id
+            WHERE ua.user_id = ? AND aq.subject IN ({placeholders})
+            GROUP BY aq.subject
+        ''', answer_params).fetchall()
+        for row in answer_data:
+            if row['avg_score']:
+                results[row['subject']]['answer_avg'] = round(row['avg_score'], 1)
+    except Exception:
+        pass
+
+    try:
+        syllabus_data = conn.execute(f'''
+            SELECT subject,
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+            FROM syllabus_topics
+            WHERE subject IN ({placeholders})
+            GROUP BY subject
+        ''', subjects).fetchall()
+        for row in syllabus_data:
+            if row['total'] > 0:
+                results[row['subject']]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+    except Exception:
+        pass
+
+    return [results[subject] for subject in subjects]
+
+
 def get_subject_performance(conn, user_id, subject):
     """
     Aggregate all metrics for a specific subject
