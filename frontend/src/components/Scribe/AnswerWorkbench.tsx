@@ -98,8 +98,9 @@ const AnswerWorkbench: React.FC = () => {
                     <div className="scribe-workbench">
                         {/* Left Panel: Question */}
                         <div className="question-panel">
-                            <h3 className="panel-title">Question</h3>
+                            <h3 id="question-heading" className="panel-title">Question</h3>
                             <textarea
+                                aria-labelledby="question-heading"
                                 className="question-textarea"
                                 placeholder="Type or paste your UPSC Mains question here..."
                                 value={question}
@@ -109,8 +110,9 @@ const AnswerWorkbench: React.FC = () => {
 
                         {/* Right Panel: Writing Area */}
                         <div className="writing-panel">
-                            <h3 className="panel-title">Your Answer</h3>
+                            <h3 id="answer-heading" className="panel-title">Your Answer</h3>
                             <textarea
+                                aria-labelledby="answer-heading"
                                 className="writing-area"
                                 placeholder="Begin your answer here, aspirant..."
                                 value={answer}
@@ -122,6 +124,7 @@ const AnswerWorkbench: React.FC = () => {
                                     className="evaluate-btn"
                                     onClick={handleEvaluate}
                                     disabled={loading || !question || !answer}
+                                    title={(!question || !answer) ? "Please provide both a question and an answer" : undefined}
                                 >
                                     {loading ? 'Consulting the Oracle...' : 'Evaluate Answer'}
                                 </button>
@@ -193,7 +196,7 @@ const AnswerWorkbench: React.FC = () => {
                     <div className="modal-content history-modal" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2>Evaluation Details</h2>
-                            <button className="close-btn" onClick={() => setSelectedHistoryItem(null)}>×</button>
+                            <button className="close-btn" onClick={() => setSelectedHistoryItem(null)} aria-label="Close details">×</button>
                         </div>
                         <div className="modal-body">
                             <div className="history-modal-section">
