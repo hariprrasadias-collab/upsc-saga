@@ -150,27 +150,24 @@ def get_time_distribution():
         # Get all activity dates
         activities = {}
         
-        # Group by date
+        # Bolt Optimization: Replaced O(N) memory/transfer loop by aggregating data directly in SQLite
         dates = conn.execute('''
-            SELECT DATE(submitted_at) as date FROM test_attempts
-            WHERE user_id = ? AND submitted_at >= ?
-            UNION ALL
-            SELECT DATE(submitted_at) FROM user_answers
-            WHERE user_id = ? AND submitted_at >= ?
-            UNION ALL
-            SELECT DATE(reviewed_at) FROM review_sessions
-            WHERE user_id = ? AND reviewed_at >= ?
+            SELECT date, COUNT(*) as count FROM (
+                SELECT DATE(submitted_at) as date FROM test_attempts
+                WHERE user_id = ? AND submitted_at >= ?
+                UNION ALL
+                SELECT DATE(submitted_at) FROM user_answers
+                WHERE user_id = ? AND submitted_at >= ?
+                UNION ALL
+                SELECT DATE(reviewed_at) FROM review_sessions
+                WHERE user_id = ? AND reviewed_at >= ?
+            ) GROUP BY date
         ''', (user_id, start_date, user_id, start_date, user_id, start_date)).fetchall()
-        
-        # Count activities per date
-        for row in dates:
-            date = row['date']
-            activities[date] = activities.get(date, 0) + 1
         
         # Convert to heatmap format: [{date, value}]
         heatmap_data = [
-            {'date': date, 'hours': min(count * 0.5, 8)}  # Estimate: 30min per activity, cap at 8h
-            for date, count in activities.items()
+            {'date': row['date'], 'hours': min(row['count'] * 0.5, 8)}  # Estimate: 30min per activity, cap at 8h
+            for row in dates
         ]
         
         return jsonify(heatmap_data)
