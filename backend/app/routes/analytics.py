@@ -110,7 +110,7 @@ def get_subject_wise():
         
         subjects = ['GS1', 'GS2', 'GS3', 'GS4', 'Prelims', 'Optional']
         results = []
-        
+
         for subject in subjects:
             try:
                 perf = get_subject_performance(conn, user_id, subject)
