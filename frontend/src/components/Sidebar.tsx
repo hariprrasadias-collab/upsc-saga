@@ -117,7 +117,8 @@ const Sidebar: React.FC = memo(() => {
           aria-label="Close sidebar"
           type="button"
         >
-          ×
+          <span aria-hidden="true">
+          ×</span>
         </button>
       </div>
 
