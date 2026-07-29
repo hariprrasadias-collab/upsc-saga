@@ -75,54 +75,76 @@ def calculate_study_hours(conn, user_id, start_date, end_date):
         return 0
 
 
-def get_subject_performance(conn, user_id, subject):
+def get_bulk_subject_performance(conn, user_id, subjects):
     """
-    Aggregate all metrics for a specific subject
+    Aggregate all metrics for multiple subjects in bulk to avoid N+1 queries.
     """
-    result = {
-        'subject': subject,
-        'mock_avg': 0,
-        'answer_avg': 0,
-        'syllabus_pct': 0,
-        'pyq_attempted': 0,
-        'flashcard_mastered': 0
+    # ⚡ Bolt: Initialize default metrics for all subjects
+    results_map = {
+        subject: {
+            'subject': subject,
+            'mock_avg': 0,
+            'answer_avg': 0,
+            'syllabus_pct': 0,
+            'pyq_attempted': 0,      # Default 0, as in original
+            'flashcard_mastered': 0  # Default 0, as in original
+        }
+        for subject in subjects
     }
+
+    if not subjects:
+        return []
+
+    placeholders = ','.join(['?'] * len(subjects))
+
+    # ⚡ Bolt: Bulk fetch Mock tests
     try:
-        # Mock tests
-        mock_avg = conn.execute('''
-            SELECT AVG(score) as avg_score
+        mock_rows = conn.execute(f'''
+            SELECT mt.subject, AVG(mta.score) as avg_score
             FROM test_attempts mta
             JOIN mock_tests mt ON mta.test_id = mt.id
-            WHERE mta.user_id = ? AND mt.subject = ?
-        ''', (user_id, subject)).fetchone()
-        if mock_avg and mock_avg['avg_score']:
-            result['mock_avg'] = round(mock_avg['avg_score'], 1)
+            WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+            GROUP BY mt.subject
+        ''', [user_id] + subjects).fetchall()
+        for row in mock_rows:
+            if row['subject'] in results_map and row['avg_score']:
+                results_map[row['subject']]['mock_avg'] = round(row['avg_score'], 1)
+    except Exception as e:
+        print(f"Error bulk fetching mock tests: {e}")
 
-        # Answer writing
-        answer_avg = conn.execute('''
-            SELECT AVG(ae.overall_score) as avg_score
+    # ⚡ Bolt: Bulk fetch Answer writing
+    try:
+        answer_rows = conn.execute(f'''
+            SELECT aq.subject, AVG(ae.overall_score) as avg_score
             FROM answer_evaluations ae
             JOIN user_answers ua ON ae.answer_id = ua.id
             JOIN answer_questions aq ON ua.prompt_id = aq.id
-            WHERE ua.user_id = ? AND aq.subject = ?
-        ''', (user_id, subject)).fetchone()
-        if answer_avg and answer_avg['avg_score']:
-            result['answer_avg'] = round(answer_avg['avg_score'], 1)
+            WHERE ua.user_id = ? AND aq.subject IN ({placeholders})
+            GROUP BY aq.subject
+        ''', [user_id] + subjects).fetchall()
+        for row in answer_rows:
+            if row['subject'] in results_map and row['avg_score']:
+                results_map[row['subject']]['answer_avg'] = round(row['avg_score'], 1)
+    except Exception as e:
+        print(f"Error bulk fetching answer writing: {e}")
 
-        # Syllabus completion
-        syllabus = conn.execute('''
-            SELECT
-                COUNT(*) as total,
-                SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+    # ⚡ Bolt: Bulk fetch Syllabus completion (no user_id column)
+    try:
+        syllabus_rows = conn.execute(f'''
+            SELECT subject,
+                   COUNT(*) as total,
+                   SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
             FROM syllabus_topics
-            WHERE subject = ?
-        ''', (subject,)).fetchone()
-        if syllabus and syllabus['total'] > 0:
-            result['syllabus_pct'] = round((syllabus['completed'] / syllabus['total']) * 100, 1)
-    except Exception:
-        pass # Return zeroed result on error
-    
-    return result
+            WHERE subject IN ({placeholders})
+            GROUP BY subject
+        ''', subjects).fetchall()
+        for row in syllabus_rows:
+            if row['subject'] in results_map and row['total'] > 0:
+                results_map[row['subject']]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+    except Exception as e:
+        print(f"Error bulk fetching syllabus: {e}")
+
+    return [results_map[s] for s in subjects]
 
 
 def identify_weak_areas(conn, user_id, limit=10):
