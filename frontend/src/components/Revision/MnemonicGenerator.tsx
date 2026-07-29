@@ -354,9 +354,7 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
                                                     <button
                                                         className="cancel-delete-btn"
                                                         onClick={cancelDelete}
-                                                    >
-                                                        ✕
-                                                    </button>
+                                                     aria-label="Close">✕</button>
                                                 </div>
                                             ) : (
                                                 <button
