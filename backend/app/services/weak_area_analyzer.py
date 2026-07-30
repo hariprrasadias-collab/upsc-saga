@@ -61,52 +61,68 @@ def calculate_weakness_score(topic_data: Dict) -> float:
     weakness_score = accuracy_score + time_score + recency_score + attempt_penalty
     return min(100, max(0, weakness_score))
 
-def analyze_topic_performance(topic: str) -> Dict:
+def analyze_topic_performance(topic: str, precalc_data=None) -> Dict:
     """Analyze performance for a specific topic and update weak_areas table"""
     conn = get_db()
     cursor = conn.cursor()
     
-    # Get performance stats for this topic
-    cursor.execute('''
-        SELECT 
-            COUNT(*) as total,
-            SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) as correct,
-            AVG(time_taken) as avg_time,
-            subject
-        FROM performance_records
-        WHERE topic = ?
-        GROUP BY subject
-    ''', (topic,))
-    
-    result = cursor.fetchone()
-    
-    if not result or result['total'] == 0:
-        conn.close()
-        return {}
-    
-    total = result['total']
-    correct = result['correct'] or 0
-    accuracy = correct / total if total > 0 else 0
-    avg_time = result['avg_time'] or 0
-    subject = result['subject']
-    
-    # Check recent failures (last 7 days)
-    cursor.execute('''
-        SELECT COUNT(*) as recent_failures
-        FROM performance_records
-        WHERE topic = ? AND is_correct = 0 
-        AND attempted_at >= datetime('now', '-7 days')
-    ''', (topic,))
-    
-    recent_failures = cursor.fetchone()['recent_failures']
-    
-    topic_data = {
-        'total_attempts': total,
-        'correct_attempts': correct,
-        'accuracy_rate': accuracy,
-        'avg_time_taken': avg_time,
-        'recent_failures': recent_failures
-    }
+    if precalc_data is None:
+        # Get performance stats for this topic
+        cursor.execute('''
+            SELECT
+                COUNT(*) as total,
+                SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) as correct,
+                AVG(time_taken) as avg_time,
+                subject
+            FROM performance_records
+            WHERE topic = ?
+            GROUP BY subject
+        ''', (topic,))
+
+        result = cursor.fetchone()
+
+        if not result or result['total'] == 0:
+            conn.close()
+            return {}
+
+        total = result['total']
+        correct = result['correct'] or 0
+        accuracy = correct / total if total > 0 else 0
+        avg_time = result['avg_time'] or 0
+        subject = result['subject']
+
+        # Check recent failures (last 7 days)
+        cursor.execute('''
+            SELECT COUNT(*) as recent_failures
+            FROM performance_records
+            WHERE topic = ? AND is_correct = 0
+            AND attempted_at >= datetime('now', '-7 days')
+        ''', (topic,))
+
+        recent_failures = cursor.fetchone()['recent_failures']
+
+        topic_data = {
+            'total_attempts': total,
+            'correct_attempts': correct,
+            'accuracy_rate': accuracy,
+            'avg_time_taken': avg_time,
+            'recent_failures': recent_failures
+        }
+    else:
+        total = precalc_data['total']
+        correct = precalc_data['correct'] or 0
+        accuracy = correct / total if total > 0 else 0
+        avg_time = precalc_data['avg_time'] or 0
+        subject = precalc_data['subject']
+        recent_failures = precalc_data['recent_failures'] or 0
+
+        topic_data = {
+            'total_attempts': total,
+            'correct_attempts': correct,
+            'accuracy_rate': accuracy,
+            'avg_time_taken': avg_time,
+            'recent_failures': recent_failures
+        }
     
     weakness_score = calculate_weakness_score(topic_data)
     
@@ -140,14 +156,38 @@ def analyze_all_performance() -> List[Dict]:
     conn = get_db()
     cursor = conn.cursor()
     
-    # Get all unique topics
-    cursor.execute('SELECT DISTINCT topic FROM performance_records WHERE topic IS NOT NULL')
-    topics = [row['topic'] for row in cursor.fetchall()]
+    # Get stats for all topics efficiently in one query to avoid N+1 problem
+    cursor.execute('''
+        SELECT
+            topic,
+            COUNT(*) as total,
+            SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) as correct,
+            AVG(time_taken) as avg_time,
+            MAX(subject) as subject,
+            SUM(CASE WHEN is_correct = 0 AND attempted_at >= datetime('now', '-7 days') THEN 1 ELSE 0 END) as recent_failures
+        FROM performance_records
+        WHERE topic IS NOT NULL
+        GROUP BY topic
+    ''')
+
+    rows = cursor.fetchall()
     conn.close()
     
     results = []
-    for topic in topics:
-        result = analyze_topic_performance(topic)
+    for row in rows:
+        if row['total'] == 0:
+            continue
+
+        topic = row['topic']
+        precalc_data = {
+            'total': row['total'],
+            'correct': row['correct'],
+            'avg_time': row['avg_time'],
+            'subject': row['subject'],
+            'recent_failures': row['recent_failures']
+        }
+
+        result = analyze_topic_performance(topic, precalc_data=precalc_data)
         if result:
             results.append(result)
     
