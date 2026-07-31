@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from app.services.analytics_service import (
     calculate_study_hours,
     get_subject_performance,
+    get_all_subjects_performance,
     identify_weak_areas,
     calculate_improvement_rate,
     get_streak_days
@@ -111,9 +112,14 @@ def get_subject_wise():
         subjects = ['GS1', 'GS2', 'GS3', 'GS4', 'Prelims', 'Optional']
         results = []
         
+        try:
+            precalc_data = get_all_subjects_performance(conn, user_id)
+        except Exception:
+            precalc_data = {}
+
         for subject in subjects:
             try:
-                perf = get_subject_performance(conn, user_id, subject)
+                perf = get_subject_performance(conn, user_id, subject, precalc_data=precalc_data)
                 results.append(perf)
             except Exception:
                 # Return empty data for missing tables
