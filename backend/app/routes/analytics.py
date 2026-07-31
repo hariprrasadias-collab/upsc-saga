@@ -109,23 +109,68 @@ def get_subject_wise():
         conn = get_db()
         
         subjects = ['GS1', 'GS2', 'GS3', 'GS4', 'Prelims', 'Optional']
-        results = []
         
-        for subject in subjects:
-            try:
-                perf = get_subject_performance(conn, user_id, subject)
-                results.append(perf)
-            except Exception:
-                # Return empty data for missing tables
-                results.append({
-                    'subject': subject,
-                    'mock_avg': 0,
-                    'answer_avg': 0,
-                    'syllabus_pct': 0,
-                    'pyq_attempted': 0,
-                    'flashcard_mastered': 0
-                })
+        # Initialize results dictionary
+        perf_data = {
+            subj: {
+                'subject': subj,
+                'mock_avg': 0,
+                'answer_avg': 0,
+                'syllabus_pct': 0,
+                'pyq_attempted': 0,
+                'flashcard_mastered': 0
+            } for subj in subjects
+        }
+
+        placeholders = ','.join(['?'] * len(subjects))
+
+        # ⚡ Bolt Optimization: Batch queries to prevent N+1 problem
+        try:
+            mock_rows = conn.execute(f'''
+                SELECT mt.subject, AVG(mta.score) as avg_score
+                FROM test_attempts mta
+                JOIN mock_tests mt ON mta.test_id = mt.id
+                WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+                GROUP BY mt.subject
+            ''', [user_id] + subjects).fetchall()
+            for row in mock_rows:
+                if row['avg_score']:
+                    perf_data[row['subject']]['mock_avg'] = round(row['avg_score'], 1)
+        except Exception:
+            pass
+
+        try:
+            # answer_questions is missing, fallback to answer_writing_prompts based on schema
+            answer_rows = conn.execute(f'''
+                SELECT awp.subject, AVG(ae.overall_score) as avg_score
+                FROM answer_evaluations ae
+                JOIN user_answers ua ON ae.answer_id = ua.id
+                JOIN answer_writing_prompts awp ON ua.prompt_id = awp.id
+                WHERE ua.user_id = ? AND awp.subject IN ({placeholders})
+                GROUP BY awp.subject
+            ''', [user_id] + subjects).fetchall()
+            for row in answer_rows:
+                if row['avg_score']:
+                    perf_data[row['subject']]['answer_avg'] = round(row['avg_score'], 1)
+        except Exception:
+            pass
+
+        try:
+            syllabus_rows = conn.execute(f'''
+                SELECT subject,
+                       COUNT(*) as total,
+                       SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+                FROM syllabus_topics
+                WHERE subject IN ({placeholders})
+                GROUP BY subject
+            ''', subjects).fetchall()
+            for row in syllabus_rows:
+                if row['total'] > 0:
+                    perf_data[row['subject']]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+        except Exception:
+            pass
         
+        results = list(perf_data.values())
         return jsonify(results)
     except Exception as e:
         print(f"Subject-wise analytics error: {e}")
