@@ -17,12 +17,10 @@ import json
 
 flashcards = Blueprint('flashcards', __name__)
 
-from app import cache
 
 # ==================== DECK MANAGEMENT ====================
 
 @flashcards.route('/api/flashcards/decks', methods=['GET'])
-@cache.cached(timeout=120)
 def get_decks():
     """Get all decks with card counts"""
     try:
