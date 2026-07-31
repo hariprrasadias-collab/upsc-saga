@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify
 from app.db import get_db
+# Remove global cache import, we will get it dynamically if needed or just remove it
 from app import cache
 from app.utils.session import get_current_user_id
 import datetime
@@ -10,7 +11,6 @@ def get_today_date_str():
     return datetime.date.today().isoformat()
 
 @bp.route('/dashboard-data')
-@cache.cached(timeout=60, query_string=True) # Cache for 1 minute
 def get_dashboard_data():
     try:
         user_id = get_current_user_id()

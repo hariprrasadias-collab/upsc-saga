@@ -231,21 +231,22 @@ def get_analytics():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-from app import cache
 
 @bp.route('/strategos/<int:question_id>', methods=['POST'])
 def ask_strategos(question_id):
     """Ask AI for tactical breakdown of a question"""
     try:
-        # 1. Rate Limiting Check using Global Cache
+        # 1. Rate Limiting Check using simple memory dictionary
         client_ip = request.remote_addr
         cache_key = f"strategos_rl_{client_ip}"
         
-        if cache.get(cache_key):
+        if not hasattr(ask_strategos, 'last_triggered'):
+            ask_strategos.last_triggered = {}
+        import time
+        if cache_key in ask_strategos.last_triggered and time.time() - ask_strategos.last_triggered[cache_key] < 5:
             return jsonify({'success': False, 'error': 'Strategos is thinking. Please wait 5 seconds.'}), 429
             
-        # Set cooldown for 5 seconds
-        cache.set(cache_key, True, timeout=5)
+        ask_strategos.last_triggered[cache_key] = time.time()
 
         conn = get_db()
         question = conn.execute("SELECT * FROM pyq_questions WHERE id = ?", (question_id,)).fetchone()
