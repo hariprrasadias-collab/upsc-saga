@@ -75,7 +75,68 @@ def calculate_study_hours(conn, user_id, start_date, end_date):
         return 0
 
 
-def get_subject_performance(conn, user_id, subject):
+def get_all_subjects_performance(conn, user_id):
+    """
+    Aggregate all metrics for all subjects in a single query per metric to avoid N+1 queries.
+    """
+    results = {}
+
+    try:
+        # Mock tests
+        mock_avgs = conn.execute('''
+            SELECT mt.subject, AVG(mta.score) as avg_score
+            FROM test_attempts mta
+            JOIN mock_tests mt ON mta.test_id = mt.id
+            WHERE mta.user_id = ?
+            GROUP BY mt.subject
+        ''', (user_id,)).fetchall()
+
+        for row in mock_avgs:
+            subj = row['subject']
+            if subj not in results:
+                results[subj] = {'subject': subj, 'mock_avg': 0, 'answer_avg': 0, 'syllabus_pct': 0, 'pyq_attempted': 0, 'flashcard_mastered': 0}
+            if row['avg_score']:
+                results[subj]['mock_avg'] = round(row['avg_score'], 1)
+
+        # Answer writing
+        answer_avgs = conn.execute('''
+            SELECT aq.subject, AVG(ae.overall_score) as avg_score
+            FROM answer_evaluations ae
+            JOIN user_answers ua ON ae.answer_id = ua.id
+            JOIN answer_questions aq ON ua.prompt_id = aq.id
+            WHERE ua.user_id = ?
+            GROUP BY aq.subject
+        ''', (user_id,)).fetchall()
+
+        for row in answer_avgs:
+            subj = row['subject']
+            if subj not in results:
+                results[subj] = {'subject': subj, 'mock_avg': 0, 'answer_avg': 0, 'syllabus_pct': 0, 'pyq_attempted': 0, 'flashcard_mastered': 0}
+            if row['avg_score']:
+                results[subj]['answer_avg'] = round(row['avg_score'], 1)
+
+        # Syllabus completion
+        syllabus_stats = conn.execute('''
+            SELECT subject,
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+            FROM syllabus_topics
+            GROUP BY subject
+        ''').fetchall()
+
+        for row in syllabus_stats:
+            subj = row['subject']
+            if subj not in results:
+                results[subj] = {'subject': subj, 'mock_avg': 0, 'answer_avg': 0, 'syllabus_pct': 0, 'pyq_attempted': 0, 'flashcard_mastered': 0}
+            if row['total'] > 0:
+                results[subj]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+
+    except Exception as e:
+        print(f"Error in get_all_subjects_performance: {e}")
+
+    return results
+
+def get_subject_performance(conn, user_id, subject, precalc_data=None):
     """
     Aggregate all metrics for a specific subject
     """
@@ -87,40 +148,45 @@ def get_subject_performance(conn, user_id, subject):
         'pyq_attempted': 0,
         'flashcard_mastered': 0
     }
-    try:
-        # Mock tests
-        mock_avg = conn.execute('''
-            SELECT AVG(score) as avg_score
-            FROM test_attempts mta
-            JOIN mock_tests mt ON mta.test_id = mt.id
-            WHERE mta.user_id = ? AND mt.subject = ?
-        ''', (user_id, subject)).fetchone()
-        if mock_avg and mock_avg['avg_score']:
-            result['mock_avg'] = round(mock_avg['avg_score'], 1)
 
-        # Answer writing
-        answer_avg = conn.execute('''
-            SELECT AVG(ae.overall_score) as avg_score
-            FROM answer_evaluations ae
-            JOIN user_answers ua ON ae.answer_id = ua.id
-            JOIN answer_questions aq ON ua.prompt_id = aq.id
-            WHERE ua.user_id = ? AND aq.subject = ?
-        ''', (user_id, subject)).fetchone()
-        if answer_avg and answer_avg['avg_score']:
-            result['answer_avg'] = round(answer_avg['avg_score'], 1)
+    if precalc_data is not None:
+        if subject in precalc_data:
+            result.update(precalc_data[subject])
+    else:
+        try:
+            # Mock tests
+            mock_avg = conn.execute('''
+                SELECT AVG(score) as avg_score
+                FROM test_attempts mta
+                JOIN mock_tests mt ON mta.test_id = mt.id
+                WHERE mta.user_id = ? AND mt.subject = ?
+            ''', (user_id, subject)).fetchone()
+            if mock_avg and mock_avg['avg_score']:
+                result['mock_avg'] = round(mock_avg['avg_score'], 1)
 
-        # Syllabus completion
-        syllabus = conn.execute('''
-            SELECT
-                COUNT(*) as total,
-                SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
-            FROM syllabus_topics
-            WHERE subject = ?
-        ''', (subject,)).fetchone()
-        if syllabus and syllabus['total'] > 0:
-            result['syllabus_pct'] = round((syllabus['completed'] / syllabus['total']) * 100, 1)
-    except Exception:
-        pass # Return zeroed result on error
+            # Answer writing
+            answer_avg = conn.execute('''
+                SELECT AVG(ae.overall_score) as avg_score
+                FROM answer_evaluations ae
+                JOIN user_answers ua ON ae.answer_id = ua.id
+                JOIN answer_questions aq ON ua.prompt_id = aq.id
+                WHERE ua.user_id = ? AND aq.subject = ?
+            ''', (user_id, subject)).fetchone()
+            if answer_avg and answer_avg['avg_score']:
+                result['answer_avg'] = round(answer_avg['avg_score'], 1)
+
+            # Syllabus completion
+            syllabus = conn.execute('''
+                SELECT
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+                FROM syllabus_topics
+                WHERE subject = ?
+            ''', (subject,)).fetchone()
+            if syllabus and syllabus['total'] > 0:
+                result['syllabus_pct'] = round((syllabus['completed'] / syllabus['total']) * 100, 1)
+        except Exception:
+            pass # Return zeroed result on error
     
     return result
 
