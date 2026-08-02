@@ -7,3 +7,7 @@
 ## 2025-03-03 - [Optimized syllabus progress trend to eliminate N+1 queries]
 **Learning:** The `get_progress_trend` function in `backend/app/routes/analytics.py` iteratively fetched `syllabus_topics` data `days + 1` times (via `SELECT COUNT(*)` queries). However, because the `syllabus_topics` table only tracks current topic status and lacks a historical tracking mechanism, these inner-loop queries always returned the same value.
 **Action:** Lift repeated logic out of loops when the underlying data tables do not support historical/time-series filters, calculating the value once beforehand to transform an O(N) database query scenario into O(1).
+
+## 2026-08-01 - Refactored N+1 queries in analytics endpoints
+**Learning:** Using iterative function calls to gather analytics per subject caused N+1 query execution (e.g., 3 separate table queries per subject).
+**Action:** Replaced loop-based analytics with bulk queries utilizing `GROUP BY` and `IN` clauses for multiple independent tables, grouping each under isolated `try...except` blocks to maintain fault tolerance.
