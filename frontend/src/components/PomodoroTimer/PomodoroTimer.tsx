@@ -222,15 +222,15 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
             <div className="pomodoro-header">
                 <h3>{mode === 'work' ? '⚔️ BATTLE TIME' : '🛡️ RESPITE'}</h3>
                 <div className="pomodoro-controls">
-                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
+                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"} aria-label={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}>
                         {isFullscreen ? '↙️' : '⛶'}
                     </button>
                     {isFullscreen && (
-                        <button onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close">✕</button>
+                        <button onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close" aria-label="Close Fullscreen">✕</button>
                     )}
-                    <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" title="History">📊</button>
-                    <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" title="Settings">⚙️</button>
-                    <button onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize">−</button>
+                    <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" title="History" aria-label="Toggle Session History">📊</button>
+                    <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" title="Settings" aria-label="Toggle Settings">⚙️</button>
+                    <button onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize" aria-label="Minimize Timer">−</button>
                 </div>
             </div>
 
@@ -294,10 +294,10 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
                 {isEditing ? (
                     <div className="timer-edit-overlay">
                         <input type="number" value={editMinutes} onChange={(e) => setEditMinutes(e.target.value)}
-                            className="timer-edit-input" min="1" max="120" />
+                            className="timer-edit-input" min="1" max="120" aria-label="Timer minutes" />
                         <div className="timer-edit-actions">
-                            <button onClick={handleEditSave} className="save-btn">✓</button>
-                            <button onClick={() => setIsEditing(false)} className="cancel-btn">✕</button>
+                            <button onClick={handleEditSave} className="save-btn" aria-label="Save Timer Edit">✓</button>
+                            <button onClick={() => setIsEditing(false)} className="cancel-btn" aria-label="Cancel Timer Edit">✕</button>
                         </div>
                     </div>
                 ) : (
@@ -329,7 +329,7 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
                                     <button className="edit-time-btn" onClick={() => {
                                         setEditMinutes(Math.floor(timeLeft / 60).toString());
                                         setIsEditing(true);
-                                    }} title="Edit Timer">✎</button>
+                                    }} title="Edit Timer" aria-label="Edit Timer Duration">✎</button>
                                 )}
                             </>
                         )}
@@ -338,10 +338,10 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
             </div>
 
             <div className="pomodoro-actions">
-                <button className={`timer-btn ${isRunning ? 'pause' : 'start'}`} onClick={toggleTimer}>
+                <button className={`timer-btn ${isRunning ? 'pause' : 'start'}`} onClick={toggleTimer} aria-label={isRunning ? 'Pause Timer' : 'Start Timer'}>
                     {isRunning ? '⏸ HOLD' : '▶ ENGAGE'}
                 </button>
-                <button className="reset-btn" onClick={resetTimer}>↻ RESTART</button>
+                <button className="reset-btn" onClick={resetTimer} aria-label="Restart Timer">↻ RESTART</button>
             </div>
 
             <div className="pomodoro-stats">
