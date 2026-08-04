@@ -3,6 +3,7 @@ import { API_BASE_URL } from '../../config';
 // /frontend/src/components/AnkiDojo/AnkiDojo.tsx
 import React, { useState, useEffect } from 'react';
 import './AnkiDojo.css';
+import DOMPurify from 'dompurify';
 import { audioManager } from '../../util/AudioManager';
 import { ebisuScheduler } from './ebisuAlgorithm';
 
@@ -283,7 +284,7 @@ const AnkiDojo: React.FC = () => {
                                 <div className="card-label">Question</div>
                                 <div
                                     className="card-content"
-                                    dangerouslySetInnerHTML={{ __html: currentCard.question }}
+                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(currentCard.question) }}
                                 />
                                 {!isFlipped && <div className="tap-hint">👆 Tap to reveal answer</div>}
                             </div>
@@ -293,7 +294,7 @@ const AnkiDojo: React.FC = () => {
                                 <div className="card-label">Answer</div>
                                 <div
                                     className="card-content"
-                                    dangerouslySetInnerHTML={{ __html: currentCard.answer }}
+                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(currentCard.answer) }}
                                 />
                             </div>
                         </div>
