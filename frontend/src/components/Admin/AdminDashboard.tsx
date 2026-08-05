@@ -219,12 +219,15 @@ const AdminDashboard: React.FC = () => {
                                                 </span>
                                             </td>
                                             <td>
-                                                <button className="action-btn edit">✏️</button>
+                                                <button className="action-btn edit" aria-label="Edit Question">
+                                                    <span aria-hidden="true">✏️</span>
+                                                </button>
                                                 <button
                                                     className="action-btn delete"
+                                                    aria-label="Delete Question"
                                                     onClick={() => handleDeleteQuestion(q.id)}
                                                 >
-                                                    🗑️
+                                                    <span aria-hidden="true">🗑️</span>
                                                 </button>
                                             </td>
                                         </tr>
@@ -288,12 +291,15 @@ const AdminDashboard: React.FC = () => {
                                                 </span>
                                             </td>
                                             <td>
-                                                <button className="action-btn edit">✏️</button>
+                                                <button className="action-btn edit" aria-label="Edit Article">
+                                                    <span aria-hidden="true">✏️</span>
+                                                </button>
                                                 <button
                                                     className="action-btn delete"
+                                                    aria-label="Delete Article"
                                                     onClick={() => handleDeleteArticle(a.id)}
                                                 >
-                                                    🗑️
+                                                    <span aria-hidden="true">🗑️</span>
                                                 </button>
                                             </td>
                                         </tr>
