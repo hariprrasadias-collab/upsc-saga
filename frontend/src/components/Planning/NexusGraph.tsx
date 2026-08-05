@@ -231,6 +231,7 @@ const NexusGraph: React.FC<NexusGraphProps> = React.memo(({ engine, completedIte
                             cursor: 'pointer',
                             fontSize: '1.2rem'
                         }}
+                        aria-label="Close"
                     >×</button>
 
                     <h2 style={{

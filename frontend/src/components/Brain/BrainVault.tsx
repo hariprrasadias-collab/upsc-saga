@@ -200,6 +200,7 @@ const BrainVault: React.FC = () => {
                                             className="delete-btn"
                                             onClick={(e) => handleDelete(item.id, e)}
                                             title="Delete Artifact"
+                                            aria-label="Delete Artifact"
                                         >
                                             ×
                                         </button>

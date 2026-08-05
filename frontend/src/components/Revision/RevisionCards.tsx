@@ -43,6 +43,7 @@ const RevisionCardItem: React.FC<{ card: RevisionCard, onDelete: (id: number) =>
                                     onDelete(card.id);
                                 }}
                                 title="Delete card"
+                                aria-label="Delete card"
                             >
                                 ×
                             </button>
