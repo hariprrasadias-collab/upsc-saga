@@ -334,8 +334,9 @@ const MockTests: React.FC<MockTestsProps> = ({ onTaskCompleted }) => {
                                         cursor: 'pointer'
                                     }}
                                     title="Delete Test"
+                                    aria-label="Delete Test"
                                 >
-                                    🗑️
+                                    <span aria-hidden="true">🗑️</span>
                                 </button>
                             </div>
                         </div>
