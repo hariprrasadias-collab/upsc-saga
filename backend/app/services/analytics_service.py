@@ -75,54 +75,81 @@ def calculate_study_hours(conn, user_id, start_date, end_date):
         return 0
 
 
-def get_subject_performance(conn, user_id, subject):
+def get_all_subjects_performance(conn, user_id, subjects):
     """
-    Aggregate all metrics for a specific subject
+    Aggregate all metrics for multiple subjects in bulk to prevent N+1 query problems.
     """
-    result = {
-        'subject': subject,
-        'mock_avg': 0,
-        'answer_avg': 0,
-        'syllabus_pct': 0,
-        'pyq_attempted': 0,
-        'flashcard_mastered': 0
+    # Initialize results
+    results_map = {
+        subject: {
+            'subject': subject,
+            'mock_avg': 0,
+            'answer_avg': 0,
+            'syllabus_pct': 0,
+            'pyq_attempted': 0,
+            'flashcard_mastered': 0
+        }
+        for subject in subjects
     }
+
+    if not subjects:
+        return []
+
+    # Bolt optimization: Refactored N+1 queries into bulk GROUP BY and IN clause queries
+    placeholders = ','.join(['?'] * len(subjects))
+
+    # Mock tests bulk
     try:
-        # Mock tests
-        mock_avg = conn.execute('''
-            SELECT AVG(score) as avg_score
+        query = f'''
+            SELECT mt.subject, AVG(score) as avg_score
             FROM test_attempts mta
             JOIN mock_tests mt ON mta.test_id = mt.id
-            WHERE mta.user_id = ? AND mt.subject = ?
-        ''', (user_id, subject)).fetchone()
-        if mock_avg and mock_avg['avg_score']:
-            result['mock_avg'] = round(mock_avg['avg_score'], 1)
+            WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+            GROUP BY mt.subject
+        '''
+        mock_results = conn.execute(query, [user_id] + subjects).fetchall()
+        for row in mock_results:
+            if row['avg_score'] is not None and row['subject'] in results_map:
+                results_map[row['subject']]['mock_avg'] = round(row['avg_score'], 1)
+    except Exception:
+        pass
 
-        # Answer writing
-        answer_avg = conn.execute('''
-            SELECT AVG(ae.overall_score) as avg_score
+    # Answer writing bulk
+    try:
+        query = f'''
+            SELECT aq.subject, AVG(ae.overall_score) as avg_score
             FROM answer_evaluations ae
             JOIN user_answers ua ON ae.answer_id = ua.id
             JOIN answer_questions aq ON ua.prompt_id = aq.id
-            WHERE ua.user_id = ? AND aq.subject = ?
-        ''', (user_id, subject)).fetchone()
-        if answer_avg and answer_avg['avg_score']:
-            result['answer_avg'] = round(answer_avg['avg_score'], 1)
+            WHERE ua.user_id = ? AND aq.subject IN ({placeholders})
+            GROUP BY aq.subject
+        '''
+        answer_results = conn.execute(query, [user_id] + subjects).fetchall()
+        for row in answer_results:
+            if row['avg_score'] is not None and row['subject'] in results_map:
+                results_map[row['subject']]['answer_avg'] = round(row['avg_score'], 1)
+    except Exception:
+        pass
 
-        # Syllabus completion
-        syllabus = conn.execute('''
+    # Syllabus completion bulk
+    try:
+        query = f'''
             SELECT
+                subject,
                 COUNT(*) as total,
                 SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
             FROM syllabus_topics
-            WHERE subject = ?
-        ''', (subject,)).fetchone()
-        if syllabus and syllabus['total'] > 0:
-            result['syllabus_pct'] = round((syllabus['completed'] / syllabus['total']) * 100, 1)
+            WHERE subject IN ({placeholders})
+            GROUP BY subject
+        '''
+        syllabus_results = conn.execute(query, subjects).fetchall()
+        for row in syllabus_results:
+            if row['total'] > 0 and row['subject'] in results_map:
+                results_map[row['subject']]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
     except Exception:
-        pass # Return zeroed result on error
-    
-    return result
+        pass
+
+    return list(results_map.values())
 
 
 def identify_weak_areas(conn, user_id, limit=10):
