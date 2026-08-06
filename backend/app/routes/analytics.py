@@ -150,22 +150,27 @@ def get_time_distribution():
         # Get all activity dates
         activities = {}
         
+        # Bolt Optimization: Shifted counting workload to DB via GROUP BY to eliminate O(N) memory transfer
+        # and iterations over all individual activity records.
         # Group by date
         dates = conn.execute('''
-            SELECT DATE(submitted_at) as date FROM test_attempts
-            WHERE user_id = ? AND submitted_at >= ?
-            UNION ALL
-            SELECT DATE(submitted_at) FROM user_answers
-            WHERE user_id = ? AND submitted_at >= ?
-            UNION ALL
-            SELECT DATE(reviewed_at) FROM review_sessions
-            WHERE user_id = ? AND reviewed_at >= ?
+            SELECT date, COUNT(*) as count FROM (
+                SELECT DATE(submitted_at) as date FROM test_attempts
+                WHERE user_id = ? AND submitted_at >= ?
+                UNION ALL
+                SELECT DATE(submitted_at) as date FROM user_answers
+                WHERE user_id = ? AND submitted_at >= ?
+                UNION ALL
+                SELECT DATE(reviewed_at) as date FROM review_sessions
+                WHERE user_id = ? AND reviewed_at >= ?
+            )
+            GROUP BY date
         ''', (user_id, start_date, user_id, start_date, user_id, start_date)).fetchall()
         
-        # Count activities per date
+        # Count activities per date directly from grouped counts
         for row in dates:
             date = row['date']
-            activities[date] = activities.get(date, 0) + 1
+            activities[date] = row['count']
         
         # Convert to heatmap format: [{date, value}]
         heatmap_data = [
