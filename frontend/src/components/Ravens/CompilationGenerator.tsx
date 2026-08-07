@@ -183,8 +183,12 @@ const CompilationGenerator: React.FC = () => {
             {compilation && (
                 <div className="compilation-report">
                     <div className="print-actions no-print">
-                        <button className="print-btn" onClick={handlePrint}>🖨️ Print / Save PDF</button>
-                        <button className="scroll-top-btn" onClick={scrollToTop}>⬆️ Back to Top</button>
+                        <button className="print-btn" onClick={handlePrint}>
+                            <span aria-hidden="true">🖨️</span> Print / Save PDF
+                        </button>
+                        <button className="scroll-top-btn" onClick={scrollToTop}>
+                            <span aria-hidden="true">⬆️</span> Back to Top
+                        </button>
                     </div>
 
                     <div className="report-cover">

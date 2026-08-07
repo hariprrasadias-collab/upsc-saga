@@ -174,7 +174,9 @@ ${result.predicted_question}
                                         <div className="quote">"{s.quote}"</div>
                                         <div className="author">— {s.name}</div>
                                         <div className="context">({s.context})</div>
-                                        <button className="copy-btn" onClick={() => copyToClipboard(`"${s.quote}" - ${s.name}`)}>📋</button>
+                                        <button className="copy-btn" onClick={() => copyToClipboard(`"${s.quote}" - ${s.name}`)} aria-label="Copy quote">
+                                            <span aria-hidden="true">📋</span>
+                                        </button>
                                     </div>
                                 ))}
                             </div>
@@ -186,7 +188,9 @@ ${result.predicted_question}
                                             <div className="stat">{d.statistic}</div>
                                             <div className="source">Source: {d.source}</div>
                                         </div>
-                                        <button className="copy-btn" onClick={() => copyToClipboard(`${d.statistic} (${d.source})`)}>📋</button>
+                                        <button className="copy-btn" onClick={() => copyToClipboard(`${d.statistic} (${d.source})`)} aria-label="Copy statistic">
+                                            <span aria-hidden="true">📋</span>
+                                        </button>
                                     </div>
                                 ))}
                             </div>
