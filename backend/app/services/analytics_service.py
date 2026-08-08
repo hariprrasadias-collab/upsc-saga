@@ -125,6 +125,81 @@ def get_subject_performance(conn, user_id, subject):
     return result
 
 
+def get_all_subjects_performance(conn, user_id):
+    """
+    Bulk aggregate all metrics for all subjects at once to prevent N+1 query bottlenecks
+    """
+    try:
+        # Get all mock averages
+        mock_data = conn.execute('''
+            SELECT mt.subject, AVG(mta.score) as avg_score
+            FROM test_attempts mta
+            JOIN mock_tests mt ON mta.test_id = mt.id
+            WHERE mta.user_id = ?
+            GROUP BY mt.subject
+        ''', (user_id,)).fetchall()
+
+        # Get all answer writing averages
+        answer_data = conn.execute('''
+            SELECT aq.subject, AVG(ae.overall_score) as avg_score
+            FROM answer_evaluations ae
+            JOIN user_answers ua ON ae.answer_id = ua.id
+            JOIN answer_writing_prompts aq ON ua.prompt_id = aq.id
+            WHERE ua.user_id = ?
+            GROUP BY aq.subject
+        ''', (user_id,)).fetchall()
+
+        # Get all syllabus completion stats
+        syllabus_data = conn.execute('''
+            SELECT subject,
+                   COUNT(*) as total,
+                   SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+            FROM syllabus_topics
+            GROUP BY subject
+        ''').fetchall()
+
+        # Aggregate into a dict
+        results_by_subject = {}
+        for subject in ['GS1', 'GS2', 'GS3', 'GS4', 'Prelims', 'Optional']:
+            results_by_subject[subject] = {
+                'subject': subject,
+                'mock_avg': 0,
+                'answer_avg': 0,
+                'syllabus_pct': 0,
+                'pyq_attempted': 0,
+                'flashcard_mastered': 0
+            }
+
+        for row in mock_data:
+            if row['subject'] in results_by_subject and row['avg_score']:
+                results_by_subject[row['subject']]['mock_avg'] = round(row['avg_score'], 1)
+
+        for row in answer_data:
+            if row['subject'] in results_by_subject and row['avg_score']:
+                results_by_subject[row['subject']]['answer_avg'] = round(row['avg_score'], 1)
+
+        for row in syllabus_data:
+            if row['subject'] in results_by_subject and row['total'] > 0:
+                results_by_subject[row['subject']]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+
+        return list(results_by_subject.values())
+
+    except Exception as e:
+        print(f"Error fetching bulk subject performance: {e}")
+        # Return zeroed result on error for all subjects
+        return [
+            {
+                'subject': subject,
+                'mock_avg': 0,
+                'answer_avg': 0,
+                'syllabus_pct': 0,
+                'pyq_attempted': 0,
+                'flashcard_mastered': 0
+            }
+            for subject in ['GS1', 'GS2', 'GS3', 'GS4', 'Prelims', 'Optional']
+        ]
+
+
 def identify_weak_areas(conn, user_id, limit=10):
     """
     Identify topics needing attention based on performance
