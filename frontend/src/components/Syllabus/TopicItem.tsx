@@ -35,7 +35,7 @@ const TopicItem: React.FC<TopicItemProps> = memo(({
                     title="Add/View Notes"
                     aria-label={`Notes for ${topic.topic}`}
                 >
-                    📝
+                    <span aria-hidden="true">📝</span>
                 </button>
                 <button
                     className="revise-btn"
@@ -43,7 +43,7 @@ const TopicItem: React.FC<TopicItemProps> = memo(({
                     title={`Mark as Revised (Count: ${topic.revision_count || 0})`}
                     aria-label={`Mark ${topic.topic} as Revised`}
                 >
-                    ↻
+                    <span aria-hidden="true">↻</span>
                 </button>
                 <select
                     className={`status-select ${topic.status.toLowerCase().replace(' ', '-')}`}
