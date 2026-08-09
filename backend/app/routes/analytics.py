@@ -4,7 +4,7 @@ from app.db import get_db
 from datetime import datetime, timedelta
 from app.services.analytics_service import (
     calculate_study_hours,
-    get_subject_performance,
+    get_all_subjects_performance,
     identify_weak_areas,
     calculate_improvement_rate,
     get_streak_days
@@ -109,14 +109,15 @@ def get_subject_wise():
         conn = get_db()
         
         subjects = ['GS1', 'GS2', 'GS3', 'GS4', 'Prelims', 'Optional']
-        results = []
         
-        for subject in subjects:
-            try:
-                perf = get_subject_performance(conn, user_id, subject)
-                results.append(perf)
-            except Exception:
-                # Return empty data for missing tables
+        try:
+            results = get_all_subjects_performance(conn, user_id, subjects)
+        except Exception as e:
+            print(f"Subject-wise analytics error fetching data: {e}")
+            results = []
+
+            # Return empty data for missing tables or other errors
+            for subject in subjects:
                 results.append({
                     'subject': subject,
                     'mock_avg': 0,
