@@ -1,17 +1,18 @@
-import requests
-import json
+import sqlite3
+import traceback
+from app.services.analytics_service import identify_weak_areas
+import datetime
 
-def test_weak_areas():
-    url = 'http://localhost:5000/api/weak-areas/practice'
-    headers = {'Content-Type': 'application/json'}
-    data = {'count': 10}
-    
-    try:
-        response = requests.post(url, headers=headers, json=data)
-        print(f"Status Code: {response.status_code}")
-        print(f"Response: {response.text}")
-    except Exception as e:
-        print(f"Error: {e}")
+def test_it():
+    conn = sqlite3.connect(':memory:')
+    conn.row_factory = sqlite3.Row
+    conn.execute('CREATE TABLE test_attempts (id INTEGER, user_id INTEGER, test_id INTEGER, score REAL, submitted_at TEXT)')
+    conn.execute('CREATE TABLE mock_tests (id INTEGER, subject TEXT)')
+    conn.execute('CREATE TABLE syllabus_topics (subject TEXT, name TEXT, status TEXT)')
 
-if __name__ == "__main__":
-    test_weak_areas()
+    conn.execute("INSERT INTO mock_tests VALUES (1, 'Math')")
+    conn.execute("INSERT INTO test_attempts VALUES (1, 1, 1, 50, '2023-01-01')")
+
+    print(identify_weak_areas(conn, 1))
+
+test_it()
