@@ -137,19 +137,78 @@ def analyze_topic_performance(topic: str) -> Dict:
 
 def analyze_all_performance() -> List[Dict]:
     """Analyze performance for all topics with attempts"""
+    from datetime import datetime
     conn = get_db()
     cursor = conn.cursor()
     
-    # Get all unique topics
-    cursor.execute('SELECT DISTINCT topic FROM performance_records WHERE topic IS NOT NULL')
-    topics = [row['topic'] for row in cursor.fetchall()]
-    conn.close()
+    # ⚡ Bolt Optimization: Use a single bulk query to eliminate N+1 queries during performance analysis.
+    # Previously, this iterated through every distinct topic and executed a query per topic.
+    cursor.execute('''
+        SELECT
+            topic,
+            MAX(subject) as subject,
+            COUNT(*) as total,
+            SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) as correct,
+            AVG(time_taken) as avg_time,
+            SUM(CASE WHEN is_correct = 0 AND attempted_at >= datetime('now', '-7 days') THEN 1 ELSE 0 END) as recent_failures
+        FROM performance_records
+        WHERE topic IS NOT NULL
+        GROUP BY topic
+    ''')
+
+    rows = cursor.fetchall()
     
+    updates = []
     results = []
-    for topic in topics:
-        result = analyze_topic_performance(topic)
-        if result:
-            results.append(result)
+
+    for row in rows:
+        topic = row['topic']
+        subject = row['subject']
+        total = row['total']
+        correct = row['correct'] or 0
+        accuracy = correct / total if total > 0 else 0
+        avg_time = row['avg_time'] or 0
+        recent_failures = row['recent_failures'] or 0
+
+        topic_data = {
+            'total_attempts': total,
+            'correct_attempts': correct,
+            'accuracy_rate': accuracy,
+            'avg_time_taken': avg_time,
+            'recent_failures': recent_failures
+        }
+
+        weakness_score = calculate_weakness_score(topic_data)
+
+        updates.append((
+            topic, subject, total, correct, accuracy, avg_time, weakness_score, datetime.now(),
+            subject, total, correct, accuracy, avg_time, weakness_score, datetime.now()
+        ))
+
+        results.append({
+            'topic': topic,
+            'subject': subject,
+            'weakness_score': weakness_score,
+            **topic_data
+        })
+
+    if updates:
+        cursor.executemany('''
+            INSERT INTO weak_areas
+            (topic, subject, total_attempts, correct_attempts, accuracy_rate, avg_time_taken, weakness_score, last_updated)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(topic) DO UPDATE SET
+                subject = ?,
+                total_attempts = ?,
+                correct_attempts = ?,
+                accuracy_rate = ?,
+                avg_time_taken = ?,
+                weakness_score = ?,
+                last_updated = ?
+        ''', updates)
+
+    conn.commit()
+    conn.close()
     
     return sorted(results, key=lambda x: x['weakness_score'], reverse=True)
 
