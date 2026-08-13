@@ -1,0 +1,3 @@
+## 2026-08-12 - [Backend: Group By for UNION ALL Optimization]
+**Learning:** In the `get_time_distribution` endpoint (`backend/app/routes/analytics.py`), the previous code fetched all individual activity dates via a `UNION ALL` across three tables, loading a potentially massive number of records into memory just to count them per day. This creates an O(N) memory and data transfer bottleneck as a user's activity grows.
+**Action:** Wrapped the `UNION ALL` subqueries in a `SELECT date, COUNT(*) FROM (...) GROUP BY date` outer query. This shifts the aggregation workload to the SQLite database engine, significantly reducing the amount of data transferred and processed in Python to O(days) instead of O(activities).
