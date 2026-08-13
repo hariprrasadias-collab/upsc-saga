@@ -26,6 +26,22 @@ def create_custom_boss():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
+def calculate_boss_stats(boss_type, boss_id, count, name, loot):
+    # Scale HP based on question count (max 20 for a session)
+    hp = min(count, 20)
+    xp_reward = hp * 50 # 50 XP per question
+
+    return {
+        "id": boss_id,
+        "type": boss_type,
+        "name": name,
+        "hp": hp,
+        "max_hp": count, # Total available questions
+        "xp_reward": xp_reward,
+        "loot": loot
+    }
+
 def get_boss_stats(boss_type, boss_id):
     """Generate boss stats dynamically based on DB content"""
     conn = get_db()
@@ -71,32 +87,26 @@ def get_boss_stats(boss_type, boss_id):
         name = "Training Dummy"
         loot = ["Wooden Sword"]
         
-    # Scale HP based on question count (max 20 for a session)
-    hp = min(count, 20) 
-    xp_reward = hp * 50 # 50 XP per question
-    
-    return {
-        "id": boss_id,
-        "type": boss_type,
-        "name": name,
-        "hp": hp,
-        "max_hp": count, # Total available questions
-        "xp_reward": xp_reward,
-        "loot": loot
-    }
+    return calculate_boss_stats(boss_type, boss_id, count, name, loot)
 
 @arena_bp.route('/bosses', methods=['GET'])
 def get_available_bosses():
     """Get list of available bosses (Years, Subjects, and Custom)"""
     conn = get_db()
     
-    # Year Bosses
-    years = conn.execute("SELECT DISTINCT year FROM pyq_questions ORDER BY year DESC").fetchall()
-    year_bosses = [get_boss_stats('YEAR', row['year']) for row in years]
+    # Year Bosses - Optimized to use a single query instead of N+1
+    years_data = conn.execute("SELECT year, COUNT(*) as count FROM pyq_questions GROUP BY year ORDER BY year DESC").fetchall()
+    year_bosses = [
+        calculate_boss_stats('YEAR', row['year'], row['count'], f"The {row['year']} Titan", ["Time Capsule", "Ancient Scroll"])
+        for row in years_data
+    ]
     
-    # Subject Bosses
-    subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
-    subject_bosses = [get_boss_stats('SUBJECT', row['subject']) for row in subjects]
+    # Subject Bosses - Optimized to use a single query instead of N+1
+    subjects_data = conn.execute("SELECT subject, COUNT(*) as count FROM pyq_questions GROUP BY subject ORDER BY subject").fetchall()
+    subject_bosses = [
+        calculate_boss_stats('SUBJECT', row['subject'], row['count'], f"The {row['subject']} Golem", ["Subject Mastery Token", "Skill Point"])
+        for row in subjects_data
+    ]
     
     # Custom Bosses
     custom = conn.execute("SELECT id FROM custom_bosses WHERE is_active = 1 ORDER BY created_at DESC").fetchall()
@@ -112,7 +122,6 @@ def get_available_bosses():
         "subject_bosses": subject_bosses,
         "custom_bosses": custom_bosses
     })
-
 @arena_bp.route('/fight/start', methods=['POST'])
 def start_fight():
     try:
