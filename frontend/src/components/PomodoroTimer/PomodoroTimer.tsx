@@ -222,23 +222,15 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
             <div className="pomodoro-header">
                 <h3>{mode === 'work' ? '⚔️ BATTLE TIME' : '🛡️ RESPITE'}</h3>
                 <div className="pomodoro-controls">
-                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"} aria-label={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}>
-                        <span aria-hidden="true">{isFullscreen ? '↙️' : '⛶'}</span>
+                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
+                        {isFullscreen ? '↙️' : '⛶'}
                     </button>
                     {isFullscreen && (
-                        <button onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close" aria-label="Close Fullscreen">
-                            <span aria-hidden="true">✕</span>
-                        </button>
+                        <button onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close">✕</button>
                     )}
-                    <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" title="History" aria-label="View History">
-                        <span aria-hidden="true">📊</span>
-                    </button>
-                    <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" title="Settings" aria-label="Open Settings">
-                        <span aria-hidden="true">⚙️</span>
-                    </button>
-                    <button onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize" aria-label="Minimize Timer">
-                        <span aria-hidden="true">−</span>
-                    </button>
+                    <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" title="History">📊</button>
+                    <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" title="Settings">⚙️</button>
+                    <button onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize">−</button>
                 </div>
             </div>
 
