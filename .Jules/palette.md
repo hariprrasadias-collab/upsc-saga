@@ -7,3 +7,7 @@
 ## 2026-08-15 - Handling missing module in tests
 
 **Learning:** Running `pnpm exec vitest run` in the `frontend` folder currently fails due to a missing `/app/frontend/src/setupTests.ts` file. Pre-existing lint and test errors can be ignored safely if our change is unrelated.
+
+## 2026-08-15 - Fixing deployment issues
+
+**Learning:** When trying to fix an issue where a PR was rejected from Render, we can modify `package.json` to have build point to `pnpm run build` and remove the duplicate `scripts` object and unused `_isUpscale` in `VisualPromptRenderer.tsx`.
