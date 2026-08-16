@@ -147,25 +147,26 @@ def get_time_distribution():
         start_date = (datetime.now() - timedelta(days=days)).isoformat()
         end_date = datetime.now().isoformat()
         
-        # Get all activity dates
+        # Get all activity dates grouped by the database
         activities = {}
         
         # Group by date
         dates = conn.execute('''
-            SELECT DATE(submitted_at) as date FROM test_attempts
-            WHERE user_id = ? AND submitted_at >= ?
-            UNION ALL
-            SELECT DATE(submitted_at) FROM user_answers
-            WHERE user_id = ? AND submitted_at >= ?
-            UNION ALL
-            SELECT DATE(reviewed_at) FROM review_sessions
-            WHERE user_id = ? AND reviewed_at >= ?
+            SELECT date, COUNT(*) as count FROM (
+                SELECT DATE(submitted_at) as date FROM test_attempts
+                WHERE user_id = ? AND submitted_at >= ?
+                UNION ALL
+                SELECT DATE(submitted_at) FROM user_answers
+                WHERE user_id = ? AND submitted_at >= ?
+                UNION ALL
+                SELECT DATE(reviewed_at) FROM review_sessions
+                WHERE user_id = ? AND reviewed_at >= ?
+            ) GROUP BY date
         ''', (user_id, start_date, user_id, start_date, user_id, start_date)).fetchall()
         
         # Count activities per date
         for row in dates:
-            date = row['date']
-            activities[date] = activities.get(date, 0) + 1
+            activities[row['date']] = row['count']
         
         # Convert to heatmap format: [{date, value}]
         heatmap_data = [
