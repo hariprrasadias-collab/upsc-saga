@@ -1,0 +1,3 @@
+## 2024-11-20 - [Avoid O(N) memory bottlenecks with UNION ALL in SQLite]
+**Learning:** When retrieving and counting records combined from multiple tables using `UNION ALL`, fetching all raw rows into Python memory before aggregating causes severe O(N) memory and data transfer bottlenecks, especially for high-frequency logs like activity timestamps.
+**Action:** Always wrap the `UNION ALL` queries in a subquery and apply a SQL `GROUP BY` clause (e.g., `SELECT date, COUNT(*) FROM (...) GROUP BY date`) to shift the aggregation workload to the SQLite database itself.
