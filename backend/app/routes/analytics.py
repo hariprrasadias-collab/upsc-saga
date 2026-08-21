@@ -141,8 +141,9 @@ def get_subject_wise():
                        COUNT(*) as total,
                        SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
                 FROM syllabus_topics
+                WHERE user_id = ?
                 GROUP BY subject
-            ''').fetchall()}
+            ''', (user_id,)).fetchall()}
         except Exception:
             syllabus_data = {}
 
