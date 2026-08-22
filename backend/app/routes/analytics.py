@@ -111,20 +111,55 @@ def get_subject_wise():
         subjects = ['GS1', 'GS2', 'GS3', 'GS4', 'Prelims', 'Optional']
         results = []
         
+        # Bolt optimization: Eliminate N+1 query by aggregating outside the loop
+        try:
+            mock_avgs = {row['subject']: row['avg_score'] for row in conn.execute('''
+                SELECT mt.subject, AVG(score) as avg_score
+                FROM test_attempts mta
+                JOIN mock_tests mt ON mta.test_id = mt.id
+                WHERE mta.user_id = ?
+                GROUP BY mt.subject
+            ''', (user_id,)).fetchall()}
+        except Exception:
+            mock_avgs = {}
+
+        try:
+            answer_avgs = {row['subject']: row['avg_score'] for row in conn.execute('''
+                SELECT aq.subject, AVG(ae.overall_score) as avg_score
+                FROM answer_evaluations ae
+                JOIN user_answers ua ON ae.answer_id = ua.id
+                JOIN answer_questions aq ON ua.prompt_id = aq.id
+                WHERE ua.user_id = ?
+                GROUP BY aq.subject
+            ''', (user_id,)).fetchall()}
+        except Exception:
+            answer_avgs = {}
+
+        try:
+            syllabus_data = {row['subject']: {'total': row['total'], 'completed': row['completed']} for row in conn.execute('''
+                SELECT subject,
+                       COUNT(*) as total,
+                       SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+                FROM syllabus_topics
+                WHERE user_id = ?
+                GROUP BY subject
+            ''', (user_id,)).fetchall()}
+        except Exception:
+            syllabus_data = {}
+
         for subject in subjects:
-            try:
-                perf = get_subject_performance(conn, user_id, subject)
-                results.append(perf)
-            except Exception:
-                # Return empty data for missing tables
-                results.append({
-                    'subject': subject,
-                    'mock_avg': 0,
-                    'answer_avg': 0,
-                    'syllabus_pct': 0,
-                    'pyq_attempted': 0,
-                    'flashcard_mastered': 0
-                })
+            perf = {
+                'subject': subject,
+                'mock_avg': round(mock_avgs.get(subject, 0), 1) if mock_avgs.get(subject) else 0,
+                'answer_avg': round(answer_avgs.get(subject, 0), 1) if answer_avgs.get(subject) else 0,
+                'syllabus_pct': 0,
+                'pyq_attempted': 0,
+                'flashcard_mastered': 0
+            }
+            s_data = syllabus_data.get(subject)
+            if s_data and s_data['total'] > 0:
+                perf['syllabus_pct'] = round((s_data['completed'] / s_data['total']) * 100, 1)
+            results.append(perf)
         
         return jsonify(results)
     except Exception as e:
