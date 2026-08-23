@@ -109,23 +109,63 @@ def get_subject_wise():
         conn = get_db()
         
         subjects = ['GS1', 'GS2', 'GS3', 'GS4', 'Prelims', 'Optional']
+        
+        # Batch mock tests
+        mock_data = {}
+        try:
+            placeholders = ','.join(['?'] * len(subjects))
+            mock_res = conn.execute(f'''
+                SELECT mt.subject, AVG(mta.score) as avg_score
+                FROM test_attempts mta
+                JOIN mock_tests mt ON mta.test_id = mt.id
+                WHERE mta.user_id = ? AND mt.subject IN ({placeholders})
+                GROUP BY mt.subject
+            ''', [user_id] + subjects).fetchall()
+            mock_data = {r['subject']: round(r['avg_score'], 1) for r in mock_res if r['avg_score']}
+        except Exception:
+            pass
+
+        # Batch answers
+        ans_data = {}
+        try:
+            placeholders = ','.join(['?'] * len(subjects))
+            ans_res = conn.execute(f'''
+                SELECT aq.subject, AVG(ae.overall_score) as avg_score
+                FROM answer_evaluations ae
+                JOIN user_answers ua ON ae.answer_id = ua.id
+                JOIN answer_questions aq ON ua.prompt_id = aq.id
+                WHERE ua.user_id = ? AND aq.subject IN ({placeholders})
+                GROUP BY aq.subject
+            ''', [user_id] + subjects).fetchall()
+            ans_data = {r['subject']: round(r['avg_score'], 1) for r in ans_res if r['avg_score']}
+        except Exception:
+            pass
+
+        # Batch syllabus
+        syl_data = {}
+        try:
+            placeholders = ','.join(['?'] * len(subjects))
+            syl_res = conn.execute(f'''
+                SELECT subject, COUNT(*) as total, SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+                FROM syllabus_topics
+                WHERE subject IN ({placeholders})
+                GROUP BY subject
+            ''', subjects).fetchall()
+            syl_data = {r['subject']: round((r['completed'] / r['total']) * 100, 1) for r in syl_res if r['total'] > 0}
+        except Exception:
+            pass
+
         results = []
-        
         for subject in subjects:
-            try:
-                perf = get_subject_performance(conn, user_id, subject)
-                results.append(perf)
-            except Exception:
-                # Return empty data for missing tables
-                results.append({
-                    'subject': subject,
-                    'mock_avg': 0,
-                    'answer_avg': 0,
-                    'syllabus_pct': 0,
-                    'pyq_attempted': 0,
-                    'flashcard_mastered': 0
-                })
-        
+            results.append({
+                'subject': subject,
+                'mock_avg': mock_data.get(subject, 0),
+                'answer_avg': ans_data.get(subject, 0),
+                'syllabus_pct': syl_data.get(subject, 0),
+                'pyq_attempted': 0,
+                'flashcard_mastered': 0
+            })
+
         return jsonify(results)
     except Exception as e:
         print(f"Subject-wise analytics error: {e}")
