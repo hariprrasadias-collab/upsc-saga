@@ -155,6 +155,38 @@ def get_subject_wise():
         except Exception:
             pass
 
+        # Batch PYQ attempted
+        pyq_data = {}
+        try:
+            placeholders = ','.join(['?'] * len(subjects))
+            pyq_res = conn.execute(f'''
+                SELECT pq.subject, COUNT(DISTINCT pqa.question_id) as attempted
+                FROM pyq_quiz_answers pqa
+                JOIN pyq_questions pq ON pqa.question_id = pq.id
+                JOIN pyq_quiz_sessions pqs ON pqa.session_id = pqs.id
+                WHERE pqs.user_id = ? AND pq.subject IN ({placeholders})
+                GROUP BY pq.subject
+            ''', [user_id] + subjects).fetchall()
+            pyq_data = {r['subject']: r['attempted'] for r in pyq_res}
+        except Exception:
+            pass
+
+        # Batch Flashcard mastered
+        fc_data = {}
+        try:
+            placeholders = ','.join(['?'] * len(subjects))
+            fc_res = conn.execute(f'''
+                SELECT d.subject, COUNT(DISTINCT f.id) as mastered
+                FROM flashcards f
+                JOIN decks d ON f.deck_id = d.id
+                JOIN review_sessions rs ON rs.flashcard_id = f.id
+                WHERE rs.user_id = ? AND d.subject IN ({placeholders}) AND rs.rating >= 4
+                GROUP BY d.subject
+            ''', [user_id] + subjects).fetchall()
+            fc_data = {r['subject']: r['mastered'] for r in fc_res}
+        except Exception:
+            pass
+
         results = []
         for subject in subjects:
             results.append({
@@ -162,8 +194,8 @@ def get_subject_wise():
                 'mock_avg': mock_data.get(subject, 0),
                 'answer_avg': ans_data.get(subject, 0),
                 'syllabus_pct': syl_data.get(subject, 0),
-                'pyq_attempted': 0,
-                'flashcard_mastered': 0
+                'pyq_attempted': pyq_data.get(subject, 0),
+                'flashcard_mastered': fc_data.get(subject, 0)
             })
 
         return jsonify(results)
