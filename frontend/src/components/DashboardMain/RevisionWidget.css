@@ -511,3 +511,13 @@
         margin: auto;
         box-shadow: 0 0 20px rgba(212, 165, 116, 0.2);
     }
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
