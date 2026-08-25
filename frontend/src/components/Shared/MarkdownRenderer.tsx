@@ -8,7 +8,10 @@ interface MarkdownRendererProps {
     className?: string;
 }
 
-const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className = '' }) => {
+// ⚡ Bolt Performance Optimization:
+// Wrapped in React.memo to prevent expensive re-parsing of markdown content on every parent render.
+// Impact: Reduces CPU load and prevents main-thread blocking during rapid state changes in parent components (e.g., typing in sibling inputs).
+const MarkdownRenderer: React.FC<MarkdownRendererProps> = React.memo(({ content, className = '' }) => {
     return (
         <div className={`markdown-content ${className}`}>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -16,6 +19,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className 
             </ReactMarkdown>
         </div>
     );
-};
+});
+MarkdownRenderer.displayName = 'MarkdownRenderer';
 
 export default MarkdownRenderer;
