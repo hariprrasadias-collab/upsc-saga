@@ -1,5 +1,5 @@
 // /frontend/src/components/AshParticles.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 interface Particle {
   id: number;
@@ -13,10 +13,12 @@ interface AshParticlesProps {
   isRageMode: boolean;
 }
 
-const AshParticles: React.FC<AshParticlesProps> = ({ isRageMode }) => {
-  const [particles, setParticles] = useState<Particle[]>([]);
-
-  useEffect(() => {
+// ⚡ Bolt Optimization: Use React.memo to prevent O(N) re-renders
+// when parent components update global state.
+const AshParticles: React.FC<AshParticlesProps> = React.memo(({ isRageMode }) => {
+  // ⚡ Bolt Optimization: Use lazy useState initialization instead of useEffect
+  // to avoid a double-render on component mount and guarantee stable random values.
+  const [particles] = useState(() => {
     const count = 50; // Number of particles
     const newParticles: Particle[] = [];
     for (let i = 0; i < count; i++) {
@@ -28,9 +30,8 @@ const AshParticles: React.FC<AshParticlesProps> = ({ isRageMode }) => {
         size: `${Math.random() * 3 + 2}px`,
       });
     }
-     
-    setParticles(newParticles);
-  }, []);
+    return newParticles;
+  });
 
   return (
     <div style={{
@@ -66,6 +67,6 @@ const AshParticles: React.FC<AshParticlesProps> = ({ isRageMode }) => {
       ))}
     </div>
   );
-};
+});
 
 export default AshParticles;
