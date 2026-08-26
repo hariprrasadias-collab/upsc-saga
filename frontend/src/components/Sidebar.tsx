@@ -1,47 +1,10 @@
 // Sidebar with Expandable Groups — Runic Forge Edition
-import React, { useState, memo } from 'react';
+import React, { useState, memo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Sidebar.css';
 import { useGlobal } from '../contexts/GlobalContext';
 
-const Sidebar: React.FC = memo(() => {
-  const { currentTab, setCurrentTab, isSidebarOpen, toggleSidebar, toggleMimir } = useGlobal();
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
-    planning: true,
-    training: false,
-    knowledge: false,
-    enhancement: false,
-    admin: false
-  });
-
-  const navigate = useNavigate();
-
-  const toggleGroup = (group: string) => {
-    setExpandedGroups(prev => ({
-      ...prev,
-      [group]: !prev[group]
-    }));
-  };
-
-  const handleTabChange = (tabId: string) => {
-    if (tabId === 'mimir') {
-      toggleMimir(true);
-      // On mobile, close sidebar after selection
-      if (window.innerWidth <= 768) {
-        toggleSidebar();
-      }
-      return;
-    }
-
-    setCurrentTab(tabId);
-    navigate('/');
-    // On mobile, close sidebar after selection
-    if (window.innerWidth <= 768) {
-      toggleSidebar();
-    }
-  };
-
-  const menuGroups = {
+const menuGroups = {
     planning: {
       title: '🗺️ Planning',
       items: [
@@ -105,6 +68,44 @@ const Sidebar: React.FC = memo(() => {
       ]
     }
   };
+
+const Sidebar: React.FC = memo(() => {
+  const { currentTab, setCurrentTab, isSidebarOpen, toggleSidebar, toggleMimir } = useGlobal();
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
+    planning: true,
+    training: false,
+    knowledge: false,
+    enhancement: false,
+    admin: false
+  });
+
+  const navigate = useNavigate();
+
+  const toggleGroup = useCallback((group: string) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [group]: !prev[group]
+    }));
+  }, []);
+
+  const handleTabChange = useCallback((tabId: string) => {
+    if (tabId === 'mimir') {
+      toggleMimir(true);
+      // On mobile, close sidebar after selection
+      if (window.innerWidth <= 768) {
+        toggleSidebar();
+      }
+      return;
+    }
+
+    setCurrentTab(tabId);
+    navigate('/');
+    // On mobile, close sidebar after selection
+    if (window.innerWidth <= 768) {
+      toggleSidebar();
+    }
+  }, [toggleMimir, toggleSidebar, setCurrentTab, navigate]);
+
 
   return (
     <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
