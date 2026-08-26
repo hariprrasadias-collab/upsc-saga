@@ -10,3 +10,6 @@
 ## 2024-08-26 - [Sidebar Memoization]
 **Learning:** Re-creating a large static object (menuGroups) on every render in a frequently toggled component like Sidebar causes unnecessary processing overhead.
 **Action:** Hoist static large configuration objects like menu definitions outside of the component module scope to prevent unnecessary allocations.
+## 2024-08-26 - [Bypass faulty root package.json build script on Render]
+**Learning:** The repository's root package.json contains a duplicate scripts block that overwrites the correct build process, causing Render deployments to fail as it fails to copy the dist folder properly.
+**Action:** When restricted from modifying package.json, explicitly instruct the user to configure the Build Command and Publish Directory in the Render Dashboard to bypass the faulty scripts.
