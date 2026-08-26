@@ -219,7 +219,7 @@ const NexusGraph: React.FC<NexusGraphProps> = React.memo(({ engine, completedIte
                     color: '#ecf0f1',
                     zIndex: 10
                 }}>
-                    <button
+                    <button aria-label="Close"
                         onClick={() => setSelectedNode(null)}
                         style={{
                             position: 'absolute',
