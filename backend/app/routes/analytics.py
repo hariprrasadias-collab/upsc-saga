@@ -111,21 +111,58 @@ def get_subject_wise():
         subjects = ['GS1', 'GS2', 'GS3', 'GS4', 'Prelims', 'Optional']
         results = []
         
-        for subject in subjects:
-            try:
-                perf = get_subject_performance(conn, user_id, subject)
-                results.append(perf)
-            except Exception:
-                # Return empty data for missing tables
-                results.append({
-                    'subject': subject,
-                    'mock_avg': 0,
-                    'answer_avg': 0,
-                    'syllabus_pct': 0,
-                    'pyq_attempted': 0,
-                    'flashcard_mastered': 0
-                })
+        try:
+            # Optimized query using GROUP BY
+            mock_data = conn.execute('''
+                SELECT mt.subject, AVG(score) as avg_score
+                FROM test_attempts mta
+                JOIN mock_tests mt ON mta.test_id = mt.id
+                WHERE mta.user_id = ? AND mt.subject IN ({})
+                GROUP BY mt.subject
+            '''.format(','.join(['?'] * len(subjects))), (user_id, *subjects)).fetchall()
+        except Exception:
+            mock_data = []
+
+        try:
+            answer_data = conn.execute('''
+                SELECT aq.subject, AVG(ae.overall_score) as avg_score
+                FROM answer_evaluations ae
+                JOIN user_answers ua ON ae.answer_id = ua.id
+                JOIN answer_questions aq ON ua.prompt_id = aq.id
+                WHERE ua.user_id = ? AND aq.subject IN ({})
+                GROUP BY aq.subject
+            '''.format(','.join(['?'] * len(subjects))), (user_id, *subjects)).fetchall()
+        except Exception:
+            answer_data = []
+
+        try:
+            syllabus_data = conn.execute('''
+                SELECT
+                    subject,
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+                FROM syllabus_topics
+                WHERE subject IN ({})
+                GROUP BY subject
+            '''.format(','.join(['?'] * len(subjects))), (*subjects,)).fetchall()
+        except Exception:
+            syllabus_data = []
+
+        # Convert to dicts for O(1) lookup
+        mock_dict = {row['subject']: round(row['avg_score'], 1) for row in mock_data if row['avg_score'] is not None}
+        answer_dict = {row['subject']: round(row['avg_score'], 1) for row in answer_data if row['avg_score'] is not None}
+        syllabus_dict = {row['subject']: round((row['completed'] / row['total']) * 100, 1) for row in syllabus_data if row['total'] > 0}
         
+        for subject in subjects:
+            results.append({
+                'subject': subject,
+                'mock_avg': mock_dict.get(subject, 0),
+                'answer_avg': answer_dict.get(subject, 0),
+                'syllabus_pct': syllabus_dict.get(subject, 0),
+                'pyq_attempted': 0,
+                'flashcard_mastered': 0
+            })
+
         return jsonify(results)
     except Exception as e:
         print(f"Subject-wise analytics error: {e}")
