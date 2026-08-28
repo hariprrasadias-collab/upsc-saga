@@ -118,6 +118,7 @@ def get_all_subjects_performance(conn, user_id, subjects):
                 results_map[subj]['answer_avg'] = round(row['avg_score'], 1)
 
         # Syllabus completion (batch)
+        # Note: syllabus_topics currently does not have a user_id column in production.
         syllabus = conn.execute('''
             SELECT
                 subject,
@@ -130,8 +131,35 @@ def get_all_subjects_performance(conn, user_id, subjects):
             subj = row['subject']
             if subj in results_map and row['total'] > 0:
                 results_map[subj]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+
+        # Pyq attempted (batch)
+        pyq_stats = conn.execute('''
+            SELECT qm.subject, COUNT(pqa.id) as attempted
+            FROM pyq_quiz_answers pqa
+            JOIN pyq_quiz_sessions pqs ON pqa.session_id = pqs.id
+            JOIN questions_master qm ON pqa.question_id = qm.id
+            WHERE pqs.user_id = ?
+            GROUP BY qm.subject
+        ''', (user_id,)).fetchall()
+        for row in pyq_stats:
+            subj = row['subject']
+            if subj in results_map:
+                results_map[subj]['pyq_attempted'] = row['attempted']
+
+        # Flashcard mastered (batch)
+        flashcard_stats = conn.execute('''
+            SELECT d.subject, COUNT(f.id) as mastered
+            FROM flashcards f
+            JOIN decks d ON f.deck_id = d.id
+            JOIN flashcard_reviews fr ON f.id = fr.flashcard_id
+            WHERE d.user_id = ? AND fr.rating >= 4
+            GROUP BY d.subject
+        ''', (user_id,)).fetchall()
+        for row in flashcard_stats:
+            subj = row['subject']
+            if subj in results_map:
+                results_map[subj]['flashcard_mastered'] = row['mastered']
     except Exception as e:
-        print(f"Error fetching all subjects performance: {e}")
         pass
 
     return [results_map[s] for s in subjects]
