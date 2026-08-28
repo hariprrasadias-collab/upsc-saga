@@ -89,8 +89,9 @@ def get_all_subjects_performance(conn, user_id, subjects):
             'flashcard_mastered': 0
         } for s in subjects
     }
+
+    # Mock tests (batch)
     try:
-        # Mock tests (batch)
         mock_avg = conn.execute('''
             SELECT mt.subject, AVG(score) as avg_score
             FROM test_attempts mta
@@ -102,8 +103,11 @@ def get_all_subjects_performance(conn, user_id, subjects):
             subj = row['subject']
             if subj in results_map and row['avg_score']:
                 results_map[subj]['mock_avg'] = round(row['avg_score'], 1)
+    except Exception:
+        pass
 
-        # Answer writing (batch)
+    # Answer writing (batch)
+    try:
         answer_avg = conn.execute('''
             SELECT aq.subject, AVG(ae.overall_score) as avg_score
             FROM answer_evaluations ae
@@ -116,9 +120,11 @@ def get_all_subjects_performance(conn, user_id, subjects):
             subj = row['subject']
             if subj in results_map and row['avg_score']:
                 results_map[subj]['answer_avg'] = round(row['avg_score'], 1)
+    except Exception:
+        pass
 
-        # Syllabus completion (batch)
-        # Note: syllabus_topics currently does not have a user_id column in production.
+    # Syllabus completion (batch)
+    try:
         syllabus = conn.execute('''
             SELECT
                 subject,
@@ -131,8 +137,11 @@ def get_all_subjects_performance(conn, user_id, subjects):
             subj = row['subject']
             if subj in results_map and row['total'] > 0:
                 results_map[subj]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+    except Exception:
+        pass
 
-        # Pyq attempted (batch)
+    # Pyq attempted (batch)
+    try:
         pyq_stats = conn.execute('''
             SELECT qm.subject, COUNT(pqa.id) as attempted
             FROM pyq_quiz_answers pqa
@@ -145,8 +154,11 @@ def get_all_subjects_performance(conn, user_id, subjects):
             subj = row['subject']
             if subj in results_map:
                 results_map[subj]['pyq_attempted'] = row['attempted']
+    except Exception:
+        pass
 
-        # Flashcard mastered (batch)
+    # Flashcard mastered (batch)
+    try:
         flashcard_stats = conn.execute('''
             SELECT d.subject, COUNT(f.id) as mastered
             FROM flashcards f
@@ -159,7 +171,7 @@ def get_all_subjects_performance(conn, user_id, subjects):
             subj = row['subject']
             if subj in results_map:
                 results_map[subj]['flashcard_mastered'] = row['mastered']
-    except Exception as e:
+    except Exception:
         pass
 
     return [results_map[s] for s in subjects]
