@@ -1,3 +1,6 @@
-## 2024-05-23 - Toast Notification Accessibility
-**Learning:** Notifications are often invisible to screen readers without proper roles. Using `role="alert"` for errors (assertive) and `role="status"` for info (polite) ensures users are notified at the right urgency level.
-**Action:** Always categorize toast notifications by urgency and apply corresponding `aria-live` regions, while ensuring close buttons have clear labels.
+## 2024-05-18 - [Add ARIA labels to close buttons]
+**Learning:** Adding ARIA labels to close buttons significantly improves accessibility for screen readers.
+**Action:** Always add aria-label="Close" or similar to 'x' buttons.
+## 2024-05-18 - Make interactive divs accessible
+**Learning:** Custom interactive elements (like `div`s with `onClick`) are completely invisible to keyboard navigation. This breaks accessibility for a significant portion of users.
+**Action:** Always add `role="button"`, `tabIndex={0}`, and an `onKeyDown` handler (supporting 'Enter' and ' ') to custom interactive elements.
