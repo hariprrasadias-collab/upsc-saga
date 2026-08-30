@@ -83,31 +83,34 @@ def get_year_trends():
     """Get year-wise subject distribution for Stacked Bar Chart"""
     conn = get_db()
     try:
-        # Get all years and subjects
-        years = conn.execute("SELECT DISTINCT year FROM pyq_questions ORDER BY year").fetchall()
-        subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
+        # Fetch all counts in a single query to eliminate N+1 problem
+        # ⚡ Bolt: Reduced DB queries from (1+N) to 1 by using GROUP BY.
+        rows = conn.execute('''
+            SELECT year, subject, COUNT(*) as count
+            FROM pyq_questions
+            GROUP BY year, subject
+            ORDER BY year, subject
+        ''').fetchall()
         
-        data = []
-        for year_row in years:
-            year = year_row['year']
-            year_data = {"year": year}
+        # We need all subjects across all years to ensure every year has keys for all subjects
+        subjects = conn.execute("SELECT DISTINCT subject FROM pyq_questions ORDER BY subject").fetchall()
+        all_subjects = [row['subject'] for row in subjects]
+
+        years_data = {}
+        for row in rows:
+            year = row['year']
+            subject = row['subject']
+            count = row['count']
             
-            # Get counts for this year
-            counts = conn.execute('''
-                SELECT subject, COUNT(*) as count 
-                FROM pyq_questions 
-                WHERE year = ? 
-                GROUP BY subject
-            ''', (year,)).fetchall()
+            if year not in years_data:
+                # Initialize year data with 0 for all subjects
+                years_data[year] = {"year": year}
+                for s in all_subjects:
+                    years_data[year][s] = 0
             
-            count_map = {row['subject']: row['count'] for row in counts}
+            years_data[year][subject] = count
             
-            for sub_row in subjects:
-                subject = sub_row['subject']
-                year_data[subject] = count_map.get(subject, 0)
-                
-            data.append(year_data)
-            
+        data = list(years_data.values())
         return jsonify(data)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
