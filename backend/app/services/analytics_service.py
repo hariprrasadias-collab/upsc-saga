@@ -75,6 +75,107 @@ def calculate_study_hours(conn, user_id, start_date, end_date):
         return 0
 
 
+def get_all_subjects_performance(conn, user_id, subjects):
+    """
+    Aggregate all metrics for multiple subjects in a single batch
+    """
+    results_map = {
+        s: {
+            'subject': s,
+            'mock_avg': 0,
+            'answer_avg': 0,
+            'syllabus_pct': 0,
+            'pyq_attempted': 0,
+            'flashcard_mastered': 0
+        } for s in subjects
+    }
+
+    # Mock tests (batch)
+    try:
+        mock_avg = conn.execute('''
+            SELECT mt.subject, AVG(score) as avg_score
+            FROM test_attempts mta
+            JOIN mock_tests mt ON mta.test_id = mt.id
+            WHERE mta.user_id = ?
+            GROUP BY mt.subject
+        ''', (user_id,)).fetchall()
+        for row in mock_avg:
+            subj = row['subject']
+            if subj in results_map and row['avg_score']:
+                results_map[subj]['mock_avg'] = round(row['avg_score'], 1)
+    except Exception:
+        pass
+
+    # Answer writing (batch)
+    try:
+        answer_avg = conn.execute('''
+            SELECT aq.subject, AVG(ae.overall_score) as avg_score
+            FROM answer_evaluations ae
+            JOIN user_answers ua ON ae.answer_id = ua.id
+            JOIN answer_questions aq ON ua.prompt_id = aq.id
+            WHERE ua.user_id = ?
+            GROUP BY aq.subject
+        ''', (user_id,)).fetchall()
+        for row in answer_avg:
+            subj = row['subject']
+            if subj in results_map and row['avg_score']:
+                results_map[subj]['answer_avg'] = round(row['avg_score'], 1)
+    except Exception:
+        pass
+
+    # Syllabus completion (batch)
+    try:
+        syllabus = conn.execute('''
+            SELECT
+                subject,
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+            FROM syllabus_topics
+            GROUP BY subject
+        ''').fetchall()
+        for row in syllabus:
+            subj = row['subject']
+            if subj in results_map and row['total'] > 0:
+                results_map[subj]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+    except Exception:
+        pass
+
+    # Pyq attempted (batch)
+    try:
+        pyq_stats = conn.execute('''
+            SELECT qm.subject, COUNT(pqa.id) as attempted
+            FROM pyq_quiz_answers pqa
+            JOIN pyq_quiz_sessions pqs ON pqa.session_id = pqs.id
+            JOIN questions_master qm ON pqa.question_id = qm.id
+            WHERE pqs.user_id = ?
+            GROUP BY qm.subject
+        ''', (user_id,)).fetchall()
+        for row in pyq_stats:
+            subj = row['subject']
+            if subj in results_map:
+                results_map[subj]['pyq_attempted'] = row['attempted']
+    except Exception:
+        pass
+
+    # Flashcard mastered (batch)
+    try:
+        flashcard_stats = conn.execute('''
+            SELECT d.subject, COUNT(f.id) as mastered
+            FROM flashcards f
+            JOIN decks d ON f.deck_id = d.id
+            JOIN flashcard_reviews fr ON f.id = fr.flashcard_id
+            WHERE d.user_id = ? AND fr.rating >= 4
+            GROUP BY d.subject
+        ''', (user_id,)).fetchall()
+        for row in flashcard_stats:
+            subj = row['subject']
+            if subj in results_map:
+                results_map[subj]['flashcard_mastered'] = row['mastered']
+    except Exception:
+        pass
+
+    return [results_map[s] for s in subjects]
+
 def get_subject_performance(conn, user_id, subject):
     """
     Aggregate all metrics for a specific subject
