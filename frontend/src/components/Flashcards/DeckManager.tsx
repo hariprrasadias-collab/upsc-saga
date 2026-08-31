@@ -369,7 +369,7 @@ const DeckCardList: React.FC<DeckCardListProps> = ({ deckId, onClose, onUpdate }
             <div className="modal-content card-list-modal" style={{ maxWidth: '800px', width: '90%' }}>
                 <div className="modal-header">
                     <h3>Deck Cards</h3>
-                    <button onClick={onClose} className="close-btn">×</button>
+                    <button aria-label="Close" onClick={onClose} className="close-btn">×</button>
                 </div>
                 <div className="cards-list-container" style={{ maxHeight: '60vh', overflowY: 'auto', marginTop: '1rem' }}>
                     {loading ? <div>Loading cards...</div> : cards.length === 0 ? <div>No cards in this deck.</div> : (

@@ -29,7 +29,7 @@ const DetailedReport: React.FC<DetailedReportProps> = ({ data, onClose }) => {
             <div className="report-modal">
                 <div className="report-header">
                     <h2>Examiner's Evaluation</h2>
-                    <button className="close-btn" onClick={onClose}>×</button>
+                    <button aria-label="Close" className="close-btn" onClick={onClose}>×</button>
                 </div>
 
                 <div className="report-content">
