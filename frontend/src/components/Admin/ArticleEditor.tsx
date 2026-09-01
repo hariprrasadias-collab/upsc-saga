@@ -53,7 +53,7 @@ const ArticleEditor: React.FC<ArticleEditorProps> = ({ onClose, onSave }) => {
             <div className="modal-content animate-scale-in">
                 <div className="modal-header">
                     <h2>New Article</h2>
-                    <button className="close-btn" onClick={onClose}>×</button>
+                    <button aria-label="Close" className="close-btn" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
