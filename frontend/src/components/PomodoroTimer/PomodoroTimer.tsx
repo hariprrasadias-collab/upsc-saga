@@ -14,7 +14,8 @@ import { AmbientSoundPlayer } from './AmbientSoundPlayer';
 import { SessionHistory } from './SessionHistory';
 
 // Internal FlipCard Component
-const FlipCard = ({ digit }: { digit: string }) => {
+// Bolt: Memoized to prevent unnecessary re-renders of static digits (e.g. minutes) every second.
+const FlipCard = React.memo(({ digit }: { digit: string }) => {
     const [prevDigit, setPrevDigit] = useState(digit);
     const [flipping, setFlipping] = useState(false);
 
@@ -48,7 +49,7 @@ const FlipCard = ({ digit }: { digit: string }) => {
             </div>
         </div>
     );
-};
+});
 
 interface PomodoroTimerProps {
     onSessionComplete?: () => void;
