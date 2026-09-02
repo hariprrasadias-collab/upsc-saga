@@ -170,7 +170,10 @@ const ModelAnswersManager: React.FC = () => {
             ) : (
                 <div className="answers-grid">
                     {answers.map(answer => (
-                        <div key={answer.id} className="answer-card" onClick={() => setSelectedAnswer(answer)}>
+                        <div key={answer.id} className="answer-card" onClick={() => setSelectedAnswer(answer)} role="button" tabIndex={0} onKeyDown={(e) => {
+                                if (e.key === 'Enter') setSelectedAnswer(answer);
+                                if (e.key === ' ') { e.preventDefault(); setSelectedAnswer(answer); }
+                            }}>
                             <div className="card-header">
                                 <h3 className="card-title">{answer.title}</h3>
                                 {answer.score && (
@@ -210,7 +213,7 @@ const ModelAnswersManager: React.FC = () => {
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2>{selectedAnswer.title}</h2>
-                            <button className="close-btn" onClick={() => setSelectedAnswer(null)}>×</button>
+                            <button className="close-btn" onClick={() => setSelectedAnswer(null)} aria-label="Close modal">×</button>
                         </div>
 
                         <div className="modal-body">
