@@ -109,22 +109,66 @@ def get_subject_wise():
         conn = get_db()
         
         subjects = ['GS1', 'GS2', 'GS3', 'GS4', 'Prelims', 'Optional']
-        results = []
         
-        for subject in subjects:
-            try:
-                perf = get_subject_performance(conn, user_id, subject)
-                results.append(perf)
-            except Exception:
-                # Return empty data for missing tables
-                results.append({
-                    'subject': subject,
-                    'mock_avg': 0,
-                    'answer_avg': 0,
-                    'syllabus_pct': 0,
-                    'pyq_attempted': 0,
-                    'flashcard_mastered': 0
-                })
+        perf_by_subject = {
+            subject: {
+                'subject': subject,
+                'mock_avg': 0,
+                'answer_avg': 0,
+                'syllabus_pct': 0,
+                'pyq_attempted': 0,
+                'flashcard_mastered': 0
+            } for subject in subjects
+        }
+
+        # Mock tests
+        try:
+            mock_data = conn.execute('''
+                SELECT mt.subject, AVG(mta.score) as avg_score
+                FROM test_attempts mta
+                JOIN mock_tests mt ON mta.test_id = mt.id
+                WHERE mta.user_id = ?
+                GROUP BY mt.subject
+            ''', (user_id,)).fetchall()
+            for row in mock_data:
+                if row['subject'] in perf_by_subject and row['avg_score']:
+                    perf_by_subject[row['subject']]['mock_avg'] = round(row['avg_score'], 1)
+        except Exception:
+            pass
+
+        # Answer writing
+        try:
+            answer_data = conn.execute('''
+                SELECT aq.subject, AVG(ae.overall_score) as avg_score
+                FROM answer_evaluations ae
+                JOIN user_answers ua ON ae.answer_id = ua.id
+                JOIN answer_questions aq ON ua.prompt_id = aq.id
+                WHERE ua.user_id = ?
+                GROUP BY aq.subject
+            ''', (user_id,)).fetchall()
+            for row in answer_data:
+                if row['subject'] in perf_by_subject and row['avg_score']:
+                    perf_by_subject[row['subject']]['answer_avg'] = round(row['avg_score'], 1)
+        except Exception:
+            pass
+
+        # Syllabus completion
+        try:
+            syllabus_data = conn.execute('''
+                SELECT
+                    subject,
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+                FROM syllabus_topics
+                GROUP BY subject
+            ''').fetchall()
+            for row in syllabus_data:
+                if row['subject'] in perf_by_subject and row['total'] > 0:
+                    perf_by_subject[row['subject']]['syllabus_pct'] = round((row['completed'] / row['total']) * 100, 1)
+        except Exception:
+            pass
+
+        results = [perf_by_subject[subject] for subject in subjects]
         
         return jsonify(results)
     except Exception as e:
