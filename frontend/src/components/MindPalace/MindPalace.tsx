@@ -256,7 +256,7 @@ const MindPalace: React.FC = () => {
                     <div className="palace-modal" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2>Construct New Location</h2>
-                            <button className="close-btn" onClick={() => setShowLocationModal(false)}>×</button>
+                            <button aria-label="Close" className="close-btn" onClick={() => setShowLocationModal(false)}>×</button>
                         </div>
                         <div className="form-group">
                             <label>Name</label>
