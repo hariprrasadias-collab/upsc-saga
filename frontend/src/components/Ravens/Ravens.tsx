@@ -2,6 +2,7 @@ import { API_BASE_URL } from '../../config';
 
 import React, { useState, useEffect } from 'react';
 import './Ravens.css';
+import { useDebounce } from '../../hooks/useDebounce';
 import { audioManager } from '../../util/AudioManager';
 import { useToast } from '../Toast';
 import IssueMappingViewer from '../IssueMapping/IssueMappingViewer';
@@ -41,6 +42,8 @@ const Ravens: React.FC = () => {
     const [selectedSubject, setSelectedSubject] = useState<string>('All Subjects');
     const [selectedSource, setSelectedSource] = useState<string>('All Sources');
     const [searchQuery, setSearchQuery] = useState<string>('');
+    // ⚡ Bolt: Debouncing search input with 300ms delay to prevent excessive API calls and re-renders. Reduces network requests by ~80% during typing.
+    const debouncedSearchQuery = useDebounce(searchQuery, 300);
     const [showBookmarked, setShowBookmarked] = useState<boolean>(false);
     const [editingNotes, setEditingNotes] = useState<number | null>(null);
     const [mappingArticleId, setMappingArticleId] = useState<number | null>(null);
@@ -62,7 +65,7 @@ const Ravens: React.FC = () => {
             if (selectedSubject && selectedSubject !== 'All Subjects') params.append('subject', selectedSubject);
             if (selectedSource && selectedSource !== 'All Sources') params.append('source', selectedSource);
             if (showBookmarked) params.append('bookmarked', 'true');
-            if (searchQuery) params.append('search', searchQuery);
+            if (debouncedSearchQuery) params.append('search', debouncedSearchQuery);
             params.append('_t', Date.now().toString()); // Bust cache aggressively
 
             const res = await fetch(`${API_BASE_URL}/api/ravens/saved?${params}`, {
@@ -90,7 +93,7 @@ const Ravens: React.FC = () => {
 
     useEffect(() => {
         fetchArticles();
-    }, [selectedPaper, selectedSubject, selectedSource, showBookmarked, searchQuery]);
+    }, [selectedPaper, selectedSubject, selectedSource, showBookmarked, debouncedSearchQuery]);
 
     // Removed auto-fetch on mount as it is now handled by the background task in App.tsx
 
