@@ -223,20 +223,27 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
     }, [topics]);
 
     // ⚡ Bolt Optimization:
-    // Wrapped getProgress in useCallback with [analytics] dependency.
-    // Why: It relies only on `analytics`. Recreating it on every render caused unnecessary re-evaluations.
-    // Impact: Avoids unnecessary allocation and recalculation overhead when traversing subTopics.
-    const getProgress = useCallback((paper: string) => {
-        if (!analytics) return 0;
-        const total = analytics.totals.find(t => t.paper === paper)?.total || 0;
-        if (total === 0) return 0;
+    // Pre-calculate progress for all papers using useMemo instead of a function called during render.
+    // Why: Calling an inline function that filters/reduces arrays during render is O(N) per paper.
+    // Impact: Avoids unnecessary recalculation overhead by computing it once when analytics changes.
+    const progressMap = useMemo(() => {
+        const map: Record<string, number> = {};
+        if (!analytics) return map;
 
-        const completed = analytics.breakdown
-            .filter(b => b.paper === paper && b.status === 'Completed')
-            .reduce((acc, curr) => acc + curr.count, 0);
-
-        return Math.round((completed / total) * 100);
+        analytics.totals.forEach(t => {
+            if (t.total === 0) {
+                map[t.paper] = 0;
+                return;
+            }
+            const completed = analytics.breakdown
+                .filter(b => b.paper === t.paper && b.status === 'Completed')
+                .reduce((acc, curr) => acc + curr.count, 0);
+            map[t.paper] = Math.round((completed / t.total) * 100);
+        });
+        return map;
     }, [analytics]);
+
+    const getProgress = (paper: string) => progressMap[paper] || 0;
 
     const togglePaper = (paper: string) => {
         setExpandedPapers(prev => ({ ...prev, [paper]: !prev[paper] }));
