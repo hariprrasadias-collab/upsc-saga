@@ -16,6 +16,22 @@ interface SyllabusTrackerProps {
     onTaskCompleted?: () => void;
 }
 
+// ⚡ Bolt Optimization:
+// Extracted renderSyncMeter into a standalone React component (SyncMeter).
+// Why: When declared inside SyllabusTracker, the function is recreated on every render.
+// Impact: Improves modularity and allows React to better optimize component reconciliation.
+const SyncMeter = ({ percent }: { percent: number }) => {
+    const segments = 10;
+    const filledSegments = Math.round((percent / 100) * segments);
+    return (
+        <div className="sync-meter">
+            {Array.from({ length: segments }).map((_, i) => (
+                <div key={i} className={`sync-segment ${i < filledSegments ? 'filled' : ''}`}></div>
+            ))}
+        </div>
+    );
+};
+
 const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) => {
     const [topics, setTopics] = useState<Topic[]>([]);
     // Analytics is now derived from topics
@@ -206,7 +222,11 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         return groups;
     }, [topics]);
 
-    const getProgress = (paper: string) => {
+    // ⚡ Bolt Optimization:
+    // Wrapped getProgress in useCallback with [analytics] dependency.
+    // Why: It relies only on `analytics`. Recreating it on every render caused unnecessary re-evaluations.
+    // Impact: Avoids unnecessary allocation and recalculation overhead when traversing subTopics.
+    const getProgress = useCallback((paper: string) => {
         if (!analytics) return 0;
         const total = analytics.totals.find(t => t.paper === paper)?.total || 0;
         if (total === 0) return 0;
@@ -216,7 +236,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
             .reduce((acc, curr) => acc + curr.count, 0);
 
         return Math.round((completed / total) * 100);
-    };
+    }, [analytics]);
 
     const togglePaper = (paper: string) => {
         setExpandedPapers(prev => ({ ...prev, [paper]: !prev[paper] }));
@@ -226,17 +246,6 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         setExpandedSubjects(prev => ({ ...prev, [subjectKey]: !prev[subjectKey] }));
     };
 
-    const renderSyncMeter = (percent: number) => {
-        const segments = 10;
-        const filledSegments = Math.round((percent / 100) * segments);
-        return (
-            <div className="sync-meter">
-                {Array.from({ length: segments }).map((_, i) => (
-                    <div key={i} className={`sync-segment ${i < filledSegments ? 'filled' : ''}`}></div>
-                ))}
-            </div>
-        );
-    };
 
     if (loading) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading Syllabus Matrix...</div>;
 
@@ -268,7 +277,7 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
                 {['Prelims', 'GS1', 'GS2', 'GS3', 'GS4', 'Optional'].map(paper => (
                     <div key={paper} className="paper-card">
                         <div className="paper-title">{paper}</div>
-                        {renderSyncMeter(getProgress(paper))}
+                        <SyncMeter percent={getProgress(paper)} />
                         <div className="progress-text">
                             {getProgress(paper)}% SYNCHRONIZED
                         </div>

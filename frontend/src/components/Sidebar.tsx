@@ -4,44 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import './Sidebar.css';
 import { useGlobal } from '../contexts/GlobalContext';
 
-const Sidebar: React.FC = memo(() => {
-  const { currentTab, setCurrentTab, isSidebarOpen, toggleSidebar, toggleMimir } = useGlobal();
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
-    planning: true,
-    training: false,
-    knowledge: false,
-    enhancement: false,
-    admin: false
-  });
-
-  const navigate = useNavigate();
-
-  const toggleGroup = (group: string) => {
-    setExpandedGroups(prev => ({
-      ...prev,
-      [group]: !prev[group]
-    }));
-  };
-
-  const handleTabChange = (tabId: string) => {
-    if (tabId === 'mimir') {
-      toggleMimir(true);
-      // On mobile, close sidebar after selection
-      if (window.innerWidth <= 768) {
-        toggleSidebar();
-      }
-      return;
-    }
-
-    setCurrentTab(tabId);
-    navigate('/');
-    // On mobile, close sidebar after selection
-    if (window.innerWidth <= 768) {
-      toggleSidebar();
-    }
-  };
-
-  const menuGroups = {
+// ⚡ Bolt Optimization:
+// Hoisted the static menuGroups object outside the Sidebar component module scope.
+// Why: Prevents this large object from being recreated in memory on every render.
+// Impact: Reduces garbage collection pressure and speeds up rendering, reducing render time overhead.
+const menuGroups = {
     planning: {
       title: '🗺️ Planning',
       items: [
@@ -106,7 +73,45 @@ const Sidebar: React.FC = memo(() => {
     }
   };
 
-  return (
+
+const Sidebar: React.FC = memo(() => {
+  const { currentTab, setCurrentTab, isSidebarOpen, toggleSidebar, toggleMimir } = useGlobal();
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
+    planning: true,
+    training: false,
+    knowledge: false,
+    enhancement: false,
+    admin: false
+  });
+
+  const navigate = useNavigate();
+
+  const toggleGroup = (group: string) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [group]: !prev[group]
+    }));
+  };
+
+  const handleTabChange = (tabId: string) => {
+    if (tabId === 'mimir') {
+      toggleMimir(true);
+      // On mobile, close sidebar after selection
+      if (window.innerWidth <= 768) {
+        toggleSidebar();
+      }
+      return;
+    }
+
+    setCurrentTab(tabId);
+    navigate('/');
+    // On mobile, close sidebar after selection
+    if (window.innerWidth <= 768) {
+      toggleSidebar();
+    }
+  };
+
+    return (
     <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
       <div className="sidebar-header">
         <h2>UPSC SAGA</h2>
