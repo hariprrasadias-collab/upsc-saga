@@ -230,7 +230,7 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
                     )}
                     <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" title="History">📊</button>
                     <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" title="Settings">⚙️</button>
-                    <button onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize">−</button>
+                    <button onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize" aria-label="Minimize timer">−</button>
                 </div>
             </div>
 
@@ -296,8 +296,8 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
                         <input type="number" value={editMinutes} onChange={(e) => setEditMinutes(e.target.value)}
                             className="timer-edit-input" min="1" max="120" />
                         <div className="timer-edit-actions">
-                            <button onClick={handleEditSave} className="save-btn">✓</button>
-                            <button onClick={() => setIsEditing(false)} className="cancel-btn">✕</button>
+                            <button onClick={handleEditSave} className="save-btn" aria-label="Save timer edit">✓</button>
+                            <button onClick={() => setIsEditing(false)} className="cancel-btn" aria-label="Cancel timer edit">✕</button>
                         </div>
                     </div>
                 ) : (
@@ -329,7 +329,7 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
                                     <button className="edit-time-btn" onClick={() => {
                                         setEditMinutes(Math.floor(timeLeft / 60).toString());
                                         setIsEditing(true);
-                                    }} title="Edit Timer">✎</button>
+                                    }} title="Edit Timer" aria-label="Edit timer duration">✎</button>
                                 )}
                             </>
                         )}
