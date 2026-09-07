@@ -1280,8 +1280,29 @@ const StudyPlanDashboard: React.FC = () => {
 
             );
         } else if (viewMode === 'overall') {
-            const totalTasks = activePlan.reduce((acc, day) => acc + day.slots.length, 0);
-            const completedTasks = activePlan.reduce((acc, day) => acc + day.slots.filter(s => s.status === 'completed').length, 0);
+            let totalTasks = 0;
+            let completedTasks = 0;
+            const subjectStats: Record<string, { total: number; completed: number }> = {};
+
+            for (let i = 0; i < activePlan.length; i++) {
+                const slots = activePlan[i].slots;
+                totalTasks += slots.length;
+
+                for (let j = 0; j < slots.length; j++) {
+                    const s = slots[j];
+                    const isCompleted = s.status === 'completed';
+                    if (isCompleted) completedTasks++;
+
+                    if (!subjectStats[s.subject]) {
+                        subjectStats[s.subject] = { total: 0, completed: 0 };
+                    }
+                    subjectStats[s.subject].total++;
+                    if (isCompleted) {
+                        subjectStats[s.subject].completed++;
+                    }
+                }
+            }
+
             const overallProgress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
             return (
@@ -1304,8 +1325,9 @@ const StudyPlanDashboard: React.FC = () => {
                     <div className="subject-progress">
                         <h3>Subject Breakdown</h3>
                         {['History', 'Geography', 'Polity', 'Economy', 'Science', 'Environment'].map(subject => {
-                            const subjectTasks = activePlan.flatMap(d => d.slots).filter(s => s.subject === subject).length;
-                            const subjectCompleted = activePlan.flatMap(d => d.slots).filter(s => s.subject === subject && s.status === 'completed').length;
+                            const stats = subjectStats[subject] || { total: 0, completed: 0 };
+                            const subjectTasks = stats.total;
+                            const subjectCompleted = stats.completed;
                             const subProgress = subjectTasks > 0 ? (subjectCompleted / subjectTasks) * 100 : 0;
 
                             return (
