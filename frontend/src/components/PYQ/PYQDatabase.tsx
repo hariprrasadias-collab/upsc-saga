@@ -1,6 +1,7 @@
 // /frontend/src/components/PYQ/PYQDatabase.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDebounce } from '../../hooks/useDebounce';
 import './PYQDatabase.css';
 import { brainService } from '../../services/BrainService';
 import MarkdownRenderer from '../Shared/MarkdownRenderer';
@@ -49,6 +50,7 @@ const PYQDatabase: React.FC = () => {
     const [availableTopics, setAvailableTopics] = useState<{ topic: string, subject: string }[]>([]);
     const [loadingTopics, setLoadingTopics] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const debouncedSearchQuery = useDebounce(searchQuery, 300); // ⚡ Bolt: Debouncing search input to reduce API calls
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [trendAnalysis, setTrendAnalysis] = useState<string | null>(null);
@@ -102,7 +104,7 @@ const PYQDatabase: React.FC = () => {
             // Multi-select topics
             selectedTopics.forEach(topic => params.append('topics', topic));
 
-            if (searchQuery) params.append('search', searchQuery);
+            if (debouncedSearchQuery) params.append('search', debouncedSearchQuery);
             if (showFavoritesOnly) params.append('is_favorite', 'true');
 
             const res = await fetch(`${API_BASE_URL}/api/pyq/questions?${params.toString()}`);
@@ -123,7 +125,7 @@ const PYQDatabase: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    }, [searchQuery, showFavoritesOnly, selectedYears, selectedSubjects, selectedTopics]);
+    }, [debouncedSearchQuery, showFavoritesOnly, selectedYears, selectedSubjects, selectedTopics]);
 
     useEffect(() => {
         fetchData();
