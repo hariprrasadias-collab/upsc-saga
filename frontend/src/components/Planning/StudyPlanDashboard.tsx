@@ -1280,8 +1280,29 @@ const StudyPlanDashboard: React.FC = () => {
 
             );
         } else if (viewMode === 'overall') {
-            const totalTasks = activePlan.reduce((acc, day) => acc + day.slots.length, 0);
-            const completedTasks = activePlan.reduce((acc, day) => acc + day.slots.filter(s => s.status === 'completed').length, 0);
+            // ⚡ Bolt: Optimize StudyPlanDashboard subject progress computation
+            // Reduced time complexity from O(M*N) to O(N) by pre-calculating counts
+            // in a single pass instead of repeatedly calling flatMap and filter inside a loop.
+            // Expected Impact: Eliminates redundant array allocations on every render for large active plans.
+            let totalTasks = 0;
+            let completedTasks = 0;
+            const subjectStats: Record<string, { total: number; completed: number }> = {};
+
+            for (const day of activePlan) {
+                totalTasks += day.slots.length;
+                for (const slot of day.slots) {
+                    if (slot.status === 'completed') completedTasks++;
+
+                    if (!subjectStats[slot.subject]) {
+                        subjectStats[slot.subject] = { total: 0, completed: 0 };
+                    }
+                    subjectStats[slot.subject].total++;
+                    if (slot.status === 'completed') {
+                        subjectStats[slot.subject].completed++;
+                    }
+                }
+            }
+
             const overallProgress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
             return (
@@ -1304,8 +1325,9 @@ const StudyPlanDashboard: React.FC = () => {
                     <div className="subject-progress">
                         <h3>Subject Breakdown</h3>
                         {['History', 'Geography', 'Polity', 'Economy', 'Science', 'Environment'].map(subject => {
-                            const subjectTasks = activePlan.flatMap(d => d.slots).filter(s => s.subject === subject).length;
-                            const subjectCompleted = activePlan.flatMap(d => d.slots).filter(s => s.subject === subject && s.status === 'completed').length;
+                            const stats = subjectStats[subject] || { total: 0, completed: 0 };
+                            const subjectTasks = stats.total;
+                            const subjectCompleted = stats.completed;
                             const subProgress = subjectTasks > 0 ? (subjectCompleted / subjectTasks) * 100 : 0;
 
                             return (
@@ -1318,6 +1340,7 @@ const StudyPlanDashboard: React.FC = () => {
                     </div>
                 </div>
             );
+
         } else if (viewMode === 'nexus') {
             return (
                 <div className="nexus-view">
