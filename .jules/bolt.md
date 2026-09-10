@@ -1,0 +1,3 @@
+## 2024-06-11 - Database schema verification for SQL rewrites
+**Learning:** When attempting to batch N+1 queries by rewriting `conn.execute` statements inside `get_subject_wise`, assuming table names or foreign keys without verifying them via PRAGMA statements will lead to silent test failures or crashes (e.g. `answer_questions` vs `answer_writing_prompts`). Moreover, the missing logic must be preserved exactly, including keys that return `0`.
+**Action:** Always verify the target schema (`PRAGMA table_info(...)`) for any SQL queries before committing an optimization plan, and explicitly extract the un-truncated original query using `sed -n` instead of relying on hallucinated variables.
