@@ -280,7 +280,19 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
             <div className="sector-map-container">
                 {Object.entries(groupedData).sort().map(([paper, subjects]) => (
                     <div key={paper} className="paper-sector">
-                        <div className="sector-header" onClick={() => togglePaper(paper)}>
+                        <div
+                            className="sector-header"
+                            onClick={() => togglePaper(paper)}
+                            role="button"
+                            tabIndex={0}
+                            aria-expanded={expandedPapers[paper] || false}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    togglePaper(paper);
+                                }
+                            }}
+                        >
                             <h2 className="paper-glitch" data-text={paper}>{paper}</h2>
                             <div className="sync-overall">
                                 {getProgress(paper)}% SYNCED
@@ -296,7 +308,19 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
 
                                     return (
                                         <div key={subject} className={`subject-node ${isPriority ? 'priority-node' : ''}`}>
-                                            <div className="subject-node-header" onClick={() => toggleSubject(`${paper}-${subject}`)}>
+                                            <div
+                                                className="subject-node-header"
+                                                onClick={() => toggleSubject(`${paper}-${subject}`)}
+                                                role="button"
+                                                tabIndex={0}
+                                                aria-expanded={expandedSubjects[`${paper}-${subject}`] || false}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' || e.key === ' ') {
+                                                        e.preventDefault();
+                                                        toggleSubject(`${paper}-${subject}`);
+                                                    }
+                                                }}
+                                            >
                                                 <h3>{subject}</h3>
                                                 <div className="node-stats">{completed}/{total}</div>
                                             </div>
