@@ -29,16 +29,16 @@ const WarMapHeader: React.FC<WarMapHeaderProps> = ({
           <h1>The War Map</h1>
           <p>Plan your campaigns and rituals here. Conquer the UPSC!</p>
           <div className="header-actions">
-            <button className="create-task-btn" onClick={onToggleAddForm}>
+            <button type="button" className="create-task-btn" onClick={onToggleAddForm}>
               Convene War Council (New Task)
             </button>
             {onRequestBriefing && (
-              <button className="briefing-btn" onClick={onRequestBriefing}>
+              <button type="button" className="briefing-btn" onClick={onRequestBriefing}>
                 🔮 Consult Oracles (Briefing)
               </button>
             )}
             {onConnectGoogle && !isGoogleConnected && (
-              <button className="connect-google-btn" onClick={onConnectGoogle}>
+              <button type="button" className="connect-google-btn" onClick={onConnectGoogle}>
                 📅 Connect Google Calendar
               </button>
             )}
