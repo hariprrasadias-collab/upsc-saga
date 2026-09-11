@@ -1280,8 +1280,27 @@ const StudyPlanDashboard: React.FC = () => {
 
             );
         } else if (viewMode === 'overall') {
-            const totalTasks = activePlan.reduce((acc, day) => acc + day.slots.length, 0);
-            const completedTasks = activePlan.reduce((acc, day) => acc + day.slots.filter(s => s.status === 'completed').length, 0);
+            // ⚡ Bolt Optimization: Single-pass calculation to prevent O(N * S) repeated array scanning for subjects.
+            // (Removed useMemo here as conditionally calling hooks violates React's Rules of Hooks).
+            let totalTasks = 0;
+            let completedTasks = 0;
+            const subjectStats: Record<string, { total: number, completed: number }> = {};
+
+            activePlan.forEach(day => {
+                day.slots.forEach(s => {
+                    totalTasks++;
+                    if (s.status === 'completed') completedTasks++;
+
+                    if (!subjectStats[s.subject]) {
+                        subjectStats[s.subject] = { total: 0, completed: 0 };
+                    }
+                    subjectStats[s.subject].total++;
+                    if (s.status === 'completed') {
+                        subjectStats[s.subject].completed++;
+                    }
+                });
+            });
+
             const overallProgress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
             return (
@@ -1304,8 +1323,9 @@ const StudyPlanDashboard: React.FC = () => {
                     <div className="subject-progress">
                         <h3>Subject Breakdown</h3>
                         {['History', 'Geography', 'Polity', 'Economy', 'Science', 'Environment'].map(subject => {
-                            const subjectTasks = activePlan.flatMap(d => d.slots).filter(s => s.subject === subject).length;
-                            const subjectCompleted = activePlan.flatMap(d => d.slots).filter(s => s.subject === subject && s.status === 'completed').length;
+                            const stats = subjectStats[subject] || { total: 0, completed: 0 };
+                            const subjectTasks = stats.total;
+                            const subjectCompleted = stats.completed;
                             const subProgress = subjectTasks > 0 ? (subjectCompleted / subjectTasks) * 100 : 0;
 
                             return (
