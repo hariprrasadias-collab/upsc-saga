@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import './ChallengeCard.css';
 import { API_BASE_URL } from '../../config';
+import { useToast, ToastContainer } from '../Toast';
 
 interface Challenge {
     id: number;
@@ -18,6 +19,7 @@ const ChallengeCard: React.FC = () => {
     const [challenge, setChallenge] = useState<Challenge | null>(null);
     const [loading, setLoading] = useState(true);
     const [streak, setStreak] = useState(0);
+    const { toasts, addToast, removeToast } = useToast();
 
     useEffect(() => {
         fetchChallenge();
@@ -60,12 +62,14 @@ const ChallengeCard: React.FC = () => {
 
             if (res.ok) {
                 const data = await res.json();
-                alert(`Challenge completed! +${data.xp_awarded} XP`);
+                addToast(`Challenge completed! +${data.xp_awarded} XP`, 'success');
                 fetchChallenge();
                 fetchStreak();
 
                 // Refresh page stats
-                window.location.reload();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
             }
         } catch (err) {
             console.error('Error completing challenge:', err);
@@ -92,6 +96,7 @@ const ChallengeCard: React.FC = () => {
 
     return (
         <div className={`challenge-card ${challenge.completed ? 'completed' : ''}`}>
+            <ToastContainer toasts={toasts} removeToast={removeToast} />
             <div className="challenge-header">
                 <h3>🎯 Daily Challenge</h3>
                 <div className="streak-badge">
