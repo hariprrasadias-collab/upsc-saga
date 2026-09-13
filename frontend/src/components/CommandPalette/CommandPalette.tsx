@@ -22,6 +22,8 @@ const CommandPalette: React.FC = () => {
     const { toggleTimer, isRunning } = usePomodoro();
 
     // Define available commands
+    // Optimization: Memoize the commands array to prevent re-creating 20+ objects on every render
+    // (e.g. when typing in the search bar or when the pomodoro timer ticks)
     const commands: CommandOption[] = useMemo(() => [
         // Navigation
         { id: 'nav-dashboard', label: 'Go to Dashboard', category: 'Navigation', action: () => setCurrentTab('dashboard') },
@@ -62,6 +64,8 @@ const CommandPalette: React.FC = () => {
         },
     ], [setCurrentTab, toggleRageMode, toggleTimer, isRunning]);
 
+    // Optimization: Memoize the filtered array to avoid O(N) recalculation on every unrelated render
+    // Only recalculates when the query string changes.
     const filteredCommands = useMemo(() => commands.filter(cmd =>
         cmd.label.toLowerCase().includes(query.toLowerCase())
     ),
