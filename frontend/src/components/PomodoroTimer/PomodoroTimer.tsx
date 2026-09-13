@@ -222,15 +222,15 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ className }) => {
             <div className="pomodoro-header">
                 <h3>{mode === 'work' ? '⚔️ BATTLE TIME' : '🛡️ RESPITE'}</h3>
                 <div className="pomodoro-controls">
-                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
-                        {isFullscreen ? '↙️' : '⛶'}
+                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="settings-btn" aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen"} title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
+                        <span aria-hidden="true">{isFullscreen ? '↙️' : '⛶'}</span>
                     </button>
                     {isFullscreen && (
-                        <button onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" title="Close">✕</button>
+                        <button onClick={() => setIsFullscreen(false)} className="settings-btn close-fullscreen" aria-label="Close fullscreen" title="Close"><span aria-hidden="true">✕</span></button>
                     )}
-                    <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" title="History">📊</button>
-                    <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" title="Settings">⚙️</button>
-                    <button onClick={() => setIsMinimized(true)} className="minimize-btn" title="Minimize">−</button>
+                    <button onClick={() => setShowHistory(!showHistory)} className="settings-btn" aria-label="Toggle History" title="History"><span aria-hidden="true">📊</span></button>
+                    <button onClick={() => setShowSettings(!showSettings)} className="settings-btn" aria-label="Toggle Settings" title="Settings"><span aria-hidden="true">⚙️</span></button>
+                    <button onClick={() => setIsMinimized(true)} className="minimize-btn" aria-label="Minimize timer" title="Minimize"><span aria-hidden="true">−</span></button>
                 </div>
             </div>
 
