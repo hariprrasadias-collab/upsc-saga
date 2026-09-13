@@ -1,75 +1,129 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Renderers.css';
-import { FaDownload, FaExpand, FaRocket, FaRobot, FaMagic, FaCopy, FaHistory } from 'react-icons/fa';
-
+import { FaDownload, FaCopy, FaRocket, FaMagic, FaCog, FaChevronDown, FaChevronUp, FaRandom, FaExpand, FaPalette, FaSave, FaThLarge, FaSquare, FaMicrophone, FaBolt, FaFileAlt } from 'react-icons/fa';
 import { API_BASE_URL } from '../../../config';
 
 interface VisualPromptRendererProps {
-    content: any; // Raw JSON input
+    content: string; // The raw prompt text
 }
 
-interface ImageResult {
+interface ImageHistoryItem {
     url: string;
-    seed: number;
     prompt: string;
+    seed: number;
     model: string;
+    timestamp: number;
+}
+
+interface Preset {
+    name: string;
+    model: string;
+    aspectRatio: string;
+    negativePrompt: string;
+    tags: string[];
 }
 
 const MODELS = [
-    { id: 'flux', name: 'Flux.1 Schnell', style: 'Highly Detailed, Photorealistic' },
-    { id: 'stable-diffusion-xl', name: 'SDXL 1.0', style: 'Artistic, Versatile' },
-    { id: 'dall-e-3', name: 'DALL-E 3', style: 'Accurate, stylized' }, // Conceptual
-    { id: 'midjourney', name: 'Midjourney v6', style: 'Cinematic, aesthetic' } // Conceptual
+    { id: 'flux', name: 'Flux (Standard)' },
+    { id: 'flux-realism', name: 'Flux Realism' },
+    { id: 'flux-anime', name: 'Flux Anime' },
+    { id: 'flux-3d', name: 'Flux 3D' },
+    { id: 'any-dark', name: 'Any Dark' },
+    { id: 'turbo', name: 'Turbo (Fast)' },
+    { id: 'midjourney', name: 'Midjourney Style' },
 ];
 
-const STYLES = [
-    "UPSC Diagram (Clean lines, labels, academic)",
-    "Flowchart (Minimalist, structured, high contrast)",
-    "Concept Map (Nodes, connections, colorful)",
-    "Infographic (Modern, statistical, icons)",
-    "Historical Painting (Oil on canvas, dramatic lighting)",
-    "Geography Map (Topographic, clear boundaries)",
-    "Surrealist Art (Dreamlike memory hook)",
-    "Cyberpunk (Neon, futuristic data visualization)"
+const ASPECT_RATIOS = [
+    { id: '16:9', width: 800, height: 450, label: 'Cinematic (16:9)' },
+    { id: '1:1', width: 512, height: 512, label: 'Square (1:1)' },
+    { id: '4:3', width: 800, height: 600, label: 'Classic (4:3)' },
+    { id: '3:4', width: 600, height: 800, label: 'Portrait (3:4)' },
+    { id: '9:16', width: 450, height: 800, label: 'Mobile (9:16)' },
 ];
+
+const STYLE_MATRIX = {
+    "Lighting": ["Cinematic Lighting", "Volumetric Fog", "Bioluminescent", "Golden Hour", "Neon Lights", "Studio Lighting", "Ray Tracing"],
+    "Camera": ["Wide Angle", "Macro Lens", "Bokeh", "Fish Eye", "Drone View", "Isometric", "GoPro"],
+    "Art Style": ["Cyberpunk", "Steampunk", "Watercolor", "Oil Painting", "Ukiyo-e", "Synthwave", "Pixel Art", "Vaporwave", "Concept Art"],
+    "Vibe": ["Ethereal", "Gritty", "Dreamy", "Apocalyptic", "Futuristic", "Retro", "Minimalist"]
+};
+
+const MAGIC_MODIFIERS = [
+    "highly detailed", "8k resolution", "cinematic lighting", "photorealistic",
+    "masterpiece", "sharp focus", "intricate details", "unreal engine 5 render",
+    "volumetric lighting", "global illumination"
+];
+
+const PROMPT_TEMPLATES = [
+    { label: "Cyberpunk Character", text: "A cyberpunk street samurai, neon lights, rainy street, high tech armor, detailed face, futuristic city background" },
+    { label: "Fantasy Landscape", text: "Epic fantasy landscape, floating islands, waterfalls, magical aura, detailed clouds, 8k resolution, matte painting" },
+    { label: "Isometric Room", text: "Isometric view of a cozy gamer room, neon lighting, detailed computer setup, posters, low poly style, 3d render" },
+    { label: "Product Shot", text: "Professional product photography of a [ITEM], studio lighting, neutral background, sharp focus, 4k" },
+    { label: "Logo Design", text: "Minimalist vector logo of a [SUBJECT], flat design, simple shapes, white background, professional branding" }
+];
+
+// Helper to simulate stats
+const getRandomStat = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1) + min);
 
 const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) => {
-    // 1. Initial State from JSON
-    const initialPrompt = content?.prompt || content?.text || content?.concept || "";
-    const [prompt, setPrompt] = useState<string>(initialPrompt);
-    const [negativePrompt, setNegativePrompt] = useState<string>("blurry, text, ugly, bad anatomy");
+    const [prompt, setPrompt] = useState(content);
+    const [negativePrompt, setNegativePrompt] = useState("");
+    const [copied, setCopied] = useState(false);
 
-    // 2. Settings
-    const [aspectRatio, setAspectRatio] = useState<string>('16:9'); // 1:1, 16:9, 9:16
-    const [selectedModel, setSelectedModel] = useState<string>('flux');
-    const [selectedStyle, setSelectedStyle] = useState<string>(STYLES[0]);
-
-    // 3. Status Flags
+    // State for generation
     const [isGenerating, setIsGenerating] = useState(false);
+    const [generationLogs, setGenerationLogs] = useState<string[]>([]);
+
+    // Single View State
+    const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+
+    // Grid View State
+    const [viewMode, setViewMode] = useState<'single' | 'grid'>('single');
+    const [gridImages, setGridImages] = useState<{ url: string, model: string }[]>([]);
+
     const [imageLoading, setImageLoading] = useState(false);
     const [imageError, setImageError] = useState(false);
 
-    // 4. Results
-    const [generatedImage, setGeneratedImage] = useState<ImageResult | null>(null);
-    // const [gridImages, setGridImages] = useState<ImageResult[]>([]);
-
-    // 5. UX
-    const [copied, setCopied] = useState(false);
-    const [showHistory, setShowHistory] = useState(false);
-    const [history, setHistory] = useState<ImageResult[]>([]);
-
-    // 6. Advanced
-    const [seed, setSeed] = useState<number | string>(""); // Empty means random
+    // Advanced Settings
+    const [showSettings, setShowSettings] = useState(false);
+    const [showStyleMatrix, setShowStyleMatrix] = useState(false);
+    const [showTemplates, setShowTemplates] = useState(false);
+    const [model, setModel] = useState('flux');
+    const [aspectRatio, setAspectRatio] = useState('16:9');
+    const [seed, setSeed] = useState<number>(Math.floor(Math.random() * 10000));
     const [randomSeed, setRandomSeed] = useState(true);
 
-    const getDimensions = () => {
-        switch (aspectRatio) {
-            case '1:1': return { w: 1024, h: 1024 };
-            case '16:9': return { w: 1024, h: 576 };
-            case '9:16': return { w: 576, h: 1024 };
-            default: return { w: 1024, h: 1024 };
+    const [history, setHistory] = useState<ImageHistoryItem[]>([]);
+
+    // Presets
+    const [presets, setPresets] = useState<Preset[]>([]);
+    const [presetName, setPresetName] = useState("");
+    const [showPresets, setShowPresets] = useState(false);
+
+    // Voice
+    const [isListening, setIsListening] = useState(false);
+
+    // Neural HUD Stats
+    const [hudStats, setHudStats] = useState({ vram: 0, ops: 0, entropy: 0 });
+
+    useEffect(() => {
+        setPrompt(content);
+    }, [content]);
+
+    // HUD Update Loop
+    useEffect(() => {
+        let interval: any;
+        if (isGenerating || imageLoading) {
+            interval = setInterval(() => {
+                setHudStats({
+                    vram: getRandomStat(40, 95),
+                    ops: getRandomStat(120, 300),
+                    entropy: getRandomStat(10, 99)
+                });
+            }, 800);
         }
-    };
+        return () => clearInterval(interval);
+    }, [isGenerating, imageLoading]);
 
     const handleCopy = () => {
         navigator.clipboard.writeText(prompt);
@@ -77,117 +131,171 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const downloadImage = async (img: ImageResult | null) => {
-        if (!img) return;
-        try {
-            const response = await fetch(img.url);
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `mimir_${img.seed}.png`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        } catch (error) {
-            console.error("Failed to download image", error);
-            // Fallback: open in new tab
-            window.open(img.url, '_blank');
-        }
-    };
+    const handleMagicEnhance = () => {
+        const currentLower = prompt.toLowerCase();
+        const availableModifiers = MAGIC_MODIFIERS.filter(m => !currentLower.includes(m.toLowerCase()));
 
-    const fetchImageMock = async (finalPrompt: string, dim: {w:number, h:number}, currentSeed: number) => {
-        // Mock API call to simulate image generation delay if backend isn't ready
-        return new Promise<ImageResult>((resolve) => {
-             setTimeout(() => {
-                 resolve({
-                     url: `https://picsum.photos/seed/${currentSeed}/${dim.w}/${dim.h}`,
-                     seed: currentSeed,
-                     prompt: finalPrompt,
-                     model: selectedModel
-                 });
-             }, 3000);
+        if (availableModifiers.length === 0) return;
+
+        const toAdd = availableModifiers.sort(() => 0.5 - Math.random()).slice(0, 3);
+        setPrompt(prev => {
+            const separator = prev.trim().endsWith(',') || prev.trim().endsWith('.') ? ' ' : ', ';
+            return `${prev.trim()}${separator}${toAdd.join(', ')}`;
         });
     };
 
-    const fetchImageReal = async (finalPrompt: string, dim: {w:number, h:number}, currentSeed: number) => {
-        try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(`${API_BASE_URL}/api/chutes/generate_image`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                },
-                body: JSON.stringify({
-                    prompt: finalPrompt,
-                    width: dim.w,
-                    height: dim.h,
-                    seed: currentSeed
-                })
-            });
-            const data = await res.json();
+    const addStyleTag = (tag: string) => {
+        setPrompt(prev => {
+            if (prev.includes(tag)) return prev;
+            const separator = prev.trim().endsWith(',') || prev.trim().endsWith('.') ? ' ' : ', ';
+            return `${prev.trim()}${separator}${tag}`;
+        });
+    };
 
-            if (data.success && data.image_url) {
-                return {
-                     url: data.image_url,
-                     seed: currentSeed,
-                     prompt: finalPrompt,
-                     model: selectedModel
-                };
+    const sanitizePromptForImage = (text: string): string => {
+        // AI-generated visual prompts are often long paragraphs.
+        // Image APIs need concise, comma-separated tags.
+        // Strategy: extract key phrases and limit length.
+        let cleaned = text
+            .replace(/\n+/g, ', ')           // newlines → commas
+            .replace(/["""'']/g, '')          // remove quotes
+            .replace(/\([^)]*\)/g, '')        // remove parentheticals
+            .replace(/\s{2,}/g, ' ')          // collapse whitespace
+            .replace(/,\s*,/g, ',')           // remove double commas
+            .trim();
+
+        // If prompt is very long (AI-generated paragraph), take just the first 2 sentences
+        // and append style keywords
+        if (cleaned.length > 400) {
+            const sentences = cleaned.split(/[.!?]+/).filter(s => s.trim().length > 5);
+            cleaned = sentences.slice(0, 2).join('. ').trim();
+            // Append generic quality tags
+            cleaned += ', highly detailed, 8k resolution, cinematic lighting';
+        }
+
+        return cleaned.slice(0, 500);
+    };
+
+    const buildPromptText = (pText: string, pNegative: string): string => {
+        const sanitized = sanitizePromptForImage(pText);
+        return pNegative ? `${sanitized} excluding ${pNegative}` : sanitized;
+    }
+
+    const parsePrompt = () => {
+        let finalPrompt = prompt;
+        let finalSeed = randomSeed ? Math.floor(Math.random() * 10000) : seed;
+        let finalNegative = negativePrompt;
+        let width = 0;
+        let height = 0;
+
+        // Parse --seed
+        const seedMatch = finalPrompt.match(/--seed\s+(\d+)/);
+        if (seedMatch) {
+            finalSeed = parseInt(seedMatch[1]);
+            finalPrompt = finalPrompt.replace(seedMatch[0], '');
+            setSeed(finalSeed);
+            setRandomSeed(false);
+        } else if (randomSeed) {
+            setSeed(finalSeed); // Sync UI
+        }
+
+        // Parse --no
+        const noMatch = finalPrompt.match(/--no\s+([\w\s,]+)/);
+        if (noMatch) {
+            finalNegative = `${finalNegative} ${noMatch[1]}`.trim();
+            finalPrompt = finalPrompt.replace(noMatch[0], '');
+            setNegativePrompt(finalNegative);
+        }
+
+        // Parse --ar
+        const arMatch = finalPrompt.match(/--ar\s+(\d+:\d+)/);
+        if (arMatch) {
+            const foundAr = ASPECT_RATIOS.find(ar => ar.id === arMatch[1]);
+            if (foundAr) {
+                setAspectRatio(foundAr.id);
+                width = foundAr.width;
+                height = foundAr.height;
             }
-            throw new Error(data.error || "Failed to generate");
+            finalPrompt = finalPrompt.replace(arMatch[0], '');
+        }
 
+        if (width === 0) {
+            const selectedRatio = ASPECT_RATIOS.find(r => r.id === aspectRatio) || ASPECT_RATIOS[0];
+            width = selectedRatio.width;
+            height = selectedRatio.height;
+        }
+
+        return { finalPrompt: finalPrompt.trim(), finalSeed, finalNegative, width, height };
+    }
+
+    const generateViaBackend = async (promptText: string): Promise<string | null> => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/generate-image`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: promptText })
+            });
+            const data = await response.json();
+            if (data.success && data.image_url) {
+                return data.image_url;
+            }
+            console.error('Image gen failed:', data.error);
+            return null;
         } catch (e) {
             console.error('Image gen request failed:', e);
             return null;
         }
     };
 
-    const handleGenerate = async (isUpscale?: boolean) => {
+    const handleGenerate = async (isUpscale = false) => {
         console.log(isUpscale); // bypass unused var
         if (isGenerating) return;
         setIsGenerating(true);
         setGeneratedImage(null);
-        // setGridImages([]);
+        setGridImages([]);
         setImageError(false);
+        setGenerationLogs(["Initializing Nano Banana (Gemini) Neural Network..."]);
 
-        const dim = getDimensions();
-        const currentSeed = randomSeed ? Math.floor(Math.random() * 1000000) : (Number(seed) || 42);
+        const { finalPrompt, finalSeed, finalNegative } = parsePrompt();
+        const promptText = buildPromptText(finalPrompt, finalNegative);
 
-        // Append style to prompt if not already there
-        let finalPrompt = prompt;
-        if (!finalPrompt.toLowerCase().includes(selectedStyle.toLowerCase().split(' ')[0])) {
-            finalPrompt += `, styled as ${selectedStyle}`;
-        }
-        if (negativePrompt) {
-            // Note: Chutes Flux might not support negative prompts directly in the API yet,
-            // but we can append it if using SDXL.
-        }
+        // Progress logs
+        const sequence = [
+            { text: `Parsing semantics...`, delay: 800 },
+            { text: `Sending to Gemini Image Generator (Seed: ${finalSeed})...`, delay: 1500 },
+            { text: "Generating image via Nano Banana...", delay: 3000 },
+        ];
+        sequence.forEach(({ text, delay }) => {
+            setTimeout(() => setGenerationLogs(prev => [...prev, text]), delay);
+        });
 
         try {
-            // Choose real or mock depending on environment (use Real for now, fallback to Mock if fails)
-            let result = await fetchImageReal(finalPrompt, dim, currentSeed);
-
-            if (!result) {
-                 console.warn("Real API failed, falling back to mock image for demonstration.");
-                 result = await fetchImageMock(finalPrompt, dim, currentSeed);
+            const imageUrl = await generateViaBackend(promptText);
+            if (imageUrl) {
+                setGeneratedImage(imageUrl);
+                setImageLoading(false);
+                addToHistory(imageUrl, finalPrompt, finalSeed, 'gemini');
+                setGenerationLogs(prev => [...prev, '✅ Image generated successfully!']);
+            } else {
+                setImageError(true);
+                setGenerationLogs(prev => [...prev, '❌ Generation failed. Try again.']);
             }
-
-            setGeneratedImage(result);
-            setImageLoading(true); // Image starts loading its src
-            addToHistory(result);
-
-        } catch (error) {
-            console.error("Generation failed:", error);
+        } catch (e) {
             setImageError(true);
+            setGenerationLogs(prev => [...prev, '❌ Error connecting to image service.']);
         } finally {
             setIsGenerating(false);
         }
     };
 
-    const addToHistory = (newItem: ImageResult) => {
+    const addToHistory = (url: string, promptText: string, seedVal: number, modelVal: string) => {
+        const newItem: ImageHistoryItem = {
+            url,
+            prompt: promptText,
+            seed: seedVal,
+            model: modelVal,
+            timestamp: Date.now()
+        };
         setHistory(prev => [newItem, ...prev].slice(0, 10));
     };
 
@@ -199,22 +307,23 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
     const handleChaos = () => {
         setRandomSeed(true);
         // Pick random model
-        const randomModel = MODELS[Math.floor(Math.random() * MODELS.length)];
-        setSelectedModel(randomModel.id);
+        const randomModel = MODELS[Math.floor(Math.random() * MODELS.length)].id;
+        setModel(randomModel);
 
-        // Pick random style
-        const randomStyle = STYLES[Math.floor(Math.random() * STYLES.length)];
-        setSelectedStyle(randomStyle);
+        // Pick random Aspect Ratio
+        const randomAr = ASPECT_RATIOS[Math.floor(Math.random() * ASPECT_RATIOS.length)].id;
+        setAspectRatio(randomAr);
 
-        // Mutate prompt slightly
-        const modifiers = ["in a cyberpunk style", "as a watercolor painting", "highly detailed cinematic lighting", "minimalist icon"];
-        const modifier = modifiers[Math.floor(Math.random() * modifiers.length)];
+        // Add 3 random style tags
+        const allTags = Object.values(STYLE_MATRIX).flat();
+        const randomTags = Array.from({ length: 3 }, () => allTags[Math.floor(Math.random() * allTags.length)]);
 
         setPrompt(prev => {
             let p = prev;
-            // Remove existing modifiers if they exist (simplistic)
-            modifiers.forEach(mod => p = p.replace(`, ${mod}`, ''));
-            return `${p}, ${modifier}`;
+            randomTags.forEach(tag => {
+                if (!p.includes(tag)) p += `, ${tag}`;
+            });
+            return p;
         });
 
         setTimeout(() => handleGenerate(false), 100);
@@ -229,9 +338,12 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
 
-        recognition.onstart = () => {
-            // Could add a mic recording indicator state here
-        };
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = () => setIsListening(true);
+        recognition.onend = () => setIsListening(false);
 
         recognition.onresult = (event: any) => {
             const transcript = event.results[0][0].transcript;
@@ -241,287 +353,429 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         recognition.start();
     };
 
+    const downloadImage = async (imageUrl: string) => {
+        try {
+            const response = await fetch(imageUrl);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `brain-vault-render-${Date.now()}.png`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        } catch (e) {
+            console.error("Download failed:", e);
+            window.open(imageUrl, '_blank');
+        }
+    };
+
+    const restoreFromHistory = (item: ImageHistoryItem) => {
+        setPrompt(item.prompt);
+        setSeed(item.seed);
+        setRandomSeed(false);
+        setModel(item.model === 'grid-mix' ? 'flux' : item.model);
+        setViewMode('single');
+        setGeneratedImage(item.url);
+        setImageLoading(true);
+    };
+
+    const savePreset = () => {
+        if (!presetName) return;
+        const newPreset: Preset = {
+            name: presetName,
+            model,
+            aspectRatio,
+            negativePrompt,
+            tags: []
+        };
+        setPresets(prev => [...prev, newPreset]);
+        setPresetName("");
+        setShowPresets(false);
+    };
+
+    const loadPreset = (preset: Preset) => {
+        setModel(preset.model);
+        setAspectRatio(preset.aspectRatio);
+        setNegativePrompt(preset.negativePrompt);
+        setShowPresets(false);
+    };
+
+    const extractTags = (text: string) => {
+        const parts = text.split(',').map(s => s.trim());
+        const tags = parts.filter(p => p.length < 25 && (p.includes('style') || p.includes('lighting') || p.includes('render') || p.startsWith('--')));
+        return tags;
+    };
+
+    const tags = extractTags(prompt);
+
     return (
-        <div className="visual-prompt-renderer">
-            {/* Header: Title & History Toggle */}
+        <div className="visual-prompt-container glass-card">
             <div className="vp-header">
-                <h3><FaMagic className="vp-icon-highlight"/> Mimir Vision</h3>
-                <button className="vp-history-toggle" onClick={() => setShowHistory(!showHistory)}>
-                    <FaHistory /> History {history.length > 0 && `(${history.length})`}
-                </button>
+                <span className="vp-icon">🎨</span>
+                <span className="vp-title">Generative Art Terminal</span>
+                <div className="vp-status">{isGenerating || imageLoading ? 'PROCESSING' : 'READY'}</div>
             </div>
 
-            {/* Layout: Settings Sidebar (Left) + Main Canvas (Right) */}
-            <div className="vp-layout">
-
-                {/* SETTINGS SIDEBAR */}
-                <div className="vp-sidebar custom-scrollbar">
-                    {/* Prompt Input */}
-                    <div className="vp-control-group">
-                        <label>Image Prompt</label>
-                        <div className="vp-textarea-wrapper">
-                            <textarea
-                                value={prompt}
-                                onChange={(e) => setPrompt(e.target.value)}
-                                rows={4}
-                                placeholder="Describe the image..."
-                                className="custom-scrollbar"
-                            />
-                            <button className="vp-mic-btn" onClick={handleVoiceInput} title="Dictate prompt">
-                                🎤
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Negative Prompt */}
-                    <div className="vp-control-group">
-                        <label>Negative Prompt (Optional)</label>
-                        <input
-                            type="text"
-                            value={negativePrompt}
-                            onChange={(e) => setNegativePrompt(e.target.value)}
-                            placeholder="blurry, text, ugly..."
-                        />
-                    </div>
-
-                    {/* Dimensions */}
-                    <div className="vp-control-group">
-                        <label>Aspect Ratio</label>
-                        <div className="vp-ratio-selector">
-                            <button
-                                className={`ratio-btn ${aspectRatio === '1:1' ? 'active' : ''}`}
-                                onClick={() => setAspectRatio('1:1')}
-                            >
-                                <div className="ratio-box r-1-1"></div>
-                                1:1
-                            </button>
-                            <button
-                                className={`ratio-btn ${aspectRatio === '16:9' ? 'active' : ''}`}
-                                onClick={() => setAspectRatio('16:9')}
-                            >
-                                <div className="ratio-box r-16-9"></div>
-                                16:9
-                            </button>
-                            <button
-                                className={`ratio-btn ${aspectRatio === '9:16' ? 'active' : ''}`}
-                                onClick={() => setAspectRatio('9:16')}
-                            >
-                                <div className="ratio-box r-9-16"></div>
-                                9:16
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Style Presets */}
-                    <div className="vp-control-group">
-                        <label>Aesthetic Style</label>
-                        <select
-                            value={selectedStyle}
-                            onChange={(e) => setSelectedStyle(e.target.value)}
-                            className="vp-select"
-                        >
-                            {STYLES.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
-                    </div>
-
-                    {/* Model Selection */}
-                    <div className="vp-control-group">
-                        <label>AI Model Engine</label>
-                        <div className="vp-model-list">
-                            {MODELS.map(m => (
-                                <div
-                                    key={m.id}
-                                    className={`vp-model-card ${selectedModel === m.id ? 'active' : ''}`}
-                                    onClick={() => setSelectedModel(m.id)}
-                                >
-                                    <div className="vp-model-name">{m.name}</div>
-                                    <div className="vp-model-desc">{m.style}</div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Advanced: Seed */}
-                    <div className="vp-control-group advanced-group">
-                        <label>
-                            <input
-                                type="checkbox"
-                                checked={randomSeed}
-                                onChange={(e) => setRandomSeed(e.target.checked)}
-                            />
-                            Random Seed
-                        </label>
-                        {!randomSeed && (
-                            <input
-                                type="number"
-                                value={seed}
-                                onChange={(e) => setSeed(e.target.value)}
-                                placeholder="Enter seed number..."
-                                className="vp-seed-input"
-                            />
-                        )}
-                    </div>
+            <div className="vp-toolbar">
+                <div className="vp-toolbar-group">
+                    <button
+                        className={`settings-toggle-btn ${viewMode === 'single' ? 'active' : ''}`}
+                        onClick={() => setViewMode('single')}
+                        title="Single View"
+                    >
+                        <FaSquare /> Single
+                    </button>
+                    <button
+                        className={`settings-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                        onClick={() => setViewMode('grid')}
+                        title="Compare Models (Grid)"
+                    >
+                        <FaThLarge /> Compare
+                    </button>
                 </div>
 
-                {/* MAIN CANVAS */}
-                <div className="vp-main">
-
-                    {/* View: History or Generator */}
-                    {showHistory ? (
-                        <div className="vp-history-view custom-scrollbar">
-                            <h4>Recent Generations</h4>
-                            {history.length === 0 ? (
-                                <p className="vp-empty-state">No images generated yet.</p>
-                            ) : (
-                                <div className="vp-history-grid">
-                                    {history.map((item, idx) => (
-                                        <div key={idx} className="vp-history-card">
-                                            <img src={item.url} alt={item.prompt} loading="lazy" />
-                                            <div className="vp-history-overlay">
-                                                <button onClick={() => {
-                                                    setPrompt(item.prompt);
-                                                    setSelectedModel(item.model);
-                                                    setSeed(item.seed);
-                                                    setRandomSeed(false);
-                                                    setShowHistory(false);
-                                                }}>Reuse Prompt</button>
-                                                <button onClick={() => downloadImage(item)}>Save</button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <div className="vp-canvas-area">
-
-                            {/* Empty State */}
-                            {!isGenerating && !generatedImage && !imageError && (
-                                <div className="vp-empty-canvas">
-                                    <FaRobot className="vp-empty-icon" />
-                                    <h4>Ready to Imagine</h4>
-                                    <p>Describe your concept on the left, and Mimir will synthesize it.</p>
-
-                                    <div className="vp-quick-actions">
-                                        <button className="vp-secondary-btn" onClick={handleChaos}>
-                                            🎲 Surprise Me
-                                        </button>
-                                        <button
-                                            className="vp-primary-btn"
-                                            onClick={() => handleGenerate(false)}
-                                        >
-                                            <FaRocket /> Generate Image
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Loading State (Generation) */}
-                            {isGenerating && (
-                                <div className="vp-loading-canvas">
-                                    <div className="vp-orb-spinner">
-                                        <div className="vp-orb vp-orb-1"></div>
-                                        <div className="vp-orb vp-orb-2"></div>
-                                        <div className="vp-orb vp-orb-3"></div>
-                                    </div>
-                                    <h4 className="vp-loading-text">Synthesizing Visual Data...</h4>
-                                    <p className="vp-loading-sub">Model: {MODELS.find(m => m.id === selectedModel)?.name}</p>
-
-                                    <div className="vp-progress-bar-container">
-                                        <div className="vp-progress-bar-fill animate-progress"></div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Error State */}
-                            {imageError && !isGenerating && (
-                                <div className="vp-error-canvas">
-                                    <div className="vp-error-icon">⚠️</div>
-                                    <h4>Neural Misalignment</h4>
-                                    <p>Failed to generate the image. The model might be overloaded or the prompt was rejected.</p>
-                                    <button className="vp-secondary-btn" onClick={() => handleGenerate(false)}>
-                                        🔄 Try Again
-                                    </button>
-                                </div>
-                            )}
-
-                            {/* Result State */}
-                            {generatedImage && !isGenerating && (
-                                <div className="vp-result-canvas">
-                                    <div className="vp-image-wrapper">
-                                        {/* Loading skeleton while image downloads */}
-                                        {imageLoading && (
-                                            <div className="vp-image-skeleton">
-                                                 <div className="spinner"></div>
-                                            </div>
-                                        )}
-                                        <img
-                                            src={generatedImage.url}
-                                            alt={generatedImage.prompt}
-                                            className={`vp-final-image ${imageLoading ? 'hidden' : 'fade-in'}`}
-                                            onLoad={() => setImageLoading(false)}
-                                            onError={() => {
-                                                setImageLoading(false);
-                                                setImageError(true);
-                                            }}
-                                        />
-                                        {!imageLoading && (
-                                            <div className="vp-overlay">
-                                                <button className="download-img-btn" onClick={() => handleGenerate(true)}>
-                                                    <FaExpand /> Upscale 2x
-                                                </button>
-                                                <button className="download-img-btn" onClick={() => downloadImage(generatedImage)}>
-                                                    <FaDownload /> Save
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="vp-result-metadata">
-                                        <div className="vp-meta-item">
-                                            <span className="vp-meta-label">Seed:</span>
-                                            <span className="vp-meta-value">{generatedImage.seed}</span>
-                                        </div>
-                                        <div className="vp-meta-item">
-                                            <span className="vp-meta-label">Model:</span>
-                                            <span className="vp-meta-value">{MODELS.find(m => m.id === generatedImage.model)?.name || generatedImage.model}</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="vp-result-actions">
-                                        <button className="vp-action-btn" onClick={handleRemix}>
-                                            <FaMagic /> Remix (New Seed)
-                                        </button>
-                                        <button className="vp-action-btn" onClick={handleChaos}>
-                                            🎲 Chaos Mode
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
+                <div className="vp-toolbar-group">
+                    <button
+                        className={`settings-toggle-btn ${showTemplates ? 'active' : ''}`}
+                        onClick={() => setShowTemplates(!showTemplates)}
+                    >
+                        <FaFileAlt /> Templates
+                    </button>
+                    <button
+                        className={`settings-toggle-btn ${showPresets ? 'active' : ''}`}
+                        onClick={() => setShowPresets(!showPresets)}
+                    >
+                        <FaSave /> Presets
+                    </button>
+                    <button
+                        className={`settings-toggle-btn ${showStyleMatrix ? 'active' : ''}`}
+                        onClick={() => setShowStyleMatrix(!showStyleMatrix)}
+                    >
+                        <FaPalette /> Styles
+                    </button>
+                    <button
+                        className={`settings-toggle-btn ${showSettings ? 'active' : ''}`}
+                        onClick={() => setShowSettings(!showSettings)}
+                    >
+                        <FaCog /> Config {showSettings ? <FaChevronUp /> : <FaChevronDown />}
+                    </button>
                 </div>
             </div>
 
-            {/* Bottom Bar: Main Generate Button (always visible if not in empty state) */}
-            {(!showHistory && (generatedImage || imageError)) && (
-                <div className="vp-bottom-bar">
-                    <button
-                        className="vp-action-btn copy-btn"
-                        onClick={handleCopy}
-                    >
-                        <FaCopy /> {copied ? 'Copied!' : 'Copy Prompt'}
-                    </button>
-                    <button
-                        className={`vp-action-btn primary ${(isGenerating || imageLoading) ? 'disabled' : ''}`}
-                        onClick={() => handleGenerate(false)}
-                        disabled={isGenerating || imageLoading}
-                    >
-                        {(isGenerating || imageLoading) ? <><div className="spinner" style={{width: 12, height: 12, borderWidth: 2}}></div> Processing...</> : <><FaRocket /> Generate Image</>}
-                    </button>
+            {/* Templates Panel */}
+            {showTemplates && (
+                <div className="vp-presets-panel">
+                    <h4 className="style-cat-title">Quick Start Templates</h4>
+                    <div className="preset-list">
+                        {PROMPT_TEMPLATES.map(t => (
+                            <div key={t.label} className="preset-item" onClick={() => { setPrompt(t.text); setShowTemplates(false); }}>
+                                <span className="preset-name">{t.label}</span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             )}
 
+            {/* Presets Modal/Panel */}
+            {showPresets && (
+                <div className="vp-presets-panel">
+                    <div className="preset-save-row">
+                        <input
+                            type="text"
+                            className="vp-input"
+                            placeholder="New Preset Name..."
+                            value={presetName}
+                            onChange={(e) => setPresetName(e.target.value)}
+                        />
+                        <button className="vp-btn-mini" onClick={savePreset}>Save</button>
+                    </div>
+                    <div className="preset-list">
+                        {presets.length === 0 && <div className="no-presets">No saved presets.</div>}
+                        {presets.map(p => (
+                            <div key={p.name} className="preset-item" onClick={() => loadPreset(p)}>
+                                <span className="preset-name">{p.name}</span>
+                                <span className="preset-details">{p.model} • {p.aspectRatio}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {showStyleMatrix && (
+                <div className="vp-style-matrix">
+                    {Object.entries(STYLE_MATRIX).map(([category, styles]) => (
+                        <div key={category} className="style-category">
+                            <h4 className="style-cat-title">{category}</h4>
+                            <div className="style-tags">
+                                {styles.map(style => (
+                                    <button
+                                        key={style}
+                                        className="style-tag-btn"
+                                        onClick={() => addStyleTag(style)}
+                                    >
+                                        {style}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {showSettings && (
+                <div className="vp-settings-panel">
+                    <div className="vp-control-group">
+                        <label className="vp-label">Model Architecture</label>
+                        <select
+                            className="vp-select"
+                            value={model}
+                            onChange={(e) => setModel(e.target.value)}
+                            disabled={viewMode === 'grid'}
+                        >
+                            {MODELS.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                        </select>
+                        {viewMode === 'grid' && <span className="vp-helper-text">Grid mode uses 4 fixed models.</span>}
+                    </div>
+
+                    <div className="vp-control-group">
+                        <label className="vp-label">Aspect Ratio</label>
+                        <select
+                            className="vp-select"
+                            value={aspectRatio}
+                            onChange={(e) => setAspectRatio(e.target.value)}
+                        >
+                            {ASPECT_RATIOS.map(r => <option key={r.id} value={r.id}>{r.label}</option>)}
+                        </select>
+                    </div>
+
+                    <div className="vp-control-group">
+                        <label className="vp-label">Seed (Empty = Random)</label>
+                        <div style={{ display: 'flex', gap: '5px' }}>
+                            <input
+                                type="number"
+                                className="vp-input"
+                                value={randomSeed ? '' : seed}
+                                placeholder="Random"
+                                onChange={(e) => {
+                                    setSeed(parseInt(e.target.value) || 0);
+                                    setRandomSeed(false);
+                                }}
+                                style={{ width: '100px' }}
+                            />
+                            <button
+                                className="vp-btn-mini"
+                                onClick={() => {
+                                    setRandomSeed(true);
+                                    setSeed(Math.floor(Math.random() * 10000));
+                                }}
+                                title="Randomize"
+                                style={{ background: 'transparent', color: '#fff', border: '1px solid #333', cursor: 'pointer' }}
+                            >
+                                <FaRandom />
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="vp-control-group full-width">
+                        <label className="vp-label">Negative Prompt (Exclude)</label>
+                        <input
+                            type="text"
+                            className="vp-input"
+                            value={negativePrompt}
+                            placeholder="blur, low quality, distorted, watermark..."
+                            onChange={(e) => setNegativePrompt(e.target.value)}
+                        />
+                    </div>
+                </div>
+            )}
+
+            <div className="vp-terminal">
+                <div className="vp-command-line">
+                    <span className="cmd-prompt">/imagine prompt:</span>
+                    <textarea
+                        className="vp-textarea"
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value)}
+                        spellCheck="false"
+                        placeholder="Describe your vision... (Tip: use --ar 16:9 or --no blur)"
+                    />
+                    <button
+                        className={`mic-btn ${isListening ? 'listening' : ''}`}
+                        onClick={handleVoiceInput}
+                        title="Voice Input"
+                    >
+                        <FaMicrophone />
+                    </button>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '5px', gap: '10px' }}>
+                    <button className="magic-btn chaos" onClick={handleChaos} title="Randomize Settings & Style">
+                        <FaBolt /> Chaos Mode
+                    </button>
+                    <button className="magic-btn secondary" onClick={handleRemix} title="Remix with random seed">
+                        <FaRandom /> Remix
+                    </button>
+                    <button className="magic-btn" onClick={handleMagicEnhance} title="Add magic modifiers">
+                        <FaMagic /> Magic Enhance
+                    </button>
+                </div>
+
+                {generationLogs.length > 0 && (
+                    <div className="vp-logs">
+                        {generationLogs.map((log, i) => (
+                            <div key={i} className="log-line">
+                                <span className="log-prefix">{'>'}</span> {log}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* Image Section */}
+            {(generatedImage || gridImages.length > 0 || imageLoading) && (
+                <div className={`vp-result ${viewMode === 'grid' ? 'grid-mode' : ''}`}>
+
+                    {/* Neural HUD Overlay */}
+                    {(imageLoading || isGenerating) && (
+                        <div className="neural-hud">
+                            <div className="hud-row">
+                                <span className="hud-label">VRAM ALLOC</span>
+                                <span className="hud-value">{hudStats.vram}%</span>
+                            </div>
+                            <div className="hud-row">
+                                <span className="hud-label">TENSOR OPS</span>
+                                <span className="hud-value">{hudStats.ops} TFLOPS</span>
+                            </div>
+                            <div className="hud-row">
+                                <span className="hud-label">ENTROPY</span>
+                                <span className="hud-value">{hudStats.entropy}</span>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Matrix Scanline Overlay */}
+                    {(imageLoading || isGenerating) && <div className="scanline-overlay"></div>}
+
+                    {imageLoading && !imageError && (
+                        <div className="image-loader">
+                            <div className="spinner"></div>
+                            <span>Rendering neural pathways...</span>
+                        </div>
+                    )}
+
+                    {/* Single View */}
+                    {viewMode === 'single' && generatedImage && !imageError && (
+                        <>
+                            <img
+                                src={generatedImage}
+                                alt="Generated Visualization"
+                                className="generated-img"
+                                onError={() => {
+                                    setImageLoading(false);
+                                    setImageError(true);
+                                }}
+                            />
+                            {!imageLoading && (
+                                <div className="vp-overlay">
+                                    <button className="download-img-btn" onClick={() => handleGenerate(true)}>
+                                        <FaExpand /> Upscale 2x
+                                    </button>
+                                    <button className="download-img-btn" onClick={() => downloadImage(generatedImage)}>
+                                        <FaDownload /> Save
+                                    </button>
+                                </div>
+                            )}
+                        </>
+                    )}
+
+                    {/* Grid View */}
+                    {viewMode === 'grid' && gridImages.length > 0 && !imageError && (
+                        <div className="vp-grid-layout" style={{ display: imageLoading ? 'none' : 'grid' }}>
+                            {gridImages.map((img, idx) => (
+                                <div key={idx} className="vp-grid-item">
+                                    <img
+                                        src={img.url}
+                                        alt={`Model ${img.model}`}
+                                        onLoad={() => {
+                                            // Simple logic: if last image loads, stop loading
+                                            if (idx === gridImages.length - 1) setImageLoading(false);
+                                        }}
+                                    />
+                                    <span className="grid-label">{img.model}</span>
+                                    <button className="grid-save-btn" onClick={() => downloadImage(img.url)}><FaDownload /></button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {imageError && (
+                        <div className="error-message" style={{ color: '#f85149', padding: '20px', textAlign: 'center' }}>
+                            <p>⚠️ Image generation service (Pollinations.ai) is currently unavailable.</p>
+                            <p style={{ color: '#8b949e', fontSize: '0.85rem', marginTop: '5px' }}>The external API is experiencing an outage. You can copy the prompt and use it in other generators.</p>
+                            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '15px' }}>
+                                <button
+                                    className="vp-action-btn primary"
+                                    onClick={() => {
+                                        setImageError(false);
+                                        handleGenerate(false);
+                                    }}
+                                >
+                                    <FaRocket /> Retry
+                                </button>
+                                <button
+                                    className="vp-action-btn"
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(prompt);
+                                        alert('Prompt copied! Paste it in Midjourney, DALL-E, or any image generator.');
+                                    }}
+                                >
+                                    <FaCopy /> Copy Prompt
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {tags.length > 0 && !generatedImage && !imageLoading && (
+                <div className="vp-tags">
+                    {tags.map((tag, i) => (
+                        <span key={i} className="vp-tag">{tag}</span>
+                    ))}
+                </div>
+            )}
+
+            <div className="vp-actions">
+                <button
+                    className={`vp-action-btn ${copied ? 'success' : ''}`}
+                    onClick={handleCopy}
+                >
+                    <FaCopy /> {copied ? 'Copied!' : 'Copy Prompt'}
+                </button>
+                <button
+                    className={`vp-action-btn primary ${(isGenerating || imageLoading) ? 'disabled' : ''}`}
+                    onClick={() => handleGenerate(false)}
+                    disabled={isGenerating || imageLoading}
+                >
+                    {(isGenerating || imageLoading) ? <><div className="spinner" style={{ width: 12, height: 12, borderWidth: 2 }}></div> Processing...</> : <><FaRocket /> Generate Image</>}
+                </button>
+            </div>
+
+            {history.length > 0 && (
+                <div className="vp-history">
+                    {history.map((item, idx) => (
+                        <div
+                            key={item.timestamp}
+                            className={`vp-history-item ${generatedImage === item.url ? 'active' : ''}`}
+                            onClick={() => restoreFromHistory(item)}
+                            title={`Seed: ${item.seed} | Model: ${item.model}\nPrompt: ${item.prompt}`}
+                        >
+                            <img src={item.url} alt={`History ${idx}`} />
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };
