@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import './CommandPalette.css';
 
 import { usePomodoro } from '../../contexts/PomodoroContext';
@@ -22,7 +22,7 @@ const CommandPalette: React.FC = () => {
     const { toggleTimer, isRunning } = usePomodoro();
 
     // Define available commands
-    const commands: CommandOption[] = [
+    const commands: CommandOption[] = useMemo(() => [
         // Navigation
         { id: 'nav-dashboard', label: 'Go to Dashboard', category: 'Navigation', action: () => setCurrentTab('dashboard') },
         { id: 'nav-warmap', label: 'Go to War Map', category: 'Navigation', action: () => setCurrentTab('war-map') },
@@ -60,11 +60,12 @@ const CommandPalette: React.FC = () => {
             category: 'Tool',
             action: () => toggleRageMode()
         },
-    ];
+    ], [setCurrentTab, toggleRageMode, toggleTimer, isRunning]);
 
-    const filteredCommands = commands.filter(cmd =>
+    const filteredCommands = useMemo(() => commands.filter(cmd =>
         cmd.label.toLowerCase().includes(query.toLowerCase())
-    );
+    ),
+    [commands, query]);
 
     // Handle Keyboard Shortcuts
     useEffect(() => {
