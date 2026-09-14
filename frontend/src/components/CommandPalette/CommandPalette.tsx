@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import './CommandPalette.css';
 
 import { usePomodoro } from '../../contexts/PomodoroContext';
@@ -22,7 +22,9 @@ const CommandPalette: React.FC = () => {
     const { toggleTimer, isRunning } = usePomodoro();
 
     // Define available commands
-    const commands: CommandOption[] = [
+    // Optimization: Memoize the commands array to prevent re-creating 20+ objects on every render
+    // (e.g. when typing in the search bar or when the pomodoro timer ticks)
+    const commands: CommandOption[] = useMemo(() => [
         // Navigation
         { id: 'nav-dashboard', label: 'Go to Dashboard', category: 'Navigation', action: () => setCurrentTab('dashboard') },
         { id: 'nav-warmap', label: 'Go to War Map', category: 'Navigation', action: () => setCurrentTab('war-map') },
@@ -60,11 +62,14 @@ const CommandPalette: React.FC = () => {
             category: 'Tool',
             action: () => toggleRageMode()
         },
-    ];
+    ], [setCurrentTab, toggleRageMode, toggleTimer, isRunning]);
 
-    const filteredCommands = commands.filter(cmd =>
+    // Optimization: Memoize the filtered array to avoid O(N) recalculation on every unrelated render
+    // Only recalculates when the query string changes.
+    const filteredCommands = useMemo(() => commands.filter(cmd =>
         cmd.label.toLowerCase().includes(query.toLowerCase())
-    );
+    ),
+    [commands, query]);
 
     // Handle Keyboard Shortcuts
     useEffect(() => {

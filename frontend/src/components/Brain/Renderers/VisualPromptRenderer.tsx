@@ -247,7 +247,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         }
     };
 
-    const handleGenerate = async (isUpscale = false) => {
+    const handleGenerate = async (_isUpscale = false) => {
         if (isGenerating) return;
         setIsGenerating(true);
         setGeneratedImage(null);
@@ -258,7 +258,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         const { finalPrompt, finalSeed, finalNegative } = parsePrompt();
         const promptText = buildPromptText(finalPrompt, finalNegative);
 
-        // Progress logs 
+        // Progress logs
         const sequence = [
             { text: `Parsing semantics...`, delay: 800 },
             { text: `Sending to Gemini Image Generator (Seed: ${finalSeed})...`, delay: 1500 },
