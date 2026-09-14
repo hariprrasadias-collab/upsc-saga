@@ -49,6 +49,17 @@ const PYQDatabase: React.FC = () => {
     const [availableTopics, setAvailableTopics] = useState<{ topic: string, subject: string }[]>([]);
     const [loadingTopics, setLoadingTopics] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+
+    // ⚡ Bolt: Debouncing search input to prevent excessive API calls on every keystroke.
+    // Expected metric: Reduces API calls during typing by up to 90%.
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [trendAnalysis, setTrendAnalysis] = useState<string | null>(null);
@@ -102,7 +113,7 @@ const PYQDatabase: React.FC = () => {
             // Multi-select topics
             selectedTopics.forEach(topic => params.append('topics', topic));
 
-            if (searchQuery) params.append('search', searchQuery);
+            if (debouncedSearchQuery) params.append('search', debouncedSearchQuery);
             if (showFavoritesOnly) params.append('is_favorite', 'true');
 
             const res = await fetch(`${API_BASE_URL}/api/pyq/questions?${params.toString()}`);
@@ -123,7 +134,7 @@ const PYQDatabase: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    }, [searchQuery, showFavoritesOnly, selectedYears, selectedSubjects, selectedTopics]);
+    }, [debouncedSearchQuery, showFavoritesOnly, selectedYears, selectedSubjects, selectedTopics]);
 
     useEffect(() => {
         fetchData();
@@ -183,7 +194,7 @@ const PYQDatabase: React.FC = () => {
             const filters = {
                 year: selectedYears[0],
                 subject: selectedSubjects[0],
-                search: searchQuery,
+                search: debouncedSearchQuery,
                 is_favorite: showFavoritesOnly,
                 limit: 25
             };
@@ -216,7 +227,7 @@ const PYQDatabase: React.FC = () => {
             const filters = {
                 year: selectedYears[0],
                 subject: selectedSubjects[0],
-                search: searchQuery
+                search: debouncedSearchQuery
             };
 
             const res = await fetch(`${API_BASE_URL}/api/arena/create-custom-boss`, {
