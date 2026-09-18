@@ -18,6 +18,7 @@ const ChallengeCard: React.FC = () => {
     const [challenge, setChallenge] = useState<Challenge | null>(null);
     const [loading, setLoading] = useState(true);
     const [streak, setStreak] = useState(0);
+    const [isCompleting, setIsCompleting] = useState(false);
 
     useEffect(() => {
         fetchChallenge();
@@ -51,8 +52,9 @@ const ChallengeCard: React.FC = () => {
     };
 
     const handleComplete = async () => {
-        if (!challenge || challenge.completed) return;
+        if (!challenge || challenge.completed || isCompleting) return;
 
+        setIsCompleting(true);
         try {
             const res = await fetch(`${API_BASE_URL}/api/challenges/complete`, {
                 method: 'POST'
@@ -69,6 +71,8 @@ const ChallengeCard: React.FC = () => {
             }
         } catch (err) {
             console.error('Error completing challenge:', err);
+        } finally {
+            setIsCompleting(false);
         }
     };
 
@@ -93,9 +97,9 @@ const ChallengeCard: React.FC = () => {
     return (
         <div className={`challenge-card ${challenge.completed ? 'completed' : ''}`}>
             <div className="challenge-header">
-                <h3>🎯 Daily Challenge</h3>
+                <h3><span aria-hidden="true">🎯</span> Daily Challenge</h3>
                 <div className="streak-badge">
-                    🔥 {streak} day{streak !== 1 ? 's' : ''}
+                    <span aria-hidden="true">🔥</span> {streak} day{streak !== 1 ? 's' : ''}
                 </div>
             </div>
 
@@ -123,8 +127,10 @@ const ChallengeCard: React.FC = () => {
                         <button
                             className="complete-btn"
                             onClick={handleComplete}
+                            disabled={isCompleting}
+                            aria-busy={isCompleting}
                         >
-                            Mark Complete
+                            {isCompleting ? 'Completing...' : 'Mark Complete'}
                         </button>
                     )}
                 </div>
