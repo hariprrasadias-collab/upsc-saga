@@ -206,16 +206,37 @@ const SyllabusTracker: React.FC<SyllabusTrackerProps> = ({ onTaskCompleted }) =>
         return groups;
     }, [topics]);
 
+    const progressMap = useMemo(() => {
+        const map: Record<string, number> = {};
+        if (!analytics) return map;
+
+        const totalsMap: Record<string, number> = {};
+        analytics.totals.forEach(t => {
+            totalsMap[t.paper] = t.total;
+        });
+
+        const completedMap: Record<string, number> = {};
+        analytics.breakdown.forEach(b => {
+            if (b.status === 'Completed') {
+                completedMap[b.paper] = (completedMap[b.paper] || 0) + b.count;
+            }
+        });
+
+        Object.keys(totalsMap).forEach(paper => {
+            const total = totalsMap[paper] || 0;
+            if (total === 0) {
+                map[paper] = 0;
+            } else {
+                const completed = completedMap[paper] || 0;
+                map[paper] = Math.round((completed / total) * 100);
+            }
+        });
+
+        return map;
+    }, [analytics]);
+
     const getProgress = (paper: string) => {
-        if (!analytics) return 0;
-        const total = analytics.totals.find(t => t.paper === paper)?.total || 0;
-        if (total === 0) return 0;
-
-        const completed = analytics.breakdown
-            .filter(b => b.paper === paper && b.status === 'Completed')
-            .reduce((acc, curr) => acc + curr.count, 0);
-
-        return Math.round((completed / total) * 100);
+        return progressMap[paper] || 0;
     };
 
     const togglePaper = (paper: string) => {
