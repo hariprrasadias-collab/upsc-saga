@@ -247,7 +247,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         }
     };
 
-    const handleGenerate = async (isUpscale = false) => {
+    const handleGenerate = async (_isUpscale = false) => {
         if (isGenerating) return;
         setIsGenerating(true);
         setGeneratedImage(null);
@@ -604,18 +604,19 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
                         className={`mic-btn ${isListening ? 'listening' : ''}`}
                         onClick={handleVoiceInput}
                         title="Voice Input"
+                        aria-label="Voice Input"
                     >
                         <FaMicrophone />
                     </button>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '5px', gap: '10px' }}>
-                    <button className="magic-btn chaos" onClick={handleChaos} title="Randomize Settings & Style">
+                    <button className="magic-btn chaos" onClick={handleChaos} title="Randomize Settings & Style" aria-label="Randomize Settings and Style">
                         <FaBolt /> Chaos Mode
                     </button>
-                    <button className="magic-btn secondary" onClick={handleRemix} title="Remix with random seed">
+                    <button className="magic-btn secondary" onClick={handleRemix} title="Remix with random seed" aria-label="Remix with random seed">
                         <FaRandom /> Remix
                     </button>
-                    <button className="magic-btn" onClick={handleMagicEnhance} title="Add magic modifiers">
+                    <button className="magic-btn" onClick={handleMagicEnhance} title="Add magic modifiers" aria-label="Add magic modifiers">
                         <FaMagic /> Magic Enhance
                     </button>
                 </div>
@@ -677,10 +678,10 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
                             />
                             {!imageLoading && (
                                 <div className="vp-overlay">
-                                    <button className="download-img-btn" onClick={() => handleGenerate(true)}>
+                                    <button className="download-img-btn" onClick={() => handleGenerate(true)} aria-label="Upscale Image 2x">
                                         <FaExpand /> Upscale 2x
                                     </button>
-                                    <button className="download-img-btn" onClick={() => downloadImage(generatedImage)}>
+                                    <button className="download-img-btn" onClick={() => downloadImage(generatedImage)} aria-label="Save Generated Image">
                                         <FaDownload /> Save
                                     </button>
                                 </div>
@@ -702,7 +703,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
                                         }}
                                     />
                                     <span className="grid-label">{img.model}</span>
-                                    <button className="grid-save-btn" onClick={() => downloadImage(img.url)}><FaDownload /></button>
+                                    <button className="grid-save-btn" onClick={() => downloadImage(img.url)} aria-label={`Save Image from Model ${img.model}`}><FaDownload /></button>
                                 </div>
                             ))}
                         </div>
