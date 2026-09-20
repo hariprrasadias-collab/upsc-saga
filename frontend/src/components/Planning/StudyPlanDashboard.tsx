@@ -787,6 +787,20 @@ const StudyPlanDashboard: React.FC = () => {
         }));
     }, [plan, isDynamicMode, filterTopic]);
 
+
+    // Optimizations
+    const totalActiveTasks = React.useMemo(() => {
+        return activePlan.reduce((acc, day) => acc + day.slots.length, 0);
+    }, [activePlan]);
+
+    const totalActiveCompleted = React.useMemo(() => {
+        return activePlan.reduce((acc, day) => acc + day.slots.filter(s => s.status === 'completed').length, 0);
+    }, [activePlan]);
+
+    const activePlanProgress = React.useMemo(() => {
+        return totalActiveTasks > 0 ? (totalActiveCompleted / totalActiveTasks) * 100 : 0;
+    }, [totalActiveTasks, totalActiveCompleted]);
+
     const renderContent = (viewMode: ViewMode) => {
         if (viewMode === 'flashcards') {
             return <FlashcardsManager />;
@@ -1006,9 +1020,7 @@ const StudyPlanDashboard: React.FC = () => {
             // Strategic Insights Logic
             const daysElapsed = Math.floor((Date.now() - new Date(activePlan[0]?.date).getTime()) / (1000 * 60 * 60 * 24));
             const safeDaysElapsed = daysElapsed < 0 ? 0 : daysElapsed; // Fix negative days
-            const totalCompleted = activePlan.reduce((acc, day) => acc + day.slots.filter(s => s.status === 'completed').length, 0);
-            const totalTasks = activePlan.reduce((acc, day) => acc + day.slots.length, 0);
-            const completionRate = totalTasks > 0 ? (totalCompleted / totalTasks) * 100 : 0;
+            const completionRate = activePlanProgress;
 
             let strategicNote = "Maintain current velocity.";
             if (completionRate < 30 && safeDaysElapsed > 30) strategicNote = "CRITICAL: Velocity below threshold. Increase daily output.";
@@ -1280,9 +1292,6 @@ const StudyPlanDashboard: React.FC = () => {
 
             );
         } else if (viewMode === 'overall') {
-            const totalTasks = activePlan.reduce((acc, day) => acc + day.slots.length, 0);
-            const completedTasks = activePlan.reduce((acc, day) => acc + day.slots.filter(s => s.status === 'completed').length, 0);
-            const overallProgress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
             return (
                 <div className="overall-view">
@@ -1290,11 +1299,11 @@ const StudyPlanDashboard: React.FC = () => {
                     <div className="stats-grid">
                         <div className="stat-card">
                             <h3>Total Tasks</h3>
-                            <p>{totalTasks}</p>
+                            <p>{totalActiveTasks}</p>
                         </div>
                         <div className="stat-card">
                             <h3>Completion</h3>
-                            <p>{Math.round(overallProgress)}%</p>
+                            <p>{Math.round(activePlanProgress)}%</p>
                         </div>
                         <div className="stat-card">
                             <h3>Projected End</h3>
