@@ -39,6 +39,30 @@ const Armory: React.FC = () => {
     const [recommendation, setRecommendation] = useState<string | null>(null);
     const [isConsulting, setIsConsulting] = useState(false);
 
+    // Cache expensive array computations to avoid recalculating on every render
+    const { unlockedCount, totalXP, badgesByCategory } = React.useMemo(() => {
+        let count = 0;
+        let xp = 0;
+        const byCategory: Record<string, Badge[]> = {
+            milestone: [],
+            mastery: [],
+            practice: [],
+            special: []
+        };
+
+        badges.forEach(b => {
+            if (b.unlocked) {
+                count += 1;
+                xp += b.xp_reward;
+            }
+            if (byCategory[b.category]) {
+                byCategory[b.category].push(b);
+            }
+        });
+
+        return { unlockedCount: count, totalXP: xp, badgesByCategory: byCategory };
+    }, [badges]);
+
     useEffect(() => {
         fetchData();
     }, []);
@@ -162,12 +186,12 @@ const Armory: React.FC = () => {
                     {activeTab === 'badges' && (
                         <div className="badges-container">
                             <div className="badge-stats glass-panel">
-                                <span>Unlocked: {badges.filter(b => b.unlocked).length} / {badges.length}</span>
-                                <span>Total XP Earned: {badges.filter(b => b.unlocked).reduce((sum, b) => sum + b.xp_reward, 0)}</span>
+                                <span>Unlocked: {unlockedCount} / {badges.length}</span>
+                                <span>Total XP Earned: {totalXP}</span>
                             </div>
 
                             {['milestone', 'mastery', 'practice', 'special'].map(category => {
-                                const categoryBadges = badges.filter(b => b.category === category);
+                                const categoryBadges = badgesByCategory[category] || [];
                                 if (categoryBadges.length === 0) return null;
 
                                 return (
