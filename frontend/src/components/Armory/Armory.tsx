@@ -107,6 +107,11 @@ const Armory: React.FC = () => {
         }
     };
 
+
+    // Optimizations
+    const totalXPEarned = React.useMemo(() => {
+        return badges.filter(b => b.unlocked).reduce((sum, b) => sum + b.xp_reward, 0);
+    }, [badges]);
     const getRarityClass = (rarity: string) => {
         return `rarity-${rarity.toLowerCase()}`;
     };
@@ -163,7 +168,7 @@ const Armory: React.FC = () => {
                         <div className="badges-container">
                             <div className="badge-stats glass-panel">
                                 <span>Unlocked: {badges.filter(b => b.unlocked).length} / {badges.length}</span>
-                                <span>Total XP Earned: {badges.filter(b => b.unlocked).reduce((sum, b) => sum + b.xp_reward, 0)}</span>
+                                <span>Total XP Earned: {totalXPEarned}</span>
                             </div>
 
                             {['milestone', 'mastery', 'practice', 'special'].map(category => {
