@@ -361,7 +361,7 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
                             />
 
                             <button type="submit" className="fight-btn">RECORD</button>
-                            <button type="button" className="cancel-fight" onClick={() => setShowModal(false)}>Cancel</button>
+                            <button aria-label="Cancel manual battle log" type="button" className="cancel-fight" onClick={() => setShowModal(false)}>Cancel</button>
                         </form>
                     </div>
                 </div>
