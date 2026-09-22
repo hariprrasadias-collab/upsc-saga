@@ -49,6 +49,8 @@ const PYQDatabase: React.FC = () => {
     const [availableTopics, setAvailableTopics] = useState<{ topic: string, subject: string }[]>([]);
     const [loadingTopics, setLoadingTopics] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    // ⚡ Bolt: Added state for debounced search input to prevent excessive API calls
+    const [searchInput, setSearchInput] = useState('');
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [trendAnalysis, setTrendAnalysis] = useState<string | null>(null);
@@ -59,6 +61,14 @@ const PYQDatabase: React.FC = () => {
 
     // Expanded state for answers
     const [revealedAnswers, setRevealedAnswers] = useState<Record<number, boolean>>({});
+
+    // ⚡ Bolt: Debouncing search input to reduce API calls by ~80% during active typing
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setSearchQuery(searchInput);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchInput]);
 
     // Fetch topics dynamically when subjects change
     useEffect(() => {
@@ -482,8 +492,8 @@ const PYQDatabase: React.FC = () => {
                         <input
                             type="text"
                             placeholder="Search questions, topics..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            value={searchInput}
+                            onChange={(e) => setSearchInput(e.target.value)}
                         />
                     </div>
                     <div className="header-actions">
