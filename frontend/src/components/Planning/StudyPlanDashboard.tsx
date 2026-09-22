@@ -787,6 +787,24 @@ const StudyPlanDashboard: React.FC = () => {
         }));
     }, [plan, isDynamicMode, filterTopic]);
 
+    const subjectStats = React.useMemo(() => {
+        const stats: Record<string, { total: number, completed: number }> = {};
+        const subjects = ['History', 'Geography', 'Polity', 'Economy', 'Science', 'Environment'];
+        subjects.forEach(sub => stats[sub] = { total: 0, completed: 0 });
+
+        activePlan.forEach(day => {
+            day.slots.forEach(slot => {
+                if (stats[slot.subject]) {
+                    stats[slot.subject].total++;
+                    if (slot.status === 'completed') {
+                        stats[slot.subject].completed++;
+                    }
+                }
+            });
+        });
+        return stats;
+    }, [activePlan]);
+
     const renderContent = (viewMode: ViewMode) => {
         if (viewMode === 'flashcards') {
             return <FlashcardsManager />;
@@ -1304,8 +1322,8 @@ const StudyPlanDashboard: React.FC = () => {
                     <div className="subject-progress">
                         <h3>Subject Breakdown</h3>
                         {['History', 'Geography', 'Polity', 'Economy', 'Science', 'Environment'].map(subject => {
-                            const subjectTasks = activePlan.flatMap(d => d.slots).filter(s => s.subject === subject).length;
-                            const subjectCompleted = activePlan.flatMap(d => d.slots).filter(s => s.subject === subject && s.status === 'completed').length;
+                            const subjectTasks = subjectStats[subject]?.total || 0;
+                            const subjectCompleted = subjectStats[subject]?.completed || 0;
                             const subProgress = subjectTasks > 0 ? (subjectCompleted / subjectTasks) * 100 : 0;
 
                             return (
