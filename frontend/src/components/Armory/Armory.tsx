@@ -1,7 +1,7 @@
 import { API_BASE_URL } from '../../config';
 
 // Enhanced Armory with Badges, Shop, and Inventory tabs
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import './Armory.css';
 import { brainService } from '../../services/BrainService';
 import MarkdownRenderer from '../Shared/MarkdownRenderer';
@@ -39,7 +39,19 @@ const Armory: React.FC = () => {
     const [recommendation, setRecommendation] = useState<string | null>(null);
     const [isConsulting, setIsConsulting] = useState(false);
 
+
+    const unlockedBadgesCount = useMemo(() => badges.filter(b => b.unlocked).length, [badges]);
+    const totalXpEarned = useMemo(() => badges.filter(b => b.unlocked).reduce((sum, b) => sum + b.xp_reward, 0), [badges]);
+    const badgesByCategory = useMemo(() => {
+        return badges.reduce((acc, badge) => {
+            if (!acc[badge.category]) acc[badge.category] = [];
+            acc[badge.category].push(badge);
+            return acc;
+        }, {} as Record<string, Badge[]>);
+    }, [badges]);
+
     useEffect(() => {
+
         fetchData();
     }, []);
 
@@ -162,12 +174,12 @@ const Armory: React.FC = () => {
                     {activeTab === 'badges' && (
                         <div className="badges-container">
                             <div className="badge-stats glass-panel">
-                                <span>Unlocked: {badges.filter(b => b.unlocked).length} / {badges.length}</span>
-                                <span>Total XP Earned: {badges.filter(b => b.unlocked).reduce((sum, b) => sum + b.xp_reward, 0)}</span>
+                                <span>Unlocked: {unlockedBadgesCount} / {badges.length}</span>
+                                <span>Total XP Earned: {totalXpEarned}</span>
                             </div>
 
                             {['milestone', 'mastery', 'practice', 'special'].map(category => {
-                                const categoryBadges = badges.filter(b => b.category === category);
+                                const categoryBadges = badgesByCategory[category] || [];
                                 if (categoryBadges.length === 0) return null;
 
                                 return (
