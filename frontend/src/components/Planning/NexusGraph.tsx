@@ -221,6 +221,7 @@ const NexusGraph: React.FC<NexusGraphProps> = React.memo(({ engine, completedIte
                 }}>
                     <button
                         onClick={() => setSelectedNode(null)}
+                        aria-label="Close"
                         style={{
                             position: 'absolute',
                             top: '10px',
@@ -231,7 +232,9 @@ const NexusGraph: React.FC<NexusGraphProps> = React.memo(({ engine, completedIte
                             cursor: 'pointer',
                             fontSize: '1.2rem'
                         }}
-                    >×</button>
+                    >
+                        <span aria-hidden="true">×</span>
+                    </button>
 
                     <h2 style={{
                         marginTop: '20px',
