@@ -1,1 +1,0 @@
-🎨 Palette: Add ARIA labels to Admin Dashboard action buttons
