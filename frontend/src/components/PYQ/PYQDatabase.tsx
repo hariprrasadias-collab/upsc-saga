@@ -57,6 +57,13 @@ const PYQDatabase: React.FC = () => {
     const [similarQuestions, setSimilarQuestions] = useState<Question[]>([]);
     const [loadingSimilar, setLoadingSimilar] = useState(false);
 
+    // ⚡ Bolt: Debouncing search input to reduce API calls
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedSearchQuery(searchQuery), 300);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
     // Expanded state for answers
     const [revealedAnswers, setRevealedAnswers] = useState<Record<number, boolean>>({});
 
@@ -102,7 +109,7 @@ const PYQDatabase: React.FC = () => {
             // Multi-select topics
             selectedTopics.forEach(topic => params.append('topics', topic));
 
-            if (searchQuery) params.append('search', searchQuery);
+            if (debouncedSearchQuery) params.append('search', debouncedSearchQuery);
             if (showFavoritesOnly) params.append('is_favorite', 'true');
 
             const res = await fetch(`${API_BASE_URL}/api/pyq/questions?${params.toString()}`);
@@ -123,7 +130,7 @@ const PYQDatabase: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    }, [searchQuery, showFavoritesOnly, selectedYears, selectedSubjects, selectedTopics]);
+    }, [debouncedSearchQuery, showFavoritesOnly, selectedYears, selectedSubjects, selectedTopics]);
 
     useEffect(() => {
         fetchData();
