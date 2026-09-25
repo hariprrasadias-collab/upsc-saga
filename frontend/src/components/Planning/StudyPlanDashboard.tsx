@@ -787,6 +787,29 @@ const StudyPlanDashboard: React.FC = () => {
         }));
     }, [plan, isDynamicMode, filterTopic]);
 
+    // ⚡ Bolt: Cache expensive array computations for overall view to prevent O(N) operations during renders
+    const overallStats = React.useMemo(() => {
+        let total = 0;
+        let completed = 0;
+        const subjects: Record<string, { total: number; completed: number }> = {};
+
+        activePlan.forEach(day => {
+            total += day.slots.length;
+            day.slots.forEach(s => {
+                if (s.status === 'completed') completed++;
+                if (!subjects[s.subject]) {
+                    subjects[s.subject] = { total: 0, completed: 0 };
+                }
+                subjects[s.subject].total++;
+                if (s.status === 'completed') {
+                    subjects[s.subject].completed++;
+                }
+            });
+        });
+
+        return { total, completed, subjects };
+    }, [activePlan]);
+
     const renderContent = (viewMode: ViewMode) => {
         if (viewMode === 'flashcards') {
             return <FlashcardsManager />;
@@ -1280,8 +1303,8 @@ const StudyPlanDashboard: React.FC = () => {
 
             );
         } else if (viewMode === 'overall') {
-            const totalTasks = activePlan.reduce((acc, day) => acc + day.slots.length, 0);
-            const completedTasks = activePlan.reduce((acc, day) => acc + day.slots.filter(s => s.status === 'completed').length, 0);
+            const totalTasks = overallStats.total;
+            const completedTasks = overallStats.completed;
             const overallProgress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
             return (
@@ -1304,8 +1327,9 @@ const StudyPlanDashboard: React.FC = () => {
                     <div className="subject-progress">
                         <h3>Subject Breakdown</h3>
                         {['History', 'Geography', 'Polity', 'Economy', 'Science', 'Environment'].map(subject => {
-                            const subjectTasks = activePlan.flatMap(d => d.slots).filter(s => s.subject === subject).length;
-                            const subjectCompleted = activePlan.flatMap(d => d.slots).filter(s => s.subject === subject && s.status === 'completed').length;
+                            const stats = overallStats.subjects[subject] || { total: 0, completed: 0 };
+                            const subjectTasks = stats.total;
+                            const subjectCompleted = stats.completed;
                             const subProgress = subjectTasks > 0 ? (subjectCompleted / subjectTasks) * 100 : 0;
 
                             return (
