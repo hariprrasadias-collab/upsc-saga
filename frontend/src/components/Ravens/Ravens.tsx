@@ -41,8 +41,17 @@ const Ravens: React.FC = () => {
     const [selectedSubject, setSelectedSubject] = useState<string>('All Subjects');
     const [selectedSource, setSelectedSource] = useState<string>('All Sources');
     const [searchQuery, setSearchQuery] = useState<string>('');
+    // ⚡ Bolt: Debouncing search input to reduce API calls
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>('');
     const [showBookmarked, setShowBookmarked] = useState<boolean>(false);
     const [editingNotes, setEditingNotes] = useState<number | null>(null);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
     const [mappingArticleId, setMappingArticleId] = useState<number | null>(null);
     const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
 
@@ -62,7 +71,7 @@ const Ravens: React.FC = () => {
             if (selectedSubject && selectedSubject !== 'All Subjects') params.append('subject', selectedSubject);
             if (selectedSource && selectedSource !== 'All Sources') params.append('source', selectedSource);
             if (showBookmarked) params.append('bookmarked', 'true');
-            if (searchQuery) params.append('search', searchQuery);
+            if (debouncedSearchQuery) params.append('search', debouncedSearchQuery);
             params.append('_t', Date.now().toString()); // Bust cache aggressively
 
             const res = await fetch(`${API_BASE_URL}/api/ravens/saved?${params}`, {
@@ -90,7 +99,7 @@ const Ravens: React.FC = () => {
 
     useEffect(() => {
         fetchArticles();
-    }, [selectedPaper, selectedSubject, selectedSource, showBookmarked, searchQuery]);
+    }, [selectedPaper, selectedSubject, selectedSource, showBookmarked, debouncedSearchQuery]);
 
     // Removed auto-fetch on mount as it is now handled by the background task in App.tsx
 
