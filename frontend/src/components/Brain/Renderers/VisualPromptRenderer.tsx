@@ -247,7 +247,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
         }
     };
 
-    const handleGenerate = async (isUpscale = false) => {
+    const handleGenerate = async (_isUpscale = false) => {
         if (isGenerating) return;
         setIsGenerating(true);
         setGeneratedImage(null);
@@ -702,7 +702,7 @@ const VisualPromptRenderer: React.FC<VisualPromptRendererProps> = ({ content }) 
                                         }}
                                     />
                                     <span className="grid-label">{img.model}</span>
-                                    <button className="grid-save-btn" onClick={() => downloadImage(img.url)}><FaDownload /></button>
+                                    <button className="grid-save-btn" onClick={() => downloadImage(img.url)} aria-label="Save image" title="Save image"><FaDownload /></button>
                                 </div>
                             ))}
                         </div>
