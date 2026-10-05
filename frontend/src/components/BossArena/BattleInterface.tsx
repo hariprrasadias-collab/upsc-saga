@@ -196,7 +196,7 @@ const BattleInterface: React.FC<BattleInterfaceProps> = ({ boss, onBattleEnd }) 
     return (
         <div className="battle-interface">
             {/* End Battle Button in top-right */}
-            <button className="end-battle-btn" onClick={onBattleEnd} title="End battle and return">
+            <button className="end-battle-btn" onClick={onBattleEnd} title="End battle and return" aria-label="End battle and return">
                 ✕ End Battle
             </button>
 
