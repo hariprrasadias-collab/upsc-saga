@@ -1,7 +1,7 @@
 import { API_BASE_URL } from '../../config';
 
 // Enhanced Armory with Badges, Shop, and Inventory tabs
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import './Armory.css';
 import { brainService } from '../../services/BrainService';
 import MarkdownRenderer from '../Shared/MarkdownRenderer';
@@ -38,6 +38,23 @@ const Armory: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [recommendation, setRecommendation] = useState<string | null>(null);
     const [isConsulting, setIsConsulting] = useState(false);
+
+    // ⚡ Bolt: Memoize expensive array operations to prevent redundant calculations on every render
+    const badgeStats = useMemo(() => {
+        const unlockedBadges = badges.filter(b => b.unlocked);
+        const unlockedCount = unlockedBadges.length;
+        const totalXPEarned = unlockedBadges.reduce((sum, b) => sum + b.xp_reward, 0);
+
+        const badgesByCategory = badges.reduce((acc, badge) => {
+            if (!acc[badge.category]) {
+                acc[badge.category] = [];
+            }
+            acc[badge.category].push(badge);
+            return acc;
+        }, {} as Record<string, Badge[]>);
+
+        return { unlockedCount, totalXPEarned, badgesByCategory };
+    }, [badges]);
 
     useEffect(() => {
         fetchData();
@@ -162,12 +179,12 @@ const Armory: React.FC = () => {
                     {activeTab === 'badges' && (
                         <div className="badges-container">
                             <div className="badge-stats glass-panel">
-                                <span>Unlocked: {badges.filter(b => b.unlocked).length} / {badges.length}</span>
-                                <span>Total XP Earned: {badges.filter(b => b.unlocked).reduce((sum, b) => sum + b.xp_reward, 0)}</span>
+                                <span>Unlocked: {badgeStats.unlockedCount} / {badges.length}</span>
+                                <span>Total XP Earned: {badgeStats.totalXPEarned}</span>
                             </div>
 
                             {['milestone', 'mastery', 'practice', 'special'].map(category => {
-                                const categoryBadges = badges.filter(b => b.category === category);
+                                const categoryBadges = badgeStats.badgesByCategory[category] || [];
                                 if (categoryBadges.length === 0) return null;
 
                                 return (
