@@ -10,6 +10,7 @@ import DifficultyTrendChart from '../Analytics/DifficultyTrendChart';
 import Modal from '../Shared/Modal';
 import { generateCombatSheet } from '../../util/exportUtils';
 import { API_BASE_URL } from '../../config';
+import { useDebounce } from '../../hooks/useDebounce';
 
 interface Question {
     id: number;
@@ -49,6 +50,8 @@ const PYQDatabase: React.FC = () => {
     const [availableTopics, setAvailableTopics] = useState<{ topic: string, subject: string }[]>([]);
     const [loadingTopics, setLoadingTopics] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    // ⚡ Bolt: Debouncing search input to reduce API calls
+    const debouncedSearchQuery = useDebounce(searchQuery, 300);
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [trendAnalysis, setTrendAnalysis] = useState<string | null>(null);
@@ -102,7 +105,7 @@ const PYQDatabase: React.FC = () => {
             // Multi-select topics
             selectedTopics.forEach(topic => params.append('topics', topic));
 
-            if (searchQuery) params.append('search', searchQuery);
+            if (debouncedSearchQuery) params.append('search', debouncedSearchQuery);
             if (showFavoritesOnly) params.append('is_favorite', 'true');
 
             const res = await fetch(`${API_BASE_URL}/api/pyq/questions?${params.toString()}`);
@@ -123,7 +126,7 @@ const PYQDatabase: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    }, [searchQuery, showFavoritesOnly, selectedYears, selectedSubjects, selectedTopics]);
+    }, [debouncedSearchQuery, showFavoritesOnly, selectedYears, selectedSubjects, selectedTopics]);
 
     useEffect(() => {
         fetchData();
