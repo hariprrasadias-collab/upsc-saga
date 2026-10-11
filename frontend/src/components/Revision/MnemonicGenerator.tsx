@@ -339,8 +339,9 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
                                                 className="icon-btn copy-icon-btn"
                                                 onClick={(e) => handleCopy(item.mnemonic_text, e)}
                                                 title="Copy Mnemonic"
+                                                aria-label="Copy Mnemonic"
                                             >
-                                                📋
+                                                <span aria-hidden="true">📋</span>
                                             </button>
 
                                             {deletingId === item.id ? (
@@ -363,8 +364,9 @@ const MnemonicGenerator: React.FC<MnemonicGeneratorProps> = ({ onMnemonicGenerat
                                                     className="icon-btn delete-icon-btn"
                                                     onClick={(e) => confirmDelete(item.id, e)}
                                                     title="Delete Mnemonic"
+                                                    aria-label="Delete Mnemonic"
                                                 >
-                                                    🗑️
+                                                    <span aria-hidden="true">🗑️</span>
                                                 </button>
                                             )}
                                         </div>
