@@ -129,6 +129,11 @@
     background: rgba(212, 165, 116, 0.1);
 }
 
+.settings-btn:focus-visible {
+    outline: 2px solid var(--kratos-gold);
+    outline-offset: 2px;
+}
+
 .keyboard-hint {
     font-size: 0.9rem;
     opacity: 0.6;
@@ -181,6 +186,11 @@
 .preset-btn:hover:not(:disabled) {
     background: rgba(212, 165, 116, 0.05);
     border-color: rgba(212, 165, 116, 0.3);
+}
+
+.preset-btn:focus-visible {
+    outline: 2px solid var(--kratos-gold);
+    outline-offset: 2px;
 }
 
 .preset-btn.active {
