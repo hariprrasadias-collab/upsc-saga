@@ -39,6 +39,26 @@ const Armory: React.FC = () => {
     const [recommendation, setRecommendation] = useState<string | null>(null);
     const [isConsulting, setIsConsulting] = useState(false);
 
+    // ⚡ Bolt Optimization: Memoize expensive badge calculations that run on every render
+    const { unlockedCount, totalXpEarned, badgesByCategory } = React.useMemo(() => {
+        let unlocked = 0;
+        let xp = 0;
+        const byCategory: Record<string, Badge[]> = {};
+
+        for (const badge of badges) {
+            if (badge.unlocked) {
+                unlocked++;
+                xp += badge.xp_reward;
+            }
+            if (!byCategory[badge.category]) {
+                byCategory[badge.category] = [];
+            }
+            byCategory[badge.category].push(badge);
+        }
+
+        return { unlockedCount: unlocked, totalXpEarned: xp, badgesByCategory: byCategory };
+    }, [badges]);
+
     useEffect(() => {
         fetchData();
     }, []);
@@ -162,12 +182,12 @@ const Armory: React.FC = () => {
                     {activeTab === 'badges' && (
                         <div className="badges-container">
                             <div className="badge-stats glass-panel">
-                                <span>Unlocked: {badges.filter(b => b.unlocked).length} / {badges.length}</span>
-                                <span>Total XP Earned: {badges.filter(b => b.unlocked).reduce((sum, b) => sum + b.xp_reward, 0)}</span>
+                                <span>Unlocked: {unlockedCount} / {badges.length}</span>
+                                <span>Total XP Earned: {totalXpEarned}</span>
                             </div>
 
                             {['milestone', 'mastery', 'practice', 'special'].map(category => {
-                                const categoryBadges = badges.filter(b => b.category === category);
+                                const categoryBadges = badgesByCategory[category] || [];
                                 if (categoryBadges.length === 0) return null;
 
                                 return (
