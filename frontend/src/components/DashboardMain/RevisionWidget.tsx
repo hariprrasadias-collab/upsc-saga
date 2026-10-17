@@ -137,6 +137,7 @@ const RevisionWidget: React.FC = () => {
                                         const isBreak = task.activity.toLowerCase().includes('break');
                                         startTask(task.id, task.activity, 25, isBreak);
                                     }}
+                                    aria-label="Focus (Start Timer)"
                                     title="Focus (Start Timer)"
                                     disabled={completingId === task.id}
                                 >
@@ -145,6 +146,7 @@ const RevisionWidget: React.FC = () => {
                                 <button
                                     className="quick-revise-btn"
                                     onClick={() => handleComplete(task)}
+                                    aria-label="Mark Complete"
                                     title="Mark Complete"
                                     disabled={completingId === task.id}
                                 >
