@@ -604,11 +604,19 @@ const StudyPlanDashboard: React.FC = () => {
                     }
                 });
 
+                // Create a slot-to-date map for O(1) lookups
+                const slotDateMap = new Map<string, string>();
+                plan.forEach(d => {
+                    d.slots.forEach(s => {
+                        slotDateMap.set(s.id, d.date);
+                    });
+                });
+
                 // 1.5 Scope Limitation (Focus on "Now")
                 // Sort by original date (Overdue first)
                 schedulableSlots.sort((a, b) => {
-                    const dateA = plan.find(d => d.slots.includes(a))?.date || '9999-99-99';
-                    const dateB = plan.find(d => d.slots.includes(b))?.date || '9999-99-99';
+                    const dateA = slotDateMap.get(a.id) || '9999-99-99';
+                    const dateB = slotDateMap.get(b.id) || '9999-99-99';
                     return dateA.localeCompare(dateB);
                 });
 
@@ -626,7 +634,7 @@ const StudyPlanDashboard: React.FC = () => {
                     topic: s.activity,
                     durationMinutes: 60, // Default 1 hour
                     priority: 'medium',
-                    originalDate: plan.find(d => d.slots.includes(s))?.date
+                    originalDate: slotDateMap.get(s.id)
                 }));
 
                 // 3. Generate Available Slots (Next 60 Days)
@@ -669,7 +677,7 @@ const StudyPlanDashboard: React.FC = () => {
                 // Keep history (completed tasks)
                 const completedSlots = allSlots.filter(s => s.status === 'completed');
                 completedSlots.forEach(s => {
-                    const d = plan.find(day => day.slots.includes(s))?.date;
+                    const d = slotDateMap.get(s.id);
                     if (d) {
                         if (!newPlanMap[d]) newPlanMap[d] = [];
                         newPlanMap[d].push(s);
