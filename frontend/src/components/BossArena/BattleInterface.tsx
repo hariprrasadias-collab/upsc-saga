@@ -3,6 +3,7 @@ import { API_BASE_URL } from '../../config';
 import React, { useState, useEffect } from 'react';
 import './BossArena.css';
 import { audioManager } from '../../util/AudioManager';
+import LoadingRune from '../Shared/LoadingRune';
 
 interface Boss {
     id: string | number;
@@ -155,7 +156,7 @@ const BattleInterface: React.FC<BattleInterfaceProps> = ({ boss, onBattleEnd }) 
     };
 
     if (loading) {
-        return <div className="loading">Loading battle arena...</div>;
+        return <LoadingRune message="Loading battle arena..." />;
     }
 
     if (!questions || questions.length === 0) {
