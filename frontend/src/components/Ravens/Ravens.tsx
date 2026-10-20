@@ -506,7 +506,7 @@ const Ravens: React.FC = () => {
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2>{selectedArticle.title}</h2>
-                            <button className="close-modal-btn" onClick={() => setSelectedArticle(null)}>×</button>
+                            <button aria-label="Close" className="close-modal-btn" onClick={() => setSelectedArticle(null)}>×</button>
                         </div>
 
                         <div className="modal-body">
