@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './BossArena.css';
 import BattleInterface from './BattleInterface';
 import { brainService } from '../../services/BrainService';
+import LoadingRune from '../Shared/LoadingRune';
 
 interface Battle {
     id: string;
@@ -285,7 +286,7 @@ const BossArena: React.FC<BossArenaProps> = ({ onBattleComplete }) => {
             <div className="battle-list" style={{ marginTop: '50px' }}>
                 <h2>Battle History</h2>
                 {loading ? (
-                    <div style={{ textAlign: 'center' }}>Summoning opponents...</div>
+                    <LoadingRune message="Summoning opponents..." />
                 ) : battles.length === 0 ? (
                     <div style={{ textAlign: 'center', opacity: 0.7 }}>No battles recorded. The arena awaits.</div>
                 ) : (
