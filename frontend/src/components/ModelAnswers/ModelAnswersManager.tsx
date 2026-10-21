@@ -119,6 +119,7 @@ const ModelAnswersManager: React.FC = () => {
                 <div className="search-bar">
                     <input
                         type="text"
+                        aria-label="Search model answers"
                         placeholder="🔍 Search model answers (AI-powered)..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -129,7 +130,7 @@ const ModelAnswersManager: React.FC = () => {
                 </div>
 
                 <div className="filters">
-                    <select value={filterPaper} onChange={(e) => setFilterPaper(e.target.value)} className="filter-select">
+                    <select aria-label="Filter by paper" value={filterPaper} onChange={(e) => setFilterPaper(e.target.value)} className="filter-select">
                         <option value="">All Papers</option>
                         <option value="GS1">GS1</option>
                         <option value="GS2">GS2</option>
@@ -137,7 +138,7 @@ const ModelAnswersManager: React.FC = () => {
                         <option value="GS4">GS4</option>
                     </select>
 
-                    <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="filter-select">
+                    <select aria-label="Filter by type" value={filterType} onChange={(e) => setFilterType(e.target.value)} className="filter-select">
                         <option value="">All Types</option>
                         <option value="examine">Examine</option>
                         <option value="analyze">Analyze</option>
@@ -146,7 +147,7 @@ const ModelAnswersManager: React.FC = () => {
                         <option value="comment">Comment</option>
                     </select>
 
-                    <select value={filterMinScore} onChange={(e) => setFilterMinScore(e.target.value)} className="filter-select">
+                    <select aria-label="Filter by minimum score" value={filterMinScore} onChange={(e) => setFilterMinScore(e.target.value)} className="filter-select">
                         <option value="">Any Score</option>
                         <option value="15">15+ marks</option>
                         <option value="18">18+ marks</option>
