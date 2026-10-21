@@ -8,14 +8,20 @@ interface MarkdownRendererProps {
     className?: string;
 }
 
-const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className = '' }) => {
+// ⚡ Bolt: Hoisted static array reference outside component to prevent
+// ReactMarkdown from re-rendering due to a new array instance on every render.
+const remarkPlugins = [remarkGfm];
+
+// ⚡ Bolt: Wrapped in React.memo to prevent unnecessary re-renders of the
+// expensive ReactMarkdown component when parent state changes.
+const MarkdownRenderer: React.FC<MarkdownRendererProps> = React.memo(({ content, className = '' }) => {
     return (
         <div className={`markdown-content ${className}`}>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            <ReactMarkdown remarkPlugins={remarkPlugins}>
                 {content}
             </ReactMarkdown>
         </div>
     );
-};
+});
 
 export default MarkdownRenderer;
