@@ -79,7 +79,7 @@ const TabletModal: React.FC<TabletModalProps> = ({ node, onClose, onUpdateStatus
             <div className="tablet-stone" onClick={(e) => e.stopPropagation()}>
                 <div className="tablet-header">
                     <h2>{node.title}</h2>
-                    <button className="close-btn" onClick={onClose}>✕</button>
+                    <button className="close-btn" onClick={onClose} aria-label="Close">✕</button>
                 </div>
 
                 <div className="tablet-body">
@@ -96,7 +96,7 @@ const TabletModal: React.FC<TabletModalProps> = ({ node, onClose, onUpdateStatus
                         }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
                                 <strong style={{ color: '#f1c40f' }}>🧠 Strategos Insight:</strong>
-                                <button onClick={() => setExplanation(null)} style={{ background: 'none', border: 'none', color: '#ccc', cursor: 'pointer' }}>✕</button>
+                                <button onClick={() => setExplanation(null)} style={{ background: 'none', border: 'none', color: '#ccc', cursor: 'pointer' }} aria-label="Close">✕</button>
                             </div>
                             <MarkdownRenderer content={explanation} />
                         </div>
