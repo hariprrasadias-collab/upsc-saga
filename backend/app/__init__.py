@@ -13,7 +13,7 @@ cache = Cache()
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = os.environ.get('SECRET_KEY', 'dev_secret_key_upsc_saga_change_in_prod')  # Load from env in production
+    app.secret_key = os.environ.get('SECRET_KEY', os.urandom(24))  # Load from env in production
     CORS(app, resources={r"/*": {"origins": "*"}})
     Compress(app) # Enable Gzip compression
 
