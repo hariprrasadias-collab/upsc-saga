@@ -123,6 +123,7 @@ const ChallengeCard: React.FC = () => {
                         <button
                             className="complete-btn"
                             onClick={handleComplete}
+                            aria-label="Mark Challenge as Complete"
                         >
                             Mark Complete
                         </button>
