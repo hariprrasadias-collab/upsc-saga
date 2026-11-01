@@ -823,9 +823,9 @@ const MapRenderer: React.FC<MapRendererProps> = ({ content, metadata }) => {
 
             <div className="map-viewport">
                 <div className="map-float-controls">
-                    <button onClick={() => handleZoom(1.5)}>+</button>
-                    <button onClick={() => handleZoom(0.75)}>-</button>
-                    <button onClick={handleReset}>↺</button>
+                    <button onClick={() => handleZoom(1.5)} aria-label="Zoom In">+</button>
+                    <button onClick={() => handleZoom(0.75)} aria-label="Zoom Out">-</button>
+                    <button onClick={handleReset} aria-label="Reset Map">↺</button>
                 </div>
 
                 <div className="map-info-overlay">
