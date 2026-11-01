@@ -148,7 +148,7 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
                                 <h3>MIMIR'S WISDOM</h3>
                                 <div className="header-actions">
                                     <button className="clear-chat-btn" onClick={handleClear}>Clear</button>
-                                    <button className="close-btn" onClick={() => toggleMimir(false)}>✕</button>
+                                    <button className="close-btn" aria-label="Close" onClick={() => toggleMimir(false)}>✕</button>
                                 </div>
                             </div>
 
@@ -178,7 +178,7 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
                                     value={input}
                                     onChange={e => setInput(e.target.value)}
                                 />
-                                <button type="submit" className="mimir-send-btn" disabled={loading}>
+                                <button type="submit" className="mimir-send-btn" aria-label="Send message" disabled={loading}>
                                     ➤
                                 </button>
                             </form>
@@ -249,6 +249,7 @@ const MimirChat: React.FC<MimirChatProps> = ({ mode = 'fullpage' }) => {
                 />
                 <button
                     className="mimir-send-btn"
+                    aria-label="Send message"
                     onClick={() => handleSend()}
                     disabled={loading || !input.trim()}
                 >
