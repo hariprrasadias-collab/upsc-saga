@@ -1,5 +1,5 @@
 // /frontend/src/components/AshParticles.tsx
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, memo } from 'react';
 
 interface Particle {
   id: number;
@@ -13,7 +13,9 @@ interface AshParticlesProps {
   isRageMode: boolean;
 }
 
-const AshParticles: React.FC<AshParticlesProps> = ({ isRageMode }) => {
+// ⚡ Bolt: Wrapped in React.memo to prevent unnecessary re-renders of all 50 particle nodes
+// when the parent App component updates, as it only depends on a primitive boolean prop.
+const AshParticles = memo(({ isRageMode }: AshParticlesProps) => {
   const [particles, setParticles] = useState<Particle[]>([]);
 
   useEffect(() => {
@@ -66,6 +68,6 @@ const AshParticles: React.FC<AshParticlesProps> = ({ isRageMode }) => {
       ))}
     </div>
   );
-};
+});
 
 export default AshParticles;
