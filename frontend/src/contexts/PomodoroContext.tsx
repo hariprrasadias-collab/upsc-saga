@@ -77,13 +77,19 @@ const DEFAULT_PRESETS: PomodoroPreset[] = [
 
 export const PomodoroProvider: React.FC<PomodoroProviderProps> = ({ children, onSessionComplete }) => {
     const [presets] = useState<PomodoroPreset[]>(DEFAULT_PRESETS);
-    const [settings, setSettings] = useState<PomodoroSettings>({
-        autoStartBreaks: false,
-        autoStartPomodoros: false,
-        autoStartDelay: 5,
-        notifications: true,
-        sound: true,
-        activePresetId: 'classic'
+    const [settings, setSettings] = useState<PomodoroSettings>(() => {
+        const savedSettings = localStorage.getItem('pomodoro_settings');
+        if (savedSettings) {
+            return JSON.parse(savedSettings);
+        }
+        return {
+            autoStartBreaks: false,
+            autoStartPomodoros: false,
+            autoStartDelay: 5,
+            notifications: true,
+            sound: true,
+            activePresetId: 'classic'
+        };
     });
 
     const activePreset = presets.find(p => p.id === settings.activePresetId) || presets[0];
@@ -91,29 +97,25 @@ export const PomodoroProvider: React.FC<PomodoroProviderProps> = ({ children, on
     const [mode, setMode] = useState<TimerMode>('work');
     const [timeLeft, setTimeLeft] = useState(activePreset.workDuration * 60);
     const [isRunning, setIsRunning] = useState(false);
-    const [sessionsCompleted, setSessionsCompleted] = useState(0);
-    const [totalStudyTime, setTotalStudyTime] = useState(0);
+    const [sessionsCompleted, setSessionsCompleted] = useState(() => {
+        const sessions = JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]');
+        return sessions.filter((s: PomodoroSession) => s.mode === 'work').length;
+    });
+    const [totalStudyTime, setTotalStudyTime] = useState(() => {
+        const sessions = JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]');
+        return sessions.reduce((acc: number, s: PomodoroSession) =>
+            s.mode === 'work' ? acc + s.duration : acc, 0);
+    });
+
     const [currentTask, setCurrentTask] = useState<{ id: string; title: string } | null>(null);
 
-    const DURATIONS = {
+    const DURATIONS = React.useMemo(() => ({
         work: activePreset.workDuration * 60,
         shortBreak: activePreset.shortBreakDuration * 60,
         longBreak: activePreset.longBreakDuration * 60
-    };
+    }), [activePreset.workDuration, activePreset.shortBreakDuration, activePreset.longBreakDuration]);
 
-    // Load initial data
-    useEffect(() => {
-        const sessions = JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]');
-        const total = sessions.reduce((acc: number, s: PomodoroSession) =>
-            s.mode === 'work' ? acc + s.duration : acc, 0);
-        setTotalStudyTime(total);
-        setSessionsCompleted(sessions.filter((s: PomodoroSession) => s.mode === 'work').length);
 
-        const savedSettings = localStorage.getItem('pomodoro_settings');
-        if (savedSettings) {
-            setSettings(JSON.parse(savedSettings));
-        }
-    }, []);
 
     const handleTimerComplete = useCallback(async () => {
         setIsRunning(false);
@@ -133,8 +135,8 @@ export const PomodoroProvider: React.FC<PomodoroProviderProps> = ({ children, on
         localStorage.setItem('pomodoro_sessions', JSON.stringify(sessions));
 
         if (mode === 'work') {
-            setSessionsCompleted(prev => prev + 1);
-            setTotalStudyTime(prev => prev + duration);
+            setSessionsCompleted((prev: number) => prev + 1);
+            setTotalStudyTime((prev: number) => prev + duration);
             window.dispatchEvent(new Event('pomodoroUpdate'));
             if (onSessionComplete) onSessionComplete();
         }
@@ -161,9 +163,10 @@ export const PomodoroProvider: React.FC<PomodoroProviderProps> = ({ children, on
     useEffect(() => {
         let interval: number | null = null;
         if (isRunning && timeLeft > 0) {
-            interval = window.setInterval(() => setTimeLeft(prev => prev - 1), 1000);
-        } else if (timeLeft === 0) {
-            handleTimerComplete();
+            interval = window.setInterval(() => setTimeLeft((prev: number) => prev - 1), 1000);
+        } else if (isRunning && timeLeft === 0) {
+            // Push completion to the next tick to avoid synchronous state update in effect
+            setTimeout(() => handleTimerComplete(), 0);
         }
         return () => { if (interval) clearInterval(interval); };
     }, [isRunning, timeLeft, handleTimerComplete]);
