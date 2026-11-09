@@ -372,22 +372,25 @@ def create_mock_from_filters():
         
         test_id = cursor.lastrowid
         
-        # 3. Insert Questions into test_questions
-        for idx, q in enumerate(questions):
-            conn.execute('''
-                INSERT INTO test_questions (
-                    test_id, question_number, question_text, 
-                    option_a, option_b, option_c, option_d, 
-                    correct_answer, explanation, subject, topic, difficulty, year
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
+        # 3. Insert Questions into test_questions (Optimized for performance)
+        # Use executemany to batch inserts and avoid the N+1 query problem
+        test_questions_data = [
+            (
                 test_id, 
                 idx + 1, 
                 q['question_text'],
                 q['option_a'], q['option_b'], q['option_c'], q['option_d'],
                 q['correct_option'], q['explanation'],
                 q['subject'], q['topic'], q['difficulty'], q['year']
-            ))
+            ) for idx, q in enumerate(questions)
+        ]
+        conn.executemany('''
+            INSERT INTO test_questions (
+                test_id, question_number, question_text,
+                option_a, option_b, option_c, option_d,
+                correct_answer, explanation, subject, topic, difficulty, year
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', test_questions_data)
             
         conn.commit()
         
@@ -463,12 +466,13 @@ def start_quiz():
         
         session_id = cursor.lastrowid
         
-        # Initialize answer records
-        for q in questions:
-            conn.execute('''
-                INSERT INTO pyq_quiz_answers (session_id, question_id)
-                VALUES (?, ?)
-            ''', (session_id, q['id']))
+        # Initialize answer records (Optimized for performance)
+        # Use executemany to batch inserts and avoid the N+1 query problem
+        answer_records_data = [(session_id, q['id']) for q in questions]
+        conn.executemany('''
+            INSERT INTO pyq_quiz_answers (session_id, question_id)
+            VALUES (?, ?)
+        ''', answer_records_data)
         
         conn.commit()
         
