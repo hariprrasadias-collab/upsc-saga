@@ -291,7 +291,7 @@ ${result.predicted_question}
                                 {saving ? '💾 Saving...' : '💾 Save to Lore'}
                             </button>
                         )}
-                        <button onClick={onClose} className="close-btn">×</button>
+                        <button aria-label="Close" onClick={onClose} className="close-btn">×</button>
                     </div>
                 </div>
 
