@@ -107,7 +107,7 @@ const SocraticArena: React.FC<SocraticArenaProps> = ({ engine, topic, onClose })
                     >
                         {isAnalyzing ? 'Judging...' : '⚖️ Analyze Debate'}
                     </button>
-                    <button className="close-btn" onClick={onClose}>×</button>
+                    <button aria-label="Close" className="close-btn" onClick={onClose}>×</button>
                 </div>
 
                 <div className="arena-chat-area">
