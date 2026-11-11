@@ -140,16 +140,72 @@ def analyze_all_performance() -> List[Dict]:
     conn = get_db()
     cursor = conn.cursor()
     
-    # Get all unique topics
-    cursor.execute('SELECT DISTINCT topic FROM performance_records WHERE topic IS NOT NULL')
-    topics = [row['topic'] for row in cursor.fetchall()]
-    conn.close()
+    cursor.execute('''
+        SELECT
+            topic,
+            COUNT(*) as total,
+            SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) as correct,
+            AVG(time_taken) as avg_time,
+            subject,
+            SUM(CASE WHEN is_correct = 0 AND attempted_at >= datetime('now', '-7 days') THEN 1 ELSE 0 END) as recent_failures
+        FROM performance_records
+        WHERE topic IS NOT NULL
+        GROUP BY topic
+    ''')
     
     results = []
-    for topic in topics:
-        result = analyze_topic_performance(topic)
-        if result:
-            results.append(result)
+    update_data = []
+
+    for result in cursor.fetchall():
+        total = result['total']
+        if total == 0:
+            continue
+
+        topic = result['topic']
+        correct = result['correct'] or 0
+        accuracy = correct / total if total > 0 else 0
+        avg_time = result['avg_time'] or 0
+        subject = result['subject']
+        recent_failures = result['recent_failures'] or 0
+
+        topic_data = {
+            'total_attempts': total,
+            'correct_attempts': correct,
+            'accuracy_rate': accuracy,
+            'avg_time_taken': avg_time,
+            'recent_failures': recent_failures
+        }
+
+        weakness_score = calculate_weakness_score(topic_data)
+
+        res = {
+            'topic': topic,
+            'subject': subject,
+            'weakness_score': weakness_score,
+            **topic_data
+        }
+        results.append(res)
+
+        update_data.append((
+            topic, subject, total, correct, accuracy, avg_time, weakness_score, datetime.now()
+        ))
+
+    cursor.executemany('''
+        INSERT INTO weak_areas
+        (topic, subject, total_attempts, correct_attempts, accuracy_rate, avg_time_taken, weakness_score, last_updated)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(topic) DO UPDATE SET
+            subject = excluded.subject,
+            total_attempts = excluded.total_attempts,
+            correct_attempts = excluded.correct_attempts,
+            accuracy_rate = excluded.accuracy_rate,
+            avg_time_taken = excluded.avg_time_taken,
+            weakness_score = excluded.weakness_score,
+            last_updated = excluded.last_updated
+    ''', update_data)
+
+    conn.commit()
+    conn.close()
     
     return sorted(results, key=lambda x: x['weakness_score'], reverse=True)
 
