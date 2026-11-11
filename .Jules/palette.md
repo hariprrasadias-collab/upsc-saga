@@ -1,3 +1,3 @@
-## 2024-05-18 - Improve accessibility of close buttons
-**Learning:** Found multiple close buttons (e.g., `×`, `✕`) in modal components lacking `aria-label`. Without this, screen readers just read "button", making it difficult for visually impaired users to know how to dismiss a modal.
-**Action:** Always include `aria-label="Close"` on modal close buttons that only use an icon or text symbol like "×".
+## 2024-05-23 - Toast Notification Accessibility
+**Learning:** Notifications are often invisible to screen readers without proper roles. Using `role="alert"` for errors (assertive) and `role="status"` for info (polite) ensures users are notified at the right urgency level.
+**Action:** Always categorize toast notifications by urgency and apply corresponding `aria-live` regions, while ensuring close buttons have clear labels.
